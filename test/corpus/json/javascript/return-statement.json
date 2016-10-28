@@ -1,0 +1,1273 @@
+[{
+    "testCaseDescription": "javascript-return-statement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                7,
+                                                8
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        9
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        10
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                10,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        10,
+                        10
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "63150293528b8f92a51906e7d0eec0b779aa453c"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "2437708ca782a3c85c9bc9eade32279884316e5a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bc22c045e489c56bc7ef5487577f5bf0012b9f98"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                15,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        8,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                7,
+                                                8
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        9
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        10
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                25,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        28
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                10,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        10,
+                        10
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "63150293528b8f92a51906e7d0eec0b779aa453c",
+            "22dde951c6fc9abc659cc72626caa6cda8205669"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "bc22c045e489c56bc7ef5487577f5bf0012b9f98",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f46088f02cf386e36436d682fa26dbb0a53ac477"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "insert",
+                                            "range": [
+                                                7,
+                                                8
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        9
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        10
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                15,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        18
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                17,
+                                                18
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        10,
+                                        19
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                10,
+                                20
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        10,
+                        20
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                25,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        28
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                27,
+                                                28
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        20,
+                                        29
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                20,
+                                30
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        20,
+                        30
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                30,
+                                30
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        30,
+                        30
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "22dde951c6fc9abc659cc72626caa6cda8205669",
+            "522349cd232eb2ae5f60d649e4b05d504c4a40b3"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "f46088f02cf386e36436d682fa26dbb0a53ac477",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2046adf5c5d883bf76e174082308a42ec85cca1f"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "delete",
+                                            "range": [
+                                                7,
+                                                8
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        9
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        10
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                17,
+                                                18
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        10,
+                                        19
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                10,
+                                20
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        10,
+                        20
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                15,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                27,
+                                                28
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        20,
+                                        29
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                20,
+                                30
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        20,
+                        30
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                25,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        28
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                30,
+                                30
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        30,
+                        30
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "522349cd232eb2ae5f60d649e4b05d504c4a40b3",
+            "22dde951c6fc9abc659cc72626caa6cda8205669"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "2046adf5c5d883bf76e174082308a42ec85cca1f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d6cccfdb9e9a9c5d5a8286cdf714c521a56cc05d"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                15,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        8,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                25,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        28
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                7,
+                                                8
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        9
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        10
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "patch": "insert",
+                                    "range": [
+                                        10,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                10,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        10,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "22dde951c6fc9abc659cc72626caa6cda8205669",
+            "4d44d6ac3898047ed4db33654eb4ab548be2690d"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "d6cccfdb9e9a9c5d5a8286cdf714c521a56cc05d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e6ea681b2576301fa6aa229e60b3aa4fd51fe162"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                7,
+                                                8
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        9
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                10
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        10
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "range": [
+                                        10,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                10,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        10,
+                        18
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "4d44d6ac3898047ed4db33654eb4ab548be2690d",
+            "f312410bd34c623a6ade23a58fdbe161663518a2"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "e6ea681b2576301fa6aa229e60b3aa4fd51fe162",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "99198a95df2c432ed1bbd113743027ecdfec69bb"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "return-statement.js",
+            "return-statement.js"
+        ],
+        "oids": [
+            "f312410bd34c623a6ade23a58fdbe161663518a2",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "99198a95df2c432ed1bbd113743027ecdfec69bb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "580b6e349db9b7481da742852edf5c2193d23599"
+}]

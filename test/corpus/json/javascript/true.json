@@ -1,0 +1,1339 @@
+[{
+    "testCaseDescription": "javascript-true-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                0,
+                                                4
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        5
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        6
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                6,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        6,
+                        6
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "4203d4b4a3d7a7ffe249a29e7bd2e88140be59dd"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "8bc285fc79525551c53539be71b14d58adf949d7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "14422aa33025569d627eb4a80f684607162b4086"
+}
+,{
+    "testCaseDescription": "javascript-true-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                7,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                13,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        13,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        13,
+                        19
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                0,
+                                                4
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        5
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        6
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                19,
+                                                23
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        24
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        25
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                6,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        6,
+                        6
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                25,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        25,
+                        25
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "4203d4b4a3d7a7ffe249a29e7bd2e88140be59dd",
+            "65b6323fa6e3d1d5f619b0742e311333eb88bc52"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "14422aa33025569d627eb4a80f684607162b4086",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8afaae7c0644c99dd1f5b8f0b579602303f1b09a"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                7,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                0,
+                                                4
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        5
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        6
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                13,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        13,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        19
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                6,
+                                                10
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        6,
+                                        11
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                6,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        6,
+                        12
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                19,
+                                                23
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        24
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        25
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                12,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        12,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                12,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        18
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                25,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        25,
+                        25
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "65b6323fa6e3d1d5f619b0742e311333eb88bc52",
+            "91e1cfc76c4e40fc45d40374371ccc035bb02ff0"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "8afaae7c0644c99dd1f5b8f0b579602303f1b09a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ff27c7034dc49e4912487738e5e8d9aa64748aee"
+}
+,{
+    "testCaseDescription": "javascript-true-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                0,
+                                                4
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        5
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        6
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                7,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                6,
+                                                10
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        6,
+                                        11
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                6,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        6,
+                        12
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                13,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        13,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        19
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                12,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        12,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                12,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        18
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                19,
+                                                23
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        24
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        25
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                25,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        25,
+                        25
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "91e1cfc76c4e40fc45d40374371ccc035bb02ff0",
+            "65b6323fa6e3d1d5f619b0742e311333eb88bc52"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "ff27c7034dc49e4912487738e5e8d9aa64748aee",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e79475faabea07a3a94e434a1011cdc56cd5fb2e"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                7,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                13,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        13,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                13,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        13,
+                        19
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                19,
+                                                23
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        24
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        25
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                0,
+                                                4
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        5
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        6
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                13,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        6,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                6,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        6,
+                        19
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                25,
+                                25
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        25,
+                        25
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                19,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        19
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "65b6323fa6e3d1d5f619b0742e311333eb88bc52",
+            "48a44d128292e7de57cb187c6f86aa892945c737"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "e79475faabea07a3a94e434a1011cdc56cd5fb2e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7f3dc3dccfcbdba9b6b9eec73151ee52e8475c72"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                0,
+                                                4
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        5
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                6
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        6
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                13,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        6,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                6,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        6,
+                        19
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                7,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                19,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        19
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                13,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        13,
+                        13
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "48a44d128292e7de57cb187c6f86aa892945c737",
+            "c1c6922d1dfea3f2e582e55796f6fdf98eaeaad3"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "7f3dc3dccfcbdba9b6b9eec73151ee52e8475c72",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2eff143b27546869d85ef162d81fc2b2792d4ac8"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Return",
+                                    "children": [
+                                        {
+                                            "category": "Boolean",
+                                            "range": [
+                                                7,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        13
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                13,
+                                13
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        13,
+                        13
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "true.js",
+            "true.js"
+        ],
+        "oids": [
+            "c1c6922d1dfea3f2e582e55796f6fdf98eaeaad3",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "2eff143b27546869d85ef162d81fc2b2792d4ac8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f80cb5b180055c2b6ee29311f679d361292bdcae"
+}]

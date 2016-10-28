@@ -1,0 +1,3835 @@
+[{
+    "testCaseDescription": "javascript-switch-statement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                49,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        49,
+                        49
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "5481c49f3a51ee55e0aaa093cd2b16ef18852968"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "7c6da72a3a3e446ba8fa022a17ce185fb6aa1cf8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8ca4d62a5ac7ffb40e417242d9f8f1c429b7b40f"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                106,
+                                                107
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        116,
+                                                        117
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                119,
+                                                                120
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        119,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                111,
+                                                121
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        127,
+                                                        128
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                130,
+                                                                131
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        130,
+                                                        132
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                122,
+                                                132
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        138,
+                                                        139
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                141,
+                                                                142
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        141,
+                                                        143
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                133,
+                                                143
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        98,
+                                        145
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                98,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        147
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                49,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        49
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                147,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        147,
+                        147
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "5481c49f3a51ee55e0aaa093cd2b16ef18852968",
+            "ffd4a32a83d8f1c5daffc82baaa1b3ae3e17615d"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "8ca4d62a5ac7ffb40e417242d9f8f1c429b7b40f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "20be39913d4f922788a358912369f985a28b95ba"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                106,
+                                                107
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        116,
+                                                        117
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                119,
+                                                                120
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        119,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                111,
+                                                121
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        127,
+                                                        128
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                130,
+                                                                131
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        130,
+                                                        132
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                122,
+                                                132
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        138,
+                                                        139
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                141,
+                                                                142
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        141,
+                                                        143
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                133,
+                                                143
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        98,
+                                        145
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                98,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        147
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                106,
+                                                107
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        116,
+                                                        117
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                119,
+                                                                120
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        119,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                111,
+                                                121
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        127,
+                                                        128
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                130,
+                                                                131
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        130,
+                                                        132
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                122,
+                                                132
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        138,
+                                                        139
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                141,
+                                                                142
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        141,
+                                                        143
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                133,
+                                                143
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        98,
+                                        145
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                98,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        147
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                147,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        147,
+                        147
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                147,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        147,
+                        147
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "ffd4a32a83d8f1c5daffc82baaa1b3ae3e17615d",
+            "302fb8bcb5f912b2536298b86f6ef79598e61161"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "20be39913d4f922788a358912369f985a28b95ba",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c061a99a47f314e3ddda9635d9890335a3564385"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                106,
+                                                107
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        116,
+                                                        117
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                119,
+                                                                120
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        119,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                111,
+                                                121
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        127,
+                                                        128
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                130,
+                                                                131
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        130,
+                                                        132
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                122,
+                                                132
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        138,
+                                                        139
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                141,
+                                                                142
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        141,
+                                                        143
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                133,
+                                                143
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        98,
+                                        145
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                98,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        147
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                106,
+                                                107
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        116,
+                                                        117
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                119,
+                                                                120
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        119,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                111,
+                                                121
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        127,
+                                                        128
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                130,
+                                                                131
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        130,
+                                                        132
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                122,
+                                                132
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        138,
+                                                        139
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                141,
+                                                                142
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        141,
+                                                        143
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                133,
+                                                143
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        98,
+                                        145
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                98,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        147
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                147,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        147,
+                        147
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                147,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        147,
+                        147
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "302fb8bcb5f912b2536298b86f6ef79598e61161",
+            "ffd4a32a83d8f1c5daffc82baaa1b3ae3e17615d"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "c061a99a47f314e3ddda9635d9890335a3564385",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "88f57c607b6e7afcce35fad1d5bbd3da607ccfb8"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                106,
+                                                107
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        116,
+                                                        117
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                119,
+                                                                120
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        119,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                111,
+                                                121
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        127,
+                                                        128
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                130,
+                                                                131
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        130,
+                                                        132
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                122,
+                                                132
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        138,
+                                                        139
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                141,
+                                                                142
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        141,
+                                                        143
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                133,
+                                                143
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        98,
+                                        145
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                98,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        147
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                147,
+                                147
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        147,
+                        147
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                98,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        98
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "ffd4a32a83d8f1c5daffc82baaa1b3ae3e17615d",
+            "9b60579183ebc74a2e009db29c44eb08ca46f1c1"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "88f57c607b6e7afcce35fad1d5bbd3da607ccfb8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8bc8b0ae48b7fc72623c31629e265aebc0d63f01"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                57,
+                                                58
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        67,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                70,
+                                                                71
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        70,
+                                                        72
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                62,
+                                                72
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        78,
+                                                        79
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                81,
+                                                                82
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        81,
+                                                        83
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                73,
+                                                83
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        89,
+                                                        90
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                92,
+                                                                93
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        92,
+                                                        94
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                84,
+                                                94
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        49,
+                                        96
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                49,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        98
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                98,
+                                98
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        98,
+                        98
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                49,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        49,
+                        49
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "9b60579183ebc74a2e009db29c44eb08ca46f1c1",
+            "374091f23100462dd830bbcee156f70da22c58be"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "8bc8b0ae48b7fc72623c31629e265aebc0d63f01",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bec62fc71316eba832db712574d70a4865ce4ae9"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "Switch",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                9
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                21,
+                                                                22
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        21,
+                                                        23
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                13,
+                                                23
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        29,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                32,
+                                                                33
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        32,
+                                                        34
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                34
+                                            ]
+                                        },
+                                        {
+                                            "category": "Case",
+                                            "children": [
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        40,
+                                                        41
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                43,
+                                                                44
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        43,
+                                                        45
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                35,
+                                                45
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        47
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        49
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                49,
+                                49
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        49,
+                        49
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "switch-statement.js",
+            "switch-statement.js"
+        ],
+        "oids": [
+            "374091f23100462dd830bbcee156f70da22c58be",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "bec62fc71316eba832db712574d70a4865ce4ae9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ebc4edb8d3a1f91c875d7b37f638ca51bb6a6c74"
+}]

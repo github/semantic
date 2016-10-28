@@ -1,0 +1,1743 @@
+[{
+    "testCaseDescription": "javascript-boolean-operator-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "7280a98cdd0353c1bb7e03770613ae709bcb2cf5"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "1e1f4151882638257880d698f3467844bb54abc0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fe084c3a14ac26618f105d5b38477381084c0c0e"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        16,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        21,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "7280a98cdd0353c1bb7e03770613ae709bcb2cf5",
+            "fe3f30646b4683f9a0bf94b7464d5dd0a9b216d5"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "fe084c3a14ac26618f105d5b38477381084c0c0e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "80f023745d01311c0f4667c483a364b27aa99965"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        16,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        21,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        16,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        21,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "fe3f30646b4683f9a0bf94b7464d5dd0a9b216d5",
+            "273c0ee8f4c5684f46f62e9bc61a9b937fd42da6"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "80f023745d01311c0f4667c483a364b27aa99965",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bda164050d2d9643995fd5c35df192078c1f484c"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        16,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        21,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        16,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        21,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "273c0ee8f4c5684f46f62e9bc61a9b937fd42da6",
+            "fe3f30646b4683f9a0bf94b7464d5dd0a9b216d5"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "bda164050d2d9643995fd5c35df192078c1f484c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "458973ffa6f467306410afa15746916294ef66c5"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        16,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        21,
+                                                        22
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                16,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        16
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "fe3f30646b4683f9a0bf94b7464d5dd0a9b216d5",
+            "7f4873c126dd7633b40d7d706254e05fdf4fa703"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "458973ffa6f467306410afa15746916294ef66c5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "729d2573326aadd2164e32c29742188d9b943e02"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        14
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                16,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        16
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "7f4873c126dd7633b40d7d706254e05fdf4fa703",
+            "c6921d12a6f183c99b1d8107b16f6f428d133af8"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "729d2573326aadd2164e32c29742188d9b943e02",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "88bcc8b8ff952bda745dcbdc5f728e21f53ecd92"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "BooleanOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "boolean-operator.js",
+            "boolean-operator.js"
+        ],
+        "oids": [
+            "c6921d12a6f183c99b1d8107b16f6f428d133af8",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "88bcc8b8ff952bda745dcbdc5f728e21f53ecd92",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4b89df9ce69aad2abec30f1413bb68e206938268"
+}]

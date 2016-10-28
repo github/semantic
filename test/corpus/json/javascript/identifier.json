@@ -1,0 +1,1335 @@
+[{
+    "testCaseDescription": "javascript-identifier-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "1cf4ad05ef284fd6411546e5ddfb1938c9151cb1"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "d265fce83b1aeba5332419db063cb52a0d5ca107",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e85202b7050f8d1a66cea804258229fd7cc89ef7"
+}
+,{
+    "testCaseDescription": "javascript-identifier-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "1cf4ad05ef284fd6411546e5ddfb1938c9151cb1",
+            "888855ad41100937e0019b87e0a81fb922b040b7"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "e85202b7050f8d1a66cea804258229fd7cc89ef7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2e0c8ed9944b2a90333c11021c56afde52221d05"
+}
+,{
+    "testCaseDescription": "javascript-identifier-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "888855ad41100937e0019b87e0a81fb922b040b7",
+            "60e041c1f5c995232ea415ada7796a8fc59cf50a"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "2e0c8ed9944b2a90333c11021c56afde52221d05",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a7c9d811d2d3e9985403b26a1987ec873947feb0"
+}
+,{
+    "testCaseDescription": "javascript-identifier-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "60e041c1f5c995232ea415ada7796a8fc59cf50a",
+            "888855ad41100937e0019b87e0a81fb922b040b7"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "a7c9d811d2d3e9985403b26a1987ec873947feb0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cb2d2fe3c69e77cdb5911942c08d2722fcb83b6e"
+}
+,{
+    "testCaseDescription": "javascript-identifier-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                15
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        8,
+                                        16
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                16,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        16
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "888855ad41100937e0019b87e0a81fb922b040b7",
+            "fbc7b28e28030a5474633484e56cfb97fbba5102"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "cb2d2fe3c69e77cdb5911942c08d2722fcb83b6e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "44fd8acff47047040b0fa3b4907fe2fb202bf163"
+}
+,{
+    "testCaseDescription": "javascript-identifier-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                8,
+                                                15
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        16
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                16,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        16
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "fbc7b28e28030a5474633484e56cfb97fbba5102",
+            "7276d95d4675eba989693d641b606c19e5c1e6ba"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "44fd8acff47047040b0fa3b4907fe2fb202bf163",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bef0daaeab0d961827d2f5ffa952877a911e46da"
+}
+,{
+    "testCaseDescription": "javascript-identifier-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Identifier",
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "identifier.js",
+            "identifier.js"
+        ],
+        "oids": [
+            "7276d95d4675eba989693d641b606c19e5c1e6ba",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "bef0daaeab0d961827d2f5ffa952877a911e46da",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b886416a556c435cf696febb406dd7df884837a6"
+}]

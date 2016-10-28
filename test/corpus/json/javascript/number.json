@@ -1,0 +1,1335 @@
+[{
+    "testCaseDescription": "javascript-number-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                4,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        4,
+                        4
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "398050c62c882fa5ebc8d8aaa2e730e70790beeb"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "c8bef75f3e0a691715055eff75da3c634d6aa14a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2e7ac6daf0ec008033a7492d300766edea732002"
+}
+,{
+    "testCaseDescription": "javascript-number-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        12
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                4,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        4
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                12,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        12
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "398050c62c882fa5ebc8d8aaa2e730e70790beeb",
+            "16da476c5eb0a463dd2f919bda7acf6bb56f15c8"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "2e7ac6daf0ec008033a7492d300766edea732002",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "288a51159f9818c5565f9383c93b82d6b2e3a802"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        12
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        12
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                12,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        12
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                12,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        12
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "16da476c5eb0a463dd2f919bda7acf6bb56f15c8",
+            "252b3e84820efae4196cb2066888a12a7cc5087d"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "288a51159f9818c5565f9383c93b82d6b2e3a802",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e17e5811f07e2ea51dd888202eb11ef668902561"
+}
+,{
+    "testCaseDescription": "javascript-number-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        12
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        12
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                12,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        12
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                12,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        12
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "252b3e84820efae4196cb2066888a12a7cc5087d",
+            "16da476c5eb0a463dd2f919bda7acf6bb56f15c8"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "e17e5811f07e2ea51dd888202eb11ef668902561",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "40db079e5f7c153bf9d7bb3d091e354c8d7dfad6"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                8,
+                                                11
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        12
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        12
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                12,
+                                12
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        12,
+                        12
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "16da476c5eb0a463dd2f919bda7acf6bb56f15c8",
+            "bb77dfbdf4e6fac33e22e4caf91084f3a6fccb07"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "40db079e5f7c153bf9d7bb3d091e354c8d7dfad6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dc8440242de24024a128d26f01965ba0e2dcf252"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                4,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        4,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                4,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        8
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                4,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        4,
+                        4
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "bb77dfbdf4e6fac33e22e4caf91084f3a6fccb07",
+            "257e563266b43281b3fbb3632ab67ab0d3f314e9"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "dc8440242de24024a128d26f01965ba0e2dcf252",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3a63765793b5396149c5f684de695f0ce9fcc7fb"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "NumberLiteral",
+                                            "range": [
+                                                0,
+                                                3
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        4
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        4
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                4,
+                                4
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        4,
+                        4
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "number.js",
+            "number.js"
+        ],
+        "oids": [
+            "257e563266b43281b3fbb3632ab67ab0d3f314e9",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "3a63765793b5396149c5f684de695f0ce9fcc7fb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f7354764b086ff87e440ddb14634c7569f8c7598"
+}]

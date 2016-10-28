@@ -1,0 +1,2705 @@
+[{
+    "testCaseDescription": "javascript-ternary-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        20,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        27
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "a62be2e889a9d188bcbbc97037fb6ff1148a09a1"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "cd1a292a8a542706b8284b664e64103adb41d060",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bf66e91c93a7d404ea3ffdb76245b946fc15e358"
+}
+,{
+    "testCaseDescription": "javascript-ternary-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        6,
+                                                                        10
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        11,
+                                                                        20
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                6,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        27
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        28,
+                                                                        32
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                35,
+                                                                                39
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                40,
+                                                                                45
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        35,
+                                                                        45
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        46,
+                                                                        50
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                35,
+                                                                50
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        6,
+                                                        50
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                50
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        51
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        52
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        52,
+                                                        61
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        64,
+                                                        69
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        72,
+                                                        77
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                52,
+                                                77
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        52,
+                                        78
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                52,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        52,
+                        79
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        20,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        27
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        79,
+                                                        88
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        91,
+                                                        96
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        99,
+                                                        104
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                79,
+                                                104
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        79,
+                                        105
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                79,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        79,
+                        106
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                106,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        106,
+                        106
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "a62be2e889a9d188bcbbc97037fb6ff1148a09a1",
+            "17b4f8ecf738666b8023952ede4139c60b5afcfa"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "bf66e91c93a7d404ea3ffdb76245b946fc15e358",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "250d7bc758f12a6468236c29030cd97b88769367"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        6,
+                                                                        10
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        11,
+                                                                        20
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                6,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        27
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        28,
+                                                                        32
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                35,
+                                                                                39
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                40,
+                                                                                45
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        35,
+                                                                        45
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        46,
+                                                                        50
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                35,
+                                                                50
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        6,
+                                                        50
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "delete",
+                                            "range": [
+                                                0,
+                                                50
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        51
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        52
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        20,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "insert",
+                                            "range": [
+                                                0,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        27
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        52,
+                                                        61
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        64,
+                                                        69
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        72,
+                                                        77
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                52,
+                                                77
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        52,
+                                        78
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                52,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        52,
+                        79
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        36
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        39,
+                                                        44
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        47,
+                                                        52
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                27,
+                                                52
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        27,
+                                        53
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                27,
+                                54
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        54
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        79,
+                                                        88
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        91,
+                                                        96
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        99,
+                                                        104
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                79,
+                                                104
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        79,
+                                        105
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                79,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        79,
+                        106
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        54,
+                                                        63
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        66,
+                                                        71
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        74,
+                                                        79
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                54,
+                                                79
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        54,
+                                        80
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                54,
+                                81
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        54,
+                        81
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                106,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        106,
+                        106
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                81,
+                                81
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        81,
+                        81
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "17b4f8ecf738666b8023952ede4139c60b5afcfa",
+            "aedee5477bd45bd4a388b3981bb19ab75da634d4"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "250d7bc758f12a6468236c29030cd97b88769367",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "209b0ab449e75df174b0a2ad66a8d1b8c6eff1e6"
+}
+,{
+    "testCaseDescription": "javascript-ternary-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        20,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "delete",
+                                            "range": [
+                                                0,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        27
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        6,
+                                                                        10
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        11,
+                                                                        20
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                6,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        27
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        28,
+                                                                        32
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                35,
+                                                                                39
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                40,
+                                                                                45
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        35,
+                                                                        45
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        46,
+                                                                        50
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                35,
+                                                                50
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        6,
+                                                        50
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "insert",
+                                            "range": [
+                                                0,
+                                                50
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        51
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        52
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        36
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        39,
+                                                        44
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        47,
+                                                        52
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                27,
+                                                52
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        27,
+                                        53
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                27,
+                                54
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        54
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        52,
+                                                        61
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        64,
+                                                        69
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        72,
+                                                        77
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                52,
+                                                77
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        52,
+                                        78
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                52,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        52,
+                        79
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        54,
+                                                        63
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        66,
+                                                        71
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        74,
+                                                        79
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                54,
+                                                79
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        54,
+                                        80
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                54,
+                                81
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        54,
+                        81
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        79,
+                                                        88
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        91,
+                                                        96
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        99,
+                                                        104
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                79,
+                                                104
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        79,
+                                        105
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                79,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        79,
+                        106
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                81,
+                                81
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        81,
+                        81
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                106,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        106,
+                        106
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "aedee5477bd45bd4a388b3981bb19ab75da634d4",
+            "17b4f8ecf738666b8023952ede4139c60b5afcfa"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "209b0ab449e75df174b0a2ad66a8d1b8c6eff1e6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "deae8cb7a43212c7418fc7562a01718436e793fa"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        6,
+                                                                        10
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        11,
+                                                                        20
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                6,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        27
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        28,
+                                                                        32
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                35,
+                                                                                39
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                40,
+                                                                                45
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        35,
+                                                                        45
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        46,
+                                                                        50
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                35,
+                                                                50
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        6,
+                                                        50
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                50
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        51
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        52
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        52,
+                                                        61
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        64,
+                                                        69
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        72,
+                                                        77
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                52,
+                                                77
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        52,
+                                        78
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                52,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        52,
+                        79
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        79,
+                                                        88
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        91,
+                                                        96
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        99,
+                                                        104
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                79,
+                                                104
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        79,
+                                        105
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                79,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        79,
+                        106
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        20,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        27
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                27,
+                                                                28
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                29,
+                                                                30
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        27,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        33,
+                                                                        37
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        38,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                33,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        50,
+                                                                        54
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        55,
+                                                                        59
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                50,
+                                                                59
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                62,
+                                                                                66
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                67,
+                                                                                72
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        62,
+                                                                        72
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        73,
+                                                                        77
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                62,
+                                                                77
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        33,
+                                                        77
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                27,
+                                                77
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        27,
+                                        78
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                27,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        27,
+                        79
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                106,
+                                106
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        106,
+                        106
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                79,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        79,
+                        79
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "17b4f8ecf738666b8023952ede4139c60b5afcfa",
+            "6fa999d8d1f8afa575b0cfb559c39002218840ea"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "deae8cb7a43212c7418fc7562a01718436e793fa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9251f6d875eabd4c8fe07d38402f38f3c42a2ca7"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Ternary",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        20,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        27
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                27,
+                                                                28
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                29,
+                                                                30
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        27,
+                                                        30
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        33,
+                                                                        37
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        38,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                33,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        50,
+                                                                        54
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        55,
+                                                                        59
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                50,
+                                                                59
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                62,
+                                                                                66
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                67,
+                                                                                72
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        62,
+                                                                        72
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        73,
+                                                                        77
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                62,
+                                                                77
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        33,
+                                                        77
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                27,
+                                                77
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        27,
+                                        78
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                27,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        79
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        6,
+                                                                        10
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        11,
+                                                                        20
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                6,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        27
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        28,
+                                                                        32
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                35,
+                                                                                39
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                40,
+                                                                                45
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        35,
+                                                                        45
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        46,
+                                                                        50
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                35,
+                                                                50
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        6,
+                                                        50
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                50
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        51
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        52
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                79,
+                                79
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        79,
+                        79
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                52,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        52,
+                        52
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "6fa999d8d1f8afa575b0cfb559c39002218840ea",
+            "b63b46d53f087cea5bd6318789341d780610cae6"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "9251f6d875eabd4c8fe07d38402f38f3c42a2ca7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "471f93a513f134fe50a621e99b0ce7528ea9e2b6"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Ternary",
+                                                    "children": [
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        6,
+                                                                        10
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        11,
+                                                                        20
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                6,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        27
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        28,
+                                                                        32
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MemberAccess",
+                                                            "children": [
+                                                                {
+                                                                    "category": "MemberAccess",
+                                                                    "children": [
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                35,
+                                                                                39
+                                                                            ]
+                                                                        },
+                                                                        {
+                                                                            "category": "Identifier",
+                                                                            "range": [
+                                                                                40,
+                                                                                45
+                                                                            ]
+                                                                        }
+                                                                    ],
+                                                                    "range": [
+                                                                        35,
+                                                                        45
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        46,
+                                                                        50
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                35,
+                                                                50
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        6,
+                                                        50
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                50
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        51
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        52
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                52,
+                                52
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        52,
+                        52
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "ternary.js",
+            "ternary.js"
+        ],
+        "oids": [
+            "b63b46d53f087cea5bd6318789341d780610cae6",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "471f93a513f134fe50a621e99b0ce7528ea9e2b6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ea6b1055b52f5913b7791347fbc095cf371bb474"
+}]

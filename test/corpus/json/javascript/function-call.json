@@ -1,0 +1,1933 @@
+[{
+    "testCaseDescription": "javascript-function-call-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "8bd95e09f34bbef6affe8b7121155d5c7688c301"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "2a2eb7a1400587ce53da2cdb258a39cdea449215",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "785e8c6c14abc4137feb1cfd382d4c16aadae757"
+}
+,{
+    "testCaseDescription": "javascript-function-call-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        56,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        69,
+                                                        73
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        75,
+                                                        81
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                56,
+                                                82
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        56,
+                                        83
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                56,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        84
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                84,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        84,
+                        84
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "8bd95e09f34bbef6affe8b7121155d5c7688c301",
+            "6bb4cf3fca51fafbe16ef8ee82d6e3eaacfa2254"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "785e8c6c14abc4137feb1cfd382d4c16aadae757",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "02c0a1665e5bf35a55e0146bb1936ec6bbeff232"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        56,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        69,
+                                                        73
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        75,
+                                                        81
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                56,
+                                                82
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        56,
+                                        83
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                56,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        84
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        56,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        69,
+                                                        73
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        75,
+                                                        81
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                56,
+                                                82
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        56,
+                                        83
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                56,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        84
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                84,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        84,
+                        84
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                84,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        84,
+                        84
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "6bb4cf3fca51fafbe16ef8ee82d6e3eaacfa2254",
+            "b38c232b930bd8334195f4ed499c451e9ea8ecdd"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "02c0a1665e5bf35a55e0146bb1936ec6bbeff232",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dd7b02a1e5daed2b7ade069afceac1347288b3d1"
+}
+,{
+    "testCaseDescription": "javascript-function-call-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        56,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        69,
+                                                        73
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        75,
+                                                        81
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                56,
+                                                82
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        56,
+                                        83
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                56,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        84
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        56,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        69,
+                                                        73
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        75,
+                                                        81
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                56,
+                                                82
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        56,
+                                        83
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                56,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        84
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                84,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        84,
+                        84
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                84,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        84,
+                        84
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "b38c232b930bd8334195f4ed499c451e9ea8ecdd",
+            "6bb4cf3fca51fafbe16ef8ee82d6e3eaacfa2254"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "dd7b02a1e5daed2b7ade069afceac1347288b3d1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0a8b424235e631bb050da8d3089eac89a602c2ca"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        56,
+                                                        68
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        69,
+                                                        73
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        75,
+                                                        81
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                56,
+                                                82
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        56,
+                                        83
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                56,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        84
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                84,
+                                84
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        84,
+                        84
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                56,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        56
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "6bb4cf3fca51fafbe16ef8ee82d6e3eaacfa2254",
+            "3e15c6acfec15cab45af7743b58b6a5d86644de8"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "0a8b424235e631bb050da8d3089eac89a602c2ca",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d0f55cce3d85d9379843fb639a6c8c478b01a4b4"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        28,
+                                                        40
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        41,
+                                                        45
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        47,
+                                                        53
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                28,
+                                                54
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        28,
+                                        55
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                28,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        56
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                56,
+                                56
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        56,
+                        56
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "3e15c6acfec15cab45af7743b58b6a5d86644de8",
+            "1add64b55168fd038e39887fb7239b77b6e7e2ea"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "d0f55cce3d85d9379843fb639a6c8c478b01a4b4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4075e065b45d84c7d636cea56d4d0cbf85de4c9a"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "FunctionCall",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        13,
+                                                        17
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        19,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                26
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        27
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        28
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                28,
+                                28
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        28,
+                        28
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "function-call.js",
+            "function-call.js"
+        ],
+        "oids": [
+            "1add64b55168fd038e39887fb7239b77b6e7e2ea",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "4075e065b45d84c7d636cea56d4d0cbf85de4c9a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d85d769df33c8f317fae6438df7e6978cf8347ee"
+}]

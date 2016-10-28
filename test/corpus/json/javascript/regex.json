@@ -1,0 +1,1335 @@
+[{
+    "testCaseDescription": "javascript-regex-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "b3818424d73f7c45817c6f976bc00d9363144460"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "f3948bfd790712219f80f3dfc732af139ff54ba0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ee91079510c5ec780e66039d5d305be41920bbfe"
+}
+,{
+    "testCaseDescription": "javascript-regex-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        16
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                24,
+                                                30
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        24,
+                                        31
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        32
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                32,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        32,
+                        32
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "b3818424d73f7c45817c6f976bc00d9363144460",
+            "6ed4b424fdb93d355b5c6cd4180e600bfc0595de"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "ee91079510c5ec780e66039d5d305be41920bbfe",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6e57a1b244bfbcd7354a084f6dbb8ef3c046e3ca"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        16
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                24,
+                                                30
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        24,
+                                        31
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        32
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                32,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        32,
+                        32
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "6ed4b424fdb93d355b5c6cd4180e600bfc0595de",
+            "abb87ec8eee8efba03b51ea7c72bd7006ced248d"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "6e57a1b244bfbcd7354a084f6dbb8ef3c046e3ca",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "36047db3a1333eb66535b8818385cd4ea61f4e6c"
+}
+,{
+    "testCaseDescription": "javascript-regex-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        16
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                8,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                24,
+                                                30
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        24,
+                                        31
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        32
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                32,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        32,
+                        32
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "abb87ec8eee8efba03b51ea7c72bd7006ced248d",
+            "6ed4b424fdb93d355b5c6cd4180e600bfc0595de"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "36047db3a1333eb66535b8818385cd4ea61f4e6c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "069aa5dd18fba35a63da49345cffd4a5aa80b5f4"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        16
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                16,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        16,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                16,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        16,
+                        24
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                24,
+                                                30
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        24,
+                                        31
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        32
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                8,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        8,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        24
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                32,
+                                32
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        32,
+                        32
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "6ed4b424fdb93d355b5c6cd4180e600bfc0595de",
+            "9f57e9197e0a21f3959215851536cad98f8a0b93"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "069aa5dd18fba35a63da49345cffd4a5aa80b5f4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "546d9903a925476b19790c6c872055b8fc431b0d"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                8,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        24
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        16
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                16,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        16,
+                        16
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "9f57e9197e0a21f3959215851536cad98f8a0b93",
+            "9b04194db65414727487376cf72803fa747f0939"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "546d9903a925476b19790c6c872055b8fc431b0d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "48b8ef8b305945a6112eb1ebedf56511ace34454"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Regex",
+                                            "range": [
+                                                0,
+                                                14
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        15
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        16
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                16,
+                                16
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        16,
+                        16
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "regex.js",
+            "regex.js"
+        ],
+        "oids": [
+            "9b04194db65414727487376cf72803fa747f0939",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "48b8ef8b305945a6112eb1ebedf56511ace34454",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bd44b4ec0af35c7c869b02a2b02f0f696eccc561"
+}]

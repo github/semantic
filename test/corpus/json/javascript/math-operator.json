@@ -1,0 +1,3003 @@
+[{
+    "testCaseDescription": "javascript-math-operator-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                19,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        19,
+                        19
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "034466776814285bcd24cd966033449721d6e89b"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "9782c0cdd9c1e6fc74148f3150dcdcc706f4337d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "198309d5e258da2bc63a94470874a408f4a8eb08"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                38,
+                                                                39
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        42,
+                                                                        43
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        46,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                42,
+                                                                47
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        38,
+                                                        47
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                50,
+                                                                51
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                54,
+                                                                55
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        50,
+                                                        55
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                38,
+                                                55
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        38,
+                                        56
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                38,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        57
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                19,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        19
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                57,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        57,
+                        57
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "034466776814285bcd24cd966033449721d6e89b",
+            "79f5f20cab835046e300f62aca0465b308b06b3f"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "198309d5e258da2bc63a94470874a408f4a8eb08",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0a77cc9cfa5d0c5dd2d1c9908f0109469918c98d"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "patch": "replace",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "patch": "replace",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                38,
+                                                                39
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        42,
+                                                                        43
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        46,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                42,
+                                                                47
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        38,
+                                                        47
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                50,
+                                                                51
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                54,
+                                                                55
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        50,
+                                                        55
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                38,
+                                                55
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        38,
+                                        56
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                38,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        57
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                38,
+                                                                39
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        42,
+                                                                        43
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        46,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                42,
+                                                                47
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        38,
+                                                        47
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                50,
+                                                                51
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                54,
+                                                                55
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        50,
+                                                        55
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                38,
+                                                55
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        38,
+                                        56
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                38,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        57
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                57,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        57,
+                        57
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                57,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        57,
+                        57
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "79f5f20cab835046e300f62aca0465b308b06b3f",
+            "284561c5dce063cf9773c88b0d61138440ef0ecb"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "0a77cc9cfa5d0c5dd2d1c9908f0109469918c98d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1114249afc591c3eb052e238ff775d1d53ad250f"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "patch": "replace",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "patch": "replace",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "patch": "replace",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                38,
+                                                                39
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        42,
+                                                                        43
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        46,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                42,
+                                                                47
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        38,
+                                                        47
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                50,
+                                                                51
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                54,
+                                                                55
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        50,
+                                                        55
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                38,
+                                                55
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        38,
+                                        56
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                38,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        57
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                38,
+                                                                39
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        42,
+                                                                        43
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        46,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                42,
+                                                                47
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        38,
+                                                        47
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                50,
+                                                                51
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                54,
+                                                                55
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        50,
+                                                        55
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                38,
+                                                55
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        38,
+                                        56
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                38,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        57
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                57,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        57,
+                        57
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                57,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        57,
+                        57
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "284561c5dce063cf9773c88b0d61138440ef0ecb",
+            "79f5f20cab835046e300f62aca0465b308b06b3f"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "1114249afc591c3eb052e238ff775d1d53ad250f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8226f4d9d2cd0f23d098eb170ed78e47f4bc5bfd"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                38,
+                                                                39
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        42,
+                                                                        43
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        46,
+                                                                        47
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                42,
+                                                                47
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        38,
+                                                        47
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                50,
+                                                                51
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                54,
+                                                                55
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        50,
+                                                        55
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                38,
+                                                55
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        38,
+                                        56
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                38,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        57
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                57,
+                                57
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        57,
+                        57
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                38,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        38
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "79f5f20cab835046e300f62aca0465b308b06b3f",
+            "d1055f77d631ead2c4f4959b2f21f6dab64462c3"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "8226f4d9d2cd0f23d098eb170ed78e47f4bc5bfd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8ead4b853c92dd16f245566d0bc0b47bf807b684"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                19,
+                                                                20
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        23,
+                                                                        24
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        27,
+                                                                        28
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                23,
+                                                                28
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        19,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                31,
+                                                                32
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                35,
+                                                                36
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        31,
+                                                        36
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                19,
+                                                36
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        19,
+                                        37
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                19,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        38
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                38,
+                                38
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        38,
+                        38
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                19,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        19,
+                        19
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "d1055f77d631ead2c4f4959b2f21f6dab64462c3",
+            "79ba2b3f103626747e184f54f8885acf39bc5d60"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "8ead4b853c92dd16f245566d0bc0b47bf807b684",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "029a6d4e4f358dde86d39a9dadfb075871985344"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "MathOperator",
+                                            "children": [
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "MathOperator",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        4,
+                                                                        5
+                                                                    ]
+                                                                },
+                                                                {
+                                                                    "category": "NumberLiteral",
+                                                                    "range": [
+                                                                        8,
+                                                                        9
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                4,
+                                                                9
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "MathOperator",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                12,
+                                                                13
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "NumberLiteral",
+                                                            "range": [
+                                                                16,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        12,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        19
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                19,
+                                19
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        19,
+                        19
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "math-operator.js",
+            "math-operator.js"
+        ],
+        "oids": [
+            "79ba2b3f103626747e184f54f8885acf39bc5d60",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "029a6d4e4f358dde86d39a9dadfb075871985344",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1e1f4151882638257880d698f3467844bb54abc0"
+}]
