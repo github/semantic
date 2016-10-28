@@ -70,7 +70,7 @@ lineFields n term range = [ "number" .= n
                           , "hasChanges" .= hasChanges term
                           ]
 
-termFields :: (KeyValue kv, ToJSON recur, HasField fields Category, HasField fields Range) =>
+termFields :: (ToJSON recur, KeyValue kv, HasField fields Category, HasField fields Range) =>
   Record fields ->
   Syntax leaf recur ->
   [kv]
