@@ -26,7 +26,6 @@ import Control.Monad.Effect.Internal
 data GenerateFormat =
     GenerateSummaries
   | GenerateJSON
-  | GenerateAll
   | GenerateNone
   deriving (Show)
 
@@ -36,7 +35,6 @@ generatorArgs :: Parser GeneratorArgs
 generatorArgs = GeneratorArgs
   <$> (flag GenerateNone GenerateSummaries (long "generate-summaries" O.<> short 's' O.<> help "Use generated summary results for new JSON test cases (rather than defaulting to an empty \"\")")
   <|> flag' GenerateJSON (long "generate-json" O.<> short 'j' O.<> help "Use generated JSON output for new JSON test cases (rather than defaulting to an empty \"\")")
-  <|> flag' GenerateAll (long "generate-all" O.<> short 'a' O.<> help "Use generated summary results and JSON output for new JSON test cases respectively"))
 
 options :: ParserInfo GeneratorArgs
 options = info (helper <*> generatorArgs) (fullDesc O.<> progDesc "Auto-generate JSON test cases" O.<> header "JSON Test Case Generator")
@@ -212,7 +210,6 @@ runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath GeneratorArg
   case generateFormat of
     GenerateSummaries -> Main.run $ generateSummaries' repoPath beforeSha afterSha repoFilePath
     GenerateJSON -> Main.run $ generateJSON' repoPath beforeSha afterSha repoFilePath
-    GenerateAll -> pure $ EmptyResult ""
     _ -> pure $ EmptyResult ""
 
 generateSummaries :: Arguments -> IO ExpectedResult -- (Map Text [Value], Map Text [Value])
