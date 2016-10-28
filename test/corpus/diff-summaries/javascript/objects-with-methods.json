@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "javascript-bitwise-operator-insert-test",
+    "testCaseDescription": "javascript-objects-with-methods-insert-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                32
                             ]
                         }
                     },
-                    "summary": "Added the 'i >> j' bitwise operator"
+                    "summary": "Added the '{ add }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "3e77e8518f359c1220dc261d75d931c823b7b368",
+    "sha1": "d76cf2078283facb69adb3aeca598008f617f4d6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "29702057db67f823bc73ffc7fdcaf8e3a21000cb"
+    "sha2": "8eb04110a5df021d87dfa534124585bbe17b5791"
 }
 ,{
-    "testCaseDescription": "javascript-bitwise-operator-replacement-insert-test",
+    "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                37
                             ]
                         }
                     },
-                    "summary": "Added the 'i >> k' bitwise operator"
+                    "summary": "Added the '{ subtract }' object"
                 },
                 {
                     "span": {
@@ -58,114 +58,114 @@
                             ],
                             "end": [
                                 2,
-                                7
+                                32
                             ]
                         }
                     },
-                    "summary": "Added the 'i >> j' bitwise operator"
+                    "summary": "Added the '{ add }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "29702057db67f823bc73ffc7fdcaf8e3a21000cb",
+    "sha1": "8eb04110a5df021d87dfa534124585bbe17b5791",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "573dd627076e023d4ba8313e0b7c65c4e42952f0"
+    "sha2": "0c7d3e9bb76c82d78a9e07735702f605b3fc6ab5"
 }
 ,{
-    "testCaseDescription": "javascript-bitwise-operator-delete-insert-test",
+    "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    6
+                                    3
                                 ],
                                 "end": [
                                     1,
-                                    7
+                                    11
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    6
+                                    3
                                 ],
                                 "end": [
                                     1,
-                                    7
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'k' identifier with the 'j' identifier"
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "573dd627076e023d4ba8313e0b7c65c4e42952f0",
+    "sha1": "0c7d3e9bb76c82d78a9e07735702f605b3fc6ab5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "58440b65ad804f36e164020385336d1cadcc693f"
+    "sha2": "f1dbaef0d6dbd277550d5ce63a8071ddff640aae"
 }
 ,{
-    "testCaseDescription": "javascript-bitwise-operator-replacement-test",
+    "testCaseDescription": "javascript-objects-with-methods-replacement-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    6
+                                    3
                                 ],
                                 "end": [
                                     1,
-                                    7
+                                    6
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    6
+                                    3
                                 ],
                                 "end": [
                                     1,
-                                    7
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j' identifier with the 'k' identifier"
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "58440b65ad804f36e164020385336d1cadcc693f",
+    "sha1": "f1dbaef0d6dbd277550d5ce63a8071ddff640aae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "23186395b1512e89930d6dc1101bbc3bb7529350"
+    "sha2": "c48800d102d2daa1f075113a0bcfaf3a5190bb5b"
 }
 ,{
-    "testCaseDescription": "javascript-bitwise-operator-delete-replacement-test",
+    "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "delete": {
@@ -175,11 +175,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                37
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i >> k' bitwise operator"
+                    "summary": "Deleted the '{ subtract }' object"
                 },
                 {
                     "span": {
@@ -190,11 +190,11 @@
                             ],
                             "end": [
                                 2,
-                                7
+                                32
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i >> j' bitwise operator"
+                    "summary": "Deleted the '{ add }' object"
                 },
                 {
                     "span": {
@@ -205,28 +205,28 @@
                             ],
                             "end": [
                                 2,
-                                7
+                                37
                             ]
                         }
                     },
-                    "summary": "Added the 'i >> k' bitwise operator"
+                    "summary": "Added the '{ subtract }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "23186395b1512e89930d6dc1101bbc3bb7529350",
+    "sha1": "c48800d102d2daa1f075113a0bcfaf3a5190bb5b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e5564dd522405c8c50aaed251ba9c6162534d72d"
+    "sha2": "00f268207a50c956f7d3c75967916a8abfb5a292"
 }
 ,{
-    "testCaseDescription": "javascript-bitwise-operator-delete-test",
+    "testCaseDescription": "javascript-objects-with-methods-delete-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "delete": {
@@ -236,28 +236,28 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                32
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i >> j' bitwise operator"
+                    "summary": "Deleted the '{ add }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "e5564dd522405c8c50aaed251ba9c6162534d72d",
+    "sha1": "00f268207a50c956f7d3c75967916a8abfb5a292",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0bd6adff9edf12a7ae8465e185d2cbf6aac4bcbe"
+    "sha2": "a46674a422e286331cd7c054ea668e7d4fed89d1"
 }
 ,{
-    "testCaseDescription": "javascript-bitwise-operator-delete-rest-test",
+    "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.js": [
+            "objects-with-methods.js": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +267,20 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                37
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i >> k' bitwise operator"
+                    "summary": "Deleted the '{ subtract }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.js"
+        "objects-with-methods.js"
     ],
-    "sha1": "0bd6adff9edf12a7ae8465e185d2cbf6aac4bcbe",
+    "sha1": "a46674a422e286331cd7c054ea668e7d4fed89d1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aeaf1cad27b742d363c84420f39006ffe7212bcc"
+    "sha2": "9d2fa3061b299d0c2fae3f8f39fc2bdaa6e65f54"
 }]
