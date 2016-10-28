@@ -34,7 +34,7 @@ data GeneratorArgs = GeneratorArgs { generateFormat :: GenerateFormat } deriving
 generatorArgs :: Parser GeneratorArgs
 generatorArgs = GeneratorArgs
   <$> (flag GenerateNone GenerateSummaries (long "generate-summaries" O.<> short 's' O.<> help "Use generated summary results for new JSON test cases (rather than defaulting to an empty \"\")")
-  <|> flag' GenerateJSON (long "generate-json" O.<> short 'j' O.<> help "Use generated JSON output for new JSON test cases (rather than defaulting to an empty \"\")")
+  <|> flag' GenerateJSON (long "generate-json" O.<> short 'j' O.<> help "Use generated JSON output for new JSON test cases (rather than defaulting to an empty \"\")"))
 
 options :: ParserInfo GeneratorArgs
 options = info (helper <*> generatorArgs) (fullDesc O.<> progDesc "Auto-generate JSON test cases" O.<> header "JSON Test Case Generator")
