@@ -47,6 +47,8 @@ spec = parallel $ do
   describe "diff summaries" $ runTestsIn diffSummaryFiles Summary shouldBe
   describe "diff summaries todo" $ runTestsIn diffSummaryToDoFiles Summary shouldNotBe
   describe "diff summaries crashers todo" $ runTestsIn diffSummaryCrasherFiles Summary shouldBe
+  jsonFormatFiles <- runIO $ testCaseFiles "test/corpus/json"
+  describe "JSON format" $ runTestsIn jsonFormatFiles JSON shouldBe
 
   where testCaseFiles :: String -> IO [FilePath]
         testCaseFiles = globDir1 (compile "*/*.json")
