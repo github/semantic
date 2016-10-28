@@ -2,7 +2,6 @@ module SemanticGitDiffSpec where
 
 import Arguments
 import Data.Aeson
-import Data.Map.Strict as Map
 import Control.Exception
 import qualified Data.ByteString.Lazy as DL
 import JSONTestCase
@@ -20,14 +19,14 @@ catchException = handle errorHandler
   where errorHandler :: (SomeException -> IO [Text])
         errorHandler exception = return [toS . encode $ ["Crashed: " <> Prologue.show exception :: Text]]
 
-assertDiffSummary :: JSONTestCase -> Format -> (Either String (Map Text (Map Text [Value])) -> Either String (Map Text (Map Text [Value])) -> Expectation) -> Expectation
+assertDiffSummary :: JSONTestCase -> Format -> (Either String ExpectedResult -> Either String ExpectedResult -> Expectation) -> Expectation
 assertDiffSummary JSONTestCase {..} format matcher = do
   diffs <- fetchDiffs $ args gitDir sha1 sha2 filePaths format
   result <- catchException . pure . pure . concatOutputs $ diffs
-  let actual = eitherDecode . DL.fromStrict . encodeUtf8 . fromJust $ listToMaybe result
+  let actual = eitherDecode . DL.fromStrict . encodeUtf8 . fromJust . listToMaybe $ result
   matcher actual (Right expectedResult)
 
-runTestsIn :: [FilePath] -> Format -> (Either String (Map Text (Map Text [Value])) -> Either String (Map Text (Map Text [Value])) -> Expectation) -> SpecWith ()
+runTestsIn :: [FilePath] -> Format -> (Either String ExpectedResult -> Either String ExpectedResult -> Expectation) -> SpecWith ()
 runTestsIn filePaths format matcher = do
   contents <- runIO $ traverse DL.readFile filePaths
   let filePathContents = zip filePaths contents
