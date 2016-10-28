@@ -40,14 +40,16 @@ runTestsIn filePaths format matcher = do
 
 spec :: Spec
 spec = parallel $ do
-  diffSummaryFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries"
-  diffSummaryToDoFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries-todo"
-  diffSummaryCrasherFiles <- runIO $ testCaseFiles "test/corpus/diff-summary-crashers"
+  summaryFormatFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries"
+  summaryFormatToDoFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries-todo"
+  summaryFormatCrasherFiles <- runIO $ testCaseFiles "test/corpus/diff-summary-crashers"
 
-  describe "diff summaries" $ runTestsIn diffSummaryFiles Summary shouldBe
-  describe "diff summaries todo" $ runTestsIn diffSummaryToDoFiles Summary shouldNotBe
-  describe "diff summaries crashers todo" $ runTestsIn diffSummaryCrasherFiles Summary shouldBe
   jsonFormatFiles <- runIO $ testCaseFiles "test/corpus/json"
+
+  describe "Summary format" $ runTestsIn summaryFormatFiles Summary shouldBe
+  describe "Summary format todo" $ runTestsIn summaryFormatToDoFiles Summary shouldNotBe
+  describe "Summary format crashers todo" $ runTestsIn summaryFormatCrasherFiles Summary shouldBe
+
   describe "JSON format" $ runTestsIn jsonFormatFiles JSON shouldBe
 
   where testCaseFiles :: String -> IO [FilePath]
