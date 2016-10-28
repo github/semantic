@@ -3,6 +3,7 @@ module JSONTestCase where
 
 import Data.Aeson
 import Data.Map.Strict as Map
+import Data.HashMap.Strict as HM
 import Prelude
 import Prologue
 
