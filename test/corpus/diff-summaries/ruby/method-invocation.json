@@ -55,9 +55,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "171fdf375ea05139a67536617ded61f79a9c23f5",
+    "sha1": "1d64a73244315b920d5fe90966068c5c81009362",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2c32de191c842ee7dc56005f1a0b7e9fe034d13e"
+    "sha2": "ed107f28c05612907f97f29e8f9ac2d5a37263c2"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-replacement-insert-test",
@@ -176,9 +176,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "2c32de191c842ee7dc56005f1a0b7e9fe034d13e",
+    "sha1": "ed107f28c05612907f97f29e8f9ac2d5a37263c2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a38721187c3c74660b06eef17a5f2abe9a3ff7f2"
+    "sha2": "051f88c30132124c3e49e057d6caf67c99b6fd6c"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-insert-test",
@@ -297,9 +297,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "a38721187c3c74660b06eef17a5f2abe9a3ff7f2",
+    "sha1": "051f88c30132124c3e49e057d6caf67c99b6fd6c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9ef8c39cc93bc7700f55392499e390044d7dccda"
+    "sha2": "8b83d29df8386a9879d1becf0ec06d64fd1d042c"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-replacement-test",
@@ -418,9 +418,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "9ef8c39cc93bc7700f55392499e390044d7dccda",
+    "sha1": "8b83d29df8386a9879d1becf0ec06d64fd1d042c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5596a69f3dbc64bf294861a1e6e446f3b0b176ec"
+    "sha2": "3908b684ec871dcc18f2669cdfcdff7c1453e1cb"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-replacement-test",
@@ -479,9 +479,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "5596a69f3dbc64bf294861a1e6e446f3b0b176ec",
+    "sha1": "3908b684ec871dcc18f2669cdfcdff7c1453e1cb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "684eae52e387ca5419bf29615c1b9d880123b927"
+    "sha2": "f4d570046d591c1e2a2ac75987a56d34bfbafbdd"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-test",
@@ -540,9 +540,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "684eae52e387ca5419bf29615c1b9d880123b927",
+    "sha1": "f4d570046d591c1e2a2ac75987a56d34bfbafbdd",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6c9b57e0251280395c08dbec66edfaa8a3580d05"
+    "sha2": "62c5df67a438e15a39a77e8c9ad8d3337448d65b"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-rest-test",
@@ -616,7 +616,7 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "6c9b57e0251280395c08dbec66edfaa8a3580d05",
+    "sha1": "62c5df67a438e15a39a77e8c9ad8d3337448d65b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "491c4b2309d4aeb5d28fee1997f4f62356b4e110"
+    "sha2": "9b332f981a2fa42849e4ddc48afca9424480312d"
 }]

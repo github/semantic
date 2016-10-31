@@ -54,18 +54,18 @@
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/delimiter.json"
       },
       {
-        "syntax": "math_assignment",
-        "repoFilePath": "math_assignment.rb",
+        "syntax": "math-assignment",
+        "repoFilePath": "math-assignment.rb",
         "insert": "x += 1\nx -= 1\nx *= 1\nx /= 1\nx **= 1",
         "replacement": "x+= 2\nx -= 1\nx *= 1\nx /= 1\nx **= 1",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/math_assignment.json"
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/math-assignment.json"
       },
       {
-        "syntax": "conditional_assignment",
-        "repoFilePath": "conditional_assignment.rb",
+        "syntax": "conditional-assignment",
+        "repoFilePath": "conditional-assignment.rb",
         "insert": "x ||= 5",
         "replacement": "x &&= 7",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/conditional_assignment.json"
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/conditional-assignment.json"
       },
       {
         "syntax": "multiple-assignments",
@@ -75,11 +75,11 @@
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/multiple-assignments.json"
       },
       {
-        "syntax": "pseudo_variables",
-        "repoFilePath": "pseudo_variables.rb",
+        "syntax": "pseudo-variables",
+        "repoFilePath": "pseudo-variables.rb",
         "insert": "nil\nself\nfalse\ntrue",
         "replacement": "self\nNIL\nTRUE\nFALSE",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/pseudo_variables.json"
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/pseudo-variables.json"
       },
       {
         "syntax": "subshell",
@@ -268,7 +268,7 @@
         "repoFilePath": "control-statements.rb",
         "insert": "begin\n	foo\nrescue x\n  bar\nelse\n	quux\nensure\n  baz\nend",
         "replacement": "begin\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/control-statements.json"
+        "testCaseFilePath": "test/corpus/diff-summaries-todo/ruby/control-statements.json"
       }
     ]
   }

@@ -25,9 +25,9 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "88cd79ae642e6e6ab88fa64bbd499a54cd033479",
+    "sha1": "fb977a1a932fedffdf11b59b7039edfee929898b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fad357e849384aca7e3d5f50dc469d40ce6df8aa"
+    "sha2": "59826bd1c0ef17b0d316b84e12d407343567b51e"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "fad357e849384aca7e3d5f50dc469d40ce6df8aa",
+    "sha1": "59826bd1c0ef17b0d316b84e12d407343567b51e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "21070fed550eb267574dd7af39540300e8ebf324"
+    "sha2": "8c3310689a60ae2aeab52560665f69a75d0e6a80"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-insert-test",
@@ -102,9 +102,9 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "21070fed550eb267574dd7af39540300e8ebf324",
+    "sha1": "8c3310689a60ae2aeab52560665f69a75d0e6a80",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "adceb497d9b38af6354d5ba320c94221d6d11056"
+    "sha2": "a9f6587196cdbbe93040f98b10dd42e56a61606b"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-replacement-test",
@@ -133,9 +133,9 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "adceb497d9b38af6354d5ba320c94221d6d11056",
+    "sha1": "a9f6587196cdbbe93040f98b10dd42e56a61606b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "771325c5f9533cab325234e3cb2796ba7e0fc8e1"
+    "sha2": "e036c90a9157248f492faab6f647dc8328a81bb7"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-replacement-test",
@@ -194,9 +194,9 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "771325c5f9533cab325234e3cb2796ba7e0fc8e1",
+    "sha1": "e036c90a9157248f492faab6f647dc8328a81bb7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "30de47fb2aa9b4f51ca60e06f86f86a4f638d75f"
+    "sha2": "ed775facea4cfb87fbd958eba63c3d0b731ae89f"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-test",
@@ -225,9 +225,9 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "30de47fb2aa9b4f51ca60e06f86f86a4f638d75f",
+    "sha1": "ed775facea4cfb87fbd958eba63c3d0b731ae89f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "64f4d086bf38587356378743c2b172e652f67c11"
+    "sha2": "45e409958bde72eed0dbf21ebde75141f9cc0ca7"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-rest-test",
@@ -256,7 +256,7 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "64f4d086bf38587356378743c2b172e652f67c11",
+    "sha1": "45e409958bde72eed0dbf21ebde75141f9cc0ca7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6c783d6f426f41a4de5d6cf3224ffa9d09e0f06a"
+    "sha2": "bf01ed653791dfe5beb43e85c33f6e2d069fefc2"
 }]

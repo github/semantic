@@ -25,9 +25,9 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "6c783d6f426f41a4de5d6cf3224ffa9d09e0f06a",
+    "sha1": "bf01ed653791dfe5beb43e85c33f6e2d069fefc2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8a1fe8d62097990b764f71ce1d589cb3c488dd3d"
+    "sha2": "f73764d7261d1e1170e691733b6b7c74132936a6"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "8a1fe8d62097990b764f71ce1d589cb3c488dd3d",
+    "sha1": "f73764d7261d1e1170e691733b6b7c74132936a6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c0a9f4257171ffd7c1711efe5b03939666b4db13"
+    "sha2": "a565bef62371853b9de3114627e035ff440fd605"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-insert-test",
@@ -114,9 +114,9 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "c0a9f4257171ffd7c1711efe5b03939666b4db13",
+    "sha1": "a565bef62371853b9de3114627e035ff440fd605",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3167ed988334ac30a6a939803b05e18935170d07"
+    "sha2": "1dbde963827409f36b55fa0f88b86e8ff782d781"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-replacement-test",
@@ -157,9 +157,9 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "3167ed988334ac30a6a939803b05e18935170d07",
+    "sha1": "1dbde963827409f36b55fa0f88b86e8ff782d781",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1e2d2c7db423fbd3449c64496aec4de935b9df3c"
+    "sha2": "b64019a98f9d5d736aa8aee285c18f359f59ac54"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-replacement-test",
@@ -218,9 +218,9 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "1e2d2c7db423fbd3449c64496aec4de935b9df3c",
+    "sha1": "b64019a98f9d5d736aa8aee285c18f359f59ac54",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6582452c94bba1b811fcda0d0d600bb05321c320"
+    "sha2": "68d2b5640d198edce8cf79588d67c73b3c12bc22"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-test",
@@ -249,9 +249,9 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "6582452c94bba1b811fcda0d0d600bb05321c320",
+    "sha1": "68d2b5640d198edce8cf79588d67c73b3c12bc22",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b31284c37efeb1b5575380593123d557d12147e5"
+    "sha2": "f2810ef2729cf5ab883af5d89e8e824a0b5d8c25"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-rest-test",
@@ -280,7 +280,7 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "b31284c37efeb1b5575380593123d557d12147e5",
+    "sha1": "f2810ef2729cf5ab883af5d89e8e824a0b5d8c25",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b351f7b6259512218bee8229d9875a7d9d05918d"
+    "sha2": "2f2168edc8d0acbcdcf2e14df2188f727260ad2f"
 }]

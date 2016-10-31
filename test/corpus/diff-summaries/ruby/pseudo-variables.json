@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-math_assignment-insert-test",
+    "testCaseDescription": "ruby-pseudo-variables-insert-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
+            "pseudo-variables.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,26 +12,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'nil' identifier"
                 },
                 {
                     "span": {
@@ -42,11 +27,11 @@
                             ],
                             "end": [
                                 3,
-                                7
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'false'"
                 },
                 {
                     "span": {
@@ -57,102 +42,72 @@
                             ],
                             "end": [
                                 4,
-                                7
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'true'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "pseudo-variables.rb"
     ],
-    "sha1": "943ab55771060dba43f907ab6dc621fc71116149",
+    "sha1": "ce3778a99ea788f6ff75371e985c61c1a240cf13",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c2f3ac2fc720005f2fcaf2bddd94cc7349c3ca87"
+    "sha2": "733f12cf3bffe56c4c06348db5254dc45f24c4ac"
 }
 ,{
-    "testCaseDescription": "ruby-math_assignment-replacement-insert-test",
+    "testCaseDescription": "ruby-pseudo-variables-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
+            "pseudo-variables.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                2,
                                 1
                             ],
                             "end": [
-                                1,
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'NIL' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'TRUE'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'FALSE'"
                 },
                 {
                     "span": {
@@ -163,26 +118,11 @@
                             ],
                             "end": [
                                 5,
-                                8
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'nil' identifier"
                 },
                 {
                     "span": {
@@ -193,11 +133,11 @@
                             ],
                             "end": [
                                 7,
-                                7
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'false'"
                 },
                 {
                     "span": {
@@ -208,203 +148,272 @@
                             ],
                             "end": [
                                 8,
-                                7
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'true'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "pseudo-variables.rb"
     ],
-    "sha1": "c2f3ac2fc720005f2fcaf2bddd94cc7349c3ca87",
+    "sha1": "733f12cf3bffe56c4c06348db5254dc45f24c4ac",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "320d55f10f6509f95ae856e590a01d527c19a83d"
+    "sha2": "a05d3f95aec10f667adf4b0c4e1cdd8bd606e377"
 }
 ,{
-    "testCaseDescription": "ruby-math_assignment-delete-insert-test",
+    "testCaseDescription": "ruby-pseudo-variables-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
+            "pseudo-variables.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'NIL' identifier with the 'nil' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'TRUE' with 'false'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'true'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'FALSE'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pseudo-variables.rb"
+    ],
+    "sha1": "a05d3f95aec10f667adf4b0c4e1cdd8bd606e377",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "18b9418c8995dcee39f6daae644bc82170913dda"
+}
+,{
+    "testCaseDescription": "ruby-pseudo-variables-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "pseudo-variables.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    5
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    4
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
-                                    6
+                                    2,
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    7
+                                    2,
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1' in the x math assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math_assignment.rb"
-    ],
-    "sha1": "320d55f10f6509f95ae856e590a01d527c19a83d",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d15ff4704e85e883e535e814baf9e16d114a23ea"
-}
-,{
-    "testCaseDescription": "ruby-math_assignment-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "math_assignment.rb": [
+                    "summary": "Replaced the 'nil' identifier with the 'NIL' identifier"
+                },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    6
+                                    3,
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    7
+                                    3,
+                                    6
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
-                                    5
+                                    3,
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    6
+                                    3,
+                                    5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2' in the x math assignment"
+                    "summary": "Replaced 'false' with 'TRUE'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'FALSE'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'true'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "pseudo-variables.rb"
     ],
-    "sha1": "d15ff4704e85e883e535e814baf9e16d114a23ea",
+    "sha1": "18b9418c8995dcee39f6daae644bc82170913dda",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c94b0e33ce76e3120a2aa51ec97895b90d592d44"
+    "sha2": "21335e57824052719d0a357137bc271a3806012b"
 }
 ,{
-    "testCaseDescription": "ruby-math_assignment-delete-replacement-test",
+    "testCaseDescription": "ruby-pseudo-variables-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
+            "pseudo-variables.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                2,
                                 1
                             ],
                             "end": [
-                                1,
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'NIL' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'TRUE'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted 'FALSE'"
                 },
                 {
                     "span": {
@@ -415,26 +424,41 @@
                             ],
                             "end": [
                                 5,
-                                8
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'nil' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                7,
                                 1
                             ],
                             "end": [
-                                6,
-                                7
+                                7,
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted 'false'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'true'"
                 },
                 {
                     "span": {
@@ -445,28 +469,58 @@
                             ],
                             "end": [
                                 6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'NIL' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'TRUE'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added 'FALSE'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "pseudo-variables.rb"
     ],
-    "sha1": "c94b0e33ce76e3120a2aa51ec97895b90d592d44",
+    "sha1": "21335e57824052719d0a357137bc271a3806012b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7cc022c87ae88a2a4dc3d5985672f8d7d2ffe535"
+    "sha2": "657002ff458fa50b32477904d9b48ef106b3a45e"
 }
 ,{
-    "testCaseDescription": "ruby-math_assignment-delete-test",
+    "testCaseDescription": "ruby-pseudo-variables-delete-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
+            "pseudo-variables.rb": [
                 {
                     "span": {
                         "delete": {
@@ -476,26 +530,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'nil' identifier"
                 },
                 {
                     "span": {
@@ -506,102 +545,11 @@
                             ],
                             "end": [
                                 3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math_assignment.rb"
-    ],
-    "sha1": "7cc022c87ae88a2a4dc3d5985672f8d7d2ffe535",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d98119bf4f4c581de2edbb8afa55db2d625a8d47"
-}
-,{
-    "testCaseDescription": "ruby-math_assignment-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "math_assignment.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted 'false'"
                 },
                 {
                     "span": {
@@ -612,35 +560,81 @@
                             ],
                             "end": [
                                 4,
-                                7
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted 'true'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "pseudo-variables.rb"
     ],
-    "sha1": "d98119bf4f4c581de2edbb8afa55db2d625a8d47",
+    "sha1": "657002ff458fa50b32477904d9b48ef106b3a45e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "139e6c400b6c0b29d394346b53ef05719f8984ad"
+    "sha2": "91d164b57939d4fcff85c1889c113feb71f90f13"
+}
+,{
+    "testCaseDescription": "ruby-pseudo-variables-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "pseudo-variables.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'NIL' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'TRUE'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'FALSE'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pseudo-variables.rb"
+    ],
+    "sha1": "91d164b57939d4fcff85c1889c113feb71f90f13",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4cf0b1c84b725b7ecea2d0e2524d4aa83e9aa9f0"
 }]
