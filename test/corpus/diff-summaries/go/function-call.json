@@ -1,0 +1,295 @@
+[{
+    "testCaseDescription": "go-function call-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "12c47b44d2e91782a6f049e094c836b5415aed72",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "860ccbe1c3bdeb0c47e32a8e90fa181a9a1cc149"
+}
+,{
+    "testCaseDescription": "go-function call-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "860ccbe1c3bdeb0c47e32a8e90fa181a9a1cc149",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "04cd5977a1e11d1ccc0c7bb98e3336b35ad8ec0e"
+}
+,{
+    "testCaseDescription": "go-function call-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the a() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "04cd5977a1e11d1ccc0c7bb98e3336b35ad8ec0e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "1256ed562694230c35ae859e74de43be61431232"
+}
+,{
+    "testCaseDescription": "go-function call-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the b() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "1256ed562694230c35ae859e74de43be61431232",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4ed01c4bcffcdf6103f3449dd11af9e3d13729b1"
+}
+,{
+    "testCaseDescription": "go-function call-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "4ed01c4bcffcdf6103f3449dd11af9e3d13729b1",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "2bf409a84ead1ad41e539e77632caeb2bad6cc7d"
+}
+,{
+    "testCaseDescription": "go-function call-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "2bf409a84ead1ad41e539e77632caeb2bad6cc7d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "01d6f80865616cf2f9c611e208da3eaa9449dedb"
+}
+,{
+    "testCaseDescription": "go-function call-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.go"
+    ],
+    "sha1": "01d6f80865616cf2f9c611e208da3eaa9449dedb",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "1dc12f3dd339cd009052043fcf2d1516d52173a3"
+}]

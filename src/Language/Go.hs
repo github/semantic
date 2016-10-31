@@ -40,6 +40,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
         withDefaultInfo $ S.VarAssignment identifier' exprs
       _ -> withCategory Error (S.Error [varSpec])
     withDefaultInfo $ S.VarDecl assignment'
+  ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
