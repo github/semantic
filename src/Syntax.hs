@@ -60,7 +60,7 @@ data Syntax a f
   -- | A for statement has a list of expressions to setup the iteration and then a list of expressions in the body.
   | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
-  | While { whileExpr :: f, whileBody :: Maybe f }
+  | While { whileExpr :: f, whileBody :: [f] }
   | Return (Maybe f)
   | Throw f
   | Constructor f
@@ -80,7 +80,7 @@ data Syntax a f
   -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield (Maybe f)
-  | Until { untilExpr :: f, untilBody :: Maybe f }
+  | Until { untilExpr :: f, untilBody :: [f] }
   -- | An unless statement with an expression and maybe more expression clauses.
   | Unless f [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)

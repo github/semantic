@@ -52,13 +52,14 @@ termConstructor source sourceSpan name range children
     ("return_statement", _) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
     ("unless_statement", expr : rest ) -> S.Unless expr rest
-    ("until_modifier", [ lhs, condition ]) -> S.Until condition (Just lhs)
-    ("until_statement", [ expr, body ]) -> S.Until expr (Just body)
-    ("until_statement", [ expr ]) -> S.Until expr Nothing
+    ("unless_statement", _ ) -> S.Error children
+    ("until_modifier", [ lhs, condition ]) -> S.Until condition [lhs]
+    ("until_modifier", _ ) -> S.Error children
+    ("until_statement", expr : rest ) -> S.Until expr rest
     ("until_statement", _ ) -> S.Error children
-    ("while_modifier", [ lhs, condition ]) -> S.While condition (Just lhs)
-    ("while_statement", [ expr, body ]) -> S.While expr (Just body)
-    ("while_statement", [ expr ]) -> S.While expr Nothing
+    ("while_modifier", [ lhs, condition ]) -> S.While condition [lhs]
+    ("while_modifier", _ ) -> S.Error children
+    ("while_statement", expr : rest ) -> S.While expr rest
     ("while_statement", _ ) -> S.Error children
     ("yield", _) -> S.Yield (listToMaybe children)
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
