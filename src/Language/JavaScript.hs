@@ -92,7 +92,10 @@ termConstructor source sourceSpan name range children
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
-    _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
+    -- _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
+    _ | name `elem` forStatements -> case unsnoc children of
+          Just (exprs, body) -> S.For exprs body
+          _ -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] body
