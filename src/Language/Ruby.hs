@@ -28,29 +28,42 @@ termConstructor source sourceSpan name range children
     ("argument_list", _) -> S.Args children
     ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
+    ("assignment", _ ) -> S.Error children
     ("case_statement", expr : rest) -> S.Switch expr rest
+    ("case_statement", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class_declaration", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+    ("class_declaration", _ ) -> S.Error children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("conditional_assignment", [ identifier, value ]) -> S.ConditionalAssignment identifier value
+    ("conditional_assignment", _ ) -> S.Error children
     ("conditional", condition : cases) -> S.Ternary condition cases
+    ("conditional", _ ) -> S.Error children
     ("function_call", _) -> case runCofree <$> children of
       [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
       [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
       [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
       (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
-      _ -> S.Indexed children
+      _ -> S.Error children
     ("hash", _) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
+    ("if_modifier", _ ) -> S.Error children
     ("if_statement", expr : rest ) -> S.If expr rest
+    ("if_statement", _ ) -> S.Error children
     ("element_reference", [ base, element ]) -> S.SubscriptAccess base element
+    ("element_reference", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+    ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
+    ("member_access", _ ) -> S.Error children
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_declaration", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
+    ("method_declaration", _ ) -> S.Error children
     ("module_declaration", identifier : body ) -> S.Module identifier body
-    ("return_statement", _) -> S.Return (listToMaybe children)
+    ("module_declaration", _ ) -> S.Error children
+    ("return_statement", _ ) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
+    ("unless_modifier", _ ) -> S.Error children
     ("unless_statement", expr : rest ) -> S.Unless expr rest
     ("unless_statement", _ ) -> S.Error children
     ("until_modifier", [ lhs, condition ]) -> S.Until condition [lhs]
