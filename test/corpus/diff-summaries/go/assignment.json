@@ -5,30 +5,48 @@
             "assignment.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    1
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Added the 'foo' assignment"
+                    "summary": "Added 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                15
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added '42'"
                 }
             ]
         },
@@ -37,9 +55,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "b9da8acec42374295d1e2c8ef4e718a71674b5c8",
+    "sha1": "d3fa479c4d82673363dbcee77472346afb069504",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "78d912e517fdbf5bf094f2eb42416144c7bd6ba9"
+    "sha2": "50d81565fe76ac5159dcd87d034ec8b910078247"
 }
 ,{
     "testCaseDescription": "go-assignment-replacement-insert-test",
@@ -48,30 +66,93 @@
             "assignment.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    1
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'package main\n\n\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file"
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"hello\" string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                15
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added '42'"
                 }
             ]
         },
@@ -80,9 +161,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "78d912e517fdbf5bf094f2eb42416144c7bd6ba9",
+    "sha1": "50d81565fe76ac5159dcd87d034ec8b910078247",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "46b7a84458c868398bc8b288598385b7ecb00c31"
+    "sha2": "bfc12bda0c44a0fc64130faf53d6019070e1cd29"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-insert-test",
@@ -94,27 +175,84 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    1
+                                    3,
+                                    5
                                 ],
                                 "end": [
-                                    7,
-                                    1
+                                    3,
+                                    8
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
-                                    1
+                                    3,
+                                    5
                                 ],
                                 "end": [
-                                    7,
-                                    1
+                                    3,
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar foo int = 42\nvar foo int = 42\nvar foo int = 42\n' source_file"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added '42'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"hello\" string"
                 }
             ]
         },
@@ -123,9 +261,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "46b7a84458c868398bc8b288598385b7ecb00c31",
+    "sha1": "bfc12bda0c44a0fc64130faf53d6019070e1cd29",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0660fdb214202450d7cce4f515f3a60ef9c10490"
+    "sha2": "89c94a0d5eaa76fb0c1067088ca04f54525fe5b9"
 }
 ,{
     "testCaseDescription": "go-assignment-replacement-test",
@@ -137,27 +275,84 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    1
+                                    3,
+                                    5
                                 ],
                                 "end": [
-                                    7,
-                                    1
+                                    3,
+                                    8
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
-                                    1
+                                    3,
+                                    5
                                 ],
                                 "end": [
-                                    7,
-                                    1
+                                    3,
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'package main\n\n\nvar foo int = 42\nvar foo int = 42\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"hello\" string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '42'"
                 }
             ]
         },
@@ -166,9 +361,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "0660fdb214202450d7cce4f515f3a60ef9c10490",
+    "sha1": "89c94a0d5eaa76fb0c1067088ca04f54525fe5b9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f97f9b8acec8b3ff1d5ed77d9bc13c2666a6de4d"
+    "sha2": "836f75041671741c0cf33a13b741cd02eea4bc5f"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-replacement-test",
@@ -177,30 +372,138 @@
             "assignment.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar foo int = 42\nvar bar string = \"hello\"\n' source_file"
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"hello\" string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                15
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '42'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"hello\" string"
                 }
             ]
         },
@@ -209,9 +512,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "f97f9b8acec8b3ff1d5ed77d9bc13c2666a6de4d",
+    "sha1": "836f75041671741c0cf33a13b741cd02eea4bc5f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "26a079f5798bcd44defb40ff55f6e8a2691d3f85"
+    "sha2": "5d39879a5b769f10db628ad01290d26fd4d9db90"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-test",
@@ -220,30 +523,48 @@
             "assignment.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'package main\n\n\nvar foo int = 42\nvar bar string = \"hello\"\n' source_file with the 'package main\n\n\nvar bar string = \"hello\"\n' source_file"
+                    "summary": "Deleted 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '42'"
                 }
             ]
         },
@@ -252,9 +573,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "26a079f5798bcd44defb40ff55f6e8a2691d3f85",
+    "sha1": "5d39879a5b769f10db628ad01290d26fd4d9db90",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7df173e52ab3790631e6c3f946896d283fbc433e"
+    "sha2": "3f313b48b6753be56759d8ab6c00372ec75fa705"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-rest-test",
@@ -263,30 +584,48 @@
             "assignment.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'package main\n\n\nvar bar string = \"hello\"\n' source_file with the 'package main' source_file"
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"hello\" string"
                 }
             ]
         },
@@ -295,7 +634,7 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "7df173e52ab3790631e6c3f946896d283fbc433e",
+    "sha1": "3f313b48b6753be56759d8ab6c00372ec75fa705",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d3fa479c4d82673363dbcee77472346afb069504"
+    "sha2": "22676623f16aa111d554b6e9ac62d44545a29456"
 }]
