@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-multiple_assignments-insert-test",
+    "testCaseDescription": "ruby-multiple-assignments-insert-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "insert": {
@@ -23,17 +23,17 @@
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "47eafe0108bec3779a2e9c3f5047479809e7f197",
+    "sha1": "ddaa68a552ca3741145fc1267a25426373d86fa7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e29a0ca35d092c31e8bebae0a02b22549c5e62a6"
+    "sha2": "eb3a7aaba5bd804f5ea7a65104cafa7b1b1437f4"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-replacement-insert-test",
+    "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "insert": {
@@ -69,17 +69,17 @@
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "e29a0ca35d092c31e8bebae0a02b22549c5e62a6",
+    "sha1": "eb3a7aaba5bd804f5ea7a65104cafa7b1b1437f4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c6fd5f61c122b05ab11d779093baefa0251086bf"
+    "sha2": "38c80b2814e3442a3aba57ed80e9596a0f8314d0"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-insert-test",
+    "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "insert": {
@@ -105,7 +105,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    3
+                                    17
                                 ]
                             },
                             {
@@ -120,7 +120,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ',' at line 1, column 2 - line 1, column 3 with the 'z' assignment in the x(…, y, z, 20, 30) function call"
+                    "summary": "Replaced the ', y = aVariable' at line 1, column 2 - line 1, column 17 with the 'z' assignment in the x(…, y, z, 20, 30) function call"
                 },
                 {
                     "span": {
@@ -167,7 +167,7 @@
             ]
         },
         "errors": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "insert": {
@@ -187,47 +187,17 @@
         }
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "c6fd5f61c122b05ab11d779093baefa0251086bf",
+    "sha1": "38c80b2814e3442a3aba57ed80e9596a0f8314d0",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3704287d57c9eed043a9498eaf90d3eafc63fc2d"
+    "sha2": "60d1438db2556644706e8c47a67261cdc13f714a"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-replacement-test",
+    "testCaseDescription": "ruby-multiple-assignments-replacement-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'aVariable' identifier in the x(…, 40) function call"
-                },
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "insert": {
@@ -306,7 +276,7 @@
             ]
         },
         "errors": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "insert": {
@@ -316,11 +286,11 @@
                             ],
                             "end": [
                                 1,
-                                3
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the ',' at line 1, column 2 - line 1, column 3 in the x(…, 40) function call"
+                    "summary": "Added the ', y = aVariable' at line 1, column 2 - line 1, column 17 in the x(…, 40) function call"
                 },
                 {
                     "span": {
@@ -341,17 +311,17 @@
         }
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "3704287d57c9eed043a9498eaf90d3eafc63fc2d",
+    "sha1": "60d1438db2556644706e8c47a67261cdc13f714a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "86dee0c5c4b170d6298fddbd2f3c08e6b1c667d2"
+    "sha2": "471c1238a6856ab0915bb7ea91b09755fc55a633"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-replacement-test",
+    "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "delete": {
@@ -402,17 +372,17 @@
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "86dee0c5c4b170d6298fddbd2f3c08e6b1c667d2",
+    "sha1": "471c1238a6856ab0915bb7ea91b09755fc55a633",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9908d047cbf09b9ca8d9a19cc04bab3bb016799f"
+    "sha2": "b39d3ad7a21bfe52a1fc8e83c880163457af3e60"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-test",
+    "testCaseDescription": "ruby-multiple-assignments-delete-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "delete": {
@@ -433,17 +403,17 @@
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "9908d047cbf09b9ca8d9a19cc04bab3bb016799f",
+    "sha1": "b39d3ad7a21bfe52a1fc8e83c880163457af3e60",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f3a0a01973e3e202f0fb5ffa7168a3fc947c5a6a"
+    "sha2": "c684eeb8b6396ebf55e2885f57ad0b8b4505bfab"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-rest-test",
+    "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "delete": {
@@ -464,9 +434,9 @@
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "multiple-assignments.rb"
     ],
-    "sha1": "f3a0a01973e3e202f0fb5ffa7168a3fc947c5a6a",
+    "sha1": "c684eeb8b6396ebf55e2885f57ad0b8b4505bfab",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fc69890ae7e264b452610db039a98c8d5ca3c775"
+    "sha2": "4bd37960291f19a0aabe7b1fcf0f277913bc2f0c"
 }]

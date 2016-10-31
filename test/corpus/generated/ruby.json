@@ -68,11 +68,11 @@
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/conditional_assignment.json"
       },
       {
-        "syntax": "multiple_assignments",
-        "repoFilePath": "multiple_assignments.rb",
+        "syntax": "multiple-assignments",
+        "repoFilePath": "multiple-assignments.rb",
         "insert": "x, y, z = 10, 20, 30",
         "replacement": "x, y = aVariable, 40",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/multiple_assignments.json"
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/multiple-assignments.json"
       },
       {
         "syntax": "pseudo_variables",
