@@ -31,6 +31,11 @@ termConstructor source sourceSpan name range children = case (name, children) of
         [] -> pure []
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) block
+  ("var_declaration", [varSpec]) -> do
+    assignment' <- case toList (unwrap varSpec) of
+      [idList, _, exprs] -> withDefaultInfo $ S.VarAssignment idList exprs
+      _ -> withCategory Error (S.Error [varSpec])
+    withDefaultInfo $ S.VarDecl assignment'
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
@@ -54,6 +59,8 @@ categoryForGoName = \case
   "selector_expression" -> MethodCall
   "parameters" -> Args
   "short_var_declaration" -> VarDecl
+  "var_declaration" -> VarDecl
+  "var_spec" -> VarAssignment
   "assignment_statement" -> Assignment
   "source_file" -> Module
   s -> Other (toS s)
