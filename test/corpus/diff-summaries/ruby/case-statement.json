@@ -25,9 +25,9 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "9216808e102caab55085dcc17c4fddfea53f1cd5",
+    "sha1": "0301330bfa29e853bcb525abbd9c430d4322b38e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9d25490c02e139ff026e70ad92264d4e7b3f7b78"
+    "sha2": "50653de009cc19fc07114aaed274ed09283e5a63"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "9d25490c02e139ff026e70ad92264d4e7b3f7b78",
+    "sha1": "50653de009cc19fc07114aaed274ed09283e5a63",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "69bf362b1de88a3487dbd0baefe7d2a48955d137"
+    "sha2": "f07652158e4bdda24a4c7d1e878cd359ce3a009a"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-insert-test",
@@ -93,7 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'else' else_block"
+                    "summary": "Deleted the 'else' expression statements"
                 }
             ]
         },
@@ -102,9 +102,9 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "69bf362b1de88a3487dbd0baefe7d2a48955d137",
+    "sha1": "f07652158e4bdda24a4c7d1e878cd359ce3a009a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "86e077770c51da8c802f033404d1e37912daf7de"
+    "sha2": "154aecb448bd4decd86b62e836eeda34336d6840"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-replacement-test",
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'else' else_block"
+                    "summary": "Added the 'else' expression statements"
                 }
             ]
         },
@@ -133,9 +133,9 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "86e077770c51da8c802f033404d1e37912daf7de",
+    "sha1": "154aecb448bd4decd86b62e836eeda34336d6840",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "23b96553e3ec01e6f3084fe9abd8d9a4bf32d517"
+    "sha2": "dc1177ba8b5c0fb82837c3ace3ec482b9fbeb6c1"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-replacement-test",
@@ -194,9 +194,9 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "23b96553e3ec01e6f3084fe9abd8d9a4bf32d517",
+    "sha1": "dc1177ba8b5c0fb82837c3ace3ec482b9fbeb6c1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d9816824fb7eeee9d7cde76636aacf4c8e9d4d74"
+    "sha2": "67dd5e83288d7ddf6bbe3f323b74da9d07c72d59"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-test",
@@ -225,9 +225,9 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "d9816824fb7eeee9d7cde76636aacf4c8e9d4d74",
+    "sha1": "67dd5e83288d7ddf6bbe3f323b74da9d07c72d59",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e489a105cc44122c6e2b40744e49ac08ea52e364"
+    "sha2": "12d217d3c3e75d0d71cd24797090dc9f381c8a14"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-rest-test",
@@ -256,7 +256,7 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "e489a105cc44122c6e2b40744e49ac08ea52e364",
+    "sha1": "12d217d3c3e75d0d71cd24797090dc9f381c8a14",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b63c62e27c326b1fa15425bf3e2ac4392b1c5440"
+    "sha2": "fd33116e12e6b51686d9e4ea4f0b799a8a32ba30"
 }]

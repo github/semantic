@@ -43,6 +43,7 @@ termConstructor source sourceSpan name range children
     ("hash", _) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_statement", expr : rest ) -> S.If expr rest
+    ("element_reference", [ base, element ]) -> S.SubscriptAccess base element
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
@@ -77,6 +78,7 @@ categoryForRubyName = \case
   "argument_list" -> Args
   "array" -> ArrayLiteral
   "assignment" -> Assignment
+  "begin_statement" -> ExpressionStatements
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
   "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
@@ -88,6 +90,10 @@ categoryForRubyName = \case
   "comparison" -> RelationalOperator -- comparison operator, e.g. <, <=, >=, >.
   "conditional_assignment" -> ConditionalAssignment
   "conditional" -> Ternary
+  "element_reference" -> SubscriptAccess
+  "else_block" -> ExpressionStatements
+  "elsif_block" -> ExpressionStatements
+  "ensure_block" -> ExpressionStatements
   "ERROR" -> Error
   "float" -> NumberLiteral
   "for_statement" -> For
@@ -109,15 +115,18 @@ categoryForRubyName = \case
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
+  "rescue_block" -> ExpressionStatements
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
+  "then_block" -> ExpressionStatements
   "unless_modifier" -> Unless
   "unless_statement" -> Unless
   "until_modifier" -> Until
   "until_statement" -> Until
+  "when_block" -> ExpressionStatements
   "while_modifier" -> While
   "while_statement" -> While
   "yield" -> Yield

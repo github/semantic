@@ -25,9 +25,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "0522110452860c1fbab3a97d2b7ca5ce760401a9",
+    "sha1": "7d2ffedb86e5a7ebe269424b2b59ec8f7cf7b7ad",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0fb0e81f1e9292c6e85251f0cf51499d0b69c708"
+    "sha2": "770c0effd0c68e97eb589bdbd869e44582ba9f32"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-insert-test",
@@ -86,9 +86,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "0fb0e81f1e9292c6e85251f0cf51499d0b69c708",
+    "sha1": "770c0effd0c68e97eb589bdbd869e44582ba9f32",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "760ae580e161b5292da34af5a088be27e30d5c32"
+    "sha2": "7c985dfd59641f2f4cdb94d76a8bafd174231d9d"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-insert-test",
@@ -147,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '\n' then_block with the 'bar' identifier"
+                    "summary": "Replaced the '\n' expression statements with the 'bar' identifier"
                 },
                 {
                     "span": {
@@ -216,9 +216,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "760ae580e161b5292da34af5a088be27e30d5c32",
+    "sha1": "7c985dfd59641f2f4cdb94d76a8bafd174231d9d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "85f66931ee4acba71f5679144581d10b72942ec3"
+    "sha2": "d441be1452db5f0b0e41a00f262052c9ca7d4410"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-test",
@@ -277,7 +277,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the '\n' then_block"
+                    "summary": "Replaced the 'bar' identifier with the '\n' expression statements"
                 },
                 {
                     "span": {
@@ -346,9 +346,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "85f66931ee4acba71f5679144581d10b72942ec3",
+    "sha1": "d441be1452db5f0b0e41a00f262052c9ca7d4410",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2c73c57a4e1a4e50085577fd43253d11b382e079"
+    "sha2": "e10d88e61ebf69dca0ace4808a0331ec4d54c579"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-replacement-test",
@@ -377,9 +377,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "2c73c57a4e1a4e50085577fd43253d11b382e079",
+    "sha1": "e10d88e61ebf69dca0ace4808a0331ec4d54c579",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f80685b32db055d2d6bf76a7113115be0e62fed2"
+    "sha2": "02708a9a2dc27b4431e4e80e0554ed5562345526"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-test",
@@ -408,9 +408,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "f80685b32db055d2d6bf76a7113115be0e62fed2",
+    "sha1": "02708a9a2dc27b4431e4e80e0554ed5562345526",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "10f2c0bbc49ae600c7f1d8961fbc9d28c44e69f7"
+    "sha2": "16425bd352364325af0bcd52fc00b58aeb4c1775"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-rest-test",
@@ -454,7 +454,7 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "10f2c0bbc49ae600c7f1d8961fbc9d28c44e69f7",
+    "sha1": "16425bd352364325af0bcd52fc00b58aeb4c1775",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "564ba2bc7dba46165688e9c7328b276e5a4b8b98"
+    "sha2": "a21f5f095a5edfc020bb8a9e0b2074ec72c572b2"
 }]

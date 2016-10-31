@@ -255,6 +255,20 @@
         "insert": "for x in y\n  f\nend",
         "replacement": "for i in [1,2,3] do\n  print i\nend",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/for.json"
+      },
+      {
+        "syntax": "element-reference",
+        "repoFilePath": "element-reference.rb",
+        "insert": "foo[bar]\nfoo[:bar]\nfoo[bar] = 1",
+        "replacement": "x[\"b\"]\nx[:\"c\"]",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/element-reference.json"
+      },
+      {
+        "syntax": "control-statements",
+        "repoFilePath": "control-statements.rb",
+        "insert": "begin\n	foo\nrescue x\n  bar\nelse\n	quux\nensure\n  baz\nend",
+        "replacement": "begin\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/control-statements.json"
       }
     ]
   }

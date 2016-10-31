@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-pseudo_variables-insert-test",
+    "testCaseDescription": "ruby-element-reference-insert-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,11 +12,26 @@
                             ],
                             "end": [
                                 1,
-                                4
+                                9
                             ]
                         }
                     },
-                    "summary": "Added 'nil' identifier"
+                    "summary": "Added the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[:bar]' subscript access"
                 },
                 {
                     "span": {
@@ -27,43 +42,43 @@
                             ],
                             "end": [
                                 3,
-                                6
+                                13
                             ]
                         }
                     },
-                    "summary": "Added 'false'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'true'"
+                    "summary": "Added the 'foo[bar]' assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "fc69890ae7e264b452610db039a98c8d5ca3c775",
+    "sha1": "4d38c0aa2169ecc56e3e1ca0afaa2c695f247044",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2251cb7fe3221091f83b56a6043055169ff7d535"
+    "sha2": "9a3f84f9c05722243a7bb0a10f4c92a4af6965ff"
 }
 ,{
-    "testCaseDescription": "ruby-pseudo_variables-replacement-insert-test",
+    "testCaseDescription": "ruby-element-reference-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"b\"]' subscript access"
+                },
                 {
                     "span": {
                         "insert": {
@@ -73,11 +88,11 @@
                             ],
                             "end": [
                                 2,
-                                4
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'NIL' identifier"
+                    "summary": "Added the 'x[:\"c\"]' subscript access"
                 },
                 {
                     "span": {
@@ -88,11 +103,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                9
                             ]
                         }
                     },
-                    "summary": "Added 'TRUE'"
+                    "summary": "Added the 'foo[bar]' subscript access"
                 },
                 {
                     "span": {
@@ -103,11 +118,11 @@
                             ],
                             "end": [
                                 4,
-                                6
+                                10
                             ]
                         }
                     },
-                    "summary": "Added 'FALSE'"
+                    "summary": "Added the 'foo[:bar]' subscript access"
                 },
                 {
                     "span": {
@@ -118,69 +133,39 @@
                             ],
                             "end": [
                                 5,
-                                4
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'nil' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added 'false'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'true'"
+                    "summary": "Added the 'foo[bar]' assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "2251cb7fe3221091f83b56a6043055169ff7d535",
+    "sha1": "9a3f84f9c05722243a7bb0a10f4c92a4af6965ff",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "619ae6073b70583a08af53ab60541b67fbcb01b9"
+    "sha2": "2a7b14ca6100671b8aecf7966f09cdb0b27d5efd"
 }
 ,{
-    "testCaseDescription": "ruby-pseudo_variables-delete-insert-test",
+    "testCaseDescription": "ruby-element-reference-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    2,
-                                    4
+                                    1,
+                                    7
                                 ]
                             },
                             {
@@ -190,86 +175,98 @@
                                 ],
                                 "end": [
                                     1,
-                                    4
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'NIL' identifier with the 'nil' identifier"
+                    "summary": "Replaced the 'x[\"b\"]' subscript access with the 'foo[bar]' subscript access"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the foo[:bar] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
                                     5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
                                 ],
                                 "end": [
-                                    3,
-                                    6
+                                    2,
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced 'TRUE' with 'false'"
+                    "summary": "Replaced the ':\"c\"' symbol with the ':bar' symbol in the foo[:bar] subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
-                                5
+                                3,
+                                13
                             ]
                         }
                     },
-                    "summary": "Added 'true'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'FALSE'"
+                    "summary": "Added the 'foo[bar]' assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "619ae6073b70583a08af53ab60541b67fbcb01b9",
+    "sha1": "2a7b14ca6100671b8aecf7966f09cdb0b27d5efd",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "15d488e57cc62a13a408b028a2866bb076a61a2e"
+    "sha2": "7f521f5acf165e4252c7c0484f3962d54be9a29c"
 }
 ,{
-    "testCaseDescription": "ruby-pseudo_variables-replacement-test",
+    "testCaseDescription": "ruby-element-reference-replacement-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
                 {
                     "span": {
                         "replace": [
@@ -280,96 +277,123 @@
                                 ],
                                 "end": [
                                     1,
-                                    4
+                                    9
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    2,
-                                    4
+                                    1,
+                                    7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'nil' identifier with the 'NIL' identifier"
+                    "summary": "Replaced the 'foo[bar]' subscript access with the 'x[\"b\"]' subscript access"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    3,
-                                    6
+                                    2,
+                                    4
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    2,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the x[:\"c\"] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
                                     5
+                                ],
+                                "end": [
+                                    2,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced 'false' with 'TRUE'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added 'FALSE'"
+                    "summary": "Replaced the ':bar' symbol with the ':\"c\"' symbol in the x[:\"c\"] subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
-                                5
+                                3,
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted 'true'"
+                    "summary": "Deleted the 'foo[bar]' assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "15d488e57cc62a13a408b028a2866bb076a61a2e",
+    "sha1": "7f521f5acf165e4252c7c0484f3962d54be9a29c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bacaf4fce2a578fd60b6b0b66b615fda90dc1f0e"
+    "sha2": "ea963de8062d853cb46246775f28cb95a15a4f11"
 }
 ,{
-    "testCaseDescription": "ruby-pseudo_variables-delete-replacement-test",
+    "testCaseDescription": "ruby-element-reference-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"b\"]' subscript access"
+                },
                 {
                     "span": {
                         "delete": {
@@ -379,11 +403,11 @@
                             ],
                             "end": [
                                 2,
-                                4
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'NIL' identifier"
+                    "summary": "Deleted the 'x[:\"c\"]' subscript access"
                 },
                 {
                     "span": {
@@ -394,11 +418,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted 'TRUE'"
+                    "summary": "Deleted the 'foo[bar]' subscript access"
                 },
                 {
                     "span": {
@@ -409,11 +433,11 @@
                             ],
                             "end": [
                                 4,
-                                6
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted 'FALSE'"
+                    "summary": "Deleted the 'foo[:bar]' subscript access"
                 },
                 {
                     "span": {
@@ -424,103 +448,58 @@
                             ],
                             "end": [
                                 5,
-                                4
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'nil' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'false'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'true'"
+                    "summary": "Deleted the 'foo[bar]' assignment"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
-                                4
+                                4,
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the 'NIL' identifier"
+                    "summary": "Added the 'x[\"b\"]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
-                                5
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Added 'TRUE'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added 'FALSE'"
+                    "summary": "Added the 'x[:\"c\"]' subscript access"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "bacaf4fce2a578fd60b6b0b66b615fda90dc1f0e",
+    "sha1": "ea963de8062d853cb46246775f28cb95a15a4f11",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4420f0188cb2dc25aae721aaca3598987cbdf695"
+    "sha2": "84eedcab61f7f5ab3daf0a8c964b113d9f64cc3e"
 }
 ,{
-    "testCaseDescription": "ruby-pseudo_variables-delete-test",
+    "testCaseDescription": "ruby-element-reference-delete-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
                 {
                     "span": {
                         "delete": {
@@ -530,11 +509,26 @@
                             ],
                             "end": [
                                 1,
-                                4
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'nil' identifier"
+                    "summary": "Deleted the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[:bar]' subscript access"
                 },
                 {
                     "span": {
@@ -545,43 +539,43 @@
                             ],
                             "end": [
                                 3,
-                                6
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted 'false'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'true'"
+                    "summary": "Deleted the 'foo[bar]' assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "4420f0188cb2dc25aae721aaca3598987cbdf695",
+    "sha1": "84eedcab61f7f5ab3daf0a8c964b113d9f64cc3e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b5a11f87eafdf949f60eb1f0920db937755aa4b9"
+    "sha2": "bc4a52ddf4d626b3a477109d3f96f07ee2cb5d43"
 }
 ,{
-    "testCaseDescription": "ruby-pseudo_variables-delete-rest-test",
+    "testCaseDescription": "ruby-element-reference-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "pseudo_variables.rb": [
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"b\"]' subscript access"
+                },
                 {
                     "span": {
                         "delete": {
@@ -591,50 +585,20 @@
                             ],
                             "end": [
                                 2,
-                                4
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted 'NIL' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'TRUE'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'FALSE'"
+                    "summary": "Deleted the 'x[:\"c\"]' subscript access"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "pseudo_variables.rb"
+        "element-reference.rb"
     ],
-    "sha1": "b5a11f87eafdf949f60eb1f0920db937755aa4b9",
+    "sha1": "bc4a52ddf4d626b3a477109d3f96f07ee2cb5d43",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fe66833a04f33c96627a87860a62d880236fd92f"
+    "sha2": "6b627bfe1713f53e87d2e7e19f7fd84bf72e8de9"
 }]
