@@ -16,67 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'quux' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'baz' identifier"
+                    "summary": "Added a begin block"
                 }
             ]
         },
@@ -107,82 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'begin\nend' expression statements"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'quux' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                3
-                            ],
-                            "end": [
-                                10,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'baz' identifier"
+                    "summary": "Added a begin block"
                 }
             ]
         },
@@ -225,7 +90,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'begin\nend' expression statements with the 'foo' identifier"
+                    "summary": "Replaced a begin block with a begin block"
                 }
             ]
         },
@@ -268,7 +133,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'begin\nend' expression statements"
+                    "summary": "Replaced a begin block with a begin block"
                 }
             ]
         },
@@ -299,97 +164,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'begin\nend' expression statements"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'quux' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                3
-                            ],
-                            "end": [
-                                10,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'baz' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'begin\nend' expression statements"
+                    "summary": "Deleted a begin block"
                 }
             ]
         },
@@ -407,66 +182,6 @@
     "expectedResult": {
         "changes": {
             "control-statements.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'quux' identifier"
-                },
                 {
                     "span": {
                         "delete": {
@@ -511,7 +226,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'begin\nend' expression statements"
+                    "summary": "Deleted a begin block"
                 }
             ]
         },
