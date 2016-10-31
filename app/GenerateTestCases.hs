@@ -170,7 +170,7 @@ runGenerateCommitAndTestCase opts JSONMetaRepo{..} testCaseFilePath (JSONMetaSyn
   _ <- executeCommand repoPath command
   afterSha <- executeCommand repoPath getLastCommitShaCommand
 
-  expectedResult' <- runExpectedResultGenerator repoPath beforeSha afterSha (syntax <> fileExt) opts
+  expectedResult' <- runExpectedResult repoPath beforeSha afterSha (syntax <> fileExt) opts
 
   let jsonTestCase = encodePretty JSONTestCase {
     gitDir = extractGitDir repoPath,
@@ -187,16 +187,27 @@ runGenerateCommitAndTestCase opts JSONMetaRepo{..} testCaseFilePath (JSONMetaSyn
   where extractGitDir :: String -> String
         extractGitDir fullRepoPath = DC.unpack $ snd $ DC.breakSubstring (DC.pack "test") (DC.pack fullRepoPath)
 
+-- | This constructs an Eff and runs it to return the appropriate IO ExpectedResult.
+runExpectedResult :: FilePath -> String -> String -> FilePath -> GeneratorArgs -> IO ExpectedResult
+runExpectedResult repoPath beforeSha afterSha repoFilePath GeneratorArgs{..} =
+  case generateFormat of
+    GenerateSummaries -> Main.run $ constructSummariesEff repoPath beforeSha afterSha repoFilePath
+    GenerateJSON -> Main.run $ constructJSONEff repoPath beforeSha afterSha repoFilePath
+    _ -> pure $ EmptyResult ""
+
 data GenerateEff a where
   GenerateSummaries' :: Arguments -> GenerateEff ExpectedResult
   GenerateJSON' :: Arguments -> GenerateEff ExpectedResult
 
-generateSummaries' :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
-generateSummaries' repoPath beforeSha afterSha repoFilePath = send $ GenerateSummaries' (args repoPath beforeSha afterSha [repoFilePath] R.Summary)
+-- | Construct an Eff whose queue includes only GenerateEff effects.
+constructSummariesEff :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
+constructSummariesEff repoPath beforeSha afterSha repoFilePath = send $ GenerateSummaries' (args repoPath beforeSha afterSha [repoFilePath] R.Summary)
 
-generateJSON' :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
-generateJSON' repoPath beforeSha afterSha repoFilePath = send $ GenerateJSON' (args repoPath beforeSha afterSha [repoFilePath] R.JSON)
+-- | Construct an Eff whose queue includes only GenerateEff effects.
+constructJSONEff :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
+constructJSONEff repoPath beforeSha afterSha repoFilePath = send $ GenerateJSON' (args repoPath beforeSha afterSha [repoFilePath] R.JSON)
 
+-- | Evaluate the Effs and return the IO ExpectedResult.
 run :: Eff '[GenerateEff] ExpectedResult -> IO ExpectedResult
 run (Val x) = pure x
 run (E u queue) = case decompose u of
@@ -204,14 +215,8 @@ run (E u queue) = case decompose u of
   (Right (GenerateJSON' args)) -> generateJSON args >>= \s -> Main.run (apply queue s)
   (Left _) -> pure $ EmptyResult ""
 
-runExpectedResultGenerator :: FilePath -> String -> String -> FilePath -> GeneratorArgs -> IO ExpectedResult
-runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath GeneratorArgs{..} =
-  case generateFormat of
-    GenerateSummaries -> Main.run $ generateSummaries' repoPath beforeSha afterSha repoFilePath
-    GenerateJSON -> Main.run $ generateJSON' repoPath beforeSha afterSha repoFilePath
-    _ -> pure $ EmptyResult ""
-
-generateSummaries :: Arguments -> IO ExpectedResult -- (Map Text [Value], Map Text [Value])
+-- | Produces DiffSummary results for the given Arguments.
+generateSummaries :: Arguments -> IO ExpectedResult
 generateSummaries args@Arguments{..} = do
   diffs <- fetchDiffs args
   let headResult = Prelude.head $ maybeMapSummary diffs
@@ -219,7 +224,8 @@ generateSummaries args@Arguments{..} = do
   let errors = fromMaybe (fromList [("errors", mempty)]) headResult ! "errors"
   pure $ SummaryResult ( Map.fromList [ ("changes", changes), ("errors", errors) ] )
 
-generateJSON :: Arguments -> IO ExpectedResult -- (Map Text Value)
+-- | Produces JSON output for the given Arguments.
+generateJSON :: Arguments -> IO ExpectedResult
 generateJSON args = do
   diffs <- fetchDiffs args
   let headResult = Prelude.head $ maybeMapJSON diffs
