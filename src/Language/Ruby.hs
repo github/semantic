@@ -55,16 +55,19 @@ termConstructor source sourceSpan name range children
     ("until_modifier", [ lhs, condition ]) -> S.Until condition (Just lhs)
     ("until_statement", [ expr, body ]) -> S.Until expr (Just body)
     ("until_statement", [ expr ]) -> S.Until expr Nothing
+    ("until_statement", _ ) -> S.Error children
     ("while_modifier", [ lhs, condition ]) -> S.While condition (Just lhs)
     ("while_statement", [ expr, body ]) -> S.While expr (Just body)
     ("while_statement", [ expr ]) -> S.While expr Nothing
+    ("while_statement", _ ) -> S.Error children
     ("yield", _) -> S.Yield (listToMaybe children)
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
+    ("for_statement", _ ) -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
           ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
-          _ -> S.Indexed children
+          _ -> S.Error children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
