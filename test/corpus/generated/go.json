@@ -18,6 +18,13 @@
         "insert": "a()",
         "testCaseFilePath": "test/corpus/diff-summaries/go/function-call.json",
         "replacement": "b()"
+      },
+      {
+        "syntax": "const declarations",
+        "repoFilePath": "const-declarations.go",
+        "insert": "const zero = 0",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/const-declarations.json",
+        "replacement": "const one, two = 1, 2"
       }
     ]
   }

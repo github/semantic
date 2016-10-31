@@ -31,6 +31,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
         [] -> pure []
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) block
+  -- TODO: Handle multiple var specs
   ("var_declaration", [varSpec]) -> do
     assignment' <- case toList (unwrap varSpec) of
       [idList, _, exprs] -> do
@@ -41,6 +42,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
       _ -> withCategory Error (S.Error [varSpec])
     withDefaultInfo $ S.VarDecl assignment'
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
+  ("const_declaration", )
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
@@ -68,5 +70,6 @@ categoryForGoName = \case
   "var_spec" -> VarAssignment
   "assignment_statement" -> Assignment
   "source_file" -> Module
+  "const_declaration" -> VarDecl
   s -> Other (toS s)
 

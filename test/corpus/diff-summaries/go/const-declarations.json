@@ -1,0 +1,640 @@
+[{
+    "testCaseDescription": "go-const declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                14
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '0'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "8ec449466dc83c779db81b1404422ce312813197",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "14534334a4caf92e6b66eac9a093d7affabf2381"
+}
+,{
+    "testCaseDescription": "go-const declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'one' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added 'two' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                14
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '0'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "14534334a4caf92e6b66eac9a093d7affabf2381",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "5b7fd378f6e6b5ce9347b86eac26e1444594c270"
+}
+,{
+    "testCaseDescription": "go-const declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    7
+                                ],
+                                "end": [
+                                    3,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    7
+                                ],
+                                "end": [
+                                    3,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    18
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    14
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "5b7fd378f6e6b5ce9347b86eac26e1444594c270",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "ab8775999cd0ce4369e9a726b011e3bad2ffa191"
+}
+,{
+    "testCaseDescription": "go-const declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    7
+                                ],
+                                "end": [
+                                    3,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    7
+                                ],
+                                "end": [
+                                    3,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    14
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    18
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "ab8775999cd0ce4369e9a726b011e3bad2ffa191",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "585cdf2882974fc7f70c2b2af54b246b70e5e112"
+}
+,{
+    "testCaseDescription": "go-const declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'one' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'two' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                14
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added 'one' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added 'two' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "585cdf2882974fc7f70c2b2af54b246b70e5e112",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c343a01ab99bdafc1a832a18d773365de9714ca9"
+}
+,{
+    "testCaseDescription": "go-const declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                14
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "c343a01ab99bdafc1a832a18d773365de9714ca9",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6245e682cc81e58ee2b3de75266a822912ec7f7b"
+}
+,{
+    "testCaseDescription": "go-const declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'one' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'two' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations.go"
+    ],
+    "sha1": "6245e682cc81e58ee2b3de75266a822912ec7f7b",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "3240337150f4b721b07dae4a1ec29072daa0c9f4"
+}]
