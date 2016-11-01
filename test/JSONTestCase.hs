@@ -8,23 +8,23 @@ import Data.HashMap.Strict as HM
 import Prelude
 import Prologue
 
-data JSONMetaRepo = JSONMetaRepo { repoUrl  :: !String
+data JSONMetaRepo = JSONMetaRepo { repoUrl :: !String
                                  , language :: !String
                                  , fileExt :: !String
                                  , syntaxes :: ![JSONMetaSyntax]
                                  } deriving (Show, Generic, FromJSON)
 
-data JSONMetaSyntax = JSONMetaSyntax { syntax           :: !String
-                                     , insert           :: !String
-                                     , replacement      :: !String
+data JSONMetaSyntax = JSONMetaSyntax { syntax :: !String
+                                     , insert :: !String
+                                     , replacement :: !String
                                      } deriving (Show, Generic, FromJSON)
 
-data JSONTestCase = JSONTestCase { gitDir              :: !String
+data JSONTestCase = JSONTestCase { gitDir :: !String
                                  , testCaseDescription :: !String
-                                 , filePaths           :: ![String]
-                                 , sha1                :: !String
-                                 , sha2                :: !String
-                                 , expectedResult      :: !ExpectedResult
+                                 , filePaths :: ![String]
+                                 , sha1 :: !String
+                                 , sha2 :: !String
+                                 , expectedResult :: !ExpectedResult
                                  } deriving (Show, Generic, FromJSON)
 
 data ExpectedResult = SummaryResult (Map Text (Map Text [Value]))
