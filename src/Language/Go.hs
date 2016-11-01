@@ -49,13 +49,14 @@ termConstructor source sourceSpan name range children = case (name, children) of
     where
       toVarAssignment constSpec = do
         assignment <- case toList (unwrap constSpec) of
-          [idList, _, exprs] -> do
+          idList : rest -> do
             identifier' <- case toList (unwrap idList) of
-              (id : _) -> case toList (unwrap id) of
-                (id : _) -> pure id
+              id : _ -> case toList (unwrap id) of
+                id : _ -> pure id
                 _ -> withCategory Error (S.Error [constSpec])
               _ -> withCategory Error (S.Error [constSpec])
-            withDefaultInfo $ S.VarAssignment identifier' exprs
+            rest' <- withDefaultInfo (S.Indexed rest)
+            withDefaultInfo $ S.VarAssignment identifier' rest'
           _ -> withCategory Error (S.Error [constSpec])
         withDefaultInfo $ S.VarDecl assignment
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
