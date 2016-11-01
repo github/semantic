@@ -53,6 +53,7 @@ library
                      , Syntax
                      , Term
                      , Term.Arbitrary
+                     , Term.Instances
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson
