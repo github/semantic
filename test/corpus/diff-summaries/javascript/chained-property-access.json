@@ -25,9 +25,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "f90a3adaa2c74802e218415dbf5e97a2bc98edd6",
+    "sha1": "d634acd5aed3ab7ef4a9914234758a3bf356d2c4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "47e35f990e572949549e96a1f0394c46d1b83457"
+    "sha2": "723940f8df7814d9f0fb1ea03dddbff771d80ac8"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "47e35f990e572949549e96a1f0394c46d1b83457",
+    "sha1": "723940f8df7814d9f0fb1ea03dddbff771d80ac8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "976277ae0a88c56692c8f16fbf4835bfa38cb45f"
+    "sha2": "4d9c7053f056b963074f086d40020195bff90c32"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
@@ -141,9 +141,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "976277ae0a88c56692c8f16fbf4835bfa38cb45f",
+    "sha1": "4d9c7053f056b963074f086d40020195bff90c32",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8fd4f80abc4f79eb8013a84925a5ae67cd88342e"
+    "sha2": "b0faefc21e5b571d399056063f96cfbf810a503f"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-test",
@@ -211,9 +211,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "8fd4f80abc4f79eb8013a84925a5ae67cd88342e",
+    "sha1": "b0faefc21e5b571d399056063f96cfbf810a503f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2db392acb1f07efdde3d79a7287ce267c8353b7c"
+    "sha2": "ea742ea1e997a7a1241d1e719c3b313d8a42067c"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
@@ -272,9 +272,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "2db392acb1f07efdde3d79a7287ce267c8353b7c",
+    "sha1": "ea742ea1e997a7a1241d1e719c3b313d8a42067c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "79412c4439f3638bfd2cd55ac0d067253404782e"
+    "sha2": "5517a9b89409234d2dc3cbf17aa526d72bc12479"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-test",
@@ -303,9 +303,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "79412c4439f3638bfd2cd55ac0d067253404782e",
+    "sha1": "5517a9b89409234d2dc3cbf17aa526d72bc12479",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "644f8f4ad6fb72187fcad570e5d6c6172f4ba2ee"
+    "sha2": "66cacfd430f02a62b6976e31fdc0a53ae019dd5e"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
@@ -334,7 +334,7 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "644f8f4ad6fb72187fcad570e5d6c6172f4ba2ee",
+    "sha1": "66cacfd430f02a62b6976e31fdc0a53ae019dd5e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "181d9807930d201a183c1799b271ec7d6267a26d"
+    "sha2": "0dd5a42b7e992a63ee0e46bbbc58699dd09f6851"
 }]

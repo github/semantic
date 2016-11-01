@@ -1,274 +1,198 @@
 [
   {
-    "repoPath": "test/corpus/repos/ruby",
-    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "language": "ruby",
+    "fileExt": ".rb",
+    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
         "syntax": "assignment",
-        "repoFilePath": "assignment.rb",
         "insert": "x = 0",
         "replacement": "x = 1",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/assignment.json"
       },
       {
         "syntax": "comment",
-        "repoFilePath": "comment.rb",
         "insert": "# This is a comment",
         "replacement": "=begin\nThis is a multiline\ncomment\n=end",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/comment.json"
       },
       {
         "syntax": "number",
-        "repoFilePath": "number.rb",
         "insert": "1234\n1_234\n0d1_234\n0xa_bcd_ef0_123_456_789\n0o1234567\n0b1_0\n1.234_5e678_90\n",
         "replacement": "1235\n1_235\n0d1_235\n0xa_bcd_ef0_123_456_788\n0o1234576\n0b1_1\n1.234_5e678_91\n",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/number.json"
       },
       {
         "syntax": "symbol",
-        "repoFilePath": "symbol.rb",
         "insert": ":foo\n:'foo'\n:\"foo\"",
         "replacement": ":bar\n:'bar'\n:\"bar\"",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/symbol.json"
       },
       {
         "syntax": "string",
-        "repoFilePath": "string.rb",
         "insert": "''\n'foo with \"bar\"'",
         "replacement": "\"\"\n\"bar with 'foo'\"",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/string.json"
       },
       {
         "syntax": "interpolation",
-        "repoFilePath": "symbol.rb",
         "insert": ":\"foo #{bar}\"\n\"foo #{bar}\"",
         "replacement": ":\"bar #{foo}\"\n\"bar #{foo}\"",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/interpolation.json"
       },
       {
         "syntax": "delimiter",
-        "repoFilePath": "delimiter.rb",
         "insert": "%q#a#\n%q<a<b>c>\n%#a#\n%Q#a#\n%<a<b>c>\n%Q<a<b>c>",
         "replacement": "%q/b/\n%q{d{e}f}\n%/b/\n%Q/b/\n%{d{e}f}\n%Q{d{e}f}",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/delimiter.json"
       },
       {
         "syntax": "math-assignment",
-        "repoFilePath": "math-assignment.rb",
         "insert": "x += 1\nx -= 1\nx *= 1\nx /= 1\nx **= 1",
         "replacement": "x+= 2\nx -= 1\nx *= 1\nx /= 1\nx **= 1",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/math-assignment.json"
       },
       {
         "syntax": "conditional-assignment",
-        "repoFilePath": "conditional-assignment.rb",
         "insert": "x ||= 5",
         "replacement": "x &&= 7",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/conditional-assignment.json"
       },
       {
         "syntax": "multiple-assignments",
-        "repoFilePath": "multiple-assignments.rb",
         "insert": "x, y, z = 10, 20, 30",
         "replacement": "x, y = aVariable, 40",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/multiple-assignments.json"
       },
       {
         "syntax": "pseudo-variables",
-        "repoFilePath": "pseudo-variables.rb",
         "insert": "nil\nself\nfalse\ntrue",
         "replacement": "self\nNIL\nTRUE\nFALSE",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/pseudo-variables.json"
       },
       {
         "syntax": "subshell",
-        "repoFilePath": "subshell.rb",
         "insert": "`ls -la`",
         "replacement": "`git status`",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/subshell.json"
       },
       {
         "syntax": "hash",
-        "repoFilePath": "hash.rb",
         "insert": "{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
         "replacement": "{ key1: \"changed value\", key2: 2, key3: true }",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/hash.json"
       },
       {
         "syntax": "boolean-operator",
-        "repoFilePath": "boolean-operator.rb",
         "insert": "a || b",
         "replacement": "a && b",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/boolean-operator.json"
       },
       {
         "syntax": "relational-operator",
-        "repoFilePath": "relational-operator.rb",
         "insert": "x == y\nx != y\nx === y",
         "replacement": "x <=> y\nx =~ y\nx =! y",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/relational-operator.json"
       },
       {
         "syntax": "comparision-operator",
-        "repoFilePath": "comparision-operator.rb",
         "insert": "x < y\na > b",
         "replacement": "x <= y\na >= b",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/comparision-operator.json"
       },
       {
         "syntax": "bitwise-operator",
-        "repoFilePath": "bitwise-operator.rb",
         "insert": "a | b\na >> b\na ^ b",
         "replacement": "a & b\na << b",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/bitwise-operator.json"
       },
       {
         "syntax": "ternary",
-        "repoFilePath": "ternary.rb",
         "insert": "condition ? case1 : case2",
         "replacement": "if condition then case 1 else case2",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/ternary.json"
       },
       {
         "syntax": "method-invocation",
-        "repoFilePath": "method-invocation.rb",
         "insert": "print\nfoo.bar\nbar",
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/method-invocation.json"
       },
       {
         "syntax": "case-statement",
-        "repoFilePath": "case-statement.rb",
         "insert": "case foo\nwhen bar\nend",
         "replacement": "case foo\nwhen bar\nelse\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/case-statement.json"
       },
       {
         "syntax": "class",
-        "repoFilePath": "class.rb",
         "insert": "class Foo < Super\n  def test; end\nend",
         "replacement": "class Foo\n  def test; end\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/class.json"
       },
       {
         "syntax": "module",
-        "repoFilePath": "module.rb",
         "insert": "module Foo\n  class Bar\n    def self.test; end\nend\nend",
         "replacement": "class Bar::Foo\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/module.json"
       },
       {
         "syntax": "return",
-        "repoFilePath": "return.rb",
         "insert": "return foo",
         "replacement": "return",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/return.json"
       },
       {
         "syntax": "yield",
-        "repoFilePath": "yield.rb",
         "insert": "yield foo",
         "replacement": "yield",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/yield.json"
       },
       {
         "syntax": "while",
-        "repoFilePath": "while.rb",
         "insert": "while foo do\nend\nfoo while run",
         "replacement": "while foo\n  bar\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/while.json"
       },
       {
         "syntax": "until",
-        "repoFilePath": "until.rb",
         "insert": "until foo do\nend\nfoo until done",
         "replacement": "until foo\n  bar\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/until.json"
       },
       {
         "syntax": "if",
-        "repoFilePath": "if.rb",
         "insert": "if foo\n  bar\nelsif quux\n  baz\nelse\n  bat\nend",
         "replacement": "if x\nend\nif y then\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/if.json"
       },
       {
         "syntax": "unless",
-        "repoFilePath": "unless.rb",
         "insert": "unless foo\n  bar\nelse\n  bat\nend",
         "replacement": "unless x\nend\nunless y then\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/unless.json"
       },
       {
         "syntax": "if-unless-modifiers",
-        "repoFilePath": "if-unless-modifiers.rb",
         "insert": "print unless foo",
         "replacement": "print if foo",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/if-unless-modifiers.json"
       },
       {
         "syntax": "and-or",
-        "repoFilePath": "and-or.rb",
         "insert": "foo and bar",
         "replacement": "foo or bar\na or b and c",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/and-or.json"
       },
       {
         "syntax": "regex",
-        "repoFilePath": "regex.rb",
         "insert": "/^(foo|bar[^_])$/i",
         "replacement": "%r/a/\n%r<a<b>c>",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/regex.json"
       },
       {
         "syntax": "array",
-        "repoFilePath": "array.rb",
         "insert": "[ 1, 2, 3]",
         "replacement": "['a', 'b', 'c']",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/array.json"
       },
       {
         "syntax": "percent-array",
-        "repoFilePath": "percent-array.rb",
         "insert": "%w(one two)",
         "replacement": "%W(one #{b} three)",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/percent-array.json"
       },
       {
         "syntax": "lambda-dash-rocket",
-        "repoFilePath": "lambda-dash-rocket.rb",
         "insert": "-> (a, b, c) {\n  1\n  2\n}",
         "replacement": "-> { foo }",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/lambda-dash-rocket.json"
       },
       {
         "syntax": "lambda",
-        "repoFilePath": "lambda.rb",
         "insert": "lambda { foo }",
         "replacement": "lambda { |x| x + 1 }",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/lambda.json"
       },
       {
         "syntax": "for",
-        "repoFilePath": "for.rb",
         "insert": "for x in y\n  f\nend",
         "replacement": "for i in [1,2,3] do\n  print i\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/for.json"
       },
       {
         "syntax": "element-reference",
-        "repoFilePath": "element-reference.rb",
         "insert": "foo[bar]\nfoo[:bar]\nfoo[bar] = 1",
         "replacement": "x[\"b\"]\nx[:\"c\"]",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/element-reference.json"
       },
       {
         "syntax": "control-statements",
-        "repoFilePath": "control-statements.rb",
         "insert": "begin\n	foo\nrescue x\n  bar\nelse\n	quux\nensure\n  baz\nend",
         "replacement": "begin\nend",
-        "testCaseFilePath": "test/corpus/diff-summaries-todo/ruby/control-statements.json"
       }
     ]
   }

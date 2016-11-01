@@ -1,0 +1,2765 @@
+[{
+    "testCaseDescription": "javascript-generator-function-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        23
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        30,
+                                                        34
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                38,
+                                                                44
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        51,
+                                                                        55
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                45,
+                                                                56
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        36,
+                                                        58
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        60
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                60,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        60,
+                        60
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "04e8a59bc45444cc298c2142de90af10b8386bf3"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "cbcb5d062890692a2a789b510fe5ca42f93fbae0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d8ab3aa4042a2054274acfd0d9cadfb34508da97"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        26
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        31
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        33,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                41,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        54,
+                                                                        58
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                48,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        39,
+                                                        61
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                61
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        62
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        63
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        73,
+                                                        86
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        87,
+                                                        91
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        93,
+                                                        97
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                101,
+                                                                107
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        114,
+                                                                        118
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                108,
+                                                                119
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        99,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                63,
+                                                121
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        63,
+                                        122
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                63,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        63,
+                        123
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        23
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        30,
+                                                        34
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                38,
+                                                                44
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        51,
+                                                                        55
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                45,
+                                                                56
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        36,
+                                                        58
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        60
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        133,
+                                                        146
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        147,
+                                                        151
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        153,
+                                                        157
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                161,
+                                                                167
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        174,
+                                                                        178
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                168,
+                                                                179
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        159,
+                                                        181
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                123,
+                                                181
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        123,
+                                        182
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                123,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        123,
+                        183
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                60,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        60
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                183,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        183,
+                        183
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "04e8a59bc45444cc298c2142de90af10b8386bf3",
+            "ed5c0370f5abc30c2f381fe513447b205647aebc"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "d8ab3aa4042a2054274acfd0d9cadfb34508da97",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d6e10d7d2dc19527725f2520be455028c06d6c1b"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        10,
+                                                        26
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        31
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        33,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                41,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        54,
+                                                                        58
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                48,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        39,
+                                                        61
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                61
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        62
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        63
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        10,
+                                                        23
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        30,
+                                                        34
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                38,
+                                                                44
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        51,
+                                                                        55
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                45,
+                                                                56
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        36,
+                                                        58
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        60
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        73,
+                                                        86
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        87,
+                                                        91
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        93,
+                                                        97
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                101,
+                                                                107
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        114,
+                                                                        118
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                108,
+                                                                119
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        99,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                63,
+                                                121
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        63,
+                                        122
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                63,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        63,
+                        123
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        70,
+                                                        83
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        84,
+                                                        88
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        90,
+                                                        94
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                98,
+                                                                104
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        111,
+                                                                        115
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                105,
+                                                                116
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        96,
+                                                        118
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                60,
+                                                118
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        60,
+                                        119
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                60,
+                                120
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        120
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        133,
+                                                        146
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        147,
+                                                        151
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        153,
+                                                        157
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                161,
+                                                                167
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        174,
+                                                                        178
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                168,
+                                                                179
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        159,
+                                                        181
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                123,
+                                                181
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        123,
+                                        182
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                123,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        123,
+                        183
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        130,
+                                                        143
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        144,
+                                                        148
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        150,
+                                                        154
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                158,
+                                                                164
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        171,
+                                                                        175
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                165,
+                                                                176
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        156,
+                                                        178
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                120,
+                                                178
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        120,
+                                        179
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                120,
+                                180
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        120,
+                        180
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                183,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        183,
+                        183
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                180,
+                                180
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        180,
+                        180
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "ed5c0370f5abc30c2f381fe513447b205647aebc",
+            "0895c3fde3cba1e850e4730eb193f62270215e70"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "d6e10d7d2dc19527725f2520be455028c06d6c1b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4c537f6b60b1ef1d082f62e211b6f4da62918d0f"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        10,
+                                                        23
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        30,
+                                                        34
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                38,
+                                                                44
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        51,
+                                                                        55
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                45,
+                                                                56
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        36,
+                                                        58
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        60
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        10,
+                                                        26
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        31
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        33,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                41,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        54,
+                                                                        58
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                48,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        39,
+                                                        61
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                61
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        62
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        63
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        70,
+                                                        83
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        84,
+                                                        88
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        90,
+                                                        94
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                98,
+                                                                104
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        111,
+                                                                        115
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                105,
+                                                                116
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        96,
+                                                        118
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                60,
+                                                118
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        60,
+                                        119
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                60,
+                                120
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        120
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        73,
+                                                        86
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        87,
+                                                        91
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        93,
+                                                        97
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                101,
+                                                                107
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        114,
+                                                                        118
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                108,
+                                                                119
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        99,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                63,
+                                                121
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        63,
+                                        122
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                63,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        63,
+                        123
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        130,
+                                                        143
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        144,
+                                                        148
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        150,
+                                                        154
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                158,
+                                                                164
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        171,
+                                                                        175
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                165,
+                                                                176
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        156,
+                                                        178
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                120,
+                                                178
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        120,
+                                        179
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                120,
+                                180
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        120,
+                        180
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        133,
+                                                        146
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        147,
+                                                        151
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        153,
+                                                        157
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                161,
+                                                                167
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        174,
+                                                                        178
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                168,
+                                                                179
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        159,
+                                                        181
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                123,
+                                                181
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        123,
+                                        182
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                123,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        123,
+                        183
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                180,
+                                180
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        180,
+                        180
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                183,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        183,
+                        183
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "0895c3fde3cba1e850e4730eb193f62270215e70",
+            "ed5c0370f5abc30c2f381fe513447b205647aebc"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "4c537f6b60b1ef1d082f62e211b6f4da62918d0f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "61b80bc773db77b10bf1da88f0fde3c935d0f5aa"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        26
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        31
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        33,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                41,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        54,
+                                                                        58
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                48,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        39,
+                                                        61
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                61
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        62
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        63
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        73,
+                                                        86
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        87,
+                                                        91
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        93,
+                                                        97
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                101,
+                                                                107
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        114,
+                                                                        118
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                108,
+                                                                119
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        99,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                63,
+                                                121
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        63,
+                                        122
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                63,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        63,
+                        123
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        133,
+                                                        146
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        147,
+                                                        151
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        153,
+                                                        157
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                161,
+                                                                167
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        174,
+                                                                        178
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                168,
+                                                                179
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        159,
+                                                        181
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                123,
+                                                181
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        123,
+                                        182
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                123,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        123,
+                        183
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        23
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        30,
+                                                        34
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                38,
+                                                                44
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        51,
+                                                                        55
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                45,
+                                                                56
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        36,
+                                                        58
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        60
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        70,
+                                                        86
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        87,
+                                                        91
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        93,
+                                                        97
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                101,
+                                                                107
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        114,
+                                                                        118
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                108,
+                                                                119
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        99,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                60,
+                                                121
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        60,
+                                        122
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                60,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        60,
+                        123
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                183,
+                                183
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        183,
+                        183
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                123,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        123,
+                        123
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "ed5c0370f5abc30c2f381fe513447b205647aebc",
+            "1dae1059cf36b86fdb5fa7cdf701f28709470b90"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "61b80bc773db77b10bf1da88f0fde3c935d0f5aa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7416033e4d4abc9a83e7ce333623fb3fb8a2926b"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        23
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        28
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        30,
+                                                        34
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                38,
+                                                                44
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        51,
+                                                                        55
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                45,
+                                                                56
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        36,
+                                                        58
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        60
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        70,
+                                                        86
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        87,
+                                                        91
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        93,
+                                                        97
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                101,
+                                                                107
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        114,
+                                                                        118
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                108,
+                                                                119
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        99,
+                                                        121
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                60,
+                                                121
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        60,
+                                        122
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                60,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        123
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        26
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        31
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        33,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                41,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        54,
+                                                                        58
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                48,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        39,
+                                                        61
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                61
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        62
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        63
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                123,
+                                123
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        123,
+                        123
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                63,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        63,
+                        63
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "1dae1059cf36b86fdb5fa7cdf701f28709470b90",
+            "5846d1c0997bed696b602367f89d69b35822caac"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "7416033e4d4abc9a83e7ce333623fb3fb8a2926b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a37529aaa73a8cefb09a4b4ac418c18e0c6cd5c3"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Function",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        10,
+                                                        26
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        27,
+                                                        31
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        33,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "ExpressionStatements",
+                                                    "children": [
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "range": [
+                                                                41,
+                                                                47
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "yield_statement",
+                                                            "children": [
+                                                                {
+                                                                    "category": "Identifier",
+                                                                    "range": [
+                                                                        54,
+                                                                        58
+                                                                    ]
+                                                                }
+                                                            ],
+                                                            "range": [
+                                                                48,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        39,
+                                                        61
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                61
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        62
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        63
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                63,
+                                63
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        63,
+                        63
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "generator-function.js",
+            "generator-function.js"
+        ],
+        "oids": [
+            "5846d1c0997bed696b602367f89d69b35822caac",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "a37529aaa73a8cefb09a4b4ac418c18e0c6cd5c3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2e98846e3a927bbf738f7d46ca9b6746840b89a7"
+}]

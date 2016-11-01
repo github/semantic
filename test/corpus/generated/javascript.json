@@ -1,434 +1,312 @@
 [
   {
-    "repoPath": "test/corpus/repos/javascript",
-    "repoUrl": "https://github.com/rewinfrey/javascript.git",
     "language": "javascript",
+    "fileExt": ".js",
+    "repoUrl": "https://github.com/diff-fixtures/javascript.git",
     "syntaxes": [
       {
         "syntax": "object",
-        "repoFilePath": "object.js",
         "insert": "{ \"key1\": \"value1\" };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/object.json",
         "replacement": "{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
       },
       {
         "syntax": "anonymous-function",
-        "repoFilePath": "anonymous-function.js",
         "insert": "function(a,b) { return a + b; }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/anonymous-function.json",
         "replacement": "function(b,c) { return b * c; }"
       },
       {
         "syntax": "anonymous-parameterless-function",
-        "repoFilePath": "anonymous-parameterless-function.js",
         "insert": "function() { return 'hi'; }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/anonymous-parameterless-function.json",
         "replacement": "function() { return 'hello'; }"
       },
       {
         "syntax": "objects-with-methods",
-        "repoFilePath": "objects-with-methods.js",
         "insert": "{ add(a, b) { return a + b; } };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/object-with-methods.json",
         "replacement": "{ subtract(a, b) { return a - b; } };"
       },
       {
         "syntax": "string",
-        "repoFilePath": "string.js",
         "insert": "'A string with \"double\" quotes';",
-        "replacement": "'A different string with \"double\" quotes';",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/string.json"
+        "replacement": "'A different string with \"double\" quotes';"
       },
       {
         "syntax": "number",
-        "repoFilePath": "number.js",
         "insert": "101",
-        "replacement": "102",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/number.json"
+        "replacement": "102"
       },
       {
         "syntax": "variable",
-        "repoFilePath": "variable.js",
         "insert": "theVar;",
-        "replacement": "theVar2",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/variable.json"
+        "replacement": "theVar2"
       },
       {
         "syntax": "identifier",
-        "repoFilePath": "identifier.js",
         "insert": "theVar;",
-        "replacement": "theVar2",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/identifier.json"
+        "replacement": "theVar2"
       },
       {
         "syntax": "this-expression",
-        "repoFilePath": "this-expression.js",
         "insert": "this;",
-        "replacement": "return this;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/this-expression.json"
+        "replacement": "return this;"
       },
       {
         "syntax": "null",
-        "repoFilePath": "null.js",
         "insert": "null;",
-        "replacement": "return null;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/null.json"
+        "replacement": "return null;"
       },
       {
         "syntax": "undefined",
-        "repoFilePath": "undefined.js",
         "insert": "undefined;",
-        "replacement": "return undefined;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/undefined.json"
+        "replacement": "return undefined;"
       },
       {
         "syntax": "true",
-        "repoFilePath": "true.js",
         "insert": "true;",
-        "replacement": "return true;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/true.json"
+        "replacement": "return true;"
       },
       {
         "syntax": "false",
-        "repoFilePath": "false.js",
         "insert": "false;",
-        "replacement": "return false;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/false.json"
+        "replacement": "return false;"
       },
       {
         "syntax": "class",
-        "repoFilePath": "class.js",
         "insert": "class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
-        "replacement": "class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/class.json"
+        "replacement": "class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
       },
       {
         "syntax": "array",
-        "repoFilePath": "array.js",
         "insert": "[ \"item1\" ];",
-        "replacement": "[ \"item1\", \"item2\" ];",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/array.json"
+        "replacement": "[ \"item1\", \"item2\" ];"
       },
       {
         "syntax": "function",
-        "repoFilePath": "function.js",
         "insert": "function(arg1, arg2) { arg2; };",
-        "replacement": "function(arg1, arg2) { arg1; };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/function.json"
+        "replacement": "function(arg1, arg2) { arg1; };"
       },
       {
         "syntax": "arrow-function",
-        "repoFilePath": "arrow-function.js",
         "insert": "(f, g) => { return h; };",
-        "replacement": "(f, g) => { return g; };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/arrow-function.json"
+        "replacement": "(f, g) => { return g; };"
       },
       {
         "syntax": "generator-function",
-        "repoFilePath": "generator-function.js",
         "insert": "function *generateStuff(arg1, arg2) { yield; yield arg2; };",
-        "replacement": "function *generateNewStuff(arg1, arg2) { yield; yield arg2; };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/generator-function.json"
+        "replacement": "function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
       },
       {
         "syntax": "named-function",
-        "repoFilePath": "named-function.js",
         "insert": "function myFunction(arg1, arg2) { arg2; };",
-        "replacement": "function anotherFunction() { return false; };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/named-function.json"
+        "replacement": "function anotherFunction() { return false; };"
       },
       {
         "syntax": "member-access",
-        "repoFilePath": "member-access.js",
         "insert": "x.someProperty;",
-        "replacement": "x.someOtherProperty",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/member-access.json"
+        "replacement": "x.someOtherProperty"
       },
       {
         "syntax": "subscript-access-variable",
-        "repoFilePath": "subscript-access-variable.js",
         "insert": "x[someVariable];",
-        "replacement": "x[someOtherVariable];",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/subscript-access-variable.json"
+        "replacement": "x[someOtherVariable];"
       },
       {
         "syntax": "subscript-access-string",
-        "repoFilePath": "subscript-access-string.js",
         "insert": "x[\"some-string\"];",
-        "replacement": "x[\"some-other-string\"];",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/subscript-access-string.json"
+        "replacement": "x[\"some-other-string\"];"
       },
       {
         "syntax": "chained-property-access",
-        "repoFilePath": "chained-property-access.js",
         "insert": "return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )",
-        "replacement": "return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/chained-property-access.json"
+        "replacement": "return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
       },
       {
         "syntax": "chained-callbacks",
-        "repoFilePath": "chained-callbacks.js",
         "insert": "this.map(function (a) { return a.b; })",
-        "replacement": "this.reduce(function (a) { return b.a; })",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/chained-callbacks.json"
+        "replacement": "this.reduce(function (a) { return b.a; })"
       },
       {
         "syntax": "function-call",
-        "repoFilePath": "function-call.js",
         "insert": "someFunction(arg1, \"arg2\");",
-        "replacement": "someFunction(arg1, \"arg3\");",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/function-call.json"
+        "replacement": "someFunction(arg1, \"arg3\");"
       },
       {
         "syntax": "method-call",
-        "repoFilePath": "method-call.js",
         "insert": "object.someMethod(arg1, \"arg2\");",
-        "replacement": "object.someMethod(arg1, \"arg3\");",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/method-call.json"
+        "replacement": "object.someMethod(arg1, \"arg3\");"
       },
       {
         "syntax": "function-call-args",
-        "repoFilePath": "function-call-args.js",
         "insert": "someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
-        "replacement": "someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/function-call-args.json"
+        "replacement": "someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
       },
       {
         "syntax": "constructor-call",
-        "repoFilePath": "constructor-call.js",
         "insert": "new module.Klass(1, \"two\");",
-        "replacement": "new module.Klass(1, \"three\");",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/constructor-call.json"
+        "replacement": "new module.Klass(1, \"three\");"
       },
       {
         "syntax": "math-operator",
-        "repoFilePath": "math-operator.js",
         "insert": "i + j * 3 - j % 5;",
-        "replacement": "i + j * 2 - j % 4;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/math-operator.json"
+        "replacement": "i + j * 2 - j % 4;"
       },
       {
         "syntax": "boolean-operator",
-        "repoFilePath": "boolean-operator.js",
         "insert": "i || j;",
-        "replacement": "i && j;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/boolean-operator.json"
+        "replacement": "i && j;"
       },
       {
         "syntax": "bitwise-operator",
-        "repoFilePath": "bitwise-operator.js",
         "insert": "i >> j;",
-        "replacement": "i >> k;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/bitwise-operator.json"
+        "replacement": "i >> k;"
       },
       {
         "syntax": "relational-operator",
-        "repoFilePath": "relational-operator.js",
         "insert": "x < y;",
-        "replacement": "x <= y;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/relational-operator.json"
+        "replacement": "x <= y;"
       },
       {
         "syntax": "for-statement",
-        "repoFilePath": "for-statement.js",
         "insert": "for (i = 0, init(); i < 10; i++) { log(i); }",
-        "replacement": "for (i = 0, init(); i < 100; i++) { log(i); }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/for-statement.json"
+        "replacement": "for (i = 0, init(); i < 100; i++) { log(i); }"
       },
       {
         "syntax": "assignment",
-        "repoFilePath": "assignment.js",
         "insert": "x = 0;",
-        "replacement": "x = 1;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/assignment.json"
+        "replacement": "x = 1;"
       },
       {
         "syntax": "member-access-assignment",
-        "repoFilePath": "member-access-assignment.js",
         "insert": "y.x = 0;",
-        "replacement": "y.x = 1;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/member-access-assignment.json"
+        "replacement": "y.x = 1;"
       },
       {
         "syntax": "subscript-access-assignment",
-        "repoFilePath": "subscript-access-assignment.js",
         "insert": "y[\"x\"] = 0;",
-        "replacement": "y[\"x\"] = 1;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/subscript-access-assignment.json"
+        "replacement": "y[\"x\"] = 1;"
       },
       {
         "syntax": "comma-operator",
-        "repoFilePath": "comma-operator.js",
         "insert": "a = 1, b = 2;",
-        "replacement": "c = {d: (3, 4 + 5, 6)};",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/comma-operator.json"
+        "replacement": "c = {d: (3, 4 + 5, 6)};"
       },
       {
         "syntax": "ternary",
-        "repoFilePath": "ternary.js",
         "insert": "condition ? case1 : case2;",
-        "replacement": "x.y = some.condition ? some.case : some.other.case;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/ternary.json"
+        "replacement": "x.y = some.condition ? some.case : some.other.case;"
       },
       {
         "syntax": "type-operator",
-        "repoFilePath": "type-operator.js",
         "insert": "typeof x;",
-        "replacement": "x instanceof String;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/type-operator.json"
+        "replacement": "x instanceof String;"
       },
       {
         "syntax": "delete-operator",
-        "repoFilePath": "delete-operator.js",
         "insert": "delete thing['prop'];",
-        "replacement": "delete thing.prop",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/delete-operator.json"
+        "replacement": "delete thing.prop"
       },
       {
         "syntax": "void-operator",
-        "repoFilePath": "void-operator.js",
         "insert": "void b()",
-        "replacement": "void c()",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/void-operator.json"
+        "replacement": "void c()"
       },
       {
         "syntax": "math-assignment-operator",
-        "repoFilePath": "math-assignment-operator.js",
         "insert": "x += 1;",
-        "replacement": "x += 2;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/math-assignment-operator.json"
+        "replacement": "x += 2;"
       },
       {
         "syntax": "for-loop-with-in-statement",
-        "repoFilePath": "for-loop-with-in-statement.js",
         "insert": "for (key in something && i = 0; i < n; i++) { doSomething(); }",
-        "replacement": "for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/for-loop-with-in-statement.json"
+        "replacement": "for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
       },
       {
         "syntax": "for-of-statement",
-        "repoFilePath": "for-of-statement.js",
         "insert": "for (let item of items) { process(item); };",
-        "replacement": "for (let thing of things) { process(thing); };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/for-of-statement.json"
+        "replacement": "for (let thing of things) { process(thing); };"
       },
       {
         "syntax": "while-statement",
-        "repoFilePath": "while-statement.js",
         "insert": "while (a) { b(); };",
-        "replacement": "while (b) { a(); };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/while-statement.json"
+        "replacement": "while (b) { a(); };"
       },
       {
         "syntax": "do-while-statement",
-        "repoFilePath": "do-while-statement.js",
         "insert": "do { console.log(insert); } while (true);",
-        "replacement": "do { console.log(replacement); } while (false);",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/do-while-statement.json"
+        "replacement": "do { console.log(replacement); } while (false);"
       },
       {
         "syntax": "return-statement",
-        "repoFilePath": "return-statement.js",
         "insert": "return 5;",
-        "replacement": "return;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/return-statement.json"
+        "replacement": "return;"
       },
       {
         "syntax": "var-declaration",
-        "repoFilePath": "var-declaration.js",
         "insert": "var x = 1;",
-        "replacement": "var x, y = {}, z;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/var-declaration.json"
+        "replacement": "var x, y = {}, z;"
       },
       {
         "syntax": "comment",
-        "repoFilePath": "comment.js",
         "insert": "// This is a property",
-        "replacement": "/*\n * This is a method\n*/",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/comment.json"
+        "replacement": "/*\n * This is a method\n*/"
       },
       {
         "syntax": "switch-statement",
-        "repoFilePath": "switch-statement.js",
         "insert": "switch (1) { case 1: 1; case 2: 1; case 3: 3; };",
-        "replacement": "switch (2) { case 1: 1; case 2: 2; case 3: 3; };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/switch-statement.json"
+        "replacement": "switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
       },
       {
         "syntax": "throw-statement",
-        "repoFilePath": "throw-statement.js",
         "insert": "throw new Error(\"uh oh\");",
-        "replacement": "throw new Error(\"oooooops\");",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/throw-statement.json"
+        "replacement": "throw new Error(\"oooooops\");"
       },
       {
         "syntax": "try-statement",
-        "repoFilePath": "try-statement.js",
         "insert": "try { f; } catch { g; } finally { h; };",
-        "replacement": "try { f; } catch { h; } finally { g; };",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/try-statement.json"
+        "replacement": "try { f; } catch { h; } finally { g; };"
       },
       {
         "syntax": "regex",
-        "repoFilePath": "regex.js",
         "insert": "/one/g;",
-        "replacement": "/on[^/]afe/gim;",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/regex.json"
+        "replacement": "/on[^/]afe/gim;"
       },
       {
         "syntax": "if",
-        "repoFilePath": "if.js",
         "insert": "if (x) { log(y); }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/if.json",
         "replacement": "if (a.b) { log(c); d; }"
       },
       {
         "syntax": "if-else",
-        "repoFilePath": "if-else.js",
         "insert": "if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
-        "replacement": "if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/if-else.json"
+        "replacement": "if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
       },
       {
         "syntax": "template-string",
-        "repoFilePath": "template-string.js",
         "insert": "`one line`",
-        "replacement": "`multi line`",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/template-string.json"
+        "replacement": "`multi line`"
       },
       {
         "syntax": "for-in-statement",
-        "repoFilePath": "for-in-statement.js",
         "insert": "for (thing in things) { thing(); }",
-        "replacement": "for (item in items) { item(); }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/for-in-statement.json"
+        "replacement": "for (item in items) { item(); }"
       },
       {
         "syntax": "nested-functions",
-        "repoFilePath": "nested-functions.js",
         "insert": "function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
-        "replacement": "function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/nested-functions.json"
+        "replacement": "function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
       },
       {
         "syntax": "nested-do-while-in-function",
-        "repoFilePath": "nested-do-while-in-function.js",
         "insert": "function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
-        "replacement": "function f(arg1, arg2) { do { something(arg2); } while (arg1); }",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/nested-do-while-in-function.json"
+        "replacement": "function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
       },
       {
         "syntax": "import",
-        "repoFilePath": "import.js",
         "insert": "import defaultMember from \"foo\";\nimport * as name from \"aardvark\";\nimport { member } from \"ant\";\nimport { member1 , member2 } from \"antelope\";\nimport { member1 , member2 as alias2 } from \"ant-eater\";\nimport defaultMember, { member1, member2 as alias2 } from \"anaconda\";\nimport defaultMember, * as name from \"alligator\";\nimport \"arctic-tern\";",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/import.json",
         "replacement": "import defaultMember from \"babirusa\";\nimport * as otherName from \"baboon\";\nimport { element } from \"badger\";\nimport { element1 , element2 } from \"bald-eagle\";\nimport { element1 , element2 as elementAlias2 } from \"bandicoot\";\nimport defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";\nimport defaultMember, * as element from \"barbet\";\nimport \"basilisk\";"
       },
       {
         "syntax": "export",
-        "repoFilePath": "export.js",
         "insert": "export { name1, name2, name3, nameN };\nexport { variable1 as name1, variable2 as name2, nameN };\nexport let name1, name2, nameN;\nexport let name1 = value1, name2 = value2, name3, nameN;\nexport default namedFunction;\nexport default function () { };\nexport default function name1() { };\nexport { name1 as default };\nexport * from 'foo';\nexport { name1, name2, nameN } from 'foo';\nexport { import1 as name1, import2 as name2, nameN } from 'bar';",
-        "testCaseFilePath": "test/corpus/diff-summaries/javascript/export.json",
         "replacement": "export { name4, name5, name6, nameZ };\nexport { variable2 as name2, variable3 as name3, nameY };\nexport let name3, name4, nameT;\nexport let name2 = value2, name3 = value3, name4, nameO;\nexport default otherNamedFunction;\nexport default function newName1() {};\nexport default function () {};\nexport { name2 as statement };\nexport * from 'baz';\nexport { name7, name8, nameP } from 'buzz';\nexport { import6 as name6, import7 as name7, nameB } from 'fizz';"
       }
     ]

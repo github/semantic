@@ -1,0 +1,2167 @@
+[{
+    "testCaseDescription": "javascript-member-access-assignment-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                9,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        9,
+                        9
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "7a99e3099456e71f6d44eae1634a02873cf08445"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "48190229aaa2c5d5ca3796814538a309e3b261d4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "453cf1754f40593356fef8fca60e37b46798c1bb"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                18,
+                                                                19
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                20,
+                                                                21
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        18,
+                                                        21
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        27
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                9,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        9
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "7a99e3099456e71f6d44eae1634a02873cf08445",
+            "32040068931708fb0b9512d6957fc4b1eb61238c"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "453cf1754f40593356fef8fca60e37b46798c1bb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a6c204d7a1b542ce75a1e06a8d95b63a3e0cc9ac"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                18,
+                                                                19
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                20,
+                                                                21
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        18,
+                                                        21
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        27
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                18,
+                                                                19
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                20,
+                                                                21
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        18,
+                                                        21
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        27
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "32040068931708fb0b9512d6957fc4b1eb61238c",
+            "94893a32f203ac706838c159344b8ab9085db17d"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "a6c204d7a1b542ce75a1e06a8d95b63a3e0cc9ac",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5f6177a9c5b4deec2c6c713f4f8dbd05c9a90f41"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                18,
+                                                                19
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                20,
+                                                                21
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        18,
+                                                        21
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        27
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                18,
+                                                                19
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                20,
+                                                                21
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        18,
+                                                        21
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        27
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "94893a32f203ac706838c159344b8ab9085db17d",
+            "32040068931708fb0b9512d6957fc4b1eb61238c"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "5f6177a9c5b4deec2c6c713f4f8dbd05c9a90f41",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c4611d75f2d4f08833e092f4297f0f259c09ef4c"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                18,
+                                                                19
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                20,
+                                                                21
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        18,
+                                                        21
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                25
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        26
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        27
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                27,
+                                27
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        27,
+                        27
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "32040068931708fb0b9512d6957fc4b1eb61238c",
+            "8d78a24f4a6b385148718b33a24742123a8c413a"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "c4611d75f2d4f08833e092f4297f0f259c09ef4c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "85c4873bfe30243574ad96c6fc0b796fcd49fa70"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                9,
+                                                                10
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                11,
+                                                                12
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        9,
+                                                        12
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                9,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        9,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                9,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        18
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                9,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        9,
+                        9
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "8d78a24f4a6b385148718b33a24742123a8c413a",
+            "799018d077c34569268d97d29864cda54c49aa23"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "85c4873bfe30243574ad96c6fc0b796fcd49fa70",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3661ffe82cd5f0e93152cad649e3e2e2d90e4474"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Assignment",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                0,
+                                                                1
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                2,
+                                                                3
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        0,
+                                                        3
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "NumberLiteral",
+                                                    "range": [
+                                                        6,
+                                                        7
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                7
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        8
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        9
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                9,
+                                9
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        9,
+                        9
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "member-access-assignment.js",
+            "member-access-assignment.js"
+        ],
+        "oids": [
+            "799018d077c34569268d97d29864cda54c49aa23",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "3661ffe82cd5f0e93152cad649e3e2e2d90e4474",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2984e6c47cb68c823069ad8467e3f43d0b833207"
+}]

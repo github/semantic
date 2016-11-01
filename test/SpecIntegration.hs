@@ -5,7 +5,7 @@ import Prologue
 import Prelude (String)
 import Data.List
 import Data.List.Utils
-import qualified SemanticGitDiffSpec
+import qualified IntegrationFormatSpec
 import Test.Hspec
 import System.Environment (withArgs)
 
@@ -13,7 +13,7 @@ main :: IO ()
 main = do
   args <- getArgs
   let (language, rest) = parseCustomArgs args
-  withArgs rest . hspec . parallel $ describe "DiffSummaries" (SemanticGitDiffSpec.spec language)
+  withArgs rest . hspec . parallel $ describe "Integration Format Specs" (IntegrationFormatSpec.spec language)
   where
     parseCustomArgs :: [String] -> (Maybe String, [String])
     parseCustomArgs args = case partitioned of

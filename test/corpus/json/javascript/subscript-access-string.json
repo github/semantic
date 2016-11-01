@@ -1,0 +1,1751 @@
+[{
+    "testCaseDescription": "javascript-subscript-access-string-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        15
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "429371721d335f8f5952d657097e24b250b7812e"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "e11abbd7db106d99d917a5ad4dc0e0bb84f015c4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b936bc34c7655415db218b0ba69cd07a8619cc1f"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        21
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        24
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        26,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                40
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        24,
+                                        41
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        24,
+                        42
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        15
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        42,
+                                                        43
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        44,
+                                                        57
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                42,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        42,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                42,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        42,
+                        60
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                60,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        60
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "429371721d335f8f5952d657097e24b250b7812e",
+            "42930094b4f069ce252e9beed6e58ea153476f18"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "b936bc34c7655415db218b0ba69cd07a8619cc1f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e66ca7baf9a62a4b20e1ec5e26cb28ebeb4e5b8f"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        2,
+                                                        21
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        24
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        2,
+                                                        15
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        26,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                40
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        24,
+                                        41
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        42
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        20,
+                                                        33
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                34
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        35
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                36
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        36
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        42,
+                                                        43
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        44,
+                                                        57
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                42,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        42,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                42,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        42,
+                        60
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        36,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        38,
+                                                        51
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                36,
+                                                52
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        36,
+                                        53
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                36,
+                                54
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        36,
+                        54
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                60,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        60
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                54,
+                                54
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        54,
+                        54
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "42930094b4f069ce252e9beed6e58ea153476f18",
+            "c53d07bbc992afb317ee398756c832650830f46d"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "e66ca7baf9a62a4b20e1ec5e26cb28ebeb4e5b8f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "502f190aa7888975d76c60586066547bc3b9a491"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        2,
+                                                        15
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "patch": "replace",
+                                                    "range": [
+                                                        2,
+                                                        21
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        24
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        20,
+                                                        33
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                34
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        35
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                36
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        36
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        26,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                40
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        24,
+                                        41
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        42
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        36,
+                                                        37
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        38,
+                                                        51
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                36,
+                                                52
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        36,
+                                        53
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                36,
+                                54
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        36,
+                        54
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        42,
+                                                        43
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        44,
+                                                        57
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                42,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        42,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                42,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        42,
+                        60
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                54,
+                                54
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        54,
+                        54
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                60,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        60
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "c53d07bbc992afb317ee398756c832650830f46d",
+            "42930094b4f069ce252e9beed6e58ea153476f18"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "502f190aa7888975d76c60586066547bc3b9a491",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5cc2450347198f0dac26176374c5b7decae00bb0"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        21
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        24
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        24,
+                                                        25
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        26,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                24,
+                                                40
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        24,
+                                        41
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                24,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        24,
+                        42
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        42,
+                                                        43
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        44,
+                                                        57
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                42,
+                                                58
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        42,
+                                        59
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                42,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        42,
+                        60
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        15
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        20,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                40
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        18,
+                                        41
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        18,
+                        42
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                60,
+                                60
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        60,
+                        60
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                42,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        42,
+                        42
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "42930094b4f069ce252e9beed6e58ea153476f18",
+            "89c1bc26de340529ad66f499e608dfe2a4bc889b"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "5cc2450347198f0dac26176374c5b7decae00bb0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "af1f11c4a8c49614fd214e5ec80304862f8fb730"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        15
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                16
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        17
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        20,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                40
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        41
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        42
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        21
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        24
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                42,
+                                42
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        42,
+                        42
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "89c1bc26de340529ad66f499e608dfe2a4bc889b",
+            "758f8e70bb0ac4bda738fda6de26837148d6c5fe"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "af1f11c4a8c49614fd214e5ec80304862f8fb730",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c702dfa0c6e74182a4cf7240217d07057e1c31b7"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "SubscriptAccess",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "StringLiteral",
+                                                    "range": [
+                                                        2,
+                                                        21
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                22
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        23
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        24
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                24,
+                                24
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        24,
+                        24
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "subscript-access-string.js",
+            "subscript-access-string.js"
+        ],
+        "oids": [
+            "758f8e70bb0ac4bda738fda6de26837148d6c5fe",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "c702dfa0c6e74182a4cf7240217d07057e1c31b7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4986fadfc0f8ecf1f3b66745c95cf2b6ab739abb"
+}]

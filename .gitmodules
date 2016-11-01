@@ -25,3 +25,6 @@
 [submodule "test/corpus/repos/ruby"]
 	path = test/corpus/repos/ruby
 	url = https://github.com/diff-fixtures/ruby.git
+[submodule "vendor/effects"]
+	path = vendor/effects
+	url = git@github.com:joshvera/effects.git
