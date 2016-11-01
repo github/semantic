@@ -114,6 +114,18 @@ data Category
   | Import
   -- | An export
   | Export
+  -- | An interpolation (e.g. "#{bar}" in Ruby)
+  | Interpolation
+  -- | A subshell command (e.g. `ls -la` in Ruby)
+  | Subshell
+  -- | A conditional assignment expression.
+  | ConditionalAssignment
+  -- | A yield statement.
+  | Yield
+  -- | An until expression.
+  | Until
+  -- | A unless/else expression.
+  | Unless
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -168,6 +180,12 @@ instance Arbitrary Category where
     , pure Module
     , pure Import
     , pure Export
+    , pure Interpolation
+    , pure Subshell
+    , pure ConditionalAssignment
+    , pure Yield
+    , pure Until
+    , pure Unless
     , Other <$> arbitrary
     ]
 

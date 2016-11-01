@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-conditional-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' conditional assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "d969215f4dc1f8fcdb7936be60bd0ac51877cea9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e7df092e38108876d5bbd8167ff092d1e5bcef0c"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' conditional assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' conditional assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "e7df092e38108876d5bbd8167ff092d1e5bcef0c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a3c46cd5e4d07efa83e2bba95552b06a2e270550"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '7' with '5'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "a3c46cd5e4d07efa83e2bba95552b06a2e270550",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d69c2aeeb2f5662a480fc0a5863c0e37957defe5"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '7'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "d69c2aeeb2f5662a480fc0a5863c0e37957defe5",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d3af4b3df061945f9a28f9b5994dbdbba51f1531"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' conditional assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' conditional assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' conditional assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "d3af4b3df061945f9a28f9b5994dbdbba51f1531",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3a293566ed56e21f15702c3ac7daa8eed77f2e4c"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' conditional assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "3a293566ed56e21f15702c3ac7daa8eed77f2e4c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2f43f8e7b848807903813396b3be87f10f632f57"
+}
+,{
+    "testCaseDescription": "ruby-conditional-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "conditional-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' conditional assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "conditional-assignment.rb"
+    ],
+    "sha1": "2f43f8e7b848807903813396b3be87f10f632f57",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "65cdd278c64ea23aacd3c8cf11e6f52864fa66ff"
+}]

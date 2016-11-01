@@ -1,0 +1,241 @@
+[{
+    "testCaseDescription": "ruby-control-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "0afd2cfcf489061cc131d9970716bb04bb5cb203",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "703d5515f05e02ad93d56987b520328f4a351265"
+}
+,{
+    "testCaseDescription": "ruby-control-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "703d5515f05e02ad93d56987b520328f4a351265",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "554242b8ed778be509d72c90b71381c7a49c5bf4"
+}
+,{
+    "testCaseDescription": "ruby-control-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced a begin block with a begin block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "554242b8ed778be509d72c90b71381c7a49c5bf4",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "bd0b46ca0ec2510b867cc5670fbafb0068db0d9c"
+}
+,{
+    "testCaseDescription": "ruby-control-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced a begin block with a begin block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "bd0b46ca0ec2510b867cc5670fbafb0068db0d9c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3a174f29f8c703fdb1ebf05ef9ef856550f3b968"
+}
+,{
+    "testCaseDescription": "ruby-control-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "3a174f29f8c703fdb1ebf05ef9ef856550f3b968",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "5dc5bafea85edc0573668d9b80192e910150caf3"
+}
+,{
+    "testCaseDescription": "ruby-control-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                3
+                            ],
+                            "end": [
+                                8,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "5dc5bafea85edc0573668d9b80192e910150caf3",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8cde2cc96f0eef72794161e18540bbb43a24937d"
+}
+,{
+    "testCaseDescription": "ruby-control-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "control-statements.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "control-statements.rb"
+    ],
+    "sha1": "8cde2cc96f0eef72794161e18540bbb43a24937d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "457dc7fc963751d0adf0ea4eb8934e39ef717e32"
+}]

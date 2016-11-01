@@ -137,6 +137,7 @@ prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
 -- Optional determiner (e.g. "the") to tie together summary statements.
 determiner :: DiffInfo -> Doc
 determiner (LeafInfo "number" _ _) = ""
+determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
@@ -148,11 +149,13 @@ toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
 toLeafInfos HideInfo = []
 toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "number" termName _) -> squotes $ toDoc termName
+  (LeafInfo "integer" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
+  (LeafInfo cName@"subshell command" termName _) -> toDoc termName <+> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
   node -> panic $ "Expected a leaf info but got a: " <> show node
 
@@ -202,8 +205,9 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
+  S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
-  S.If expr _ _ -> termNameFromSource expr
+  S.If expr _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
@@ -221,6 +225,9 @@ toTermName source term = case unwrap term of
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
+  S.ConditionalAssignment id _ -> toTermName' id
+  S.Until expr _ -> toTermName' expr
+  S.Unless expr _ -> termNameFromSource expr
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -338,9 +345,15 @@ instance HasCategory Category where
     C.If -> "if statement"
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
-    C.Module -> "module statement"
+    C.Module -> "module"
     C.Import -> "import statement"
     C.Export -> "export statement"
+    C.Interpolation -> "interpolation"
+    C.Subshell -> "subshell command"
+    C.ConditionalAssignment -> "conditional assignment"
+    C.Yield -> "yield statement"
+    C.Until -> "until statement"
+    C.Unless -> "unless statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

@@ -1,0 +1,622 @@
+[{
+    "testCaseDescription": "ruby-method-invocation-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "1d64a73244315b920d5fe90966068c5c81009362",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ed107f28c05612907f97f29e8f9ac2d5a37263c2"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print(\"hello world\")' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(2, 3)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(2, 3)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "ed107f28c05612907f97f29e8f9ac2d5a37263c2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "051f88c30132124c3e49e057d6caf67c99b6fd6c"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print(\"hello world\")' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar(2, 3)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar(2, 3)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "051f88c30132124c3e49e057d6caf67c99b6fd6c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8b83d29df8386a9879d1becf0ec06d64fd1d042c"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print(\"hello world\")' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(2, 3)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(2, 3)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "8b83d29df8386a9879d1becf0ec06d64fd1d042c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3908b684ec871dcc18f2669cdfcdff7c1453e1cb"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "3908b684ec871dcc18f2669cdfcdff7c1453e1cb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f4d570046d591c1e2a2ac75987a56d34bfbafbdd"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "f4d570046d591c1e2a2ac75987a56d34bfbafbdd",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "62c5df67a438e15a39a77e8c9ad8d3337448d65b"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print(\"hello world\")' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar(2, 3)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar(2, 3)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "62c5df67a438e15a39a77e8c9ad8d3337448d65b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9b332f981a2fa42849e4ddc48afca9424480312d"
+}]

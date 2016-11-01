@@ -1,0 +1,460 @@
+[{
+    "testCaseDescription": "ruby-interpolation-insert-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "27c8bb9ed1adb160824505aa87bcb49fd2bd0606",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7012caec8c5c7e9162e2fb6ca8e3a56137424389"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "7012caec8c5c7e9162e2fb6ca8e3a56137424389",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cdde49454606b1e206ac682ad6401813ec06216e"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "cdde49454606b1e206ac682ad6401813ec06216e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "45a81347385633df6b063567d6971c6035ad1184"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "45a81347385633df6b063567d6971c6035ad1184",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "06b627b15c97b775ba5734a23c018630fb959cb4"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "06b627b15c97b775ba5734a23c018630fb959cb4",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e8c88d21818c95eb56330219a546fe2b7d948709"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-delete-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "e8c88d21818c95eb56330219a546fe2b7d948709",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a259650f6a8aefbbd8f41e70c0e12b13c19c9e1b"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "a259650f6a8aefbbd8f41e70c0e12b13c19c9e1b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0de5663fae24bc6af3327776d01518ef6a240ed6"
+}]

@@ -1,0 +1,646 @@
+[{
+    "testCaseDescription": "ruby-math-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "644e721ee81af7e3491342e9ce3c03c31a55cfb7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "b7dfa15d6187b14d18be50ccb795956af9147613"
+}
+,{
+    "testCaseDescription": "ruby-math-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "b7dfa15d6187b14d18be50ccb795956af9147613",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4534512207149f194dd347f448d495c98f1b8eda"
+}
+,{
+    "testCaseDescription": "ruby-math-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the x math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "4534512207149f194dd347f448d495c98f1b8eda",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fb1f78bd03eaba84b56395e7438018543565a0d9"
+}
+,{
+    "testCaseDescription": "ruby-math-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the x math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "fb1f78bd03eaba84b56395e7438018543565a0d9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ac1296999ccb9067af062d4d59e16513c61cd81d"
+}
+,{
+    "testCaseDescription": "ruby-math-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "ac1296999ccb9067af062d4d59e16513c61cd81d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "25954da8e8e2b92da4d869668e380180773997d7"
+}
+,{
+    "testCaseDescription": "ruby-math-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "25954da8e8e2b92da4d869668e380180773997d7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9a78372252901282e34c9f9ec376f3e4b4c761ce"
+}
+,{
+    "testCaseDescription": "ruby-math-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment.rb"
+    ],
+    "sha1": "9a78372252901282e34c9f9ec376f3e4b4c761ce",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d411db29ef77ddde028a6408d3e5b9d1af156598"
+}]

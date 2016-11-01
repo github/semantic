@@ -1,0 +1,262 @@
+[{
+    "testCaseDescription": "ruby-percent-array-insert-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '%w(one two)' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "fb977a1a932fedffdf11b59b7039edfee929898b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "59826bd1c0ef17b0d316b84e12d407343567b51e"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '%W(one #{b} three)' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '%w(one two)' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "59826bd1c0ef17b0d316b84e12d407343567b51e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8c3310689a60ae2aeab52560665f69a75d0e6a80"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "8c3310689a60ae2aeab52560665f69a75d0e6a80",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a9f6587196cdbbe93040f98b10dd42e56a61606b"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "a9f6587196cdbbe93040f98b10dd42e56a61606b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e036c90a9157248f492faab6f647dc8328a81bb7"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%W(one #{b} three)' array"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%w(one two)' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '%W(one #{b} three)' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "e036c90a9157248f492faab6f647dc8328a81bb7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ed775facea4cfb87fbd958eba63c3d0b731ae89f"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-delete-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%w(one two)' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "ed775facea4cfb87fbd958eba63c3d0b731ae89f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "45e409958bde72eed0dbf21ebde75141f9cc0ca7"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%W(one #{b} three)' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "45e409958bde72eed0dbf21ebde75141f9cc0ca7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "bf01ed653791dfe5beb43e85c33f6e2d069fefc2"
+}]

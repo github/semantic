@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-for-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x in y' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "82fa376f02abeb45af195e210cd5cee82ab00f07",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "96215e090bed74f6afb6545cded29cd5dd1b8104"
+}
+,{
+    "testCaseDescription": "ruby-for-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i in [1,2,3]' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x in y' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "96215e090bed74f6afb6545cded29cd5dd1b8104",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d50d94b2571fc6b70d210dcf210196e96a38dd1d"
+}
+,{
+    "testCaseDescription": "ruby-for-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i in [1,2,3]' for statement with the 'x in y' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "d50d94b2571fc6b70d210dcf210196e96a38dd1d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fea9255406ce4c7e5ece0e1af17d1691d353edc1"
+}
+,{
+    "testCaseDescription": "ruby-for-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x in y' for statement with the 'i in [1,2,3]' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "fea9255406ce4c7e5ece0e1af17d1691d353edc1",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "56923ddea441f6eaf01dd1834c9bf8340670a062"
+}
+,{
+    "testCaseDescription": "ruby-for-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i in [1,2,3]' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x in y' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i in [1,2,3]' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "56923ddea441f6eaf01dd1834c9bf8340670a062",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "65fe66fe0c3c7f3659e906f1eb3a6ca6188ba1e8"
+}
+,{
+    "testCaseDescription": "ruby-for-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x in y' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "65fe66fe0c3c7f3659e906f1eb3a6ca6188ba1e8",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a0f366e07e9c13c7bdb7d414d48d3ef3838433e6"
+}
+,{
+    "testCaseDescription": "ruby-for-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i in [1,2,3]' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "a0f366e07e9c13c7bdb7d414d48d3ef3838433e6",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6bef099d2af7b41f171358e66662163cdf0bc96e"
+}]

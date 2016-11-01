@@ -1,0 +1,292 @@
+[{
+    "testCaseDescription": "ruby-if-unless-modifiers-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "9dee69155ea3541370dce7da3a81e7d3940e2317",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "72f62c263b483fb808e30e70899c7ede343aa21a"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "72f62c263b483fb808e30e70899c7ede343aa21a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8b50beca01ac6324a87702756e9173f869abaf01"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' unless statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "8b50beca01ac6324a87702756e9173f869abaf01",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "85c98a0fb367a029d93b2e50f0856798fe0e98f9"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "85c98a0fb367a029d93b2e50f0856798fe0e98f9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4e4583f4d47d9c902d6e76a35a4bae3bb3ff0ed9"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "4e4583f4d47d9c902d6e76a35a4bae3bb3ff0ed9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c313e07c30cad4476f4de300adc660c1170cf609"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "c313e07c30cad4476f4de300adc660c1170cf609",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fefa947a4ade45d9762ebeea79f8db98ca51d9fb"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "fefa947a4ade45d9762ebeea79f8db98ca51d9fb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f9e62bf41467cae8ada35780dd97dbbbddf57da5"
+}]

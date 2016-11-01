@@ -1,0 +1,382 @@
+[{
+    "testCaseDescription": "ruby-bitwise-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a | b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a >> b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a ^ b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "85eb09d96abcd8b75415cc71358b6753031dd375",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f30cf572f929f8aa28b9722b1d241bdd3092d1cf"
+}
+,{
+    "testCaseDescription": "ruby-bitwise-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a & b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a << b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a | b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a >> b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a ^ b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "f30cf572f929f8aa28b9722b1d241bdd3092d1cf",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "dc84e24a4de7c203974093883e81c2f9f7ed8dd8"
+}
+,{
+    "testCaseDescription": "ruby-bitwise-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a | b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "dc84e24a4de7c203974093883e81c2f9f7ed8dd8",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "1313c16b9be2354df6c3222a09c150f838e6b632"
+}
+,{
+    "testCaseDescription": "ruby-bitwise-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a | b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "1313c16b9be2354df6c3222a09c150f838e6b632",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8e70f2e4ce7b7f950d67bfbe677c92e25195437f"
+}
+,{
+    "testCaseDescription": "ruby-bitwise-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a & b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a << b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a | b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "8e70f2e4ce7b7f950d67bfbe677c92e25195437f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9a6739d945526752e9ddf05b4bb315335a68a58d"
+}
+,{
+    "testCaseDescription": "ruby-bitwise-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a | b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a >> b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a ^ b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "9a6739d945526752e9ddf05b4bb315335a68a58d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d1fb460ac12248c0351090d4be0d07b443afb5a3"
+}
+,{
+    "testCaseDescription": "ruby-bitwise-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a & b' bitwise operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a << b' bitwise operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.rb"
+    ],
+    "sha1": "d1fb460ac12248c0351090d4be0d07b443afb5a3",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c3ffed8011708e89709328349892066714996e97"
+}]

@@ -1,0 +1,412 @@
+[{
+    "testCaseDescription": "ruby-array-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ 1, 2, 3]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "275c429c547953450d7c9bf531188b8f50e9295d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "99a499d6d76ebb87c352c0122896b9002068a2fb"
+}
+,{
+    "testCaseDescription": "ruby-array-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the '['a', 'b', 'c']' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ 1, 2, 3]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "99a499d6d76ebb87c352c0122896b9002068a2fb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cf7716725c52e82855702ff87f2bc53c829fbda9"
+}
+,{
+    "testCaseDescription": "ruby-array-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                3
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "cf7716725c52e82855702ff87f2bc53c829fbda9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2f4a0901ef95870d066861b89bfc388a446cfc81"
+}
+,{
+    "testCaseDescription": "ruby-array-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                3
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "2f4a0901ef95870d066861b89bfc388a446cfc81",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fed9d441befcfe8fce50601b0de754f6e0f25a97"
+}
+,{
+    "testCaseDescription": "ruby-array-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '['a', 'b', 'c']' array"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ 1, 2, 3]' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the '['a', 'b', 'c']' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "fed9d441befcfe8fce50601b0de754f6e0f25a97",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ff8e5cccb9751457edac3562f326432d9b6431ea"
+}
+,{
+    "testCaseDescription": "ruby-array-delete-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ 1, 2, 3]' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "ff8e5cccb9751457edac3562f326432d9b6431ea",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f085923cdf14b732c4e606edb4a13d463ca3633a"
+}
+,{
+    "testCaseDescription": "ruby-array-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '['a', 'b', 'c']' array"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "f085923cdf14b732c4e606edb4a13d463ca3633a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fb977a1a932fedffdf11b59b7039edfee929898b"
+}]

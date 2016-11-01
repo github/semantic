@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-lambda-dash-rocket-insert-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(a, b, c) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "bf01ed653791dfe5beb43e85c33f6e2d069fefc2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f73764d7261d1e1170e691733b6b7c74132936a6"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous() function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(a, b, c) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "f73764d7261d1e1170e691733b6b7c74132936a6",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a565bef62371853b9de3114627e035ff440fd605"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced an anonymous() function with an anonymous(a, b, c) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "a565bef62371853b9de3114627e035ff440fd605",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "1dbde963827409f36b55fa0f88b86e8ff782d781"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced an anonymous(a, b, c) function with an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "1dbde963827409f36b55fa0f88b86e8ff782d781",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "b64019a98f9d5d736aa8aee285c18f359f59ac54"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous() function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b, c) function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "b64019a98f9d5d736aa8aee285c18f359f59ac54",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "68d2b5640d198edce8cf79588d67c73b3c12bc22"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b, c) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "68d2b5640d198edce8cf79588d67c73b3c12bc22",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f2810ef2729cf5ab883af5d89e8e824a0b5d8c25"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "f2810ef2729cf5ab883af5d89e8e824a0b5d8c25",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2f2168edc8d0acbcdcf2e14df2188f727260ad2f"
+}]
