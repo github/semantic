@@ -7,9 +7,10 @@ import Category
 import Range
 import SourceSpan
 import Test.QuickCheck
+import Data.Aeson
 
 newtype Cost = Cost { unCost :: Int }
-  deriving (Eq, Num, Ord, Show)
+  deriving (Eq, Num, Ord, Show, ToJSON)
 
 characterRange :: HasField fields Range => Record fields -> Range
 characterRange = getField
