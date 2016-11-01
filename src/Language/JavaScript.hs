@@ -30,56 +30,77 @@ termConstructor source sourceSpan name range children
   | otherwise = withDefaultInfo $ case (name, children) of
     ("return_statement", _) -> S.Return (listToMaybe children)
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
+    ("assignment", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+    ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
+    ("member_access", _ ) -> S.Error children
     ("subscript_access", [ base, element ]) -> S.SubscriptAccess base element
+    ("subscript_access", _ ) -> S.Error children
     ("comma_op", [ a, b ]) -> case unwrap b of
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
+    ("comma_op", _ ) -> S.Error children
     ("function_call", _) -> case runCofree <$> children of
       [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
       [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
       [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
       (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
-      _ -> S.Indexed children
+      _ -> S.Error children
     ("ternary", condition : cases) -> S.Ternary condition cases
+    ("ternary", _ ) -> S.Error children
     ("arguments", _) -> S.Args children
     ("var_assignment", [ x, y ]) -> S.VarAssignment x y
+    ("var_assignment", _ ) -> S.Error children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
     ("switch_statement", expr : rest) -> S.Switch expr rest
+    ("switch_statement", _ ) -> S.Error children
     ("case", [ expr, body ]) -> S.Case expr body
+    ("case", _ ) -> S.Error children
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("if_statement", expr : rest ) -> S.If expr rest
+    ("if_statement", _ ) -> S.Error children
     ("while_statement", expr : rest ) -> S.While expr rest
+    ("while_statement", _ ) -> S.Error children
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
+    ("do_statement", _ ) -> S.Error children
     ("throw_statement", [ expr ]) -> S.Throw expr
+    ("throw_statment", _ ) -> S.Error children
     ("new_expression", [ expr ]) -> S.Constructor expr
+    ("new_expression", _ ) -> S.Error children
     ("try_statement", [ body ]) -> S.Try body Nothing Nothing
     ("try_statement", [ body, catch ]) | Catch <- category (extract catch) -> S.Try body (Just catch) Nothing
     ("try_statement", [ body, finally ]) | Finally <- category (extract finally) -> S.Try body Nothing (Just finally)
     ("try_statement", [ body, catch, finally ])
       | Catch <- category (extract catch)
       , Finally <- category (extract finally) -> S.Try body (Just catch) (Just finally)
+    ("try_statement", _ ) -> S.Error children
     ("array", _) -> S.Array children
     ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
+    ("method_definition", _ ) -> S.Error children
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+    ("class", _ ) -> S.Error children
     ("import_statement", [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
     ("import_statement", [ identifier ] ) -> S.Import identifier []
+    ("import_statement", _ ) -> S.Error children
     ("export_statement", [ statements, identifier] ) -> S.Export (Just identifier) (toList (unwrap statements))
     ("export_statement", [ statements ] ) -> case unwrap statements of
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
-    _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs [body]
+    ("export_statement", _ ) -> S.Error children
+    _ | name `elem` forStatements -> case unsnoc children of
+          Just (exprs, body) -> S.For exprs [body]
+          _ -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
           [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
           [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
-          _ -> S.Indexed children
+          _ -> S.Error children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
