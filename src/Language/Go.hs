@@ -59,6 +59,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
             withDefaultInfo $ S.VarAssignment identifier' rest'
           _ -> withCategory Error (S.Error [constSpec])
         withDefaultInfo $ S.VarDecl assignment
+  ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) body
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
@@ -78,7 +79,7 @@ categoryForGoName = \case
   "raw_string_literal" -> StringLiteral
   "binary_expression" -> RelationalOperator
   "function_declaration" -> Function
-  "func_literal" -> Function
+  "func_literal" -> AnonymousFunction
   "call_expression" -> FunctionCall
   "selector_expression" -> MethodCall
   "parameters" -> Args
