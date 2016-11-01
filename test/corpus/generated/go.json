@@ -20,6 +20,13 @@
         "replacement": "b()"
       },
       {
+        "syntax": "function-literal",
+        "repoFilePath": "function-literal.go",
+        "insert": "const s1 = func(s string) (int, int) {\nreturn 1, 2\n}",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/function-call.json",
+        "replacement": "const s1 = func(b int) (string, string) {\nreturn 1, 2\n}"
+      },
+      {
         "syntax": "const-declarations",
         "repoFilePath": "const-declarations.go",
         "insert": "const zero = 0",

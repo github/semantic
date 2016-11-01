@@ -114,6 +114,8 @@ data Category
   | Import
   -- | An export
   | Export
+  -- | An anonymous function
+  | AnonymousFunction
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

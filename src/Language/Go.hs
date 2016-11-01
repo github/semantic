@@ -78,6 +78,7 @@ categoryForGoName = \case
   "raw_string_literal" -> StringLiteral
   "binary_expression" -> RelationalOperator
   "function_declaration" -> Function
+  "func_literal" -> Function
   "call_expression" -> FunctionCall
   "selector_expression" -> MethodCall
   "parameters" -> Args

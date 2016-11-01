@@ -1,0 +1,592 @@
+[{
+    "testCaseDescription": "go-function-literal-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "b68f8e2c834d30ff74130dc77f5aac31366f42b0",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "1d7ad060d2d65581b58b2f309fa4155262f7f2ae"
+}
+,{
+    "testCaseDescription": "go-function-literal-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "1d7ad060d2d65581b58b2f309fa4155262f7f2ae",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6210023a695044de9a953829b2d9b43dcd998f28"
+}
+,{
+    "testCaseDescription": "go-function-literal-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                36
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                25
+                            ],
+                            "end": [
+                                3,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                36
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                25
+                            ],
+                            "end": [
+                                3,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "6210023a695044de9a953829b2d9b43dcd998f28",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "0161655f230b1c6f6638e2432c9484edeb79f774"
+}
+,{
+    "testCaseDescription": "go-function-literal-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                28
+                            ],
+                            "end": [
+                                3,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                36
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                28
+                            ],
+                            "end": [
+                                3,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                36
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "0161655f230b1c6f6638e2432c9484edeb79f774",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "74f772235f7094e0998f5f45ca2fd5f90976936d"
+}
+,{
+    "testCaseDescription": "go-function-literal-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "74f772235f7094e0998f5f45ca2fd5f90976936d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "73aecb62bd1f1eccaea9a5df70aef38755cb53c9"
+}
+,{
+    "testCaseDescription": "go-function-literal-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "73aecb62bd1f1eccaea9a5df70aef38755cb53c9",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "d5e079e988e6b3539e1ab735aea928ea3cdf94b8"
+}
+,{
+    "testCaseDescription": "go-function-literal-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-literal.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literal.go"
+    ],
+    "sha1": "d5e079e988e6b3539e1ab735aea928ea3cdf94b8",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "0cb4e934b322d7dd1f49b43557f9aa2019eb81b6"
+}]
