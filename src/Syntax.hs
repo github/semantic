@@ -5,6 +5,7 @@ import Prologue
 import Data.Mergeable
 import GHC.Generics
 import Test.QuickCheck hiding (Fixed)
+import Data.Aeson
 
 -- | A node in an abstract syntax tree.
 --
@@ -76,7 +77,7 @@ data Syntax a f
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
 -- Instances
