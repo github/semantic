@@ -1,8 +1,8 @@
 [
   {
-    "repoUrl": "https://github.com/diff-fixtures/javascript.git",
     "language": "javascript",
     "fileExt": ".js",
+    "repoUrl": "https://github.com/diff-fixtures/javascript.git",
     "syntaxes": [
       {
         "syntax": "object",

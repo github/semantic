@@ -1,0 +1,604 @@
+[{
+    "testCaseDescription": "ruby-element-reference-insert-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[:bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[bar]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "6bef099d2af7b41f171358e66662163cdf0bc96e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8bc26414118839cc62822f791546a858daf7463d"
+}
+,{
+    "testCaseDescription": "ruby-element-reference-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"b\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[:\"c\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[:bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[bar]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "8bc26414118839cc62822f791546a858daf7463d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "5bf31b94df885fc6aeef3d941a276275a1b54539"
+}
+,{
+    "testCaseDescription": "ruby-element-reference-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x[\"b\"]' subscript access with the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the foo[:bar] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':\"c\"' symbol with the ':bar' symbol in the foo[:bar] subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo[bar]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "5bf31b94df885fc6aeef3d941a276275a1b54539",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2772d28a1314eea9589d8248bfaacaac641d78fd"
+}
+,{
+    "testCaseDescription": "ruby-element-reference-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo[bar]' subscript access with the 'x[\"b\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the x[:\"c\"] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':bar' symbol with the ':\"c\"' symbol in the x[:\"c\"] subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[bar]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "2772d28a1314eea9589d8248bfaacaac641d78fd",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6bd4d2e07d73b6bf4d52cff5ec3990c18e04da38"
+}
+,{
+    "testCaseDescription": "ruby-element-reference-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"b\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[:\"c\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[:bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[bar]' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"b\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[:\"c\"]' subscript access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "6bd4d2e07d73b6bf4d52cff5ec3990c18e04da38",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "69629c98667b474becb7b596dedd4133cd703449"
+}
+,{
+    "testCaseDescription": "ruby-element-reference-delete-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[:bar]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo[bar]' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "69629c98667b474becb7b596dedd4133cd703449",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "65dc4b08527a43bdf462865885355973c8154460"
+}
+,{
+    "testCaseDescription": "ruby-element-reference-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "element-reference.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"b\"]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[:\"c\"]' subscript access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "element-reference.rb"
+    ],
+    "sha1": "65dc4b08527a43bdf462865885355973c8154460",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0afd2cfcf489061cc131d9970716bb04bb5cb203"
+}]

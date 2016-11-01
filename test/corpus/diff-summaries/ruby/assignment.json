@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "c1011bb99d1909091258a822b4b1cffd554404e2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e41b3065504363a0301c9b303287647996485eb0"
+}
+,{
+    "testCaseDescription": "ruby-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "e41b3065504363a0301c9b303287647996485eb0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8f67f0dddc276771748784c1c867ba26ef19cda7"
+}
+,{
+    "testCaseDescription": "ruby-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in an assignment to x"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "8f67f0dddc276771748784c1c867ba26ef19cda7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "68f0d646d1b49e7e5b49f56b3af54223fb47c85a"
+}
+,{
+    "testCaseDescription": "ruby-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in an assignment to x"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "68f0d646d1b49e7e5b49f56b3af54223fb47c85a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "26627cf899d8f7bc331270249d6a9333e048ac19"
+}
+,{
+    "testCaseDescription": "ruby-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "26627cf899d8f7bc331270249d6a9333e048ac19",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "b4bd50ed246f8e68c1a7f3e24e78ceb4e65c96f6"
+}
+,{
+    "testCaseDescription": "ruby-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "b4bd50ed246f8e68c1a7f3e24e78ceb4e65c96f6",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9fe03a3aec3859d5b48075e09fb5024bfd82c375"
+}
+,{
+    "testCaseDescription": "ruby-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.rb"
+    ],
+    "sha1": "9fe03a3aec3859d5b48075e09fb5024bfd82c375",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9e7143591420559db8bb6c8648077d460d371b9f"
+}]

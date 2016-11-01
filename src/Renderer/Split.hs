@@ -83,7 +83,13 @@ styleName category = "category-" <> case category of
   C.Module -> "module_statement"
   C.Import -> "import_statement"
   C.Export -> "export_statement"
-  
+  C.Interpolation -> "interpolation"
+  C.Subshell -> "subshell"
+  C.ConditionalAssignment -> "conditional_assignment"
+  C.Yield -> "yield_statement"
+  C.Until -> "until"
+  C.Unless -> "unless_statement"
+
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
 splitPatchToClassName patch = stringValue $ "patch " <> case patch of

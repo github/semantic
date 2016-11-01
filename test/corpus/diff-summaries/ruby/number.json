@@ -1,0 +1,1459 @@
+[{
+    "testCaseDescription": "ruby-number-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1_234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '0d1_234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '0o1234567'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0b1_0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '1.234_5e678_90'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "0957bae761de5bf738359a6690f06c633b38a43d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "aeda46e163198f22c8eaeda07966064567ffe4cc"
+}
+,{
+    "testCaseDescription": "ruby-number-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1_235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '0d1_235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '0o1234576'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0b1_1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '1.234_5e678_91'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '\n1234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1_234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '0d1_234'"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    12,
+                                    1
+                                ],
+                                "end": [
+                                    12,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1234' with '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '0o1234567'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0b1_0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '1.234_5e678_90'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '\n1234'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "aeda46e163198f22c8eaeda07966064567ffe4cc",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "33f99dbd2d8065e4b180835837107a5e289d1928"
+}
+,{
+    "testCaseDescription": "ruby-number-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1_234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '0d1_234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '0o1234567'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0b1_0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '1.234_5e678_90'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234576'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_91'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "33f99dbd2d8065e4b180835837107a5e289d1928",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fef6e24bc278c784f035efa55f2c71c41f409b81"
+}
+,{
+    "testCaseDescription": "ruby-number-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1_235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '0d1_235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '0o1234576'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0b1_1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '1.234_5e678_91'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234567'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_90'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "fef6e24bc278c784f035efa55f2c71c41f409b81",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "03b758f4230c3e65e2bfc2f42dbb8f263c8c3623"
+}
+,{
+    "testCaseDescription": "ruby-number-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234576'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_91'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '\n1234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234567'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_90'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '\n1234'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '\n1235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1_235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '0d1_235'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '0o1234576'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0b1_1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added '1.234_5e678_91'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "03b758f4230c3e65e2bfc2f42dbb8f263c8c3623",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e005d4540a533e8fcd0226d43ac774df7f9b478e"
+}
+,{
+    "testCaseDescription": "ruby-number-delete-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_234'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_789'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234567'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_90'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '\n1235'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "e005d4540a533e8fcd0226d43ac774df7f9b478e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d7654d564470fc8f926394c4410de1388e2d9e20"
+}
+,{
+    "testCaseDescription": "ruby-number-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "number.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1_235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0d1_235'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0xa_bcd_ef0_123_456_788'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0o1234576'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0b1_1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1.234_5e678_91'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.rb"
+    ],
+    "sha1": "d7654d564470fc8f926394c4410de1388e2d9e20",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cf75d6b80230785d209c010331669dcc53f3131c"
+}]

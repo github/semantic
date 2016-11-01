@@ -118,8 +118,12 @@ syntaxToTermField syntax = case syntax of
   S.Array c -> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier parameters definitions -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
-  S.If expression thenClause elseClause -> [ "expression" .= expression ] <> [ "thenClause" .=  thenClause ] <> [ "elseClause" .= elseClause ]
+  S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
   S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
+  S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
+  S.Yield expr -> [ "yieldExpression" .= expr ]
+  S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
+  S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
   where childrenFields c = [ "children" .= c ]

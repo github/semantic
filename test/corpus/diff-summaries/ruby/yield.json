@@ -1,0 +1,262 @@
+[{
+    "testCaseDescription": "ruby-yield-insert-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' yield statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "9b31b02e831a9ab3366e95bcb9f6399451d97d76",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "dbee6f357338aaa3f39b672e6b1b4523a8f04484"
+}
+,{
+    "testCaseDescription": "ruby-yield-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' yield statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' yield statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "dbee6f357338aaa3f39b672e6b1b4523a8f04484",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e67fd93b9125fcde8c8409b783b4655c06a3df25"
+}
+,{
+    "testCaseDescription": "ruby-yield-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "e67fd93b9125fcde8c8409b783b4655c06a3df25",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2141d5505436e89dfb53f08627a0763751731a5f"
+}
+,{
+    "testCaseDescription": "ruby-yield-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "2141d5505436e89dfb53f08627a0763751731a5f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "275211816068d07474e95acca8a51626e2c2bf9c"
+}
+,{
+    "testCaseDescription": "ruby-yield-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' yield statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' yield statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' yield statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "275211816068d07474e95acca8a51626e2c2bf9c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "904f13395ebdcccb186a779f0a06b94811fdebe0"
+}
+,{
+    "testCaseDescription": "ruby-yield-delete-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' yield statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "904f13395ebdcccb186a779f0a06b94811fdebe0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "abe626de0237f33d3420253ca7569dace23da8ae"
+}
+,{
+    "testCaseDescription": "ruby-yield-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' yield statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "abe626de0237f33d3420253ca7569dace23da8ae",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "1cda9292af04e8e32459e7947db6705129af8474"
+}]

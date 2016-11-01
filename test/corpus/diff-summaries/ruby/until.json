@@ -1,0 +1,352 @@
+[{
+    "testCaseDescription": "ruby-until-insert-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' until statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'done' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "afb10073d68a4e2f0fbaac9a77f612de65bbccbe",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6780e35bdc5913d3fc7f4ae577adb8b4fdc3b194"
+}
+,{
+    "testCaseDescription": "ruby-until-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' until statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' until statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'done' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "6780e35bdc5913d3fc7f4ae577adb8b4fdc3b194",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0df6b2c10e983b7f0f24922996a0ea94ddb22619"
+}
+,{
+    "testCaseDescription": "ruby-until-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'done' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "0df6b2c10e983b7f0f24922996a0ea94ddb22619",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c191ed363b003098cef1ca46778033443fcee4bd"
+}
+,{
+    "testCaseDescription": "ruby-until-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'done' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "c191ed363b003098cef1ca46778033443fcee4bd",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f0c1239d16c2628f928ac58736c95992a2f10923"
+}
+,{
+    "testCaseDescription": "ruby-until-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' until statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' until statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'done' until statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "f0c1239d16c2628f928ac58736c95992a2f10923",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "94c63611ca1981024d1113d68f6cc4476d3b2715"
+}
+,{
+    "testCaseDescription": "ruby-until-delete-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' until statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'done' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "94c63611ca1981024d1113d68f6cc4476d3b2715",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a0540b9451554f2a624c6562070f7df8115dfefe"
+}
+,{
+    "testCaseDescription": "ruby-until-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "until.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' until statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "until.rb"
+    ],
+    "sha1": "a0540b9451554f2a624c6562070f7df8115dfefe",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "03b2db1cb47a50501b36faf7fc35ebd3347c0a0a"
+}]

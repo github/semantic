@@ -1,0 +1,472 @@
+[{
+    "testCaseDescription": "ruby-relational-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x == y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x != y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x === y' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "ef97729fc1ce67c8c748ea440decb29ce2e8fb6e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "724a9cb614befd72789dcd62cf7b0a9985dd9b23"
+}
+,{
+    "testCaseDescription": "ruby-relational-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x <=> y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x =~ y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x == y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x != y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x === y' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "724a9cb614befd72789dcd62cf7b0a9985dd9b23",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "57d4171a58d3565183f75619b4c044aa0e80c5c2"
+}
+,{
+    "testCaseDescription": "ruby-relational-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x == y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "57d4171a58d3565183f75619b4c044aa0e80c5c2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "abfa3a152c9057cf2373a440079e39757782e9bb"
+}
+,{
+    "testCaseDescription": "ruby-relational-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x == y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "abfa3a152c9057cf2373a440079e39757782e9bb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "92a1884a99d461f88a20c7ba0be8c3b850ce82cd"
+}
+,{
+    "testCaseDescription": "ruby-relational-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x <=> y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x =~ y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x == y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "92a1884a99d461f88a20c7ba0be8c3b850ce82cd",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e4851a23d5aa5cbe144dff6b48cb6c33c51fd7e1"
+}
+,{
+    "testCaseDescription": "ruby-relational-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x == y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x != y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x === y' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "e4851a23d5aa5cbe144dff6b48cb6c33c51fd7e1",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3ace56632c61e59046865dee72b13029a9a1b0b2"
+}
+,{
+    "testCaseDescription": "ruby-relational-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x <=> y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x =~ y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.rb"
+    ],
+    "sha1": "3ace56632c61e59046865dee72b13029a9a1b0b2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "b5ca633b949a2227913a944093e291dd78724130"
+}]

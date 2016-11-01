@@ -22,9 +22,9 @@ data Syntax a f
   -- | A ternary has a condition, a true case and a false case
   | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
   -- | An anonymous function has a list of expressions and params.
-  | AnonymousFunction { params :: [f], expressions :: f }
+  | AnonymousFunction { params :: [f], expressions :: [f] }
   -- | A function has a list of expressions.
-  | Function { id :: f, params :: [f], expressions :: f }
+  | Function { id :: f, params :: [f], expressions :: [f] }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | A math assignment represents expressions whose operator classifies as mathy (e.g. += or *=).
@@ -57,9 +57,10 @@ data Syntax a f
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
   | Error [f]
-  | For [f] f
+  -- | A for statement has a list of expressions to setup the iteration and then a list of expressions in the body.
+  | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
-  | While { whileExpr :: f, whileBody :: f }
+  | While { whileExpr :: f, whileBody :: [f] }
   | Return (Maybe f)
   | Throw f
   | Constructor f
@@ -70,12 +71,18 @@ data Syntax a f
   | Class f (Maybe f) [f]
   -- | A method definition with an identifier, params, and a list of expressions.
   | Method f [f] [f]
-  -- | An if statement with an expression, a clause, and maybe more expressions, clauses.
-  | If f f [f]
+  -- | An if statement with an expression and maybe more expression clauses.
+  | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
+  -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
+  | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
+  | Yield (Maybe f)
+  | Until { untilExpr :: f, untilBody :: [f] }
+  -- | An unless statement with an expression and maybe more expression clauses.
+  | Unless f [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

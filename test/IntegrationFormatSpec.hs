@@ -38,13 +38,13 @@ runTestsIn filePaths format matcher = do
             Left err ->  it ("An error occurred " <> err <> " (" <> filePath <> ")") $ True `shouldBe` False
             Right testCases -> traverse_ (\testCase -> it (testCaseDescription testCase) $ assertDiffSummary testCase format matcher) testCases
 
-spec :: Spec
-spec = parallel $ do
-  summaryFormatFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries"
-  summaryFormatToDoFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries-todo"
-  summaryFormatCrasherFiles <- runIO $ testCaseFiles "test/corpus/diff-summary-crashers"
+spec :: Maybe String -> Spec
+spec maybeLanguage = parallel $ do
+  summaryFormatFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summaries"
+  summaryFormatToDoFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summaries-todo"
+  summaryFormatCrasherFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summary-crashers"
 
-  jsonFormatFiles <- runIO $ testCaseFiles "test/corpus/json"
+  jsonFormatFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/json"
 
   describe "Summary format" $ runTestsIn summaryFormatFiles Summary shouldBe
   describe "Summary format todo" $ runTestsIn summaryFormatToDoFiles Summary shouldNotBe
@@ -52,5 +52,8 @@ spec = parallel $ do
 
   describe "JSON format" $ runTestsIn jsonFormatFiles JSON shouldBe
 
-  where testCaseFiles :: String -> IO [FilePath]
-        testCaseFiles = globDir1 (compile "*/*.json")
+  where
+    testCaseFiles :: Maybe String -> String -> IO [FilePath]
+    testCaseFiles maybeLanguage dir = case maybeLanguage of
+      Just language -> globDir1 (compile (language <> "/*.json")) dir
+      Nothing -> globDir1 (compile "*/*.json") dir

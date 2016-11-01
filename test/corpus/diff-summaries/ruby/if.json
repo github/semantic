@@ -1,0 +1,460 @@
+[{
+    "testCaseDescription": "ruby-if-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "03b2db1cb47a50501b36faf7fc35ebd3347c0a0a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "06f67f854a8c5278a30c80ea8daab16114f0705d"
+}
+,{
+    "testCaseDescription": "ruby-if-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "06f67f854a8c5278a30c80ea8daab16114f0705d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c2e0eaba62e5fb53f9dd334f0e21b52064b27c6e"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '\n' expression statements with the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'quux' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bat' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "c2e0eaba62e5fb53f9dd334f0e21b52064b27c6e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "321cfe0b9283c0b1f35c175e8259043b7f3fbc21"
+}
+,{
+    "testCaseDescription": "ruby-if-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the '\n' expression statements"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'quux' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bat' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "321cfe0b9283c0b1f35c175e8259043b7f3fbc21",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2eadf498c21757333d25f7c003b41afbe0579757"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "2eadf498c21757333d25f7c003b41afbe0579757",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "350fc0e2ea2916667a35b82f86f52cdcc479ff18"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "350fc0e2ea2916667a35b82f86f52cdcc479ff18",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0a4501920cccb75d37d857ed92b235778d943997"
+}
+,{
+    "testCaseDescription": "ruby-if-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if.rb"
+    ],
+    "sha1": "0a4501920cccb75d37d857ed92b235778d943997",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "482d92220765ab9cc71c4a13b264d98554a987b2"
+}]
