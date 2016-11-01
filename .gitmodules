@@ -25,3 +25,6 @@
 [submodule "test/corpus/repos/go"]
 	path = test/corpus/repos/go
 	url = https://github.com/diff-fixtures/go.git
+[submodule "vendor/effects"]
+	path = vendor/effects
+	url = https://github.com/joshvera/effects.git

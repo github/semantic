@@ -25,9 +25,9 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "2a887b5d06f807f64eb0441bf4a29ca83e919096",
+    "sha1": "e01da1d7da05b823873a3d54668f908216c92694",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ff6d30117ea0ab0742b58dac20c9560207d19ace"
+    "sha2": "c40a8da30fd77e505774c5124454d46f5e07f608"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "ff6d30117ea0ab0742b58dac20c9560207d19ace",
+    "sha1": "c40a8da30fd77e505774c5124454d46f5e07f608",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "02c909644f2dd515afd7c1ad6e6d43eb2d4d34bf"
+    "sha2": "8d1f422c1d1af152ae1d8ed0fa4391ac6ec6f1e6"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-insert-test",
@@ -141,9 +141,9 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "02c909644f2dd515afd7c1ad6e6d43eb2d4d34bf",
+    "sha1": "8d1f422c1d1af152ae1d8ed0fa4391ac6ec6f1e6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b9766865391e6398e7c1c59eb6f98dea25120f2b"
+    "sha2": "e04397861769262f0c682e6ac4050be04302616c"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-replacement-test",
@@ -211,9 +211,9 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "b9766865391e6398e7c1c59eb6f98dea25120f2b",
+    "sha1": "e04397861769262f0c682e6ac4050be04302616c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "89d4e14b5e7a904743522a6bb8a9e0fe4eb03836"
+    "sha2": "da3be5ae932bfa8baf3d88de70ba76dc3503a756"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-replacement-test",
@@ -272,9 +272,9 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "89d4e14b5e7a904743522a6bb8a9e0fe4eb03836",
+    "sha1": "da3be5ae932bfa8baf3d88de70ba76dc3503a756",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b9444a9255d1be7d6f8aac4eebd08adb9df16547"
+    "sha2": "8b1f6a80d4434515e3129552987804e58ee95182"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-test",
@@ -303,9 +303,9 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "b9444a9255d1be7d6f8aac4eebd08adb9df16547",
+    "sha1": "8b1f6a80d4434515e3129552987804e58ee95182",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8d241972061ddd76bc31ca184f4df71c847ef44f"
+    "sha2": "78e6515b27f094beeb4b3b6dec2bbe60bb57a088"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-rest-test",
@@ -334,7 +334,7 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "8d241972061ddd76bc31ca184f4df71c847ef44f",
+    "sha1": "78e6515b27f094beeb4b3b6dec2bbe60bb57a088",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6a23d6c3d49e4aab8de5daedf66773c9eba65644"
+    "sha2": "1011ea99d2c513437073a38030c1290fcc06cac4"
 }]

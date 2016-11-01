@@ -1,0 +1,1985 @@
+[{
+    "testCaseDescription": "javascript-delete-operator-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                13,
+                                                                19
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "c83346db7cc26ffb88d39bba2e5ea473628a5d64"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "164de6ef1b42af3022bf42e1fdcab480143b06ef",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b888225437f386dca2a30482de1e9cc06c8ed1ed"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                13,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                25,
+                                                                30
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                31,
+                                                                37
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        25,
+                                                        38
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                38
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        18,
+                                        39
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        18,
+                        40
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                13,
+                                                                19
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                47,
+                                                                52
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                53,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        47,
+                                                        60
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                40,
+                                                60
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        40,
+                                        61
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                40,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        40,
+                        62
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                62,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        62,
+                        62
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "c83346db7cc26ffb88d39bba2e5ea473628a5d64",
+            "7c8b990856cc161278d88fbf344995bb0e511c79"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "b888225437f386dca2a30482de1e9cc06c8ed1ed",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9d36ec6996e8aa33423dc43df5b5884bc5750742"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                13,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                13,
+                                                                19
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                25,
+                                                                30
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                31,
+                                                                37
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        25,
+                                                        38
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                38
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        39
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        40
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                29,
+                                                                34
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                35,
+                                                                41
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        29,
+                                                        42
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                42
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        22,
+                                        43
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                44
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        44
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                47,
+                                                                52
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                53,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        47,
+                                                        60
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                40,
+                                                60
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        40,
+                                        61
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                40,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        40,
+                        62
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                51,
+                                                                56
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                57,
+                                                                63
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        51,
+                                                        64
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                44,
+                                                64
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        44,
+                                        65
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                44,
+                                66
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        44,
+                        66
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                62,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        62,
+                        62
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                66,
+                                66
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        66,
+                        66
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "7c8b990856cc161278d88fbf344995bb0e511c79",
+            "f506e360a27ff5a46107a78305cb26eae376969a"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "9d36ec6996e8aa33423dc43df5b5884bc5750742",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e4c386ff7cf5914e3d03a1b4e10416115d11766c"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                13,
+                                                                19
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                13,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "patch": "replace",
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                29,
+                                                                34
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                35,
+                                                                41
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        29,
+                                                        42
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                42
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        22,
+                                        43
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                44
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        44
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                25,
+                                                                30
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                31,
+                                                                37
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        25,
+                                                        38
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                38
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        18,
+                                        39
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        40
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                51,
+                                                                56
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                57,
+                                                                63
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        51,
+                                                        64
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                44,
+                                                64
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        44,
+                                        65
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                44,
+                                66
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        44,
+                        66
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                47,
+                                                                52
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                53,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        47,
+                                                        60
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                40,
+                                                60
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        40,
+                                        61
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                40,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        40,
+                        62
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                66,
+                                66
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        66,
+                        66
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                62,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        62,
+                        62
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "f506e360a27ff5a46107a78305cb26eae376969a",
+            "7c8b990856cc161278d88fbf344995bb0e511c79"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "e4c386ff7cf5914e3d03a1b4e10416115d11766c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "43a3be746ece5fa2650750d060c63295fc15c27b"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                13,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                25,
+                                                                30
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                31,
+                                                                37
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        25,
+                                                        38
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                18,
+                                                38
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        18,
+                                        39
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                18,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        18,
+                        40
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                47,
+                                                                52
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                53,
+                                                                59
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        47,
+                                                        60
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                40,
+                                                60
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        40,
+                                        61
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                40,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        40,
+                        62
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                13,
+                                                                19
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                29,
+                                                                34
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                35,
+                                                                39
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        29,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                39
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        22,
+                                        40
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        22,
+                        40
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                62,
+                                62
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        62,
+                        62
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                40,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        40,
+                        40
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "7c8b990856cc161278d88fbf344995bb0e511c79",
+            "2dfe0799039bd2ada9ce8baae7d0bf386081de9e"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "43a3be746ece5fa2650750d060c63295fc15c27b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "56ee50869ff5102e8aa3bff067886ac95e5c2da6"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "SubscriptAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "StringLiteral",
+                                                            "range": [
+                                                                13,
+                                                                19
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        22
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                29,
+                                                                34
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                35,
+                                                                39
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        29,
+                                                        39
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                22,
+                                                39
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        22,
+                                        40
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                22,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        40
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                13,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                40,
+                                40
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        40,
+                        40
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "2dfe0799039bd2ada9ce8baae7d0bf386081de9e",
+            "9d68dfb82c6d88266f02270c6896ef7056448ef9"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "56ee50869ff5102e8aa3bff067886ac95e5c2da6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "be8ba365ed1831c473fc55c8d73cc3b8693c68b6"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "Operator",
+                                            "children": [
+                                                {
+                                                    "category": "MemberAccess",
+                                                    "children": [
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                7,
+                                                                12
+                                                            ]
+                                                        },
+                                                        {
+                                                            "category": "Identifier",
+                                                            "range": [
+                                                                13,
+                                                                17
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "range": [
+                                                        7,
+                                                        17
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                17
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        18
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        18
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                18,
+                                18
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        18,
+                        18
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "delete-operator.js",
+            "delete-operator.js"
+        ],
+        "oids": [
+            "9d68dfb82c6d88266f02270c6896ef7056448ef9",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "be8ba365ed1831c473fc55c8d73cc3b8693c68b6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "01c8f3bc964827b93c4f234df17d50755ab361c2"
+}]

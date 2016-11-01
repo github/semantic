@@ -1,5 +1,5 @@
 [{
-    "testCaseDescription": "go-const declarations-insert-test",
+    "testCaseDescription": "go-const-declarations-insert-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -25,12 +25,12 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "1fa1885457279cc6e82c4bd837bea2544b32a2e2",
+    "sha1": "9e8b6854cb376c29a480a5a5fbbc055e13227cfd",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b33dc31af4b76bce6c546b744faba1eed6f303ec"
+    "sha2": "5c264465d2d5b0f2b13770c4c571c91c3d581c3d"
 }
 ,{
-    "testCaseDescription": "go-const declarations-replacement-insert-test",
+    "testCaseDescription": "go-const-declarations-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -48,6 +48,21 @@
                         }
                     },
                     "summary": "Added the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
                 }
             ]
         },
@@ -56,12 +71,12 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "b33dc31af4b76bce6c546b744faba1eed6f303ec",
+    "sha1": "5c264465d2d5b0f2b13770c4c571c91c3d581c3d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a0b7b15f1e8340c6fb9dc4565456f7549c27022b"
+    "sha2": "328e9d44579e09fe55e2d48625ffc54c90cca16f"
 }
 ,{
-    "testCaseDescription": "go-const declarations-delete-insert-test",
+    "testCaseDescription": "go-const-declarations-delete-insert-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -90,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -105,7 +120,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' identifier"
+                    "summary": "Deleted the 'two' identifier in the const zero = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -132,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0'"
+                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -147,7 +162,49 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    18
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    14
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
                 }
             ]
         },
@@ -156,12 +213,12 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "a0b7b15f1e8340c6fb9dc4565456f7549c27022b",
+    "sha1": "328e9d44579e09fe55e2d48625ffc54c90cca16f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4619a925a26e81b6d1209c92dc1e8df1a1db757b"
+    "sha2": "75ead88fca4e5e1a83c4901d9410220d66ee5a74"
 }
 ,{
-    "testCaseDescription": "go-const declarations-replacement-test",
+    "testCaseDescription": "go-const-declarations-replacement-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -190,7 +247,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -205,7 +262,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier"
+                    "summary": "Added the 'two' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -232,7 +289,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1'"
+                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -247,7 +304,49 @@
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    14
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    18
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
                 }
             ]
         },
@@ -256,12 +355,12 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "4619a925a26e81b6d1209c92dc1e8df1a1db757b",
+    "sha1": "75ead88fca4e5e1a83c4901d9410220d66ee5a74",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "41a6ea87f5c62d21f958fff123807f74c2158413"
+    "sha2": "76db009eeaa9e79350336f2916624b1aabb9bef8"
 }
 ,{
-    "testCaseDescription": "go-const declarations-delete-replacement-test",
+    "testCaseDescription": "go-const-declarations-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -317,12 +416,12 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "41a6ea87f5c62d21f958fff123807f74c2158413",
+    "sha1": "76db009eeaa9e79350336f2916624b1aabb9bef8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "41fd81a20db5b09ef22d9ca39f375669cf030428"
+    "sha2": "529a98cf617a3fe11212c66e51d0507d0db6c319"
 }
 ,{
-    "testCaseDescription": "go-const declarations-delete-test",
+    "testCaseDescription": "go-const-declarations-delete-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -348,12 +447,12 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "41fd81a20db5b09ef22d9ca39f375669cf030428",
+    "sha1": "529a98cf617a3fe11212c66e51d0507d0db6c319",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "596a3aa98863bc7bfc3532867c2bbdb7d4363a1f"
+    "sha2": "6ae534557f3972270cabf341d6bf95a68f920f36"
 }
 ,{
-    "testCaseDescription": "go-const declarations-delete-rest-test",
+    "testCaseDescription": "go-const-declarations-delete-rest-test",
     "expectedResult": {
         "changes": {
             "const-declarations.go": [
@@ -379,7 +478,7 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "596a3aa98863bc7bfc3532867c2bbdb7d4363a1f",
+    "sha1": "6ae534557f3972270cabf341d6bf95a68f920f36",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "602ed5a76cbb85535ad82a1f61ef44f10eaa49bc"
+    "sha2": "a77d9ca2b63f1f86d67ab41b9eb78cb66f348e2f"
 }]

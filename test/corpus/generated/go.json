@@ -1,8 +1,8 @@
 [
   {
-    "repoPath": "test/corpus/repos/go",
     "repoUrl": "https://github.com/joshvera/go.git",
     "language": "go",
+    "fileExt": ".go",
     "templateText": "package main\n",
     "syntaxes": [
       {
@@ -13,14 +13,14 @@
         "replacement": "var bar string = \"hello\""
       },
       {
-        "syntax": "function call",
+        "syntax": "function-call",
         "repoFilePath": "function-call.go",
         "insert": "a()",
         "testCaseFilePath": "test/corpus/diff-summaries/go/function-call.json",
         "replacement": "b()"
       },
       {
-        "syntax": "const declarations",
+        "syntax": "const-declarations",
         "repoFilePath": "const-declarations.go",
         "insert": "const zero = 0",
         "testCaseFilePath": "test/corpus/diff-summaries/go/const-declarations.json",
