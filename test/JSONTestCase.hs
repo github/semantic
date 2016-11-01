@@ -29,7 +29,6 @@ data JSONTestCase = JSONTestCase { gitDir :: !String
 
 data ExpectedResult = SummaryResult (Map Text (Map Text [Value]))
                     | JSONResult (Map Text Value)
-                    | EmptyResult Text
                     deriving (Show, Generic, Eq)
 
 -- | These replace the defaultOptions normally used by genericToEncoding.
@@ -58,8 +57,7 @@ instance ToJSON ExpectedResult where
 instance FromJSON ExpectedResult where
   parseJSON = Data.Aeson.withObject "ExpectedResult" $ \o ->
     SummaryResult <$> summaryResultValues o <|>
-    JSONResult <$> jsonResultValues o <|>
-    EmptyResult <$> o .: ""
+    JSONResult <$> jsonResultValues o
     where
       jsonResultValues :: Object -> Parser (Map Text Value)
       jsonResultValues o = Map.fromList <$> (fromKey "oids" <> fromKey "rows" <> fromKey "paths")
