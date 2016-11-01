@@ -1,0 +1,1743 @@
+[{
+    "testCaseDescription": "javascript-relational-operator-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                5
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        6
+                                    ]
+                                }
+                            ],
+                            "patch": "insert",
+                            "range": [
+                                0,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        7
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "insert",
+                            "range": [
+                                7,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        7,
+                        7
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+            "4021910f3d29e1915cf66201d9558dfa1b19fa8d"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "a919283c34de839a761ede23220cbfb06d95fc5e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6f0b4481386af74840df4ebfdb08231f5c84e131"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-replacement-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        13
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                13
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "insert",
+                                    "range": [
+                                        8,
+                                        14
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        15
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                5
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        6
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        7
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        19,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                15,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        15,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                15,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        15,
+                        22
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                7,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        7,
+                        7
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "4021910f3d29e1915cf66201d9558dfa1b19fa8d",
+            "dbef0501d91f214d6bb08756d1447824b8eccd54"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "6f0b4481386af74840df4ebfdb08231f5c84e131",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dd659ba5e7a414307340a5a4570a21bbcc384d8a"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-insert-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                5
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        6
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        7
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        13
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                13
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        14
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        15
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        7,
+                                                        8
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        11,
+                                                        12
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                7,
+                                                12
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        7,
+                                        13
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                7,
+                                14
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        7,
+                        14
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        19,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                15,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        15,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                15,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        15,
+                        22
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        14,
+                                                        15
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                14,
+                                                19
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        14,
+                                        20
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                14,
+                                21
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        14,
+                        21
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                21,
+                                21
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        21,
+                        21
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "dbef0501d91f214d6bb08756d1447824b8eccd54",
+            "a9ff7f65a167feb135388b62a3375a6e7d235472"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "dd659ba5e7a414307340a5a4570a21bbcc384d8a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8d831be60c4871818beb03d2ebb6bceb3d95eac8"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                5
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        6
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        7
+                    ],
+                    "number": 1
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        7,
+                                                        8
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        11,
+                                                        12
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                7,
+                                                12
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        7,
+                                        13
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                7,
+                                14
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        7,
+                        14
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        13
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                13
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        14
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        15
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        14,
+                                                        15
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        18,
+                                                        19
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                14,
+                                                19
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        14,
+                                        20
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                14,
+                                21
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        14,
+                        21
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        19,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                15,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        15,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                15,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        15,
+                        22
+                    ],
+                    "number": 3
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                21,
+                                21
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        21,
+                        21
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 4
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "a9ff7f65a167feb135388b62a3375a6e7d235472",
+            "dbef0501d91f214d6bb08756d1447824b8eccd54"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "8d831be60c4871818beb03d2ebb6bceb3d95eac8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "59ebb3564bdf427b5b5ddb5df4541bf09dc5d5b4"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-replacement-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        8,
+                                                        9
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        13
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                8,
+                                                13
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        8,
+                                        14
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                8,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        15
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                5
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        6
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        7
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        15,
+                                                        16
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        19,
+                                                        20
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                15,
+                                                20
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        15,
+                                        21
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                15,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        15,
+                        22
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        7,
+                                                        8
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        13
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                7,
+                                                13
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        7,
+                                        14
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                7,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        7,
+                        15
+                    ],
+                    "number": 2
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                22,
+                                22
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        22,
+                        22
+                    ],
+                    "number": 4
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                15,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        15,
+                        15
+                    ],
+                    "number": 3
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "dbef0501d91f214d6bb08756d1447824b8eccd54",
+            "1ee42eb93693db35c67b8f9dcad91d058bbb4ba0"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "59ebb3564bdf427b5b5ddb5df4541bf09dc5d5b4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b04246c2e0dd010ca1c49e6f440f60b71f136b4a"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        4,
+                                                        5
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                5
+                                            ]
+                                        }
+                                    ],
+                                    "patch": "delete",
+                                    "range": [
+                                        0,
+                                        6
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                7
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        7
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        7,
+                                                        8
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        12,
+                                                        13
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                7,
+                                                13
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        7,
+                                        14
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                7,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        7,
+                        15
+                    ],
+                    "number": 2
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                15,
+                                15
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        15,
+                        15
+                    ],
+                    "number": 3
+                },
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": false,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "1ee42eb93693db35c67b8f9dcad91d058bbb4ba0",
+            "3be8450fc04aa724c72a21d9fa334afdaf09acac"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "b04246c2e0dd010ca1c49e6f440f60b71f136b4a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8011c74e25c32e350a110f23ea5d183f48b6adbe"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-rest-test",
+    "expectedResult": {
+        "rows": [
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [
+                                {
+                                    "category": "ExpressionStatements",
+                                    "children": [
+                                        {
+                                            "category": "RelationalOperator",
+                                            "children": [
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        0,
+                                                        1
+                                                    ]
+                                                },
+                                                {
+                                                    "category": "Identifier",
+                                                    "range": [
+                                                        5,
+                                                        6
+                                                    ]
+                                                }
+                                            ],
+                                            "range": [
+                                                0,
+                                                6
+                                            ]
+                                        }
+                                    ],
+                                    "range": [
+                                        0,
+                                        7
+                                    ]
+                                }
+                            ],
+                            "patch": "delete",
+                            "range": [
+                                0,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        0,
+                        8
+                    ],
+                    "number": 1
+                }
+            ],
+            [
+                {
+                    "terms": [
+                        {
+                            "category": "Program",
+                            "children": [],
+                            "patch": "delete",
+                            "range": [
+                                8,
+                                8
+                            ]
+                        }
+                    ],
+                    "hasChanges": true,
+                    "range": [
+                        8,
+                        8
+                    ],
+                    "number": 2
+                }
+            ]
+        ],
+        "paths": [
+            "relational-operator.js",
+            "relational-operator.js"
+        ],
+        "oids": [
+            "3be8450fc04aa724c72a21d9fa334afdaf09acac",
+            "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+        ]
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "8011c74e25c32e350a110f23ea5d183f48b6adbe",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f6f1a76087498759b09a64e05a2d7c1867a77ff3"
+}]
