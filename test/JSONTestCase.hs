@@ -8,10 +8,8 @@ import Data.HashMap.Strict as HM
 import Prelude
 import Prologue
 
-data JSONMetaRepo = JSONMetaRepo { repoPath :: !String
-                                 , repoUrl  :: !String
+data JSONMetaRepo = JSONMetaRepo { repoUrl  :: !String
                                  , language :: !String
-                                 , testCaseDirName :: !String
                                  , fileExt :: !String
                                  , syntaxes :: ![JSONMetaSyntax]
                                  } deriving (Show, Generic, FromJSON)
