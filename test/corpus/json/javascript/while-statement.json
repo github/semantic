@@ -108,9 +108,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "ae1968ad1d203b12a667f6eee6ff8c752fed7a01",
+    "sha1": "0fb01413d57a0e85053f498b1e91effda758d625",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b858728df3fe923e42c0f371d0f969ff75104346"
+    "sha2": "15accab1cbff459dd966234d5e41324f6b68c3ab"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-replacement-insert-test",
@@ -451,9 +451,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "b858728df3fe923e42c0f371d0f969ff75104346",
+    "sha1": "15accab1cbff459dd966234d5e41324f6b68c3ab",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b458a44e24f98f15ed3f43bebe6ca965a545e67f"
+    "sha2": "ffa21c0ba8dc082acc8e2f981daa18d9a242809e"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-insert-test",
@@ -934,9 +934,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "b458a44e24f98f15ed3f43bebe6ca965a545e67f",
+    "sha1": "ffa21c0ba8dc082acc8e2f981daa18d9a242809e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "192d77ad2e020fea55da6626ec67e6bb41127fca"
+    "sha2": "bc7538da0c7da13df1af66aff6fd30b1aef485d9"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-replacement-test",
@@ -1417,9 +1417,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "192d77ad2e020fea55da6626ec67e6bb41127fca",
+    "sha1": "bc7538da0c7da13df1af66aff6fd30b1aef485d9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "af8c95de9f62b9a86993f524436108ad2b4a4307"
+    "sha2": "d5804425450c27201b5dd68b3f6daec9f55ea3d4"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-replacement-test",
@@ -1832,9 +1832,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "af8c95de9f62b9a86993f524436108ad2b4a4307",
+    "sha1": "d5804425450c27201b5dd68b3f6daec9f55ea3d4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f1358d06ec5140bf6595f2e63e62f3aaf1839463"
+    "sha2": "c0e8eff109279ff502fa2d79a28f0e61ee86877a"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-test",
@@ -2103,9 +2103,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "f1358d06ec5140bf6595f2e63e62f3aaf1839463",
+    "sha1": "c0e8eff109279ff502fa2d79a28f0e61ee86877a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e5b8eae41564fa06346d55d1055cf0ee0f102c7"
+    "sha2": "cc6cc438be57072ecb081cd74bcddfa3d8278688"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-rest-test",
@@ -2217,7 +2217,7 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "8e5b8eae41564fa06346d55d1055cf0ee0f102c7",
+    "sha1": "cc6cc438be57072ecb081cd74bcddfa3d8278688",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ecf8cd8052db6b30a820c1aa31afe58cadc89c7c"
+    "sha2": "c83c4ea2ff4d29ff6ac3b44972b1e00a723d97b3"
 }]
