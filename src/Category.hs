@@ -114,7 +114,6 @@ data Category
   | Import
   -- | An export
   | Export
-  | NamespaceImport
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
