@@ -8,22 +8,7 @@
                         "insert": {
                             "start": [
                                 3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                14
+                                1
                             ],
                             "end": [
                                 3,
@@ -31,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '0'"
+                    "summary": "Added the 'variable' variable"
                 }
             ]
         },
@@ -40,9 +25,9 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "8ec449466dc83c779db81b1404422ce312813197",
+    "sha1": "1fa1885457279cc6e82c4bd837bea2544b32a2e2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "14534334a4caf92e6b66eac9a093d7affabf2381"
+    "sha2": "b33dc31af4b76bce6c546b744faba1eed6f303ec"
 }
 ,{
     "testCaseDescription": "go-const declarations-replacement-insert-test",
@@ -54,52 +39,7 @@
                         "insert": {
                             "start": [
                                 3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added 'one' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added 'two' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                18
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                21
+                                1
                             ],
                             "end": [
                                 3,
@@ -107,37 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                7
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                14
-                            ],
-                            "end": [
-                                4,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added '0'"
+                    "summary": "Added the 'variable' variable"
                 }
             ]
         },
@@ -146,9 +56,9 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "14534334a4caf92e6b66eac9a093d7affabf2381",
+    "sha1": "b33dc31af4b76bce6c546b744faba1eed6f303ec",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5b7fd378f6e6b5ce9347b86eac26e1444594c270"
+    "sha2": "a0b7b15f1e8340c6fb9dc4565456f7549c27022b"
 }
 ,{
     "testCaseDescription": "go-const declarations-delete-insert-test",
@@ -246,9 +156,9 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "5b7fd378f6e6b5ce9347b86eac26e1444594c270",
+    "sha1": "a0b7b15f1e8340c6fb9dc4565456f7549c27022b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ab8775999cd0ce4369e9a726b011e3bad2ffa191"
+    "sha2": "4619a925a26e81b6d1209c92dc1e8df1a1db757b"
 }
 ,{
     "testCaseDescription": "go-const declarations-replacement-test",
@@ -346,9 +256,9 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "ab8775999cd0ce4369e9a726b011e3bad2ffa191",
+    "sha1": "4619a925a26e81b6d1209c92dc1e8df1a1db757b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "585cdf2882974fc7f70c2b2af54b246b70e5e112"
+    "sha2": "41a6ea87f5c62d21f958fff123807f74c2158413"
 }
 ,{
     "testCaseDescription": "go-const declarations-delete-replacement-test",
@@ -360,52 +270,7 @@
                         "delete": {
                             "start": [
                                 3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'one' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'two' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                18
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
+                                1
                             ],
                             "end": [
                                 3,
@@ -413,29 +278,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'variable' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                7
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                14
+                                1
                             ],
                             "end": [
                                 4,
@@ -443,59 +293,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '0'"
+                    "summary": "Deleted the 'variable' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                7
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added 'one' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added 'two' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                18
-                            ],
-                            "end": [
-                                4,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                21
+                                1
                             ],
                             "end": [
                                 4,
@@ -503,7 +308,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'variable' variable"
                 }
             ]
         },
@@ -512,9 +317,9 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "585cdf2882974fc7f70c2b2af54b246b70e5e112",
+    "sha1": "41a6ea87f5c62d21f958fff123807f74c2158413",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c343a01ab99bdafc1a832a18d773365de9714ca9"
+    "sha2": "41fd81a20db5b09ef22d9ca39f375669cf030428"
 }
 ,{
     "testCaseDescription": "go-const declarations-delete-test",
@@ -526,22 +331,7 @@
                         "delete": {
                             "start": [
                                 3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                14
+                                1
                             ],
                             "end": [
                                 3,
@@ -549,7 +339,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '0'"
+                    "summary": "Deleted the 'variable' variable"
                 }
             ]
         },
@@ -558,9 +348,9 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "c343a01ab99bdafc1a832a18d773365de9714ca9",
+    "sha1": "41fd81a20db5b09ef22d9ca39f375669cf030428",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6245e682cc81e58ee2b3de75266a822912ec7f7b"
+    "sha2": "596a3aa98863bc7bfc3532867c2bbdb7d4363a1f"
 }
 ,{
     "testCaseDescription": "go-const declarations-delete-rest-test",
@@ -572,52 +362,7 @@
                         "delete": {
                             "start": [
                                 3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'one' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'two' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                18
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
+                                1
                             ],
                             "end": [
                                 3,
@@ -625,7 +370,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'variable' variable"
                 }
             ]
         },
@@ -634,7 +379,7 @@
     "filePaths": [
         "const-declarations.go"
     ],
-    "sha1": "6245e682cc81e58ee2b3de75266a822912ec7f7b",
+    "sha1": "596a3aa98863bc7bfc3532867c2bbdb7d4363a1f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3240337150f4b721b07dae4a1ec29072daa0c9f4"
+    "sha2": "602ed5a76cbb85535ad82a1f61ef44f10eaa49bc"
 }]

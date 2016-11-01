@@ -42,7 +42,22 @@ termConstructor source sourceSpan name range children = case (name, children) of
       _ -> withCategory Error (S.Error [varSpec])
     withDefaultInfo $ S.VarDecl assignment'
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
-  ("const_declaration", )
+  ("const_declaration", constSpecs) -> do
+    assignments' <- sequenceA $ toVarAssignment <$> constSpecs
+    constSpecs'<- withDefaultInfo (S.Indexed assignments')
+    withDefaultInfo $ S.VarDecl constSpecs'
+    where
+      toVarAssignment constSpec = do
+        assignment <- case toList (unwrap constSpec) of
+          [idList, _, exprs] -> do
+            identifier' <- case toList (unwrap idList) of
+              (id : _) -> case toList (unwrap id) of
+                (id : _) -> pure id
+                _ -> withCategory Error (S.Error [constSpec])
+              _ -> withCategory Error (S.Error [constSpec])
+            withDefaultInfo $ S.VarAssignment identifier' exprs
+          _ -> withCategory Error (S.Error [constSpec])
+        withDefaultInfo $ S.VarDecl assignment
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
