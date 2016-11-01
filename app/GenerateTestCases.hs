@@ -222,7 +222,7 @@ run (Val x) = pure x
 run (E u queue) = case decompose u of
   (Right (GenerateSummaries' args)) -> generateSummaries args >>= \s -> Main.run (apply queue s)
   (Right (GenerateJSON' args)) -> generateJSON args >>= \s -> Main.run (apply queue s)
-  (Left _) -> pure $ EmptyResult ""
+  (Left _) -> pure $ SummaryResult ( Map.fromList [ ("changes", Map.singleton mempty mempty), ("errors", Map.singleton mempty mempty) ] )
 
 -- | Produces DiffSummary results for the given Arguments.
 generateSummaries :: Arguments -> IO ExpectedResult
