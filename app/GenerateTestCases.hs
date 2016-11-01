@@ -26,14 +26,13 @@ import Control.Monad.Effect.Internal
 data GenerateFormat =
     GenerateSummaries
   | GenerateJSON
-  | GenerateNone
   deriving (Show)
 
 data GeneratorArgs = GeneratorArgs { generateFormat :: GenerateFormat } deriving (Show)
 
 generatorArgs :: Parser GeneratorArgs
 generatorArgs = GeneratorArgs
-  <$> (flag GenerateNone GenerateSummaries (long "generate-summaries" O.<> short 's' O.<> help "Use generated summary results for new JSON test cases (rather than defaulting to an empty \"\")")
+  <$> (flag' GenerateSummaries (long "generate-summaries" O.<> short 's' O.<> help "Use generated summary results for new JSON test cases (rather than defaulting to an empty \"\")")
   <|> flag' GenerateJSON (long "generate-json" O.<> short 'j' O.<> help "Use generated JSON output for new JSON test cases (rather than defaulting to an empty \"\")"))
 
 options :: ParserInfo GeneratorArgs
@@ -43,15 +42,19 @@ main :: IO ()
 main = do
   opts <- execParser options
   generatorFilePaths <- runFetchGeneratorFiles
-  unparsedGeneratorCases <- traverse DL.readFile generatorFilePaths
-  let parsedGeneratorCases = eitherDecode <$> unparsedGeneratorCases :: [Either String [JSONMetaRepo]]
-  traverse_ (handleGeneratorCases opts generatorFilePaths) parsedGeneratorCases
-  where handleGeneratorCases :: GeneratorArgs -> [FilePath] -> Either String [JSONMetaRepo] -> IO ()
-        handleGeneratorCases opts generatorFilePaths parsedGeneratorCase =
-          case parsedGeneratorCase of
+  metaRepos <- traverse DL.readFile generatorFilePaths
+
+  for_ (decodeMetaRepos metaRepos) (handle opts generatorFilePaths)
+
+  where decodeMetaRepos :: [DL.ByteString] -> [Either String [JSONMetaRepo]]
+        decodeMetaRepos metaRepos = eitherDecode <$> metaRepos
+
+        handle :: GeneratorArgs -> [FilePath] -> Either String [JSONMetaRepo] -> IO ()
+        handle opts generatorFilePaths decodedMetaRepos =
+          case decodedMetaRepos of
             Left err ->  Prelude.putStrLn $ "An error occurred: " <> err
-            Right metaTestCases -> do
-              traverse_ (runGenerator opts) metaTestCases
+            Right metaRepos -> do
+              traverse_ (runGenerator opts) metaRepos
               traverse_ runMoveGeneratorFile generatorFilePaths
 
 -- | Finds all JSON files within the generators directory.
@@ -63,10 +66,14 @@ runFetchGeneratorFiles = globDir1 (compile "*.json") "test/corpus/generators"
 -- | Finally push the generated commits to the submodule's remote repository.
 runGenerator :: GeneratorArgs -> JSONMetaRepo -> IO ()
 runGenerator opts metaRepo@JSONMetaRepo{..} = do
-  runSetupGitRepo metaRepo
+  runSetupGitRepo repoUrl $ repoPath language
   runCommitsAndTestCasesGeneration opts metaRepo
-  runPullGitRemote repoUrl repoPath
-  runPushGitRemote repoPath
+  runPullGitRemote repoUrl $ repoPath language
+  runPushGitRemote $ repoPath language
+
+-- | Defines the repoPath based on the convention that a repository is based on its language name for a defaut location.
+repoPath :: String -> FilePath
+repoPath language = "test/corpus/repos/" <> language
 
 -- | Upon successful test case generation for a generator file, move the file to the generated directory.
 -- | This prevents subsequence runs of the test generator from duplicating test cases and adding extraneous
@@ -80,8 +87,8 @@ runMoveGeneratorFile filePath = do
 
 -- | Initializes a new git repository and adds it as a submodule to the semantic-diff git index.
 -- | This repository contains the commits associated with the given JSONMetaRepo's syntax examples.
-runSetupGitRepo :: JSONMetaRepo -> IO ()
-runSetupGitRepo JSONMetaRepo{..} = do
+runSetupGitRepo :: String -> FilePath -> IO ()
+runSetupGitRepo repoUrl repoPath = do
   runInitializeRepo repoUrl repoPath
   runAddSubmodule repoUrl repoPath
 
@@ -118,18 +125,21 @@ runCommitsAndTestCasesGeneration opts metaRepo@JSONMetaRepo{..} =
       generate :: JSONMetaSyntax -> IO ()
       generate metaSyntax = do
         _ <- runInitialCommitForSyntax metaRepo metaSyntax
-        runSetupTestCaseFile $ testCaseFilePath metaSyntax
-        runCommitAndTestCaseGeneration opts metaRepo metaSyntax (testCaseFilePath metaSyntax)
-        runCloseTestCaseFile $ testCaseFilePath metaSyntax
-      testCaseFilePath :: JSONMetaSyntax -> FilePath
-      testCaseFilePath JSONMetaSyntax{..} = testCaseDirName <> "/" <> language <> "/" <> syntax <> ".json"
+        runSetupTestCaseFile $ testCaseFilePath language opts metaSyntax
+        runCommitAndTestCaseGeneration opts metaRepo metaSyntax (testCaseFilePath language opts metaSyntax)
+        runCloseTestCaseFile $ testCaseFilePath language opts metaSyntax
+
+      testCaseFilePath :: String -> GeneratorArgs -> JSONMetaSyntax -> FilePath
+      testCaseFilePath language GeneratorArgs{..} JSONMetaSyntax{..} = case generateFormat of
+        GenerateSummaries -> "test/corpus/diff-summaries/" <> language <> "/" <> syntax <> ".json"
+        GenerateJSON -> "test/corpus/json/" <> language <> "/" <> syntax <> ".json"
 
 -- | For a syntax, we want the initial commit to be an empty file.
 -- | This function performs a touch and commits the empty file.
 runInitialCommitForSyntax :: JSONMetaRepo -> JSONMetaSyntax -> IO ()
 runInitialCommitForSyntax JSONMetaRepo{..} JSONMetaSyntax{..} = do
   Prelude.putStrLn $ "Generating initial commit for " <> syntax <> " syntax."
-  result <- try . executeCommand repoPath $ touchCommand (syntax <> fileExt) <> commitCommand syntax "Initial commit"
+  result <- try . executeCommand (repoPath language) $ touchCommand (syntax <> fileExt) <> commitCommand syntax "Initial commit"
   case ( result :: Either Prelude.IOError String) of
     Left error -> Prelude.putStrLn $ "Initializing the " <> syntax <> fileExt <> " failed with: " <> show error <> ". " <> "Possible reason: file already initialized. \nProceeding to the next step."
     Right _ -> pure ()
@@ -166,14 +176,14 @@ runGenerateCommitAndTestCase :: GeneratorArgs -> JSONMetaRepo -> FilePath -> (JS
 runGenerateCommitAndTestCase opts JSONMetaRepo{..} testCaseFilePath (JSONMetaSyntax{..}, description, seperator, command) = do
   Prelude.putStrLn $ "Executing " <> syntax <> " " <> description <> " commit."
 
-  beforeSha <- executeCommand repoPath getLastCommitShaCommand
-  _ <- executeCommand repoPath command
-  afterSha <- executeCommand repoPath getLastCommitShaCommand
+  beforeSha <- executeCommand (repoPath language) getLastCommitShaCommand
+  _ <- executeCommand (repoPath language) command
+  afterSha <- executeCommand (repoPath language) getLastCommitShaCommand
 
-  expectedResult' <- runExpectedResult repoPath beforeSha afterSha (syntax <> fileExt) opts
+  expectedResult' <- runExpectedResult (repoPath language) beforeSha afterSha (syntax <> fileExt) opts
 
   let jsonTestCase = encodePretty JSONTestCase {
-    gitDir = extractGitDir repoPath,
+    gitDir = extractGitDir (repoPath language),
     testCaseDescription = language <> "-" <> syntax <> "-" <> description <> "-" <> "test",
     filePaths = [syntax <> fileExt],
     sha1 = beforeSha,
@@ -193,7 +203,6 @@ runExpectedResult repoPath beforeSha afterSha repoFilePath GeneratorArgs{..} =
   case generateFormat of
     GenerateSummaries -> Main.run $ constructSummariesEff repoPath beforeSha afterSha repoFilePath
     GenerateJSON -> Main.run $ constructJSONEff repoPath beforeSha afterSha repoFilePath
-    _ -> pure $ EmptyResult ""
 
 data GenerateEff a where
   GenerateSummaries' :: Arguments -> GenerateEff ExpectedResult
