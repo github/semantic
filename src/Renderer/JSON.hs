@@ -59,15 +59,11 @@ instance (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasFiel
     (Free (info :< syntax)) -> pairs $ mconcat (termFields info syntax)
     (Pure patch)            -> pairs $ mconcat (patchFields patch)
 
-newtype JSONSyntaxTerm leaf fields = JSONSyntaxTerm { unJSONSyntaxTerm :: SyntaxTerm leaf fields }
-
-instance (ToJSON (Record fields), ToJSON leaf, HasField fields Category, HasField fields Range) => ToJSON (JSONSyntaxTerm leaf fields) where
+instance (ToJSON (Record fields), ToJSON leaf, HasField fields Category, HasField fields Range) => ToJSON (SyntaxTerm leaf fields) where
   toJSON term     |
-    term' <- unJSONSyntaxTerm term,
-    (info :< syntax) <- runCofree term' = object (termFields info syntax)
+    (info :< syntax) <- runCofree term = object (termFields info syntax)
   toEncoding term |
-    term' <- unJSONSyntaxTerm term,
-    (info :< syntax) <- runCofree term' = pairs $ mconcat (termFields info syntax)
+    (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
 
 lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range) => KeyValue kv => Int -> SplitSyntaxDiff leaf fields -> Range -> [kv]
 lineFields n term range = [ "number" .= n
@@ -84,13 +80,12 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
 
 patchFields :: (ToJSON (Record fields), ToJSON leaf, KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
 patchFields patch = case patch of
-  SplitInsert term -> fields "insert" (JSONSyntaxTerm term)
-  SplitDelete term -> fields "delete" (JSONSyntaxTerm term)
-  SplitReplace term -> fields "replace" (JSONSyntaxTerm term)
+  SplitInsert term -> fields "insert" term
+  SplitDelete term -> fields "delete" term
+  SplitReplace term -> fields "replace" term
   where
     fields kind term |
-      term' <- unJSONSyntaxTerm term,
-      (info :< syntax) <- runCofree term' = "patch" .= T.pack kind : termFields info syntax
+      (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax
 
 syntaxToTermField :: (ToJSON recur, KeyValue kv) => Syntax leaf recur -> [kv]
 syntaxToTermField syntax = case syntax of
