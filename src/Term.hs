@@ -9,7 +9,6 @@ import Data.Functor.Both
 import Data.Record
 import Data.These
 import Syntax
-import Data.Aeson
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
 type TermF = CofreeF
@@ -17,10 +16,6 @@ type Term f = Cofree f
 
 type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
 type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
-
-instance (ToJSON leaf, ToJSON (Record fields)) => ToJSON (SyntaxTerm leaf fields) where
-  toJSON syntaxTerm = case runCofree syntaxTerm of
-    (record :< syntax) -> object [ ("record", toJSON record), ("syntax", toJSON syntax) ]
 
 type instance Base (Term f a) = TermF f a
 instance Functor f => Recursive (Term f a) where project = runCofree
