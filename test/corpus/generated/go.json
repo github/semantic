@@ -6,6 +6,13 @@
     "templateText": "package main\n",
     "syntaxes": [
       {
+        "syntax": "int-literal",
+        "repoFilePath": "int-literal.go",
+        "insert": "const (\na = 1, b = 2, c = 3\n)",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/int-literal.json",
+        "replacement": "const (\na = 4, b = 5, c = 6\n)"
+      },
+      {
         "syntax": "assignment",
         "repoFilePath": "assignment.go",
         "insert": "var foo int = 42",
@@ -23,7 +30,7 @@
         "syntax": "function-literal",
         "repoFilePath": "function-literal.go",
         "insert": "const s1 = func(s string) (int, int) {\nreturn 1, 2\n}",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/function-call.json",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/function-literal.json",
         "replacement": "const s1 = func(b int) (string, string) {\nreturn 1, 2\n}"
       },
       {

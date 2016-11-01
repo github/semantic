@@ -1,0 +1,340 @@
+[{
+    "testCaseDescription": "go-int-literal-insert-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "4a5c167b97b833a97ee133ff062dbfda69b8a27f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "03387e133e1b12d03b8ab51ec6790134a559e989"
+}
+,{
+    "testCaseDescription": "go-int-literal-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "03387e133e1b12d03b8ab51ec6790134a559e989",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "a2e7da424b313e0946320547adfca645d7b4b055"
+}
+,{
+    "testCaseDescription": "go-int-literal-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '2' in the a variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    19
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    19
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '6' with '3' in the a variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "a2e7da424b313e0946320547adfca645d7b4b055",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "16b7a4bd739ddfaa0501d1898cc91af6a11db379"
+}
+,{
+    "testCaseDescription": "go-int-literal-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '5' in the a variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    19
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    19
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '6' in the a variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "16b7a4bd739ddfaa0501d1898cc91af6a11db379",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "945068ed13e2305be7b88b3173f54f5b669f791a"
+}
+,{
+    "testCaseDescription": "go-int-literal-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "945068ed13e2305be7b88b3173f54f5b669f791a",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c418a9f6feeb727d912b06e99489c72f6ba341c1"
+}
+,{
+    "testCaseDescription": "go-int-literal-delete-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "c418a9f6feeb727d912b06e99489c72f6ba341c1",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "be4a30c996560cf20e53a4d84df3a2fd1a9afe1c"
+}
+,{
+    "testCaseDescription": "go-int-literal-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "int-literal.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literal.go"
+    ],
+    "sha1": "be4a30c996560cf20e53a4d84df3a2fd1a9afe1c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "fb2eb3fb954a85da8318126b1886308c05e60d13"
+}]
