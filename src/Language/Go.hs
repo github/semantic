@@ -25,7 +25,9 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   -- TODO: Handle multiple var specs
-  ("var_declaration", [varSpec]) -> toVarDecl varSpec
+  ("var_declaration", varSpecs) -> do
+    varSpecs' <- mapM toVarDecl varSpecs
+    withDefaultInfo $ S.Indexed varSpecs'
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
   ("const_declaration", constSpecs) -> toConsts constSpecs
   ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)

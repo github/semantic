@@ -7,61 +7,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
-                                5
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added 'zero' identifier"
+                    "summary": "Added the 'zero' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added '0'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
-                                4
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added 'one' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                7
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'one' variable"
                 }
             ]
         },
@@ -70,9 +40,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "db902f28676fff4a3536270ca9d547c0b7184e7f",
+    "sha1": "38a52f75d11a46db92196c2e872ba384a858cd60",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ecb29a7fe44e9105adad20830b19f59d74536af3"
+    "sha2": "6a62bf99ac34359e9bc748d329edbea19ebe8fbd"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-insert-test",
@@ -83,121 +53,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '0'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added '0'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added 'one' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -206,9 +86,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "ecb29a7fe44e9105adad20830b19f59d74536af3",
+    "sha1": "6a62bf99ac34359e9bc748d329edbea19ebe8fbd",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cca35c4a91bc31cae217223d18e78cd91c72e454"
+    "sha2": "648232daf30b13f7db57cffe5fd52e1443404a03"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -240,7 +120,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -267,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable of the 'main' module"
                 }
             ]
         },
@@ -276,9 +156,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "cca35c4a91bc31cae217223d18e78cd91c72e454",
+    "sha1": "648232daf30b13f7db57cffe5fd52e1443404a03",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6285a410337d6913abb950696e9799984c3cc15d"
+    "sha2": "72b63bf2318523b5d5ac60c2813ce5c42b00a4f9"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -310,7 +190,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -337,7 +217,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable of the 'main' module"
                 }
             ]
         },
@@ -346,9 +226,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "6285a410337d6913abb950696e9799984c3cc15d",
+    "sha1": "72b63bf2318523b5d5ac60c2813ce5c42b00a4f9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d461630d6e3d1f2870573825235c2f7edaf82939"
+    "sha2": "4104f64f5fe19adac99056d5202a3c5a3f587364"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -359,181 +239,91 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '0'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted 'b' identifier"
+                    "summary": "Deleted the 'b' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
+                                7,
                                 1
                             ],
                             "end": [
-                                8,
-                                5
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted 'zero' identifier"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '0'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
-                                4
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted 'one' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'one' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                7,
                                 1
                             ],
                             "end": [
-                                8,
+                                10,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
-                                5
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '0'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                10,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                5
-                            ],
-                            "end": [
-                                9,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -542,9 +332,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "d461630d6e3d1f2870573825235c2f7edaf82939",
+    "sha1": "4104f64f5fe19adac99056d5202a3c5a3f587364",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c734bc3505ae22c597392d8db2778df2f179953e"
+    "sha2": "04cb77f4dd4f84ccd95b5333f602633ae37036f9"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-test",
@@ -555,61 +345,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
-                                5
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted 'zero' identifier"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '0'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
-                                4
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted 'one' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                7
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'one' variable"
                 }
             ]
         },
@@ -618,9 +378,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "c734bc3505ae22c597392d8db2778df2f179953e",
+    "sha1": "04cb77f4dd4f84ccd95b5333f602633ae37036f9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "747399e72ff16245ffcb23fe586eb5fd97294381"
+    "sha2": "47aa8017cb3e11cb4333f98c9219728d4319bec2"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-rest-test",
@@ -631,61 +391,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '0'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'b' variable"
                 }
             ]
         },
@@ -694,7 +424,7 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "747399e72ff16245ffcb23fe586eb5fd97294381",
+    "sha1": "47aa8017cb3e11cb4333f98c9219728d4319bec2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "60f1a0f9924bdc1c8f12ac76dd02520942634128"
+    "sha2": "9b5e04e900043dcf09977013dea140086c83941c"
 }]

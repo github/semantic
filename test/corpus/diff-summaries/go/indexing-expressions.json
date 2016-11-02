@@ -37,9 +37,9 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "281d0d2c1ca8ec7fc8856f7c8ba4effe3ea237f0",
+    "sha1": "0061272a887b969ee51b55972b83bdb6d8983d16",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7c39958c58b1bc4d5f17688b7dd00148c753cea9"
+    "sha2": "fa47df1c0a2955dadea222405f6c31aa51173c46"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-insert-test",
@@ -518,9 +518,9 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "7c39958c58b1bc4d5f17688b7dd00148c753cea9",
+    "sha1": "fa47df1c0a2955dadea222405f6c31aa51173c46",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "faba0911d5f918628a4667eaec359fe0ef6d4463"
+    "sha2": "e2df53fce8ef9f2a38c578fbf3dbb67107a18b78"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -693,9 +693,9 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "faba0911d5f918628a4667eaec359fe0ef6d4463",
+    "sha1": "e2df53fce8ef9f2a38c578fbf3dbb67107a18b78",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "af619c9bfc7c6080390c6df01a8664e914e29f9e"
+    "sha2": "2ba2db68645346fd678a1e286156d38780dfeb71"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -874,9 +874,9 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "af619c9bfc7c6080390c6df01a8664e914e29f9e",
+    "sha1": "2ba2db68645346fd678a1e286156d38780dfeb71",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ead64e424866e147949e72fbd77cf04c01de6ace"
+    "sha2": "f91433d3bbc89d10973369b923d29c5491b6ba94"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -1295,9 +1295,9 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "ead64e424866e147949e72fbd77cf04c01de6ace",
+    "sha1": "f91433d3bbc89d10973369b923d29c5491b6ba94",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "346b0cfdf5d383b60d49ca13e0b7c431456ad659"
+    "sha2": "7b037e53a3f1f64d59962af1abce07acd5d9e380"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-test",
@@ -1536,9 +1536,9 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "346b0cfdf5d383b60d49ca13e0b7c431456ad659",
+    "sha1": "7b037e53a3f1f64d59962af1abce07acd5d9e380",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "42245afaf55971fca83c8a519b9624fd7bb1a8ed"
+    "sha2": "586f95ed6fdd3f4b593077ddff546776e1b12a45"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-rest-test",
@@ -1579,7 +1579,7 @@
     "filePaths": [
         "indexing-expressions.go"
     ],
-    "sha1": "42245afaf55971fca83c8a519b9624fd7bb1a8ed",
+    "sha1": "586f95ed6fdd3f4b593077ddff546776e1b12a45",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c40bc8e2854f1744abf893b55475db20a9d601c4"
+    "sha2": "9c09e576b360479d31e301dbec9cd3f88eea56ef"
 }]

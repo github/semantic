@@ -220,9 +220,9 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "3fe6aea90f8a09863f87d72faa76c22881cd7546",
+    "sha1": "75f16d032d708b8ac2825f6a859c9297d3895aad",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b1ae723439f9a15dc97d5f2e32eb8e4feaa73c0a"
+    "sha2": "33911b77a3f6f02f35dd6709e3196266f95022bb"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-insert-test",
@@ -656,9 +656,9 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "b1ae723439f9a15dc97d5f2e32eb8e4feaa73c0a",
+    "sha1": "33911b77a3f6f02f35dd6709e3196266f95022bb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f97b43e9af1bc3e89043edb91375748576cf1f38"
+    "sha2": "4a4e1b81a09d652c8a07ecb7c6ce2afd9bed6023"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-insert-test",
@@ -780,9 +780,9 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "f97b43e9af1bc3e89043edb91375748576cf1f38",
+    "sha1": "4a4e1b81a09d652c8a07ecb7c6ce2afd9bed6023",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5bc2b42169f2da57c758e29cba2bade50e6b4c72"
+    "sha2": "b6721dd7a9b2c12b315e9b4e77ca14f54572a869"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-test",
@@ -904,9 +904,9 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "5bc2b42169f2da57c758e29cba2bade50e6b4c72",
+    "sha1": "b6721dd7a9b2c12b315e9b4e77ca14f54572a869",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "55c8ecda388d8d7bf96139e20fc3066ff7d36b35"
+    "sha2": "d707d5f90e42c0ebcdb18fc2682028765c861b62"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-replacement-test",
@@ -1550,9 +1550,9 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "55c8ecda388d8d7bf96139e20fc3066ff7d36b35",
+    "sha1": "d707d5f90e42c0ebcdb18fc2682028765c861b62",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "897df320b98d040de47593b7c26d92443fb6341b"
+    "sha2": "1473e56c612135aea93290e783d3b2754557c7d8"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-test",
@@ -1776,9 +1776,9 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "897df320b98d040de47593b7c26d92443fb6341b",
+    "sha1": "1473e56c612135aea93290e783d3b2754557c7d8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "29224dc0aebec189d0497469fa47e463761bb889"
+    "sha2": "0085772c72512629034acca679bf0255b38ef76e"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-rest-test",
@@ -2002,7 +2002,7 @@
     "filePaths": [
         "struct-types.go"
     ],
-    "sha1": "29224dc0aebec189d0497469fa47e463761bb889",
+    "sha1": "0085772c72512629034acca679bf0255b38ef76e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "071e0bcdee22e3f889fe600485486cebeae4ca9b"
+    "sha2": "12029544383329b699af33cc3840d2e56e6923b8"
 }]
