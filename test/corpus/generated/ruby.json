@@ -213,6 +213,16 @@
         "syntax": "elsif",
         "insert": "if bar\n  foo()\nelsif baz\nend",
         "replacement": "if bar\n  foo()\nelsif baz\n  qoz()\nend"
+      },
+      {
+        "syntax": "begin-ensure",
+        "insert": "begin\n  foo\nend",
+        "replacement": "begin\n  foo\nensure\n  bar\nend"
+      },
+      {
+        "syntax": "ensure",
+        "insert": "begin\n  foo\nensure\nend",
+        "replacement": "begin\n  foo\nensure\n  bar\nend"
       }
     ]
   }

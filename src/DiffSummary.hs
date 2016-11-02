@@ -53,8 +53,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.DoWhile{} -> Identifiable
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
-          S.Begin{} -> Identifiable
-          S.Else{} -> Identifiable
+          S.BlockExpression{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -144,6 +143,7 @@ determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "begin statement" _ _) = "a"
 determiner (LeafInfo "else block" _ _) = "an"
 determiner (LeafInfo "elsif block" _ _) = "an"
+determiner (LeafInfo "ensure block" _ _) = "an"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
@@ -160,6 +160,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo cName@"begin statement" _ _) -> toDoc cName
   (LeafInfo cName@"else block" _ _) -> toDoc cName
   (LeafInfo cName@"elsif block" _ _) -> toDoc cName
+  (LeafInfo cName@"ensure block" _ _) -> toDoc cName
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
@@ -171,8 +172,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
-  S.Begin children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
-  S.Else children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.BlockExpression children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
@@ -256,6 +256,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
       C.Else -> "in an" <+> catName c
       C.Elsif -> "in an" <+> catName c
+      C.Ensure -> "in an" <+> catName c
       C.Begin -> "in a" <+> catName c
       _ -> "in the" <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
@@ -370,6 +371,7 @@ instance HasCategory Category where
     C.Begin -> "begin statement"
     C.Else -> "else block"
     C.Elsif -> "elsif block"
+    C.Ensure -> "ensure block"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

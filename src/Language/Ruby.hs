@@ -15,6 +15,9 @@ operators = ["and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_an
 functions :: [Text]
 functions = [ "lambda_literal", "lambda_expression" ]
 
+blocks :: [Text]
+blocks = [ "begin_statement", "else_block", "elsif_block", "ensure_block" ]
+
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -29,7 +32,6 @@ termConstructor source sourceSpan name range children
     ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
-    ("begin_statement", _) -> S.Begin children
     ("case_statement", expr : rest) -> S.Switch expr rest
     ("case_statement", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
@@ -78,7 +80,7 @@ termConstructor source sourceSpan name range children
     ("yield", _) -> S.Yield (listToMaybe children)
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
     ("for_statement", _ ) -> S.Error children
-    _ | name `elem` ["else_block", "elsif_block"] -> S.Else children
+    _ | name `elem` blocks -> S.BlockExpression children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
@@ -112,7 +114,7 @@ categoryForRubyName = \case
   "element_reference" -> SubscriptAccess
   "else_block" -> Else
   "elsif_block" -> Elsif
-  "ensure_block" -> ExpressionStatements
+  "ensure_block" -> Ensure
   "ERROR" -> Error
   "float" -> NumberLiteral
   "for_statement" -> For
