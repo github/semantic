@@ -54,6 +54,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
           S.BlockExpression{} -> Identifiable
+          S.ConditionalBlockExpression{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -144,6 +145,7 @@ determiner (LeafInfo "begin statement" _ _) = "a"
 determiner (LeafInfo "else block" _ _) = "an"
 determiner (LeafInfo "elsif block" _ _) = "an"
 determiner (LeafInfo "ensure block" _ _) = "an"
+determiner (LeafInfo "rescue block" _ _) = "an"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
@@ -161,6 +163,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo cName@"else block" _ _) -> toDoc cName
   (LeafInfo cName@"elsif block" _ _) -> toDoc cName
   (LeafInfo cName@"ensure block" _ _) -> toDoc cName
+  (LeafInfo cName@"rescue block" _ _) -> toDoc cName
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
@@ -173,6 +176,7 @@ toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => So
 toTermName source term = case unwrap term of
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.BlockExpression children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.ConditionalBlockExpression children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
@@ -254,10 +258,11 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
   where
     identifiableDoc (c, t) = case c of
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
+      C.Begin -> "in a" <+> catName c
       C.Else -> "in an" <+> catName c
       C.Elsif -> "in an" <+> catName c
       C.Ensure -> "in an" <+> catName c
-      C.Begin -> "in a" <+> catName c
+      C.Rescue -> "in an" <+> catName c
       _ -> "in the" <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
@@ -372,6 +377,7 @@ instance HasCategory Category where
     C.Else -> "else block"
     C.Elsif -> "elsif block"
     C.Ensure -> "ensure block"
+    C.Rescue -> "rescue block"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

@@ -85,6 +85,8 @@ data Syntax a f
   | Unless f [f]
   -- | A block expression has a list of expressions (e.g. begin, else, ensure in Ruby).
   | BlockExpression [f]
+  -- | A conditional block expression has a conditional expression and list of expressions (e.g. rescue in Ruby).
+  | ConditionalBlockExpression [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

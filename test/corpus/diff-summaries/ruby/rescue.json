@@ -1,0 +1,262 @@
+[{
+    "testCaseDescription": "ruby-rescue-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "50c82fa654f0034327299dd8199684f8cf85f66e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "1779e3cc69cbd93ad7347d1155836f9ba2ff60e3"
+}
+,{
+    "testCaseDescription": "ruby-rescue-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "1779e3cc69cbd93ad7347d1155836f9ba2ff60e3",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "243a4cce922381ecab2555e069a8aff9d40f1ebd"
+}
+,{
+    "testCaseDescription": "ruby-rescue-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in an rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "243a4cce922381ecab2555e069a8aff9d40f1ebd",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4ef80a5375d333d2c92af09cb47ec5a301739232"
+}
+,{
+    "testCaseDescription": "ruby-rescue-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in an rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "4ef80a5375d333d2c92af09cb47ec5a301739232",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a4b1cedb8d344102e20fcbca66020c9a890496a5"
+}
+,{
+    "testCaseDescription": "ruby-rescue-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "a4b1cedb8d344102e20fcbca66020c9a890496a5",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "603a677e1e53aba705d234be023fcb6eb16b8fa6"
+}
+,{
+    "testCaseDescription": "ruby-rescue-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "603a677e1e53aba705d234be023fcb6eb16b8fa6",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e908e1528b1a63126473b0af87da9a9e6e797593"
+}
+,{
+    "testCaseDescription": "ruby-rescue-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "sha1": "e908e1528b1a63126473b0af87da9a9e6e797593",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7475561115b4241d0ed7ea33b7c9c2c5da3435f5"
+}]

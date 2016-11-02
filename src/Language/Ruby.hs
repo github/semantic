@@ -10,13 +10,16 @@ import qualified Syntax as S
 import Term
 
 operators :: [Text]
-operators = ["and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
+operators = [ "and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison" ]
 
 functions :: [Text]
 functions = [ "lambda_literal", "lambda_expression" ]
 
 blocks :: [Text]
-blocks = [ "begin_statement", "else_block", "elsif_block", "ensure_block" ]
+blocks = [ "begin_statement", "else_block", "ensure_block" ]
+
+conditionalBlocks :: [Text]
+conditionalBlocks = [ "rescue_block", "elsif_block" ]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
@@ -81,6 +84,7 @@ termConstructor source sourceSpan name range children
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
     ("for_statement", _ ) -> S.Error children
     _ | name `elem` blocks -> S.BlockExpression children
+    _ | name `elem` conditionalBlocks -> S.ConditionalBlockExpression children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
@@ -136,7 +140,7 @@ categoryForRubyName = \case
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
-  "rescue_block" -> ExpressionStatements
+  "rescue_block" -> Rescue
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "string" -> StringLiteral

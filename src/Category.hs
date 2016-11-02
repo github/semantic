@@ -130,6 +130,7 @@ data Category
   | Else
   | Elsif
   | Ensure
+  | Rescue
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -194,6 +195,7 @@ instance Arbitrary Category where
     , pure Else
     , pure Elsif
     , pure Ensure
+    , pure Rescue
     , Other <$> arbitrary
     ]
 

@@ -223,6 +223,16 @@
         "syntax": "ensure",
         "insert": "begin\n  foo\nensure\nend",
         "replacement": "begin\n  foo\nensure\n  bar\nend"
+      },
+      {
+        "syntax": "begin-rescue",
+        "insert": "begin\n  foo\nend",
+        "replacement": "begin\n  foo\nrescue x\n  bar\nend"
+      },
+      {
+        "syntax": "rescue",
+        "insert": "begin\n  foo\nrescue x\nend",
+        "replacement": "begin\n  foo\nrescue x\n  bar\nend"
       }
     ]
   }
