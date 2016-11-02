@@ -50,6 +50,7 @@ argumentsParser = info (version <*> helper <*> argumentsP)
       <*> switch (long "no-index" <> help "compare two paths on the filesystem")
       <*> some (argument (eitherReader parseShasAndFiles) (metavar "SHA_A..SHAB FILES..."))
       <*> switch (long "development" <> short 'd' <> help "set development mode which prevents timeout behavior by default")
+      <*> flag Diff Parse (long "parse" <> short 'p' <> help "parses a source file without diffing")
       where
         parseShasAndFiles :: String -> Either String ExtraArg
         parseShasAndFiles s = case matchRegex regex s of
