@@ -341,6 +341,7 @@ instance HasCategory Category where
     C.Module -> "module statement"
     C.Import -> "import statement"
     C.Export -> "export statement"
+    C.AnonymousFunction -> "anonymous function"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
