@@ -35,34 +35,35 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("var_declaration", [varSpec]) -> do
     assignment' <- case toList (unwrap varSpec) of
       [idList, _, exprs] -> do
-        identifier' <- case toList (unwrap idList) of
-          [identifier] -> pure identifier
-          _ -> withCategory Error (S.Error [idList])
+        identifier' <- idOrError idList
         withDefaultInfo $ S.VarAssignment identifier' exprs
       _ -> withCategory Error (S.Error [varSpec])
     withDefaultInfo $ S.VarDecl assignment'
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
-  ("const_declaration", constSpecs) -> do
-    assignments' <- sequenceA $ toVarAssignment <$> constSpecs
-    constSpecs'<- withDefaultInfo (S.Indexed assignments')
-    withDefaultInfo $ S.VarDecl constSpecs'
-    where
-      toVarAssignment constSpec = do
-        assignment <- case toList (unwrap constSpec) of
-          idList : rest -> do
-            identifier' <- case toList (unwrap idList) of
-              id : _ -> case toList (unwrap id) of
-                id : _ -> pure id
-                _ -> withCategory Error (S.Error [constSpec])
-              _ -> withCategory Error (S.Error [constSpec])
-            rest' <- withDefaultInfo (S.Indexed rest)
-            withDefaultInfo $ S.VarAssignment identifier' rest'
-          _ -> withCategory Error (S.Error [constSpec])
-        withDefaultInfo $ S.VarDecl assignment
+  ("const_declaration", constSpecs) -> toConsts constSpecs
   ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) body
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
+    idOrError idList = case toList (unwrap idList) of
+      [identifier] -> pure identifier
+      _ -> withCategory Error (S.Error [idList])
+    toConsts constSpecs = do
+      assignments' <- sequenceA $ toVarAssignment <$> constSpecs
+      constSpecs'<- withDefaultInfo (S.Indexed assignments')
+      withDefaultInfo $ S.VarDecl constSpecs'
+    toVarAssignment constSpec = do
+      assignment <- case toList (unwrap constSpec) of
+        idList : rest -> do
+          identifier' <- case toList (unwrap idList) of
+            id : _ -> case toList (unwrap id) of
+              id : _ -> pure id
+              _ -> withCategory Error (S.Error [constSpec])
+            _ -> withCategory Error (S.Error [constSpec])
+          rest' <- withDefaultInfo (S.Indexed rest)
+          withDefaultInfo $ S.VarAssignment identifier' rest'
+        _ -> withCategory Error (S.Error [constSpec])
+      withDefaultInfo $ S.VarDecl assignment
     withCategory category syntax = do
       sourceSpan' <- sourceSpan
       pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)
