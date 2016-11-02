@@ -1,0 +1,262 @@
+[{
+    "testCaseDescription": "ruby-elsif-insert-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "b7cc1ccb630e56a0bbcfcf942551784e45fa7cbb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "63fdb3aae79ed2cc13f8f93d17af52ad7b1290c5"
+}
+,{
+    "testCaseDescription": "ruby-elsif-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "63fdb3aae79ed2cc13f8f93d17af52ad7b1290c5",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3356d784e7442522e54e7e7a9e0fc20b4a1fb476"
+}
+,{
+    "testCaseDescription": "ruby-elsif-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'qoz()' function call in an elsif block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "3356d784e7442522e54e7e7a9e0fc20b4a1fb476",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "71d8125f6d776a70e10b334a86ed3ba2e27e8c79"
+}
+,{
+    "testCaseDescription": "ruby-elsif-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'qoz()' function call in an elsif block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "71d8125f6d776a70e10b334a86ed3ba2e27e8c79",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fb9eb1ec665e4d496df1bd203ab63ba4fe334f73"
+}
+,{
+    "testCaseDescription": "ruby-elsif-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "fb9eb1ec665e4d496df1bd203ab63ba4fe334f73",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "71ef34a281dca99673448e99bb4934bb4041533e"
+}
+,{
+    "testCaseDescription": "ruby-elsif-delete-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "71ef34a281dca99673448e99bb4934bb4041533e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c9865039860789d8a00b051200fb8561532d066b"
+}
+,{
+    "testCaseDescription": "ruby-elsif-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "elsif.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "elsif.rb"
+    ],
+    "sha1": "c9865039860789d8a00b051200fb8561532d066b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "615bf8e036a9df2d56bd07699f84eda4a122d4b4"
+}]

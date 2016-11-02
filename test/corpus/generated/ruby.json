@@ -203,6 +203,16 @@
         "syntax": "else",
         "insert": "begin\n  foo()\nelse\nend",
         "replacement": "begin\n  foo()\nelse\n  bar()\nend"
+      },
+      {
+        "syntax": "if-elsif",
+        "insert": "if bar\n  foo()\nend",
+        "replacement": "if bar\n  foo()\nelsif baz\n  qoz()\nend"
+      },
+      {
+        "syntax": "elsif",
+        "insert": "if bar\n  foo()\nelsif baz\nend",
+        "replacement": "if bar\n  foo()\nelsif baz\n  qoz()\nend"
       }
     ]
   }

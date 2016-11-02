@@ -143,6 +143,7 @@ determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "begin statement" _ _) = "a"
 determiner (LeafInfo "else block" _ _) = "an"
+determiner (LeafInfo "elsif block" _ _) = "an"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
@@ -158,6 +159,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"begin statement" _ _) -> toDoc cName
   (LeafInfo cName@"else block" _ _) -> toDoc cName
+  (LeafInfo cName@"elsif block" _ _) -> toDoc cName
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
@@ -253,6 +255,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
     identifiableDoc (c, t) = case c of
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
       C.Else -> "in an" <+> catName c
+      C.Elsif -> "in an" <+> catName c
       C.Begin -> "in a" <+> catName c
       _ -> "in the" <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
@@ -366,6 +369,7 @@ instance HasCategory Category where
     C.Unless -> "unless statement"
     C.Begin -> "begin statement"
     C.Else -> "else block"
+    C.Elsif -> "elsif block"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

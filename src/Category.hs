@@ -128,6 +128,7 @@ data Category
   | Unless
   | Begin
   | Else
+  | Elsif
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -190,6 +191,7 @@ instance Arbitrary Category where
     , pure Unless
     , pure Begin
     , pure Else
+    , pure Elsif
     , Other <$> arbitrary
     ]
 

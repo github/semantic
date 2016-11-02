@@ -30,7 +30,6 @@ termConstructor source sourceSpan name range children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
     ("begin_statement", _) -> S.Begin children
-    ("else_block", _) -> S.Else children
     ("case_statement", expr : rest) -> S.Switch expr rest
     ("case_statement", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
@@ -79,6 +78,7 @@ termConstructor source sourceSpan name range children
     ("yield", _) -> S.Yield (listToMaybe children)
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
     ("for_statement", _ ) -> S.Error children
+    _ | name `elem` ["else_block", "elsif_block"] -> S.Else children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
@@ -111,7 +111,7 @@ categoryForRubyName = \case
   "conditional" -> Ternary
   "element_reference" -> SubscriptAccess
   "else_block" -> Else
-  "elsif_block" -> ExpressionStatements
+  "elsif_block" -> Elsif
   "ensure_block" -> ExpressionStatements
   "ERROR" -> Error
   "float" -> NumberLiteral
@@ -140,7 +140,6 @@ categoryForRubyName = \case
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
-  "then_block" -> ExpressionStatements
   "unless_modifier" -> Unless
   "unless_statement" -> Unless
   "until_modifier" -> Until
