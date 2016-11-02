@@ -102,8 +102,8 @@
       },
       {
         "syntax": "for-statements",
-        "insert": "for { case x < y: f1()\ncase x < z: g()\ncase x == 4: h()\n}",
-        "replacement": "func main() { for { a() goto loop }\nloop: for i := 0; i < 5; i++\n{ a()\nbreak loop\n}\nloop2: for ; i < 10; i++ \n{ \na()\ncontinue loop2\n}\nfor ;; { a() continue }\nfor x := range y { a(x)\nbreak }\n}"
+        "insert": " for {\na()\ngoto loop\n}\nfor i := 0; i < 5; i++ {\na()\nbreak loop\n}\nfor ; i < 10; i++ {\na()\ncontinue loop2\n}\nfor ;; {\na()\ncontinue\n}\nfor x := range y {\na(x)\nbreak\n}",
+        "replacement": " for ;; {\na()\ngoto loop\n}\nfor x := range y {\na()\nbreak loop\n}\nfor ;; {\na()\ncontinue loop2\n}\nfor ; i < 10; i++ {\na()\ncontinue\n}\nfor  {\na(x)\nbreak\n}"
       },
       {
         "syntax": "function-declarations",
