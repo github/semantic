@@ -37,9 +37,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "07aae88de4bfa6f5dc1cf72e50b7a7ab3a8e826e",
+    "sha1": "ae948d5012e6a04567eacf083e70f96375ffdd4c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "197035a86336059bb513405976a02b0e37058772"
+    "sha2": "13f3930aff04fb759c856029f8c5a987a7267ab1"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-insert-test",
@@ -85,26 +85,11 @@
                             ],
                             "end": [
                                 6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
                                 12
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {
@@ -220,26 +205,11 @@
                             ],
                             "end": [
                                 17,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                9
-                            ],
-                            "end": [
-                                17,
                                 12
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -323,9 +293,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "197035a86336059bb513405976a02b0e37058772",
+    "sha1": "13f3930aff04fb759c856029f8c5a987a7267ab1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "20646c5133170d63be852fef462cd3274da71f32"
+    "sha2": "91d8667207881cd241f043dd872d5752f634f516"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -384,7 +354,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'a' identifier"
+                    "summary": "Replaced the 'y' identifier with the 'a' identifier in the a variable"
                 },
                 {
                     "span": {
@@ -420,9 +390,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "20646c5133170d63be852fef462cd3274da71f32",
+    "sha1": "91d8667207881cd241f043dd872d5752f634f516",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5daa2e11c89f6c2bee5210a65b38dead495372a9"
+    "sha2": "df0f65cdcd21ade59b00e07348a59037e2628e64"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -481,7 +451,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'y' identifier"
+                    "summary": "Replaced the 'a' identifier with the 'y' identifier in the y variable"
                 },
                 {
                     "span": {
@@ -517,9 +487,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "5daa2e11c89f6c2bee5210a65b38dead495372a9",
+    "sha1": "df0f65cdcd21ade59b00e07348a59037e2628e64",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7e36f0dcbe01c32b2e447ee115fd83b5b9b58759"
+    "sha2": "960f2fba1e3cc5ffab4d2bef069f23e2145f7663"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -565,26 +535,11 @@
                             ],
                             "end": [
                                 6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
                                 12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted the 'y' variable"
                 },
                 {
                     "span": {
@@ -700,26 +655,11 @@
                             ],
                             "end": [
                                 17,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                9
-                            ],
-                            "end": [
-                                17,
                                 12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -835,26 +775,11 @@
                             ],
                             "end": [
                                 17,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                9
-                            ],
-                            "end": [
-                                17,
                                 12
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {
@@ -938,9 +863,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "7e36f0dcbe01c32b2e447ee115fd83b5b9b58759",
+    "sha1": "960f2fba1e3cc5ffab4d2bef069f23e2145f7663",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d34771c376dcea72277e3449c62e1bfae5f3963e"
+    "sha2": "a40c8e1c0947cf1a231accfa231b661221616a2e"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-test",
@@ -986,26 +911,11 @@
                             ],
                             "end": [
                                 6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
                                 12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -1089,9 +999,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "d34771c376dcea72277e3449c62e1bfae5f3963e",
+    "sha1": "a40c8e1c0947cf1a231accfa231b661221616a2e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d0807970ece6bef4b18afe4ea5cef3291689064d"
+    "sha2": "8293c0a5ac57c143014fe6948fdfc1ed352cd337"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-rest-test",
@@ -1132,7 +1042,7 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "d0807970ece6bef4b18afe4ea5cef3291689064d",
+    "sha1": "8293c0a5ac57c143014fe6948fdfc1ed352cd337",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7986cb447aab8da255aeff9cf756da65e16b122e"
+    "sha2": "4961ece78a5ae3daeec52eddce0a3a5ded25ca57"
 }]

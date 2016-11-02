@@ -40,9 +40,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "38a52f75d11a46db92196c2e872ba384a858cd60",
+    "sha1": "086608d0e2c1fd0009f3f19ba8fb2ebd161d81d8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6a62bf99ac34359e9bc748d329edbea19ebe8fbd"
+    "sha2": "9550b1812292664e3d58236fa473d161c93f1fac"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-insert-test",
@@ -78,6 +78,36 @@
                         }
                     },
                     "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one' variable"
                 }
             ]
         },
@@ -86,9 +116,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "6a62bf99ac34359e9bc748d329edbea19ebe8fbd",
+    "sha1": "9550b1812292664e3d58236fa473d161c93f1fac",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "648232daf30b13f7db57cffe5fd52e1443404a03"
+    "sha2": "a0adbc32fbc3a3f902094a21c376498141a902da"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -156,9 +186,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "648232daf30b13f7db57cffe5fd52e1443404a03",
+    "sha1": "a0adbc32fbc3a3f902094a21c376498141a902da",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "72b63bf2318523b5d5ac60c2813ce5c42b00a4f9"
+    "sha2": "921d53f08b63ed7b5e4d40c16a19637d356b59cd"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -226,9 +256,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "72b63bf2318523b5d5ac60c2813ce5c42b00a4f9",
+    "sha1": "921d53f08b63ed7b5e4d40c16a19637d356b59cd",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4104f64f5fe19adac99056d5202a3c5a3f587364"
+    "sha2": "331ff827cf3ef7729808bdac932108c975d29252"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -332,9 +362,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "4104f64f5fe19adac99056d5202a3c5a3f587364",
+    "sha1": "331ff827cf3ef7729808bdac932108c975d29252",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "04cb77f4dd4f84ccd95b5333f602633ae37036f9"
+    "sha2": "22d83065c327ce8f1e7a7270b4da85479192f3bf"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-test",
@@ -378,9 +408,9 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "04cb77f4dd4f84ccd95b5333f602633ae37036f9",
+    "sha1": "22d83065c327ce8f1e7a7270b4da85479192f3bf",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "47aa8017cb3e11cb4333f98c9219728d4319bec2"
+    "sha2": "f43e6478e821f760121fff58a668ae8f489b5e85"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-rest-test",
@@ -424,7 +454,7 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "47aa8017cb3e11cb4333f98c9219728d4319bec2",
+    "sha1": "f43e6478e821f760121fff58a668ae8f489b5e85",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9b5e04e900043dcf09977013dea140086c83941c"
+    "sha2": "f185bdcbb7bbaede6b706eea4f761ee2aeb52e11"
 }]

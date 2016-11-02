@@ -12,48 +12,18 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                9
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                12
+                                1
                             ],
                             "end": [
                                 3,
@@ -61,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -70,9 +40,9 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "7986cb447aab8da255aeff9cf756da65e16b122e",
+    "sha1": "4961ece78a5ae3daeec52eddce0a3a5ded25ca57",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8b5ad8690b22d42ced40409b0842794531872597"
+    "sha2": "e424b7db57a38a1f1649a35ef5190ea1b20b3a21"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-insert-test",
@@ -113,9 +83,9 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "8b5ad8690b22d42ced40409b0842794531872597",
+    "sha1": "e424b7db57a38a1f1649a35ef5190ea1b20b3a21",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cf370f833475884de205ce81e7db97003926540b"
+    "sha2": "dc25f8be76bc092d24fa4744b83d4648829be5ba"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -147,34 +117,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a variable"
                 },
                 {
                     "span": {
@@ -201,7 +144,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '1'"
+                    "summary": "Replaced '3' with '1' in the a variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b variable"
                 },
                 {
                     "span": {
@@ -228,7 +198,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '2'"
+                    "summary": "Replaced '4' with '2' in the b variable"
                 }
             ]
         },
@@ -237,9 +207,9 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "cf370f833475884de205ce81e7db97003926540b",
+    "sha1": "dc25f8be76bc092d24fa4744b83d4648829be5ba",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e59d7f6b1126c789d8de61262e8ac1fb9a855803"
+    "sha2": "924eb9e00078085417a4ec4fdd8e38c0a0dcd9cb"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -271,34 +241,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x variable"
                 },
                 {
                     "span": {
@@ -325,7 +268,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '3'"
+                    "summary": "Replaced '1' with '3' in the x variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y variable"
                 },
                 {
                     "span": {
@@ -352,7 +322,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '4'"
+                    "summary": "Replaced '2' with '4' in the y variable"
                 }
             ]
         },
@@ -361,9 +331,9 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "e59d7f6b1126c789d8de61262e8ac1fb9a855803",
+    "sha1": "924eb9e00078085417a4ec4fdd8e38c0a0dcd9cb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "44bb535383f5b2c2adae00f78e056c2702bd0c93"
+    "sha2": "65c6f29238f77f95f0cd50f25d9c9b23e40f1d90"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -379,48 +349,18 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted 'x' identifier"
+                    "summary": "Deleted the 'x' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                9
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
+                                1
                             ],
                             "end": [
                                 3,
@@ -428,7 +368,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '4'"
+                    "summary": "Deleted the 'y' variable"
                 },
                 {
                     "span": {
@@ -439,48 +379,18 @@
                             ],
                             "end": [
                                 4,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                12
+                                1
                             ],
                             "end": [
                                 4,
@@ -488,7 +398,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'b' variable"
                 },
                 {
                     "span": {
@@ -499,48 +409,18 @@
                             ],
                             "end": [
                                 4,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Added 'x' identifier"
+                    "summary": "Added the 'x' variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                12
+                                1
                             ],
                             "end": [
                                 4,
@@ -548,7 +428,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '4'"
+                    "summary": "Added the 'y' variable"
                 }
             ]
         },
@@ -557,9 +437,9 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "44bb535383f5b2c2adae00f78e056c2702bd0c93",
+    "sha1": "65c6f29238f77f95f0cd50f25d9c9b23e40f1d90",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e87027ebca0e12680892c283465918735fcb4d64"
+    "sha2": "cf2753eb32d9baf4f65efd158bb1f1dd628c0568"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-test",
@@ -591,7 +471,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced 'main' module with 'main' module"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -600,9 +480,9 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "e87027ebca0e12680892c283465918735fcb4d64",
+    "sha1": "cf2753eb32d9baf4f65efd158bb1f1dd628c0568",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "03e3c4a97c3ff6e0c3cc04e162dc53421d10036c"
+    "sha2": "9fb1e576b35144ff414a5e68f2f71191c73f90a4"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-rest-test",
@@ -618,48 +498,18 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted 'x' identifier"
+                    "summary": "Deleted the 'x' variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                9
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
+                                1
                             ],
                             "end": [
                                 3,
@@ -667,7 +517,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '4'"
+                    "summary": "Deleted the 'y' variable"
                 }
             ]
         },
@@ -676,7 +526,7 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "03e3c4a97c3ff6e0c3cc04e162dc53421d10036c",
+    "sha1": "9fb1e576b35144ff414a5e68f2f71191c73f90a4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c6ec339789f38058a9364e257b5d521d1a559100"
+    "sha2": "d1ef6ada5fe604bdf772e2b889c7222dfc608fcd"
 }]
