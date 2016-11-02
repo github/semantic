@@ -1,0 +1,700 @@
+[{
+    "testCaseDescription": "go-grouped-var-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added 'one' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                7
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "93092da9ac9ca1f459a3c096a07197103b3d5ef0",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6a5f08b65276caafa79d80e3535382b561ce7cf7"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                8
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added 'one' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                7
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "6a5f08b65276caafa79d80e3535382b561ce7cf7",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "bfea6e38df8006e49ef0f1fb1b10c33485c19ab3"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "bfea6e38df8006e49ef0f1fb1b10c33485c19ab3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "66f10929a386076d993476a7b32549e08fab6d72"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "66f10929a386076d993476a7b32549e08fab6d72",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "29e8f1bdba9cc38f2f93e85f2f40c813deda0a22"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                8
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'one' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                7
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                5
+                            ],
+                            "end": [
+                                9,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "29e8f1bdba9cc38f2f93e85f2f40c813deda0a22",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b1f5464fff8aa7c2427fabe7427d7559566055d3"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'zero' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'one' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                7
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "b1f5464fff8aa7c2427fabe7427d7559566055d3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "57b5c47d8a78ef43056e5c1500fc442dfe2a467a"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "sha1": "57b5c47d8a78ef43056e5c1500fc442dfe2a467a",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "201fd290f19184f934742f0a871f7a60e08ac617"
+}]

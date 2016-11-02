@@ -1,0 +1,526 @@
+[{
+    "testCaseDescription": "go-map-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                20
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "853d35d10d7b906dad140671cabab4a1695910e3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "35e114c35ca0f09d76513eb391912c417e5f21ac"
+}
+,{
+    "testCaseDescription": "go-map-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                20
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "35e114c35ca0f09d76513eb391912c417e5f21ac",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "41aa5140ae393d8aca11fbda682b2fe6b4cb7378"
+}
+,{
+    "testCaseDescription": "go-map-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    13
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    13
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "41aa5140ae393d8aca11fbda682b2fe6b4cb7378",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c22c38bf9f3c293315388bcc9b58449fec90ed15"
+}
+,{
+    "testCaseDescription": "go-map-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    13
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    13
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "c22c38bf9f3c293315388bcc9b58449fec90ed15",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b05ba372fe270ff474375edcb0bccde6d5b73454"
+}
+,{
+    "testCaseDescription": "go-map-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                20
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                17
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "b05ba372fe270ff474375edcb0bccde6d5b73454",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c0c26a608cf93ee9bc3bdd190fffc3f57ee53ee6"
+}
+,{
+    "testCaseDescription": "go-map-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                20
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "c0c26a608cf93ee9bc3bdd190fffc3f57ee53ee6",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b4d68dbf808819f9a9d1fe711df06c457fc4b322"
+}
+,{
+    "testCaseDescription": "go-map-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'm1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "sha1": "b4d68dbf808819f9a9d1fe711df06c457fc4b322",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4a13db771ec31b8fdb5f87d7f8f51cdec1a8bc7d"
+}]

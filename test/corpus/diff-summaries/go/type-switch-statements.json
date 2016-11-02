@@ -1,0 +1,595 @@
+[{
+    "testCaseDescription": "go-type-switch-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                9
+                            ],
+                            "end": [
+                                6,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "be84a9ca3fc8bebfe1a9e4b70298e30b4684cc41",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "92caae239a17254ad1f5088c7d5d142a90e644de"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    9,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "92caae239a17254ad1f5088c7d5d142a90e644de",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "2fc4780a02aad67bcc8da5ac72fbfb40b3cf8261"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'e' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "2fc4780a02aad67bcc8da5ac72fbfb40b3cf8261",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c617656693d6d7a0792b4423674aec4509ff0326"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'b' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "c617656693d6d7a0792b4423674aec4509ff0326",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "d2a322da3250a177cea4a622613db1cb37b2d4a6"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                9
+                            ],
+                            "end": [
+                                6,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                10
+                            ],
+                            "end": [
+                                10,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                9
+                            ],
+                            "end": [
+                                12,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                5
+                            ],
+                            "end": [
+                                13,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                10
+                            ],
+                            "end": [
+                                10,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                9
+                            ],
+                            "end": [
+                                12,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                5
+                            ],
+                            "end": [
+                                13,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "d2a322da3250a177cea4a622613db1cb37b2d4a6",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8b845324b507b6712321e90e8195788c733b29b1"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    9,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "8b845324b507b6712321e90e8195788c733b29b1",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b7a22c564b3aea776ac41ed4323a1836406755ca"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                9
+                            ],
+                            "end": [
+                                6,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "sha1": "b7a22c564b3aea776ac41ed4323a1836406755ca",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "5813d44fbe76a0a6ac0e89faa63db27ba74334eb"
+}]

@@ -1,153 +1,183 @@
 [{
-    "testCaseDescription": "go-unary-expressions-insert-test",
+    "testCaseDescription": "go-var-declarations-with-types-insert-test",
     "expectedResult": {
         "changes": {
-            "unary-expressions.go": [
+            "var-declarations-with-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var one, two uint64 = 1, 2' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-types.go"
+    ],
+    "sha1": "3dc8afdc07cac6ee2d04e2e8c098f4956f88ccf3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "aee145be5f694e605fb901c2e0410ec7358b5dcd"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var b, c uint64 = 1, 2' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var one, two uint64 = 1, 2' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-types.go"
+    ],
+    "sha1": "aee145be5f694e605fb901c2e0410ec7358b5dcd",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "fc26be94a948d2114fc4c54a78fb4136779acc41"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-types.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    1
+                                    3,
+                                    5
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    6
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
-                                    1
+                                    3,
+                                    5
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "c6e378458d00f3303563a027e8517d0d1ab76d84",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "a087f7c628cf9bc9c07b5c9999bd3338438611e7"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module statement"
                 },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'identifier()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                4
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'identifier()' function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "a087f7c628cf9bc9c07b5c9999bd3338438611e7",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "e4d14c655c1e56781a8d1a8217659ee8bdec91cc"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    4
+                                    4,
+                                    6
                                 ],
                                 "end": [
-                                    3,
-                                    5
+                                    4,
+                                    7
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    4
+                                    4,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    5
+                                    4,
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -155,300 +185,330 @@
                             {
                                 "start": [
                                     4,
-                                    2
+                                    9
                                 ],
                                 "end": [
                                     4,
-                                    5
+                                    10
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    2
+                                    10
                                 ],
                                 "end": [
                                     4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the identifier() function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "e4d14c655c1e56781a8d1a8217659ee8bdec91cc",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "2d3f0f3042d42158086bf2b7c30bc35ec08a74c0"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the identifier() function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "2d3f0f3042d42158086bf2b7c30bc35ec08a74c0",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "0312c432a300bcd9ae78265f01570e76235208bc"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'identifier()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                4
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'identifier()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                4
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'identifier()' function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "0312c432a300bcd9ae78265f01570e76235208bc",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "87eace763a44e4723c44c130dc1684313ac67193"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-delete-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'identifier()' function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "87eace763a44e4723c44c130dc1684313ac67193",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "4ea92a27006c8c68c512ef3f28ba6d9156cd069d"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
                                     13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "unary-expressions.go"
+        "var-declarations-with-types.go"
     ],
-    "sha1": "4ea92a27006c8c68c512ef3f28ba6d9156cd069d",
+    "sha1": "fc26be94a948d2114fc4c54a78fb4136779acc41",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8576eb3bc6fa4d3ae5bb48b761bdce8fd3b13434"
+    "sha2": "4fb068056bdd4286aa58f1b999f90d4246803391"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-types.go"
+    ],
+    "sha1": "4fb068056bdd4286aa58f1b999f90d4246803391",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "a313d3aa7e83e437f6933f2179854544c54d1755"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'var b, c uint64 = 1, 2' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'var one, two uint64 = 1, 2' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var b, c uint64 = 1, 2' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-types.go"
+    ],
+    "sha1": "a313d3aa7e83e437f6933f2179854544c54d1755",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "9dd2b1262371e445dc0a3697354598d8a71d43c2"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'var one, two uint64 = 1, 2' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-types.go"
+    ],
+    "sha1": "9dd2b1262371e445dc0a3697354598d8a71d43c2",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b827c42d91161e710c98ae3f3811c9c49e7b2c2f"
+}
+,{
+    "testCaseDescription": "go-var-declarations-with-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'var b, c uint64 = 1, 2' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-types.go"
+    ],
+    "sha1": "b827c42d91161e710c98ae3f3811c9c49e7b2c2f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b4db98cbac60696d2d301dcd532c38fd976b219f"
 }]

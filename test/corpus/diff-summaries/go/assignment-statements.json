@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-float-literals-insert-test",
+    "testCaseDescription": "go-assignment-statements-insert-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
+            "assignment-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -35,17 +35,17 @@
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "8576eb3bc6fa4d3ae5bb48b761bdce8fd3b13434",
+    "sha1": "2f583464d338666560562211d4d71bd5bf831968",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "87f1b9074b8ab84b55c7e350b218519079c1a28f"
+    "sha2": "cf18f58170541f40efa15606b31df3cf67fd01b6"
 }
 ,{
-    "testCaseDescription": "go-float-literals-replacement-insert-test",
+    "testCaseDescription": "go-assignment-statements-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
+            "assignment-statements.go": [
                 {
                     "span": {
                         "insert": {
@@ -55,48 +55,78 @@
                             ],
                             "end": [
                                 3,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f2' identifier"
+                    "summary": "Added 'x' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                6
+                                5
                             ],
                             "end": [
                                 3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
                                 9
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
                             ],
                             "end": [
                                 4,
-                                3
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the 'f3' identifier"
+                    "summary": "Added '2'"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                6
+                                12
                             ],
                             "end": [
                                 4,
@@ -104,7 +134,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e100' float_literal"
+                    "summary": "Added '3'"
                 },
                 {
                     "span": {
@@ -115,11 +145,11 @@
                             ],
                             "end": [
                                 5,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f4' identifier"
+                    "summary": "Added 'z' identifier"
                 },
                 {
                     "span": {
@@ -130,11 +160,11 @@
                             ],
                             "end": [
                                 5,
-                                13
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e+50' float_literal"
+                    "summary": "Added '3'"
                 },
                 {
                     "span": {
@@ -145,11 +175,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f5' identifier"
+                    "summary": "Added 'h' identifier"
                 },
                 {
                     "span": {
@@ -160,11 +190,11 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e-5' float_literal"
+                    "summary": "Added '1'"
                 },
                 {
                     "span": {
@@ -175,26 +205,26 @@
                             ],
                             "end": [
                                 7,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f6' identifier"
+                    "summary": "Added 'a' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 7,
-                                6
+                                5
                             ],
                             "end": [
                                 7,
-                                12
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the '.5e-50' float_literal"
+                    "summary": "Added '1'"
                 },
                 {
                     "span": {
@@ -205,56 +235,86 @@
                             ],
                             "end": [
                                 8,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f1' identifier"
+                    "summary": "Added 'b' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 8,
-                                6
+                                4
                             ],
                             "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
                                 8,
                                 9
+                            ],
+                            "end": [
+                                8,
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the '1.5' float_literal"
+                    "summary": "Added '2'"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                9,
-                                1
+                                8,
+                                12
                             ],
                             "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                6
-                            ],
-                            "end": [
-                                9,
+                                8,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e100' float_literal"
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
                 },
                 {
                     "span": {
@@ -265,11 +325,11 @@
                             ],
                             "end": [
                                 10,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f3' identifier"
+                    "summary": "Added 'e' identifier"
                 },
                 {
                     "span": {
@@ -280,144 +340,54 @@
                             ],
                             "end": [
                                 10,
-                                13
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                6
-                            ],
-                            "end": [
-                                11,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                6
-                            ],
-                            "end": [
-                                12,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
+                    "summary": "Added '1'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "87f1b9074b8ab84b55c7e350b218519079c1a28f",
+    "sha1": "cf18f58170541f40efa15606b31df3cf67fd01b6",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5c3ffa798f2af35129766d4416b31e54327d5c1c"
+    "sha2": "32254a29d41f8a1aa8cf595992b8317cfccb3adc"
 }
 ,{
-    "testCaseDescription": "go-float-literals-delete-insert-test",
+    "testCaseDescription": "go-assignment-statements-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5' float_literal"
-                },
+            "assignment-statements.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     3,
-                                    6
+                                    1
                                 ],
                                 "end": [
                                     3,
-                                    9
+                                    2
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
-                                    6
+                                    3,
+                                    1
                                 ],
                                 "end": [
-                                    4,
-                                    13
+                                    3,
+                                    2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.5' float_literal with the '1.5e100' float_literal"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
                 },
                 {
                     "span": {
@@ -425,26 +395,53 @@
                             {
                                 "start": [
                                     4,
-                                    6
+                                    1
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
                                 ]
                             },
                             {
                                 "start": [
                                     5,
-                                    6
+                                    1
                                 ],
                                 "end": [
                                     5,
-                                    13
+                                    2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.5e100' float_literal with the '1.5e+50' float_literal"
+                    "summary": "Replaced the 'z' identifier with the 'd' identifier"
                 },
                 {
                     "span": {
@@ -455,11 +452,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f4' identifier"
+                    "summary": "Added 'e' identifier"
                 },
                 {
                     "span": {
@@ -470,71 +467,11 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
+                    "summary": "Added '1'"
                 },
                 {
                     "span": {
@@ -545,11 +482,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f5' identifier"
+                    "summary": "Deleted 'h' identifier"
                 },
                 {
                     "span": {
@@ -560,147 +497,108 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
+                    "summary": "Deleted '1'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "5c3ffa798f2af35129766d4416b31e54327d5c1c",
+    "sha1": "32254a29d41f8a1aa8cf595992b8317cfccb3adc",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e745d234bfa8c8cb24bcfa8cf206d9fceaf3eafe"
+    "sha2": "779321cb47df0003033728594924684072b509f2"
 }
 ,{
-    "testCaseDescription": "go-float-literals-replacement-test",
+    "testCaseDescription": "go-assignment-statements-replacement-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
+            "assignment-statements.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f2' identifier"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                9
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the '1.5' float_literal"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e+50' float_literal"
+                    "summary": "Replaced the 'd' identifier with the 'z' identifier"
                 },
                 {
                     "span": {
@@ -711,11 +609,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f5' identifier"
+                    "summary": "Added 'h' identifier"
                 },
                 {
                     "span": {
@@ -726,131 +624,11 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
+                    "summary": "Added '1'"
                 },
                 {
                     "span": {
@@ -861,11 +639,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f4' identifier"
+                    "summary": "Deleted 'e' identifier"
                 },
                 {
                     "span": {
@@ -876,58 +654,28 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
+                    "summary": "Deleted '1'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "e745d234bfa8c8cb24bcfa8cf206d9fceaf3eafe",
+    "sha1": "779321cb47df0003033728594924684072b509f2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d07f397e594fda2dc0ccea685efd4369252837b3"
+    "sha2": "236df4242f9c4ad23cc78fe6005d69b6a0ea7d1a"
 }
 ,{
-    "testCaseDescription": "go-float-literals-delete-replacement-test",
+    "testCaseDescription": "go-assignment-statements-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
+            "assignment-statements.go": [
                 {
                     "span": {
                         "delete": {
@@ -937,48 +685,78 @@
                             ],
                             "end": [
                                 3,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f2' identifier"
+                    "summary": "Deleted 'x' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                6
+                                5
                             ],
                             "end": [
                                 3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
                                 9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
                             ],
                             "end": [
                                 4,
-                                3
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f3' identifier"
+                    "summary": "Deleted '2'"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                6
+                                12
                             ],
                             "end": [
                                 4,
@@ -986,7 +764,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e100' float_literal"
+                    "summary": "Deleted '3'"
                 },
                 {
                     "span": {
@@ -997,11 +775,11 @@
                             ],
                             "end": [
                                 5,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f4' identifier"
+                    "summary": "Deleted 'z' identifier"
                 },
                 {
                     "span": {
@@ -1012,11 +790,11 @@
                             ],
                             "end": [
                                 5,
-                                13
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e+50' float_literal"
+                    "summary": "Deleted '3'"
                 },
                 {
                     "span": {
@@ -1027,11 +805,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f5' identifier"
+                    "summary": "Deleted 'h' identifier"
                 },
                 {
                     "span": {
@@ -1042,11 +820,11 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e-5' float_literal"
+                    "summary": "Deleted '1'"
                 },
                 {
                     "span": {
@@ -1057,26 +835,26 @@
                             ],
                             "end": [
                                 7,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f6' identifier"
+                    "summary": "Deleted 'a' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 7,
-                                6
+                                5
                             ],
                             "end": [
                                 7,
-                                12
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the '.5e-50' float_literal"
+                    "summary": "Deleted '1'"
                 },
                 {
                     "span": {
@@ -1087,313 +865,283 @@
                             ],
                             "end": [
                                 8,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f1' identifier"
+                    "summary": "Deleted 'b' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 8,
-                                6
+                                4
                             ],
                             "end": [
                                 8,
-                                9
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5' float_literal"
+                    "summary": "Deleted 'c' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                6
-                            ],
-                            "end": [
-                                9,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                6
-                            ],
-                            "end": [
-                                11,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                6
-                            ],
-                            "end": [
-                                12,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
                                 8,
                                 9
+                            ],
+                            "end": [
+                                8,
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the '1.5' float_literal"
+                    "summary": "Deleted '2'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                9,
-                                1
+                                8,
+                                12
                             ],
                             "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                6
-                            ],
-                            "end": [
-                                9,
+                                8,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e100' float_literal"
+                    "summary": "Deleted '3'"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
+                },
+                {
+                    "span": {
+                        "delete": {
                             "start": [
                                 10,
                                 1
                             ],
                             "end": [
                                 10,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f4' identifier"
+                    "summary": "Deleted 'e' identifier"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 10,
                                 6
                             ],
                             "end": [
                                 10,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                4
+                            ],
+                            "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                12
+                            ],
+                            "end": [
+                                8,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e+50' float_literal"
+                    "summary": "Added '3'"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                11,
-                                3
+                                9,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f5' identifier"
+                    "summary": "Added 'z' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 6
                             ],
                             "end": [
-                                11,
-                                12
+                                9,
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e-5' float_literal"
+                    "summary": "Added '3'"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 1
                             ],
                             "end": [
-                                12,
-                                3
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'f6' identifier"
+                    "summary": "Added 'h' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 6
                             ],
                             "end": [
-                                12,
-                                12
+                                10,
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the '.5e-50' float_literal"
+                    "summary": "Added '1'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "d07f397e594fda2dc0ccea685efd4369252837b3",
+    "sha1": "236df4242f9c4ad23cc78fe6005d69b6a0ea7d1a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2bd29ccd6384f5879be0746b41e6270b76a190b4"
+    "sha2": "9a5b172542beb63a340a7d56426281f18511401f"
 }
 ,{
-    "testCaseDescription": "go-float-literals-delete-test",
+    "testCaseDescription": "go-assignment-statements-delete-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
+            "assignment-statements.go": [
                 {
                     "span": {
                         "delete": {
@@ -1403,48 +1151,78 @@
                             ],
                             "end": [
                                 3,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f1' identifier"
+                    "summary": "Deleted 'a' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                6
+                                5
                             ],
                             "end": [
                                 3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
                                 9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
                             ],
                             "end": [
                                 4,
-                                3
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f2' identifier"
+                    "summary": "Deleted '2'"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                6
+                                12
                             ],
                             "end": [
                                 4,
@@ -1452,7 +1230,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e100' float_literal"
+                    "summary": "Deleted '3'"
                 },
                 {
                     "span": {
@@ -1463,11 +1241,11 @@
                             ],
                             "end": [
                                 5,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f3' identifier"
+                    "summary": "Deleted 'd' identifier"
                 },
                 {
                     "span": {
@@ -1478,11 +1256,11 @@
                             ],
                             "end": [
                                 5,
-                                13
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e+50' float_literal"
+                    "summary": "Deleted '3'"
                 },
                 {
                     "span": {
@@ -1493,11 +1271,11 @@
                             ],
                             "end": [
                                 6,
-                                3
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f4' identifier"
+                    "summary": "Deleted 'e' identifier"
                 },
                 {
                     "span": {
@@ -1508,58 +1286,28 @@
                             ],
                             "end": [
                                 6,
-                                12
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
+                    "summary": "Deleted '1'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "2bd29ccd6384f5879be0746b41e6270b76a190b4",
+    "sha1": "9a5b172542beb63a340a7d56426281f18511401f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "65a2871566ab94d475f3f98e119c87ebeff94765"
+    "sha2": "88538e6f3bdfeef208db9426eb59f01a8e602d2c"
 }
 ,{
-    "testCaseDescription": "go-float-literals-delete-rest-test",
+    "testCaseDescription": "go-assignment-statements-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "float-literals.go": [
+            "assignment-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -1585,16 +1333,16 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced 'main' module statement with 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "float-literals.go"
+        "assignment-statements.go"
     ],
-    "sha1": "65a2871566ab94d475f3f98e119c87ebeff94765",
+    "sha1": "88538e6f3bdfeef208db9426eb59f01a8e602d2c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f21837e2d040e66d0d8daa1c191e700d37a53d67"
+    "sha2": "c9fcb96a95eac69f1ef8e8b4f0b834a1efcfe9ec"
 }]

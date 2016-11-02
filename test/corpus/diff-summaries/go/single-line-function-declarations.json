@@ -1,0 +1,634 @@
+[{
+    "testCaseDescription": "go-single-line-function-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f3' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "260fbf63c19006bd7925208650b05fa4ade15e5e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "437c05abf9822580dee220ee8ddfc93f0a29f56f"
+}
+,{
+    "testCaseDescription": "go-single-line-function-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g1' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g2' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g3' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f3' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "437c05abf9822580dee220ee8ddfc93f0a29f56f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "dead765a627f38f08a5dd8a830cc60b549950b6c"
+}
+,{
+    "testCaseDescription": "go-single-line-function-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "dead765a627f38f08a5dd8a830cc60b549950b6c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "dcdc8d0de277ba4c9cbf09ed7ee934d1c5f6e3e7"
+}
+,{
+    "testCaseDescription": "go-single-line-function-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "dcdc8d0de277ba4c9cbf09ed7ee934d1c5f6e3e7",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "315e5ef495620295b7cecd65f8042c00d71ea8d5"
+}
+,{
+    "testCaseDescription": "go-single-line-function-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g1' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g2' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g3' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f3' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g1' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g2' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g3' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "315e5ef495620295b7cecd65f8042c00d71ea8d5",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "e46bf2f4b135bbf79324acffaecf57ccb98d9716"
+}
+,{
+    "testCaseDescription": "go-single-line-function-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f3' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "e46bf2f4b135bbf79324acffaecf57ccb98d9716",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "088f9cae076db5643ec08fca4aed7a0f8067cb23"
+}
+,{
+    "testCaseDescription": "go-single-line-function-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "single-line-function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g1' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g2' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g3' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-line-function-declarations.go"
+    ],
+    "sha1": "088f9cae076db5643ec08fca4aed7a0f8067cb23",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4d101658ac8f273a68689ac89aebfc80d49627f5"
+}]

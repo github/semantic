@@ -1,8 +1,9 @@
 [{
-    "testCaseDescription": "go-imports-insert-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-insert-test",
     "expectedResult": {
-        "changes": {
-            "imports.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "insert": {
@@ -12,11 +13,11 @@
                             ],
                             "end": [
                                 3,
-                                18
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the \"net/http\" import statement"
+                    "summary": "Added the 'var zero int' at line 3, column 1 - line 3, column 13"
                 },
                 {
                     "span": {
@@ -31,42 +32,24 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"some/dsl\" import statement"
-                }
-            ]
-        },
-        "errors": {
-            "imports.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'import alias \"some/package\"' at line 5, column 1 - line 5, column 28"
+                    "summary": "Added the 'var one, two uint64' at line 4, column 1 - line 4, column 20"
                 }
             ]
         }
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "fca223b7d276d1418cf78d534ca2cb53f7d34531",
+    "sha1": "a0373be7140d30a4e948b39895b79992ccff01c2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2d108efa617317d39c74299137e2f7e1e506a4e4"
+    "sha2": "2ee4cc039ae401778e33a613c9d0c700a54e1250"
 }
 ,{
-    "testCaseDescription": "go-imports-replacement-insert-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-insert-test",
     "expectedResult": {
-        "changes": {
-            "imports.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "insert": {
@@ -76,11 +59,11 @@
                             ],
                             "end": [
                                 3,
-                                17
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the \"foo/bar\" import statement"
+                    "summary": "Added the 'var a int' at line 3, column 1 - line 3, column 10"
                 },
                 {
                     "span": {
@@ -91,11 +74,26 @@
                             ],
                             "end": [
                                 4,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Added the \"types/dsl\" import statement"
+                    "summary": "Added the 'var b, c uint64' at line 4, column 1 - line 4, column 16"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var zero int' at line 5, column 1 - line 5, column 13"
                 },
                 {
                     "span": {
@@ -106,102 +104,53 @@
                             ],
                             "end": [
                                 6,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the \"net/http\" import statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
                                 20
                             ]
                         }
                     },
-                    "summary": "Added the \"some/dsl\" import statement"
-                }
-            ]
-        },
-        "errors": {
-            "imports.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'import alias \"some/package\"' at line 8, column 1 - line 8, column 28"
+                    "summary": "Added the 'var one, two uint64' at line 6, column 1 - line 6, column 20"
                 }
             ]
         }
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "2d108efa617317d39c74299137e2f7e1e506a4e4",
+    "sha1": "2ee4cc039ae401778e33a613c9d0c700a54e1250",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7e16b21a7fd894ced28f3b87274002ef5337964f"
+    "sha2": "5744ab80199d5d4a3eee9696088067ba89550c61"
 }
 ,{
-    "testCaseDescription": "go-imports-delete-insert-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "imports.go": [
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     3,
-                                    8
+                                    5
                                 ],
                                 "end": [
                                     3,
-                                    17
+                                    6
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    8
+                                    5
                                 ],
                                 "end": [
                                     3,
-                                    18
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the \"net/http\" import statement of the 'main' module statement"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier"
                 },
                 {
                     "span": {
@@ -209,96 +158,123 @@
                             {
                                 "start": [
                                     4,
-                                    10
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    21
+                                    6
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    10
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    20
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
-                                    14
+                                    4,
+                                    8
                                 ],
                                 "end": [
-                                    5,
-                                    32
+                                    4,
+                                    9
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
-                                    14
+                                    4,
+                                    10
                                 ],
                                 "end": [
-                                    5,
-                                    28
+                                    4,
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"awesome/packages\" string with the \"some/package\" string"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "7e16b21a7fd894ced28f3b87274002ef5337964f",
+    "sha1": "5744ab80199d5d4a3eee9696088067ba89550c61",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0e32bdc9934dea1a8adfa5dca8c10d27b9f4a4b8"
+    "sha2": "8b5319bff781096cfd0d0a3f2b581024d22713da"
 }
 ,{
-    "testCaseDescription": "go-imports-replacement-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
     "expectedResult": {
         "changes": {
-            "imports.go": [
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     3,
-                                    8
+                                    5
                                 ],
                                 "end": [
                                     3,
-                                    18
+                                    9
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    8
+                                    5
                                 ],
                                 "end": [
                                     3,
-                                    17
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the \"foo/bar\" import statement of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier"
                 },
                 {
                     "span": {
@@ -310,66 +286,40 @@
                                 ],
                                 "end": [
                                     4,
-                                    20
+                                    13
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    10
+                                    8
                                 ],
                                 "end": [
                                     4,
-                                    21
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    14
-                                ],
-                                "end": [
-                                    5,
-                                    28
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    14
-                                ],
-                                "end": [
-                                    5,
-                                    32
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"some/package\" string with the \"awesome/packages\" string"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "0e32bdc9934dea1a8adfa5dca8c10d27b9f4a4b8",
+    "sha1": "8b5319bff781096cfd0d0a3f2b581024d22713da",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3b0233c08a9de971a81b0912c0262fa4cd534f09"
+    "sha2": "ee5db282261e76b3cf21985d34d9058adb93e6ce"
 }
 ,{
-    "testCaseDescription": "go-imports-delete-replacement-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "imports.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "delete": {
@@ -379,11 +329,11 @@
                             ],
                             "end": [
                                 3,
-                                17
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the \"foo/bar\" import statement"
+                    "summary": "Deleted the 'var a int' at line 3, column 1 - line 3, column 10"
                 },
                 {
                     "span": {
@@ -394,11 +344,26 @@
                             ],
                             "end": [
                                 4,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Deleted the \"types/dsl\" import statement"
+                    "summary": "Deleted the 'var b, c uint64' at line 4, column 1 - line 4, column 16"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'var zero int' at line 5, column 1 - line 5, column 13"
                 },
                 {
                     "span": {
@@ -409,26 +374,26 @@
                             ],
                             "end": [
                                 6,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the \"net/http\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
                                 20
                             ]
                         }
                     },
-                    "summary": "Deleted the \"some/dsl\" import statement"
+                    "summary": "Deleted the 'var one, two uint64' at line 6, column 1 - line 6, column 20"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var a int' at line 5, column 1 - line 5, column 10"
                 },
                 {
                     "span": {
@@ -439,91 +404,28 @@
                             ],
                             "end": [
                                 6,
-                                17
+                                16
                             ]
                         }
                     },
-                    "summary": "Added the \"foo/bar\" import statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the \"types/dsl\" import statement"
-                }
-            ]
-        },
-        "errors": {
-            "imports.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'import alias \"some/package\"' at line 8, column 1 - line 8, column 28"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'import alias \"awesome/packages\"' at line 8, column 1 - line 8, column 32"
+                    "summary": "Added the 'var b, c uint64' at line 6, column 1 - line 6, column 16"
                 }
             ]
         }
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "3b0233c08a9de971a81b0912c0262fa4cd534f09",
+    "sha1": "ee5db282261e76b3cf21985d34d9058adb93e6ce",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "15a082e0004a20660d823c9c90f7535c1ce8ab1e"
+    "sha2": "453ef0406ebe7ccec1642f03fed01998057d94f3"
 }
 ,{
-    "testCaseDescription": "go-imports-delete-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-test",
     "expectedResult": {
-        "changes": {
-            "imports.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "delete": {
@@ -533,11 +435,11 @@
                             ],
                             "end": [
                                 3,
-                                18
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the \"net/http\" import statement"
+                    "summary": "Deleted the 'var zero int' at line 3, column 1 - line 3, column 13"
                 },
                 {
                     "span": {
@@ -552,42 +454,24 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"some/dsl\" import statement"
-                }
-            ]
-        },
-        "errors": {
-            "imports.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'import alias \"some/package\"' at line 5, column 1 - line 5, column 28"
+                    "summary": "Deleted the 'var one, two uint64' at line 4, column 1 - line 4, column 20"
                 }
             ]
         }
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "15a082e0004a20660d823c9c90f7535c1ce8ab1e",
+    "sha1": "453ef0406ebe7ccec1642f03fed01998057d94f3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a1523caa7685ab5be6d81a60ac427ae6bc6b23b1"
+    "sha2": "c32dd110c5fdefba8664c8cedb619b6682c303c9"
 }
 ,{
-    "testCaseDescription": "go-imports-delete-rest-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-rest-test",
     "expectedResult": {
-        "changes": {
-            "imports.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
                         "delete": {
@@ -597,11 +481,11 @@
                             ],
                             "end": [
                                 3,
-                                17
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the \"foo/bar\" import statement"
+                    "summary": "Deleted the 'var a int' at line 3, column 1 - line 3, column 10"
                 },
                 {
                     "span": {
@@ -612,38 +496,19 @@
                             ],
                             "end": [
                                 4,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Deleted the \"types/dsl\" import statement"
-                }
-            ]
-        },
-        "errors": {
-            "imports.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                    "summary": "Deleted the 'var b, c uint64' at line 4, column 1 - line 4, column 16"
                 }
             ]
         }
     },
     "filePaths": [
-        "imports.go"
+        "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "a1523caa7685ab5be6d81a60ac427ae6bc6b23b1",
+    "sha1": "c32dd110c5fdefba8664c8cedb619b6682c303c9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c517d0acb98bcbef49c0f5bf480fbb868ee06ae3"
+    "sha2": "583c308d9082412faf570d96282d5a5397086ca5"
 }]

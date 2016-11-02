@@ -1,44 +1,44 @@
 [{
-    "testCaseDescription": "go-type-declarations-insert-test",
+    "testCaseDescription": "go-channel-types-insert-test",
     "expectedResult": {
         "changes": {
-            "type-declarations.go": [
+            "channel-types.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                6
+                                4,
+                                1
                             ],
                             "end": [
-                                3,
-                                7
+                                4,
+                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c1' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                8
+                                4,
+                                16
                             ],
                             "end": [
-                                3,
-                                9
+                                4,
+                                19
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'int' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -46,29 +46,29 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c2' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                4
+                                18
                             ],
                             "end": [
                                 5,
-                                5
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                2
+                                1
                             ],
                             "end": [
                                 6,
@@ -76,75 +76,75 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c3' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                4
+                                18
                             ],
                             "end": [
                                 6,
-                                5
+                                21
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier"
+                    "summary": "Added the 'int' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "type-declarations.go"
+        "channel-types.go"
     ],
-    "sha1": "539b2342fb439592df8f001e686ee4a1a76ff91b",
+    "sha1": "3639e77ccd46ef029776d5ef390cd9196162e984",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4844865abf525a71002625de226b2ef5dac3f0bc"
+    "sha2": "011ef1be6180be1cc1b707634585720587f07dca"
 }
 ,{
-    "testCaseDescription": "go-type-declarations-replacement-insert-test",
+    "testCaseDescription": "go-channel-types-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "type-declarations.go": [
+            "channel-types.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                6
+                                4,
+                                1
                             ],
                             "end": [
-                                3,
-                                7
+                                4,
+                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c2' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                7
+                                4,
+                                16
                             ],
                             "end": [
-                                3,
-                                10
+                                4,
+                                22
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'string' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -152,29 +152,29 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c3' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                3
+                                18
                             ],
                             "end": [
                                 5,
-                                6
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                2
+                                1
                             ],
                             "end": [
                                 6,
@@ -182,59 +182,59 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c4' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                3
+                                18
                             ],
                             "end": [
                                 6,
-                                6
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the '' d' identifier"
+                    "summary": "Added the 'string' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
-                                6
+                                9,
+                                1
                             ],
                             "end": [
-                                8,
-                                7
+                                9,
+                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c1' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
-                                8
+                                9,
+                                16
                             ],
                             "end": [
-                                8,
-                                9
+                                9,
+                                19
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'int' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 10,
-                                2
+                                1
                             ],
                             "end": [
                                 10,
@@ -242,29 +242,29 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c2' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 10,
-                                4
+                                18
                             ],
                             "end": [
                                 10,
-                                5
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 11,
-                                2
+                                1
                             ],
                             "end": [
                                 11,
@@ -272,325 +272,262 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c3' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 11,
-                                4
+                                18
                             ],
                             "end": [
                                 11,
-                                5
+                                21
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier"
+                    "summary": "Added the 'int' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "type-declarations.go"
+        "channel-types.go"
     ],
-    "sha1": "4844865abf525a71002625de226b2ef5dac3f0bc",
+    "sha1": "011ef1be6180be1cc1b707634585720587f07dca",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c7695b3471d36afaddcd9bdd4a9139fe7a6246cd"
+    "sha2": "a7daa810e46c73954532b8363a67d14fddf1c559"
 }
 ,{
-    "testCaseDescription": "go-type-declarations-delete-insert-test",
+    "testCaseDescription": "go-channel-types-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "type-declarations.go": [
+            "channel-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                18
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                18
+                            ],
+                            "end": [
+                                6,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                18
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                18
+                            ],
+                            "end": [
+                                6,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "sha1": "a7daa810e46c73954532b8363a67d14fddf1c559",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "909fa3fdb4e77889a4ebe5182b0f72c7f3fc39f4"
+}
+,{
+    "testCaseDescription": "go-channel-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    7
+                                    4,
+                                    1
                                 ],
                                 "end": [
-                                    3,
-                                    10
+                                    4,
+                                    3
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    8
+                                    4,
+                                    1
                                 ],
                                 "end": [
-                                    3,
-                                    9
+                                    4,
+                                    3
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '' b' identifier with the 'b' identifier"
+                    "summary": "Replaced the 'c1' identifier with the 'c2' identifier"
                 },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                4
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' d' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "type-declarations.go"
-    ],
-    "sha1": "c7695b3471d36afaddcd9bdd4a9139fe7a6246cd",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "7836427e085a7858ede5115a1229d0579b0c6de0"
-}
-,{
-    "testCaseDescription": "go-type-declarations-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "type-declarations.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    8
+                                    4,
+                                    16
                                 ],
                                 "end": [
-                                    3,
-                                    9
+                                    4,
+                                    19
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    7
+                                    4,
+                                    16
                                 ],
                                 "end": [
-                                    3,
-                                    10
+                                    4,
+                                    22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the '' b' identifier"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Replaced the 'c2' identifier with the 'c3' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the '' d' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                4
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
+                                1
                             ],
                             "end": [
                                 6,
@@ -598,75 +535,105 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Added the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                18
+                            ],
+                            "end": [
+                                6,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                4
+                                1
                             ],
                             "end": [
                                 6,
-                                5
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                18
+                            ],
+                            "end": [
+                                6,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "type-declarations.go"
+        "channel-types.go"
     ],
-    "sha1": "7836427e085a7858ede5115a1229d0579b0c6de0",
+    "sha1": "909fa3fdb4e77889a4ebe5182b0f72c7f3fc39f4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0152d385323687028328b33d096ca4e10861e0e7"
+    "sha2": "86f0f2691f287ac6591558ec10d675699f747eb5"
 }
 ,{
-    "testCaseDescription": "go-type-declarations-delete-replacement-test",
+    "testCaseDescription": "go-channel-types-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "type-declarations.go": [
+            "channel-types.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                6
+                                4,
+                                1
                             ],
                             "end": [
-                                3,
-                                7
+                                4,
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c2' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                7
+                                4,
+                                16
                             ],
                             "end": [
-                                3,
-                                10
+                                4,
+                                22
                             ]
                         }
                     },
-                    "summary": "Deleted the '' b' identifier"
+                    "summary": "Deleted the 'string' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -674,29 +641,29 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c3' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                3
+                                18
                             ],
                             "end": [
                                 5,
-                                6
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the '' b' identifier"
+                    "summary": "Deleted the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                2
+                                1
                             ],
                             "end": [
                                 6,
@@ -704,59 +671,59 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c4' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                3
+                                18
                             ],
                             "end": [
                                 6,
-                                6
+                                24
                             ]
                         }
                     },
-                    "summary": "Deleted the '' d' identifier"
+                    "summary": "Deleted the 'string' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                8,
-                                6
+                                9,
+                                1
                             ],
                             "end": [
-                                8,
-                                7
+                                9,
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c1' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                8,
-                                8
+                                9,
+                                16
                             ],
                             "end": [
-                                8,
-                                9
+                                9,
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'int' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 10,
-                                2
+                                1
                             ],
                             "end": [
                                 10,
@@ -764,29 +731,29 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c2' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 10,
-                                4
+                                18
                             ],
                             "end": [
                                 10,
-                                5
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 11,
-                                2
+                                1
                             ],
                             "end": [
                                 11,
@@ -794,59 +761,59 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c3' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 11,
-                                4
+                                18
                             ],
                             "end": [
                                 11,
-                                5
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'int' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
-                                6
+                                9,
+                                1
                             ],
                             "end": [
-                                8,
-                                7
+                                9,
+                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c2' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
-                                7
+                                9,
+                                16
                             ],
                             "end": [
-                                8,
-                                10
+                                9,
+                                22
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'string' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 10,
-                                2
+                                1
                             ],
                             "end": [
                                 10,
@@ -854,29 +821,29 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'c3' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 10,
-                                3
+                                18
                             ],
                             "end": [
                                 10,
-                                6
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 11,
-                                2
+                                1
                             ],
                             "end": [
                                 11,
@@ -884,75 +851,75 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c4' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 11,
-                                3
+                                18
                             ],
                             "end": [
                                 11,
-                                6
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the '' d' identifier"
+                    "summary": "Added the 'string' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "type-declarations.go"
+        "channel-types.go"
     ],
-    "sha1": "0152d385323687028328b33d096ca4e10861e0e7",
+    "sha1": "86f0f2691f287ac6591558ec10d675699f747eb5",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "12394ab61331157d8e6c5691bfe3672c8edbe265"
+    "sha2": "d3ccd77e925b637cb7e3bd42824bd5c8808e823e"
 }
 ,{
-    "testCaseDescription": "go-type-declarations-delete-test",
+    "testCaseDescription": "go-channel-types-delete-test",
     "expectedResult": {
         "changes": {
-            "type-declarations.go": [
+            "channel-types.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                6
+                                4,
+                                1
                             ],
                             "end": [
-                                3,
-                                7
+                                4,
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c1' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                8
+                                4,
+                                16
                             ],
                             "end": [
-                                3,
-                                9
+                                4,
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'int' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -960,29 +927,29 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c2' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                4
+                                18
                             ],
                             "end": [
                                 5,
-                                5
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                2
+                                1
                             ],
                             "end": [
                                 6,
@@ -990,75 +957,75 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c3' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                4
+                                18
                             ],
                             "end": [
                                 6,
-                                5
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'int' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "type-declarations.go"
+        "channel-types.go"
     ],
-    "sha1": "12394ab61331157d8e6c5691bfe3672c8edbe265",
+    "sha1": "d3ccd77e925b637cb7e3bd42824bd5c8808e823e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e189ae3d603efe4d444d0c0b505505b1372306a6"
+    "sha2": "b6cf3770e9d02f1bd63c52992185e5550f94563c"
 }
 ,{
-    "testCaseDescription": "go-type-declarations-delete-rest-test",
+    "testCaseDescription": "go-channel-types-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "type-declarations.go": [
+            "channel-types.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                6
+                                4,
+                                1
                             ],
                             "end": [
-                                3,
-                                7
+                                4,
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c2' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                7
+                                4,
+                                16
                             ],
                             "end": [
-                                3,
-                                10
+                                4,
+                                22
                             ]
                         }
                     },
-                    "summary": "Deleted the '' b' identifier"
+                    "summary": "Deleted the 'string' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -1066,29 +1033,29 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'c3' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                3
+                                18
                             ],
                             "end": [
                                 5,
-                                6
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the '' b' identifier"
+                    "summary": "Deleted the 'struct{}' struct_type"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                2
+                                1
                             ],
                             "end": [
                                 6,
@@ -1096,31 +1063,31 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c4' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                3
+                                18
                             ],
                             "end": [
                                 6,
-                                6
+                                24
                             ]
                         }
                     },
-                    "summary": "Deleted the '' d' identifier"
+                    "summary": "Deleted the 'string' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "type-declarations.go"
+        "channel-types.go"
     ],
-    "sha1": "e189ae3d603efe4d444d0c0b505505b1372306a6",
+    "sha1": "b6cf3770e9d02f1bd63c52992185e5550f94563c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f5321d8bf3849b79986c4bfc5e82607ddbc8dad4"
+    "sha2": "c1a3152666d9ebb1a0e9f87a16734296436d4400"
 }]

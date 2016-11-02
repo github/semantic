@@ -1,0 +1,649 @@
+[{
+    "testCaseDescription": "go-single-import-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"some/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import alias \"some/package\"' at line 5, column 1 - line 5, column 28"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "7448c4ca268e0d81c2bd799b039236701d288cec",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "7c327a980b86296df87fa5cd74edc5b1a19b088f"
+}
+,{
+    "testCaseDescription": "go-single-import-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"foo/bar\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"types/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"some/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import alias \"some/package\"' at line 8, column 1 - line 8, column 28"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "7c327a980b86296df87fa5cd74edc5b1a19b088f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4d3510140bc028dbcf0441c0e9cac386e3f8aec8"
+}
+,{
+    "testCaseDescription": "go-single-import-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the \"net/http\" import statement of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"awesome/packages\" string with the \"some/package\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "4d3510140bc028dbcf0441c0e9cac386e3f8aec8",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "bf581c04d26c93f1b8571e889f00a02a2d385557"
+}
+,{
+    "testCaseDescription": "go-single-import-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the \"foo/bar\" import statement of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"some/package\" string with the \"awesome/packages\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "bf581c04d26c93f1b8571e889f00a02a2d385557",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "2a37194bbfb147cbd72c61f74826da85bd272307"
+}
+,{
+    "testCaseDescription": "go-single-import-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"foo/bar\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"types/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"some/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"foo/bar\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"types/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import alias \"some/package\"' at line 8, column 1 - line 8, column 28"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import alias \"awesome/packages\"' at line 8, column 1 - line 8, column 32"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "2a37194bbfb147cbd72c61f74826da85bd272307",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "fd5acb72d12b497ac4206aa847de1b0a94583a5c"
+}
+,{
+    "testCaseDescription": "go-single-import-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"some/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import alias \"some/package\"' at line 5, column 1 - line 5, column 28"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "fd5acb72d12b497ac4206aa847de1b0a94583a5c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "50374ead850284ec48e2c48c47a03448285d9168"
+}
+,{
+    "testCaseDescription": "go-single-import-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"foo/bar\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"types/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "single-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "single-import-declarations.go"
+    ],
+    "sha1": "50374ead850284ec48e2c48c47a03448285d9168",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "ec40427d50286b8a3e137f70d1373210cf1555d7"
+}]

@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-unary-expressions-insert-test",
+    "testCaseDescription": "go-increment-decrement-statements-insert-test",
     "expectedResult": {
         "changes": {
-            "unary-expressions.go": [
+            "increment-decrement-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -35,31 +35,31 @@
         "errors": {}
     },
     "filePaths": [
-        "unary-expressions.go"
+        "increment-decrement-statements.go"
     ],
-    "sha1": "c6e378458d00f3303563a027e8517d0d1ab76d84",
+    "sha1": "2dee7272ffa733b13265089eacbcc498aef9303d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a087f7c628cf9bc9c07b5c9999bd3338438611e7"
+    "sha2": "31d71fd894d0b67e2b35623ae0f896a6bbdae824"
 }
 ,{
-    "testCaseDescription": "go-unary-expressions-replacement-insert-test",
+    "testCaseDescription": "go-increment-decrement-statements-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "unary-expressions.go": [
+            "increment-decrement-statements.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                4
+                                1
                             ],
                             "end": [
                                 3,
-                                5
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
@@ -70,26 +70,26 @@
                             ],
                             "end": [
                                 4,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'x' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                4
+                                1
                             ],
                             "end": [
                                 5,
-                                5
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'i' identifier"
                 },
                 {
                     "span": {
@@ -100,182 +100,69 @@
                             ],
                             "end": [
                                 6,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'j' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "unary-expressions.go"
+        "increment-decrement-statements.go"
     ],
-    "sha1": "a087f7c628cf9bc9c07b5c9999bd3338438611e7",
+    "sha1": "31d71fd894d0b67e2b35623ae0f896a6bbdae824",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e4d14c655c1e56781a8d1a8217659ee8bdec91cc"
+    "sha2": "131ba11f38a80334e49831066017e48fc302333e"
 }
 ,{
-    "testCaseDescription": "go-unary-expressions-delete-insert-test",
+    "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "unary-expressions.go": [
+            "increment-decrement-statements.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     3,
-                                    4
+                                    1
                                 ],
                                 "end": [
                                     3,
-                                    5
+                                    4
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    4
+                                    1
                                 ],
                                 "end": [
                                     3,
-                                    5
+                                    2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
+                    "summary": "Replaced the 'foo' identifier with the 'i' identifier"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the identifier() function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "e4d14c655c1e56781a8d1a8217659ee8bdec91cc",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "2d3f0f3042d42158086bf2b7c30bc35ec08a74c0"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the identifier() function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "2d3f0f3042d42158086bf2b7c30bc35ec08a74c0",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "0312c432a300bcd9ae78265f01570e76235208bc"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                3,
-                                4
+                                4,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Added the 'j' identifier"
                 },
                 {
                     "span": {
@@ -286,26 +173,145 @@
                             ],
                             "end": [
                                 4,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'x' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "sha1": "131ba11f38a80334e49831066017e48fc302333e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "bee29a0fb8d35f740df8d8d173f76a15713b1571"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i' identifier with the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "sha1": "bee29a0fb8d35f740df8d8d173f76a15713b1571",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c273d4a4fda113cc7ee6bb246bc6ed92aeac1478"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                4
+                                1
                             ],
                             "end": [
                                 5,
-                                5
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'i' identifier"
                 },
                 {
                     "span": {
@@ -316,26 +322,26 @@
                             ],
                             "end": [
                                 6,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'j' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                4
+                                1
                             ],
                             "end": [
                                 5,
-                                5
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
@@ -346,42 +352,42 @@
                             ],
                             "end": [
                                 6,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'x' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "unary-expressions.go"
+        "increment-decrement-statements.go"
     ],
-    "sha1": "0312c432a300bcd9ae78265f01570e76235208bc",
+    "sha1": "c273d4a4fda113cc7ee6bb246bc6ed92aeac1478",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "87eace763a44e4723c44c130dc1684313ac67193"
+    "sha2": "d6724cb8b96f1e3139e73b121fe5c34f7ed1e37a"
 }
 ,{
-    "testCaseDescription": "go-unary-expressions-delete-test",
+    "testCaseDescription": "go-increment-decrement-statements-delete-test",
     "expectedResult": {
         "changes": {
-            "unary-expressions.go": [
+            "increment-decrement-statements.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                4
+                                1
                             ],
                             "end": [
                                 3,
-                                5
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'i' identifier"
                 },
                 {
                     "span": {
@@ -392,28 +398,28 @@
                             ],
                             "end": [
                                 4,
-                                7
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'j' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "unary-expressions.go"
+        "increment-decrement-statements.go"
     ],
-    "sha1": "87eace763a44e4723c44c130dc1684313ac67193",
+    "sha1": "d6724cb8b96f1e3139e73b121fe5c34f7ed1e37a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4ea92a27006c8c68c512ef3f28ba6d9156cd069d"
+    "sha2": "117d3c5b56c0628fc1d3e6a5b4c7c7ffe80c75e8"
 }
 ,{
-    "testCaseDescription": "go-unary-expressions-delete-rest-test",
+    "testCaseDescription": "go-increment-decrement-statements-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "unary-expressions.go": [
+            "increment-decrement-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -446,9 +452,9 @@
         "errors": {}
     },
     "filePaths": [
-        "unary-expressions.go"
+        "increment-decrement-statements.go"
     ],
-    "sha1": "4ea92a27006c8c68c512ef3f28ba6d9156cd069d",
+    "sha1": "117d3c5b56c0628fc1d3e6a5b4c7c7ffe80c75e8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8576eb3bc6fa4d3ae5bb48b761bdce8fd3b13434"
+    "sha2": "67322b2d55292367c6f6b5f25adebb20c11282c1"
 }]

@@ -1,0 +1,712 @@
+[{
+    "testCaseDescription": "go-slice-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "95159c11d54c103607d94c28b48712720d7abf46",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "5e0d01c1e6441f4803738c4ebb54c89234917727"
+}
+,{
+    "testCaseDescription": "go-slice-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'p' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                10
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "5e0d01c1e6441f4803738c4ebb54c89234917727",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "898e4363dcf59f92db573c22d7b743b4bbedb55d"
+}
+,{
+    "testCaseDescription": "go-slice-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'p' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "898e4363dcf59f92db573c22d7b743b4bbedb55d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "51b54a5b1486ff6541690f199eb4e96198b90678"
+}
+,{
+    "testCaseDescription": "go-slice-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'p' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "51b54a5b1486ff6541690f199eb4e96198b90678",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "07a0450366926f8e279be50983c4de8e5c7d8f24"
+}
+,{
+    "testCaseDescription": "go-slice-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'p' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                10
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'p' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                10
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "07a0450366926f8e279be50983c4de8e5c7d8f24",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "24ae3e600ba5ec7d2e7d20358bd0fcbdd735ab42"
+}
+,{
+    "testCaseDescription": "go-slice-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "24ae3e600ba5ec7d2e7d20358bd0fcbdd735ab42",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "e2e637c8c270694708c78f3c127f073f56d3c4b6"
+}
+,{
+    "testCaseDescription": "go-slice-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "slice-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'p' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "slice-types.go"
+    ],
+    "sha1": "e2e637c8c270694708c78f3c127f073f56d3c4b6",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "7e210dda1c0139bb98ba4890886f06ebb95ad7f7"
+}]

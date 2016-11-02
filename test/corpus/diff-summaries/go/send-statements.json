@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-function-call-insert-test",
+    "testCaseDescription": "go-send-statements-insert-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "insert": {
@@ -16,24 +16,39 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
+                    "summary": "Added 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '5'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "914e6a5d1b9382291702d5919357687ee4e01fa5",
+    "sha1": "c709e4cf99c30c35dde9ba1b60e816d6a4c25952",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "774cdf502cd390fbf4566e80b028ffcb3d5b7e72"
+    "sha2": "4ce61e96ccaa2ee49b44de3a73b4c22d7b8cfb4e"
 }
 ,{
-    "testCaseDescription": "go-function-call-replacement-insert-test",
+    "testCaseDescription": "go-send-statements-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -66,17 +81,17 @@
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "774cdf502cd390fbf4566e80b028ffcb3d5b7e72",
+    "sha1": "4ce61e96ccaa2ee49b44de3a73b4c22d7b8cfb4e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "49342eb5244e1d625eae9f8f2a2dd1b878a40647"
+    "sha2": "02f065956a8fd4be8e43b18187d325c810920572"
 }
 ,{
-    "testCaseDescription": "go-function-call-delete-insert-test",
+    "testCaseDescription": "go-send-statements-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -87,7 +102,7 @@
                                 ],
                                 "end": [
                                     3,
-                                    2
+                                    4
                                 ]
                             },
                             {
@@ -97,29 +112,56 @@
                                 ],
                                 "end": [
                                     3,
-                                    2
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the a() function call"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '6' with '5'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "49342eb5244e1d625eae9f8f2a2dd1b878a40647",
+    "sha1": "02f065956a8fd4be8e43b18187d325c810920572",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3a3f22d550db10ed04b3ebfb31dca7b6cac169ff"
+    "sha2": "cac352bdfc9068360732e4e21d364fd26daa398d"
 }
 ,{
-    "testCaseDescription": "go-function-call-replacement-test",
+    "testCaseDescription": "go-send-statements-replacement-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -130,7 +172,7 @@
                                 ],
                                 "end": [
                                     3,
-                                    2
+                                    4
                                 ]
                             },
                             {
@@ -140,29 +182,56 @@
                                 ],
                                 "end": [
                                     3,
-                                    2
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the b() function call"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '6'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "3a3f22d550db10ed04b3ebfb31dca7b6cac169ff",
+    "sha1": "cac352bdfc9068360732e4e21d364fd26daa398d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9ae2ff8c60faf4be106e7218750ec560f2844c9f"
+    "sha2": "cdc8b967e6223286bcda9ea2ca1812790f765558"
 }
 ,{
-    "testCaseDescription": "go-function-call-delete-replacement-test",
+    "testCaseDescription": "go-send-statements-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "delete": {
@@ -176,7 +245,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '6'"
                 },
                 {
                     "span": {
@@ -191,7 +275,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' function call"
+                    "summary": "Deleted 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '5'"
                 },
                 {
                     "span": {
@@ -206,24 +305,39 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '6'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "9ae2ff8c60faf4be106e7218750ec560f2844c9f",
+    "sha1": "cdc8b967e6223286bcda9ea2ca1812790f765558",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7ba25460df3c68634ff52f48955dfe693e63793f"
+    "sha2": "5ff9b3da8d07279916119976e4bc944a3aa89efb"
 }
 ,{
-    "testCaseDescription": "go-function-call-delete-test",
+    "testCaseDescription": "go-send-statements-delete-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "replace": [
@@ -249,24 +363,24 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced 'main' module statement with 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "7ba25460df3c68634ff52f48955dfe693e63793f",
+    "sha1": "5ff9b3da8d07279916119976e4bc944a3aa89efb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6e252f72f50342623013a49245ea0abb8cbb0d2c"
+    "sha2": "eaf7acec59a492d3a24597f10511b7c8fc4ab13a"
 }
 ,{
-    "testCaseDescription": "go-function-call-delete-rest-test",
+    "testCaseDescription": "go-send-statements-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "function-call.go": [
+            "send-statements.go": [
                 {
                     "span": {
                         "delete": {
@@ -280,16 +394,31 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '6'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-call.go"
+        "send-statements.go"
     ],
-    "sha1": "6e252f72f50342623013a49245ea0abb8cbb0d2c",
+    "sha1": "eaf7acec59a492d3a24597f10511b7c8fc4ab13a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e8d9a5830549173894d2d7034cb51dd0e1f87e46"
+    "sha2": "ac93ee4e5b27e59ec3f919fc2511702331ad7639"
 }]

@@ -1,0 +1,682 @@
+[{
+    "testCaseDescription": "go-short-var-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "504a32c06e7e79d9cd933dea4ffbad531a665164",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "5bfe40bbd815eda87bc5d30218f1c238f7af3b06"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "5bfe40bbd815eda87bc5d30218f1c238f7af3b06",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "bee81139191c61d1fbb0c76ed950a283c24b99b8"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '1'"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "bee81139191c61d1fbb0c76ed950a283c24b99b8",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "f46e7f1801e2344dea6de88bf761a6c3ef524628"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    9
+                                ],
+                                "end": [
+                                    3,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '3'"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '4'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "f46e7f1801e2344dea6de88bf761a6c3ef524628",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "a7e0553a7c81438baee09806c405493ee0954a5a"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added '4'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "a7e0553a7c81438baee09806c405493ee0954a5a",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "f8e84afa3440d58486ea585d9a2565813c123d31"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'main' module statement with 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "f8e84afa3440d58486ea585d9a2565813c123d31",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6d95350b697ecdeca8d79e0257e9513223496423"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '4'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "sha1": "6d95350b697ecdeca8d79e0257e9513223496423",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "239d9bd1fe76765327929225eed293b1d1ccc0be"
+}]

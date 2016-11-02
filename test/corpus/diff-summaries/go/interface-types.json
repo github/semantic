@@ -1,0 +1,1834 @@
+[{
+    "testCaseDescription": "go-interface-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "c676ff4fa798a23bc7469bb7d25ea350722eca8c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "0a32a0895e65ffe91fa6d970acf68f44d507261e"
+}
+,{
+    "testCaseDescription": "go-interface-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                6
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                9
+                            ],
+                            "end": [
+                                10,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                6
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                21
+                            ],
+                            "end": [
+                                11,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                24
+                            ],
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                6
+                            ],
+                            "end": [
+                                12,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                4
+                            ],
+                            "end": [
+                                14,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                13
+                            ],
+                            "end": [
+                                15,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                15
+                            ],
+                            "end": [
+                                15,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                23
+                            ],
+                            "end": [
+                                15,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "0a32a0895e65ffe91fa6d970acf68f44d507261e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4ba3e9eda143a9aef587b1d56da456a26c07308d"
+}
+,{
+    "testCaseDescription": "go-interface-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'j1' identifier with the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'j2' identifier with the 'i2' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'j3' identifier with the 'i3' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "4ba3e9eda143a9aef587b1d56da456a26c07308d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4e868f238365d50f30f313fff0f3b264d1669677"
+}
+,{
+    "testCaseDescription": "go-interface-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i1' identifier with the 'j1' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i2' identifier with the 'j2' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i3' identifier with the 'j3' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "4e868f238365d50f30f313fff0f3b264d1669677",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "e2d7b2b9c3178d03b9532f62c250d215ff8a7668"
+}
+,{
+    "testCaseDescription": "go-interface-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                6
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                9
+                            ],
+                            "end": [
+                                10,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                6
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                21
+                            ],
+                            "end": [
+                                11,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                24
+                            ],
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                6
+                            ],
+                            "end": [
+                                12,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                4
+                            ],
+                            "end": [
+                                14,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                13
+                            ],
+                            "end": [
+                                15,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                15
+                            ],
+                            "end": [
+                                15,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                23
+                            ],
+                            "end": [
+                                15,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                6
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                9
+                            ],
+                            "end": [
+                                10,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                6
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                21
+                            ],
+                            "end": [
+                                11,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                24
+                            ],
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                6
+                            ],
+                            "end": [
+                                12,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                4
+                            ],
+                            "end": [
+                                14,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                13
+                            ],
+                            "end": [
+                                15,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                15
+                            ],
+                            "end": [
+                                15,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                23
+                            ],
+                            "end": [
+                                15,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "e2d7b2b9c3178d03b9532f62c250d215ff8a7668",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "5d764c1fa6a9b5bb6940b8946e269d24f3a7f06e"
+}
+,{
+    "testCaseDescription": "go-interface-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "5d764c1fa6a9b5bb6940b8946e269d24f3a7f06e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "2da27bdef1f4e2c05eeb08df7e5a3179234f044f"
+}
+,{
+    "testCaseDescription": "go-interface-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "interface-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'interface {}' interface_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'io' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Reader' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'SomeMethod' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "interface-types.go"
+    ],
+    "sha1": "2da27bdef1f4e2c05eeb08df7e5a3179234f044f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "825fb927e9d7ff22d9a45775abc49a7350fe01aa"
+}]

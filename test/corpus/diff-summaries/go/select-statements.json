@@ -1,0 +1,1453 @@
+[{
+    "testCaseDescription": "go-select-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                15
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                13
+                            ],
+                            "end": [
+                                5,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                13
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                13
+                            ],
+                            "end": [
+                                7,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'time' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'After' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                21
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                5
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '6'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                3
+                            ],
+                            "end": [
+                                10,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'default' communication_case"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "e7589ab1691214696c244aacb0997a026417c8f1",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "802fde531dfc6d5b974e2159efe127a70003925e"
+}
+,{
+    "testCaseDescription": "go-select-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    13,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "802fde531dfc6d5b974e2159efe127a70003925e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "14cfbc2a533d2dcc37d538b2a1d7fbccb82401a0"
+}
+,{
+    "testCaseDescription": "go-select-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    8
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    8
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "14cfbc2a533d2dcc37d538b2a1d7fbccb82401a0",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b42f147df3e0f10fbec2bfe3b18f0860c381836f"
+}
+,{
+    "testCaseDescription": "go-select-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    8
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    8
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "b42f147df3e0f10fbec2bfe3b18f0860c381836f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "02b9acc3342d06662961d491085ac2530fe2c221"
+}
+,{
+    "testCaseDescription": "go-select-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                15
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                13
+                            ],
+                            "end": [
+                                5,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                13
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                13
+                            ],
+                            "end": [
+                                7,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'time' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'After' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                21
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                5
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '6'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                3
+                            ],
+                            "end": [
+                                10,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'default' communication_case"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                8
+                            ],
+                            "end": [
+                                14,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                15
+                            ],
+                            "end": [
+                                14,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                5
+                            ],
+                            "end": [
+                                15,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                13
+                            ],
+                            "end": [
+                                15,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                8
+                            ],
+                            "end": [
+                                16,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                13
+                            ],
+                            "end": [
+                                16,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                13
+                            ],
+                            "end": [
+                                17,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                10
+                            ],
+                            "end": [
+                                18,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'time' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                15
+                            ],
+                            "end": [
+                                18,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'After' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                21
+                            ],
+                            "end": [
+                                18,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                5
+                            ],
+                            "end": [
+                                19,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                13
+                            ],
+                            "end": [
+                                19,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '6'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                20,
+                                3
+                            ],
+                            "end": [
+                                20,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'default' communication_case"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                5
+                            ],
+                            "end": [
+                                21,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                8
+                            ],
+                            "end": [
+                                14,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                15
+                            ],
+                            "end": [
+                                14,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                5
+                            ],
+                            "end": [
+                                15,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                13
+                            ],
+                            "end": [
+                                15,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                8
+                            ],
+                            "end": [
+                                16,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                13
+                            ],
+                            "end": [
+                                16,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                13
+                            ],
+                            "end": [
+                                17,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                10
+                            ],
+                            "end": [
+                                18,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'time' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                15
+                            ],
+                            "end": [
+                                18,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'After' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                21
+                            ],
+                            "end": [
+                                18,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                5
+                            ],
+                            "end": [
+                                19,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                13
+                            ],
+                            "end": [
+                                19,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '6'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                3
+                            ],
+                            "end": [
+                                20,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'default' communication_case"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                5
+                            ],
+                            "end": [
+                                21,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "02b9acc3342d06662961d491085ac2530fe2c221",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6c6a95366675b8e11b7395e6b75aa4e964ac7eca"
+}
+,{
+    "testCaseDescription": "go-select-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    13,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "6c6a95366675b8e11b7395e6b75aa4e964ac7eca",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "ca78e3d64659a84d28a0bc8a5a13eac5bec6fd80"
+}
+,{
+    "testCaseDescription": "go-select-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "select-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                8
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                15
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                13
+                            ],
+                            "end": [
+                                5,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                13
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                13
+                            ],
+                            "end": [
+                                7,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'time' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                15
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'After' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                21
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                5
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'println' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '6'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                3
+                            ],
+                            "end": [
+                                10,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'default' communication_case"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "select-statements.go"
+    ],
+    "sha1": "ca78e3d64659a84d28a0bc8a5a13eac5bec6fd80",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "859416085db632582beeeb32e2a05ad85cd06bfe"
+}]

@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-const-declarations-insert-test",
+    "testCaseDescription": "go-array-with-implicit-length-insert-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "insert": {
@@ -12,7 +12,7 @@
                             ],
                             "end": [
                                 3,
-                                15
+                                29
                             ]
                         }
                     },
@@ -23,17 +23,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "3ba0c5fa5af4ff296115957cfdb1131de7c23097",
+    "sha1": "78815b5ab49f24e2d713cc04753cb3eb523f159e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "769d6b98d8e9c178d34cee5602e70e6787f89d61"
+    "sha2": "d047bdf0e8b8f8e68d1f4044c6a576cf4be7112d"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-replacement-insert-test",
+    "testCaseDescription": "go-array-with-implicit-length-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "insert": {
@@ -43,7 +43,7 @@
                             ],
                             "end": [
                                 3,
-                                22
+                                27
                             ]
                         }
                     },
@@ -58,7 +58,7 @@
                             ],
                             "end": [
                                 4,
-                                15
+                                29
                             ]
                         }
                     },
@@ -69,100 +69,58 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "769d6b98d8e9c178d34cee5602e70e6787f89d61",
+    "sha1": "d047bdf0e8b8f8e68d1f4044c6a576cf4be7112d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "280da57d4126b546277911bcdd364a94b10b8b4e"
+    "sha2": "0f79b1699ec4c99a06e390d177c52233987c3c6f"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-insert-test",
+    "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     3,
-                                    7
+                                    21
                                 ],
                                 "end": [
                                     3,
-                                    10
+                                    22
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    7
+                                    21
                                 ],
                                 "end": [
                                     3,
-                                    11
+                                    22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '4' with '1' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
                                 3,
-                                12
+                                24
                             ],
                             "end": [
                                 3,
-                                15
+                                25
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' identifier in the const zero = 0 variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    18
-                                ],
-                                "end": [
-                                    3,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    14
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Added '2' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -170,141 +128,183 @@
                             {
                                 "start": [
                                     3,
-                                    18
+                                    23
                                 ],
                                 "end": [
                                     3,
-                                    19
+                                    24
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    14
+                                    27
                                 ],
                                 "end": [
                                     3,
-                                    15
+                                    28
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '5' with '3' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                21
+                                25
                             ],
                             "end": [
                                 3,
-                                22
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Deleted '6' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    21
+                                ],
+                                "end": [
+                                    3,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    21
+                                ],
+                                "end": [
+                                    3,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '1' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                24
+                            ],
+                            "end": [
+                                3,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    23
+                                ],
+                                "end": [
+                                    3,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    27
+                                ],
+                                "end": [
+                                    3,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '3' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                25
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '6' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "280da57d4126b546277911bcdd364a94b10b8b4e",
+    "sha1": "0f79b1699ec4c99a06e390d177c52233987c3c6f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d08fdc76419200fa06087428523aea779817b797"
+    "sha2": "78b268ae2394d21ea94bb7dc13602c1d79a9852a"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-replacement-test",
+    "testCaseDescription": "go-array-with-implicit-length-replacement-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     3,
-                                    7
+                                    21
                                 ],
                                 "end": [
                                     3,
-                                    11
+                                    22
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    7
+                                    21
                                 ],
                                 "end": [
                                     3,
-                                    10
+                                    22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '1' with '4' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                12
+                                23
                             ],
                             "end": [
                                 3,
-                                15
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    14
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    18
-                                ],
-                                "end": [
-                                    3,
-                                    19
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '5' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -312,58 +312,142 @@
                             {
                                 "start": [
                                     3,
-                                    14
+                                    24
                                 ],
                                 "end": [
                                     3,
-                                    15
+                                    25
                                 ]
                             },
                             {
                                 "start": [
                                     3,
-                                    18
+                                    25
                                 ],
                                 "end": [
                                     3,
-                                    19
+                                    26
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '2' with '6' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                27
+                            ],
+                            "end": [
+                                3,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    21
+                                ],
+                                "end": [
+                                    3,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    21
+                                ],
+                                "end": [
+                                    3,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '4' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                21
+                                23
                             ],
                             "end": [
                                 3,
-                                22
+                                24
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '5' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    24
+                                ],
+                                "end": [
+                                    3,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    25
+                                ],
+                                "end": [
+                                    3,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '6' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                27
+                            ],
+                            "end": [
+                                3,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3' in the const a1 = [...]int{4,5,6} variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "d08fdc76419200fa06087428523aea779817b797",
+    "sha1": "78b268ae2394d21ea94bb7dc13602c1d79a9852a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "810e9f558045d9c115d2024c34957e588763b8ef"
+    "sha2": "0c805b04967c44d8f98233f6d231bd21f68654be"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-replacement-test",
+    "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "delete": {
@@ -373,7 +457,7 @@
                             ],
                             "end": [
                                 3,
-                                22
+                                27
                             ]
                         }
                     },
@@ -388,7 +472,7 @@
                             ],
                             "end": [
                                 4,
-                                15
+                                29
                             ]
                         }
                     },
@@ -403,7 +487,7 @@
                             ],
                             "end": [
                                 4,
-                                22
+                                27
                             ]
                         }
                     },
@@ -414,17 +498,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "810e9f558045d9c115d2024c34957e588763b8ef",
+    "sha1": "0c805b04967c44d8f98233f6d231bd21f68654be",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b03f91acbe84e07505cddad0634af413360e3b11"
+    "sha2": "371a6b797f1ba659ca6a0d9b6986c654cbfe52b9"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-test",
+    "testCaseDescription": "go-array-with-implicit-length-delete-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "delete": {
@@ -434,7 +518,7 @@
                             ],
                             "end": [
                                 3,
-                                15
+                                29
                             ]
                         }
                     },
@@ -445,17 +529,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "b03f91acbe84e07505cddad0634af413360e3b11",
+    "sha1": "371a6b797f1ba659ca6a0d9b6986c654cbfe52b9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c13f182011fe16b97b3fe1b158fa6bb5f29613dc"
+    "sha2": "23462bb72e52744afdc8539db1890c2550ee7b18"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-rest-test",
+    "testCaseDescription": "go-array-with-implicit-length-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "array-with-implicit-length.go": [
                 {
                     "span": {
                         "delete": {
@@ -465,7 +549,7 @@
                             ],
                             "end": [
                                 3,
-                                22
+                                27
                             ]
                         }
                     },
@@ -476,9 +560,9 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "array-with-implicit-length.go"
     ],
-    "sha1": "c13f182011fe16b97b3fe1b158fa6bb5f29613dc",
+    "sha1": "23462bb72e52744afdc8539db1890c2550ee7b18",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "952d1b46e882bdbb09783d3af1790bedba413106"
+    "sha2": "b1911fe4350922c55eefb0556333f591731b09f5"
 }]

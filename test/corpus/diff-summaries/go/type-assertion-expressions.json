@@ -1,0 +1,553 @@
+[{
+    "testCaseDescription": "go-type-assertion-expressions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "7490ff9bbea27103f87d0c85d597020fac40e3fb",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "2e54c39a203a08af7f999de0baf15580cbda1d22"
+}
+,{
+    "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "2e54c39a203a08af7f999de0baf15580cbda1d22",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "22f2edcdd3293a3a5648a936ebfdfbcdbcd98f4b"
+}
+,{
+    "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "22f2edcdd3293a3a5648a936ebfdfbcdbcd98f4b",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "d18ded6ee56355e185b7271655f6c9c4a0f06b52"
+}
+,{
+    "testCaseDescription": "go-type-assertion-expressions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "d18ded6ee56355e185b7271655f6c9c4a0f06b52",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "912f416d32efae6d1e0b302140e3e48e7f809ae9"
+}
+,{
+    "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Dog' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "912f416d32efae6d1e0b302140e3e48e7f809ae9",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "921e7de063daf1b99ca28bf11aa5d0fc498c8564"
+}
+,{
+    "testCaseDescription": "go-type-assertion-expressions-delete-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "921e7de063daf1b99ca28bf11aa5d0fc498c8564",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "a3d17d85bd58baf3bdcfa275043c37525bd00f6c"
+}
+,{
+    "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "sha1": "a3d17d85bd58baf3bdcfa275043c37525bd00f6c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b1ca59fb4507b74dc9cab04a07134ee7322b32e3"
+}]
