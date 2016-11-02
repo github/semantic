@@ -56,24 +56,19 @@ termConstructor source sourceSpan name range children = case (name, children) of
     toConsts constSpecs = do
       assignments' <- sequenceA $ toVarAssignment <$> constSpecs
       withDefaultInfo (S.Indexed assignments')
-    toVarAssignment constSpec = do
-      assignment <- case toList (unwrap constSpec) of
+    toVarAssignment constSpec =
+      case toList (unwrap constSpec) of
         [idList, expressionList] -> do
           assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
         [idList, _, expressionList] -> do
           assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
-        idList : rest -> do
-          identifier' <- case toList (unwrap idList) of
-            id : _ -> case toList (unwrap id) of
-              id : _ -> pure id
-              _ -> withCategory Error (S.Error [constSpec])
-            _ -> withCategory Error (S.Error [constSpec])
-          rest' <- withDefaultInfo (S.Indexed rest)
-          withDefaultInfo $ S.VarAssignment identifier' rest'
+        [idList] -> do
+           varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
+           withDefaultInfo (S.Indexed varDecls)
         _ -> withCategory Error (S.Error [constSpec])
-      pure assignment
+
     withCategory category syntax = do
       sourceSpan' <- sourceSpan
       pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)

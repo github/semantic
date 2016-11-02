@@ -46,21 +46,6 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
                     "summary": "Added the 'c' variable"
                 },
                 {
@@ -80,14 +65,32 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "df13073efcb8f965ff6d5685540fb138a889af76",
+    "sha1": "4d766735dd15224ac1bcc17eabb7b0fa9d7be774",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "65b2820a699128b930696dc3dff8797d56431340"
+    "sha2": "11b8f47c04c4bc2bbbfc2d70428f4e2d3782b7c4"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-insert-test",
@@ -123,21 +126,6 @@
                         }
                     },
                     "summary": "Added the 'c' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
                 },
                 {
                     "span": {
@@ -197,21 +185,6 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
-                                2
-                            ]
-                        }
-                    },
                     "summary": "Added the 'c' variable"
                 },
                 {
@@ -231,14 +204,47 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 12, column 1 - line 20, column 2"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "65b2820a699128b930696dc3dff8797d56431340",
+    "sha1": "11b8f47c04c4bc2bbbfc2d70428f4e2d3782b7c4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4ea869ea02c6dfd124982031f4205a653c1f6aec"
+    "sha2": "afb05f4a4edc3e67803bc4d6656df6d4ca307b25"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -300,21 +306,6 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
                     "summary": "Added the 'c' variable"
                 },
                 {
@@ -346,21 +337,6 @@
                         }
                     },
                     "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
                 },
                 {
                     "span": {
@@ -379,14 +355,47 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "4ea869ea02c6dfd124982031f4205a653c1f6aec",
+    "sha1": "afb05f4a4edc3e67803bc4d6656df6d4ca307b25",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "002be3c6de299ee091193db77121e9d61207732d"
+    "sha2": "96464d79943a21214bfc6b7d96d09e7624e81e0f"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -448,21 +457,6 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
                     "summary": "Added the 'c' variable"
                 },
                 {
@@ -479,21 +473,6 @@
                         }
                     },
                     "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
                 },
                 {
                     "span": {
@@ -527,14 +506,47 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "002be3c6de299ee091193db77121e9d61207732d",
+    "sha1": "96464d79943a21214bfc6b7d96d09e7624e81e0f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "555655fd7ae7f810b35ae690fc23f79504eb1461"
+    "sha2": "73b621ff94430dfb054644394a71a082411e4c2e"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -584,21 +596,6 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
                     "summary": "Deleted the 'c' variable"
                 },
                 {
@@ -630,21 +627,6 @@
                         }
                     },
                     "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
                 },
                 {
                     "span": {
@@ -719,7 +701,41 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                    "summary": "Added the 'c' variable"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 12, column 1 - line 20, column 2"
                 },
                 {
                     "span": {
@@ -734,18 +750,17 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 12, column 1 - line 20, column 2"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "555655fd7ae7f810b35ae690fc23f79504eb1461",
+    "sha1": "73b621ff94430dfb054644394a71a082411e4c2e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c66f3c693040e5f4f0b3480d134e4e894aa48d39"
+    "sha2": "0e66862ceef6496252a2c949378df93f5c561a08"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-test",
@@ -795,21 +810,6 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
                     "summary": "Deleted the 'c' variable"
                 },
                 {
@@ -829,14 +829,32 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "c66f3c693040e5f4f0b3480d134e4e894aa48d39",
+    "sha1": "0e66862ceef6496252a2c949378df93f5c561a08",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "33c67d59c3a7a77053b21ead1d433c9e07807474"
+    "sha2": "2e7ffdf9fee753cf6b3c6d4fa9b55f9c0eac874d"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-rest-test",
@@ -886,8 +904,12 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
-                },
+                    "summary": "Deleted the 'c' variable"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -901,16 +923,15 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' variable"
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "33c67d59c3a7a77053b21ead1d433c9e07807474",
+    "sha1": "2e7ffdf9fee753cf6b3c6d4fa9b55f9c0eac874d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "38ccdd438b20632ccbf96c0da5dc0baa489f04cb"
+    "sha2": "5cba78f3f371c7d668cbd9cde79f46b536b70505"
 }]
