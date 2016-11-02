@@ -238,6 +238,16 @@
         "syntax": "when",
         "insert": "case foo\nwhen bar\nend",
         "replacement": "case foo\nwhen bar\n  baz\nend"
+      },
+      {
+        "syntax": "case-when-else",
+        "insert": "case foo\nwhen bar\n  baz\nend",
+        "replacement": "case foo\nwhen bar\n  baz\nelse\n qoz\nend"
+      },
+      {
+        "syntax": "when-else",
+        "insert": "case foo\nwhen bar\n  baz\nelse\nend",
+        "replacement": "case foo\nwhen bar\n  baz\nelse\n qoz\nend"
       }
     ]
   }
