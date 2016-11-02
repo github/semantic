@@ -127,6 +127,11 @@
         "syntax": "float-literals",
         "insert": "f1 = 1.5\nf2 = 1.5e100\nf3 = 1.5e+50\nf4 = 1.5e-5\nf5 = .5e-50",
         "replacement": "f2 = 1.5\nf3 = 1.5e100\nf4 = 1.5e+50\nf5 = 1.5e-5\nf6 = .5e-50"
+      },
+      {
+        "syntax": "rune-literals",
+        "insert": "const (\na = '0'\nb = '\\''\nc = '\\\\'\nc = '\\n'\nc = '\\u0000'\nc = '\\U01234567'\n)",
+        "replacement": "const (\na = '1'\nb = '\\n''\nc = '\\u0011'\nc = '\\\\'\nc = '\\u0022'\nc = '\\U01234568'\n)"
       }
     ]
   }
