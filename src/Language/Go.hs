@@ -61,7 +61,9 @@ termConstructor source sourceSpan name range children = case (name, children) of
         [idList, expressionList] -> do
           assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
-
+        [idList, _, expressionList] -> do
+          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+          withDefaultInfo (S.Indexed assignments')
         idList : rest -> do
           identifier' <- case toList (unwrap idList) of
             id : _ -> case toList (unwrap id) of

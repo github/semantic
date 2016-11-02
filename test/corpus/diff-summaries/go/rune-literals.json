@@ -85,9 +85,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "3fd67193a47bbc9b299a42a4bd28fcd935c56d5e",
+    "sha1": "df13073efcb8f965ff6d5685540fb138a889af76",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1e193239a3788429d3e0a299a4f02731ee29056f"
+    "sha2": "65b2820a699128b930696dc3dff8797d56431340"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-insert-test",
@@ -236,9 +236,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "1e193239a3788429d3e0a299a4f02731ee29056f",
+    "sha1": "65b2820a699128b930696dc3dff8797d56431340",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "328c19c30234a77c09f93541ecf0d0bdf69f81a7"
+    "sha2": "4ea869ea02c6dfd124982031f4205a653c1f6aec"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -384,9 +384,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "328c19c30234a77c09f93541ecf0d0bdf69f81a7",
+    "sha1": "4ea869ea02c6dfd124982031f4205a653c1f6aec",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6c5f4c1a07010bb8402a15c897e3d69911f1b9e4"
+    "sha2": "002be3c6de299ee091193db77121e9d61207732d"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -532,9 +532,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "6c5f4c1a07010bb8402a15c897e3d69911f1b9e4",
+    "sha1": "002be3c6de299ee091193db77121e9d61207732d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8e34404408c453aa999b149828e37425929b87fb"
+    "sha2": "555655fd7ae7f810b35ae690fc23f79504eb1461"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -743,9 +743,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "8e34404408c453aa999b149828e37425929b87fb",
+    "sha1": "555655fd7ae7f810b35ae690fc23f79504eb1461",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "82ae383f4866dff8bb3addcf91baa8b4bba5cef4"
+    "sha2": "c66f3c693040e5f4f0b3480d134e4e894aa48d39"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-test",
@@ -834,9 +834,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "82ae383f4866dff8bb3addcf91baa8b4bba5cef4",
+    "sha1": "c66f3c693040e5f4f0b3480d134e4e894aa48d39",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6013a658cb8d7a545a170a758678d0417e61b5cf"
+    "sha2": "33c67d59c3a7a77053b21ead1d433c9e07807474"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-rest-test",
@@ -910,7 +910,7 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "6013a658cb8d7a545a170a758678d0417e61b5cf",
+    "sha1": "33c67d59c3a7a77053b21ead1d433c9e07807474",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f765e19c1f374834a9ea6263c7814bed1c8375b1"
+    "sha2": "38ccdd438b20632ccbf96c0da5dc0baa489f04cb"
 }]
