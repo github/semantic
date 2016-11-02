@@ -1,8 +1,7 @@
 [{
     "testCaseDescription": "go-var-declarations-with-no-expressions-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
@@ -17,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var zero int' at line 3, column 1 - line 3, column 13"
+                    "summary": "Added the 'zero' variable"
                 },
                 {
                     "span": {
@@ -32,23 +31,38 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var one, two uint64' at line 4, column 1 - line 4, column 20"
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "5ba058d206fea7bd4c1befa2733f1aee48c10845",
+    "sha1": "1f72af0f7bd142e7e1b681905051101a96b33b55",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b14ca734516dcfed9379c736ebebb29f9972f957"
+    "sha2": "cffdfb6e4a32a36f35707252c00feffa9510e70f"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
@@ -63,7 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var a int' at line 3, column 1 - line 3, column 10"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -78,7 +92,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var b, c uint64' at line 4, column 1 - line 4, column 16"
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
                 },
                 {
                     "span": {
@@ -93,7 +122,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var zero int' at line 5, column 1 - line 5, column 13"
+                    "summary": "Added the 'zero' variable"
                 },
                 {
                     "span": {
@@ -108,17 +137,33 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var one, two uint64' at line 6, column 1 - line 6, column 20"
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "b14ca734516dcfed9379c736ebebb29f9972f957",
+    "sha1": "cffdfb6e4a32a36f35707252c00feffa9510e70f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bba27766f255f2b5a92b394b602081b80ede1de8"
+    "sha2": "530ccfcac935fccc104c9913ab0a4c8b818c649f"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
@@ -213,9 +258,9 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "bba27766f255f2b5a92b394b602081b80ede1de8",
+    "sha1": "530ccfcac935fccc104c9913ab0a4c8b818c649f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b2424b245f9fe2ed05c50890d2661a47a5b975c7"
+    "sha2": "ad792d386051642e0298226334046842f8b5b911"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
@@ -310,15 +355,14 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "b2424b245f9fe2ed05c50890d2661a47a5b975c7",
+    "sha1": "ad792d386051642e0298226334046842f8b5b911",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d2f0a9e27bac393e09784a3578e4fa850be3ef3c"
+    "sha2": "c989e336998c7dee4ad51facdf14a46659995944"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
@@ -333,7 +377,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var a int' at line 3, column 1 - line 3, column 10"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -348,7 +392,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var b, c uint64' at line 4, column 1 - line 4, column 16"
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
                 },
                 {
                     "span": {
@@ -363,7 +422,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var zero int' at line 5, column 1 - line 5, column 13"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
@@ -378,7 +437,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var one, two uint64' at line 6, column 1 - line 6, column 20"
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
                 },
                 {
                     "span": {
@@ -393,7 +467,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var a int' at line 5, column 1 - line 5, column 10"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -408,23 +482,38 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var b, c uint64' at line 6, column 1 - line 6, column 16"
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "d2f0a9e27bac393e09784a3578e4fa850be3ef3c",
+    "sha1": "c989e336998c7dee4ad51facdf14a46659995944",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "63c1a26fb56c1e8d2621bd8dbebbf2bfdfbf9305"
+    "sha2": "404811dd70c51d06eeee227a19351ef3d97f7357"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
@@ -439,7 +528,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var zero int' at line 3, column 1 - line 3, column 13"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
@@ -454,23 +543,38 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var one, two uint64' at line 4, column 1 - line 4, column 20"
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "63c1a26fb56c1e8d2621bd8dbebbf2bfdfbf9305",
+    "sha1": "404811dd70c51d06eeee227a19351ef3d97f7357",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ee7effe87c0354f43f84734b6afb5a22a4fa2088"
+    "sha2": "e159f4e131b6a677569a5809e61fa60e4c30fac1"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-rest-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
@@ -485,7 +589,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var a int' at line 3, column 1 - line 3, column 10"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -500,15 +604,31 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var b, c uint64' at line 4, column 1 - line 4, column 16"
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "ee7effe87c0354f43f84734b6afb5a22a4fa2088",
+    "sha1": "e159f4e131b6a677569a5809e61fa60e4c30fac1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bb972d7b16f83f5de5b8bb012c01be4e1898a145"
+    "sha2": "db902f28676fff4a3536270ca9d547c0b7184e7f"
 }]

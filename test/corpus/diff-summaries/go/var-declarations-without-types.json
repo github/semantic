@@ -1,8 +1,7 @@
 [{
     "testCaseDescription": "go-var-declarations-without-types-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-without-types.go": [
                 {
                     "span": {
@@ -17,23 +16,23 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var zero = 0' at line 3, column 1 - line 3, column 13"
+                    "summary": "Added the 'zero' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "880bfa2c2bc8413b804481f0bc4846bd177845a7",
+    "sha1": "63d7b5cffd3cba40f16b9b5b405592cb05fa0986",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e83fa4fe2154918a23f6491fe812d66dac4430ef"
+    "sha2": "25f218cf008d7b3824d5a9d51655d0a4e34bf9b8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-replacement-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-without-types.go": [
                 {
                     "span": {
@@ -48,7 +47,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var one, two = 1, 2' at line 3, column 1 - line 3, column 20"
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
                 },
                 {
                     "span": {
@@ -63,17 +77,18 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var zero = 0' at line 4, column 1 - line 4, column 13"
+                    "summary": "Added the 'zero' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "e83fa4fe2154918a23f6491fe812d66dac4430ef",
+    "sha1": "25f218cf008d7b3824d5a9d51655d0a4e34bf9b8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f83f9e77d56c763ae628fe9922992fe2e591df44"
+    "sha2": "ff7e9a0c1813d39cc3078dd33dbcce2f34189d2c"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-insert-test",
@@ -105,22 +120,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                10
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' identifier"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -147,14 +147,14 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0'"
+                    "summary": "Replaced '1' with '0' in the zero variable of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                19
+                                1
                             ],
                             "end": [
                                 3,
@@ -162,7 +162,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'two' variable"
                 }
             ]
         },
@@ -171,9 +171,9 @@
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "f83f9e77d56c763ae628fe9922992fe2e591df44",
+    "sha1": "ff7e9a0c1813d39cc3078dd33dbcce2f34189d2c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "991a170a83aa7c8e7bd2fe418c2ee3f85db94c86"
+    "sha2": "b7851cd542d8ae28a62401c41a017e8cd68bfd70"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-replacement-test",
@@ -205,22 +205,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                10
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' identifier"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -247,14 +232,14 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1'"
+                    "summary": "Replaced '0' with '1' in the one variable of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                19
+                                1
                             ],
                             "end": [
                                 3,
@@ -262,7 +247,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'two' variable"
                 }
             ]
         },
@@ -271,15 +256,14 @@
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "991a170a83aa7c8e7bd2fe418c2ee3f85db94c86",
+    "sha1": "b7851cd542d8ae28a62401c41a017e8cd68bfd70",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "49a776ba48c0be7203926ef870d52c2f42e29a07"
+    "sha2": "030444d2f66691d89711bb77f7bd6607b97585ea"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-without-types.go": [
                 {
                     "span": {
@@ -294,7 +278,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var one, two = 1, 2' at line 3, column 1 - line 3, column 20"
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
                 },
                 {
                     "span": {
@@ -309,7 +308,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var zero = 0' at line 4, column 1 - line 4, column 13"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
@@ -324,23 +323,38 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var one, two = 1, 2' at line 4, column 1 - line 4, column 20"
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "49a776ba48c0be7203926ef870d52c2f42e29a07",
+    "sha1": "030444d2f66691d89711bb77f7bd6607b97585ea",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bf822e5d9ae3b1a815c0b405b11299a05bc3169e"
+    "sha2": "fe1e46d4acfdc6d8aeb253cfac5653d72d28ced2"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-without-types.go": [
                 {
                     "span": {
@@ -355,23 +369,23 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var zero = 0' at line 3, column 1 - line 3, column 13"
+                    "summary": "Deleted the 'zero' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "bf822e5d9ae3b1a815c0b405b11299a05bc3169e",
+    "sha1": "fe1e46d4acfdc6d8aeb253cfac5653d72d28ced2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9c54231ebacf7134deb2350f6b3226ea8f6ccf8a"
+    "sha2": "66686fc149e9f8bbfdc64fca6862c7c206296485"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-rest-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "var-declarations-without-types.go": [
                 {
                     "span": {
@@ -386,15 +400,31 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var one, two = 1, 2' at line 3, column 1 - line 3, column 20"
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "var-declarations-without-types.go"
     ],
-    "sha1": "9c54231ebacf7134deb2350f6b3226ea8f6ccf8a",
+    "sha1": "66686fc149e9f8bbfdc64fca6862c7c206296485",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0cc1737dde7317d9002938f28539ee9c98893f3e"
+    "sha2": "debc872db2d293a8c49912748e11fffbc8bd364c"
 }]

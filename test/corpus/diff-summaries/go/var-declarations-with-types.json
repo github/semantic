@@ -31,7 +31,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var one, two uint64 = 1, 2' variable"
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
                 }
             ]
         },
@@ -40,9 +55,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "0cc1737dde7317d9002938f28539ee9c98893f3e",
+    "sha1": "debc872db2d293a8c49912748e11fffbc8bd364c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a663d5d52e0f158cf13ba46fb83af4479903b20f"
+    "sha2": "3aa15a789024345d7cad67cc741962b878912d72"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-insert-test",
@@ -77,7 +92,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var b, c uint64 = 1, 2' variable"
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
                 },
                 {
                     "span": {
@@ -107,7 +137,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var one, two uint64 = 1, 2' variable"
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
                 }
             ]
         },
@@ -116,9 +161,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "a663d5d52e0f158cf13ba46fb83af4479903b20f",
+    "sha1": "3aa15a789024345d7cad67cc741962b878912d72",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "598ba6a4a47b6de5d98190b2de77bedff8ee76c9"
+    "sha2": "5efc7797ee32830133446f9c7a801921cd5c06f2"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -177,7 +222,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -204,7 +249,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the two variable of the 'main' module"
                 }
             ]
         },
@@ -213,9 +258,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "598ba6a4a47b6de5d98190b2de77bedff8ee76c9",
+    "sha1": "5efc7797ee32830133446f9c7a801921cd5c06f2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4d095ce859b7633657c461a4a404475ea6328b86"
+    "sha2": "614420465a235fb6b37245f4f4f4a1ab7a5f93c8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -274,7 +319,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -301,7 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the c variable of the 'main' module"
                 }
             ]
         },
@@ -310,9 +355,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "4d095ce859b7633657c461a4a404475ea6328b86",
+    "sha1": "614420465a235fb6b37245f4f4f4a1ab7a5f93c8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "80e07c0bcfcff799da848ca8fcae797d62ad1db3"
+    "sha2": "f8405516babd56a27e6de7189fb618b2e87fca17"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -347,7 +392,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var b, c uint64 = 1, 2' variable"
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
                 },
                 {
                     "span": {
@@ -377,7 +437,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var one, two uint64 = 1, 2' variable"
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
                 },
                 {
                     "span": {
@@ -407,7 +482,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var b, c uint64 = 1, 2' variable"
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
                 }
             ]
         },
@@ -416,9 +506,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "80e07c0bcfcff799da848ca8fcae797d62ad1db3",
+    "sha1": "f8405516babd56a27e6de7189fb618b2e87fca17",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "20c4e14eec5eb51358e8b5bdaff94f2998e81da6"
+    "sha2": "58a8a294f952619ac35debabd27058a220038c7f"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-test",
@@ -453,7 +543,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var one, two uint64 = 1, 2' variable"
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
                 }
             ]
         },
@@ -462,9 +567,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "20c4e14eec5eb51358e8b5bdaff94f2998e81da6",
+    "sha1": "58a8a294f952619ac35debabd27058a220038c7f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "60dcbc6d77a3a5cc1d736b1e24b5cfb5674daf6e"
+    "sha2": "965c812c934135f25b95aa9b16aa247efd7ba2f8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-rest-test",
@@ -499,7 +604,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var b, c uint64 = 1, 2' variable"
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
                 }
             ]
         },
@@ -508,7 +628,7 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "60dcbc6d77a3a5cc1d736b1e24b5cfb5674daf6e",
+    "sha1": "965c812c934135f25b95aa9b16aa247efd7ba2f8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5ba058d206fea7bd4c1befa2733f1aee48c10845"
+    "sha2": "1f72af0f7bd142e7e1b681905051101a96b33b55"
 }]
