@@ -137,6 +137,11 @@
         "syntax": "imaginary-literals",
         "insert": "const (\na = 01i\nb = 1.e+100i\n)",
         "replacement": "const (\na = 02i\nb = 1.e+103i\n)"
+      },
+      {
+        "syntax": "string-literals",
+        "insert": "const (\na = \"0\"\nb = \"hello world\"\n)",
+        "replacement": "const (\na = \"2\"\nb = \"hi\"\n)"
       }
     ]
   }

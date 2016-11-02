@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-function-literal-insert-test",
+    "testCaseDescription": "go-imaginary-literals-insert-test",
     "expectedResult": {
         "changes": {
-            "function-literal.go": [
+            "imaginary-literals.go": [
                 {
                     "span": {
                         "insert": {
@@ -11,53 +11,7 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'variable' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-literal.go"
-    ],
-    "sha1": "b8bae5c65a680232431ad8af160a9344913ff879",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "ab4502bcbae11318d6d845fd10f5170255a2b0ef"
-}
-,{
-    "testCaseDescription": "go-function-literal-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "function-literal.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'variable' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 6,
-                                1
-                            ],
-                            "end": [
-                                8,
                                 2
                             ]
                         }
@@ -69,265 +23,311 @@
         "errors": {}
     },
     "filePaths": [
-        "function-literal.go"
+        "imaginary-literals.go"
     ],
-    "sha1": "ab4502bcbae11318d6d845fd10f5170255a2b0ef",
+    "sha1": "a77421daec2a2b057cbc6c4600168313f7967363",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a60da85b6bcbbba5e831c6b4766e1350784ed74b"
+    "sha2": "86512f969d13ad48e74788a6666cb382d4d100a8"
 }
 ,{
-    "testCaseDescription": "go-function-literal-delete-insert-test",
+    "testCaseDescription": "go-imaginary-literals-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "function-literal.go": [
+            "imaginary-literals.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    17
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    17
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Added the 'variable' variable"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    19
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    19
-                                ],
-                                "end": [
-                                    3,
-                                    25
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    17
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    17
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    19
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    19
-                                ],
-                                "end": [
-                                    3,
-                                    25
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Added the 'variable' variable"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-literal.go"
+        "imaginary-literals.go"
     ],
-    "sha1": "a60da85b6bcbbba5e831c6b4766e1350784ed74b",
+    "sha1": "86512f969d13ad48e74788a6666cb382d4d100a8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9d116b312a9e4453ef8f2831ca65bfa64391b015"
+    "sha2": "452042aace37723f34917396ee4f38d1e9f0df87"
 }
 ,{
-    "testCaseDescription": "go-function-literal-replacement-test",
+    "testCaseDescription": "go-imaginary-literals-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "function-literal.go": [
+            "imaginary-literals.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    17
+                                    4,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    18
+                                    4,
+                                    8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    17
+                                    4,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    18
+                                    4,
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    19
+                                    4,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    25
+                                    4,
+                                    8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    19
+                                    4,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    22
+                                    4,
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    17
+                                    5,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    18
+                                    5,
+                                    13
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    17
+                                    5,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    18
+                                    5,
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    19
+                                    5,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    25
+                                    5,
+                                    13
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
-                                    19
+                                    5,
+                                    5
                                 ],
                                 "end": [
-                                    3,
-                                    22
+                                    5,
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "function-literal.go"
+        "imaginary-literals.go"
     ],
-    "sha1": "9d116b312a9e4453ef8f2831ca65bfa64391b015",
+    "sha1": "452042aace37723f34917396ee4f38d1e9f0df87",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8953c6516ddc59cf21ff7aa306b880ca30f5ae7c"
+    "sha2": "046dfbd242abaa9537a400db74cfe6f37add22e1"
 }
 ,{
-    "testCaseDescription": "go-function-literal-delete-replacement-test",
+    "testCaseDescription": "go-imaginary-literals-replacement-test",
     "expectedResult": {
         "changes": {
-            "function-literal.go": [
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "sha1": "046dfbd242abaa9537a400db74cfe6f37add22e1",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "bb06ccc4c6591acf444a6916f0f98ed207ec90e8"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -336,7 +336,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
@@ -347,11 +347,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                7,
                                 1
                             ],
                             "end": [
-                                8,
+                                10,
                                 2
                             ]
                         }
@@ -362,11 +362,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                7,
                                 1
                             ],
                             "end": [
-                                8,
+                                10,
                                 2
                             ]
                         }
@@ -378,17 +378,17 @@
         "errors": {}
     },
     "filePaths": [
-        "function-literal.go"
+        "imaginary-literals.go"
     ],
-    "sha1": "8953c6516ddc59cf21ff7aa306b880ca30f5ae7c",
+    "sha1": "bb06ccc4c6591acf444a6916f0f98ed207ec90e8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f1c8413582c416c6d6b94569769eee53d294cd92"
+    "sha2": "89eb47193ee859728fc3c4fabea1b7b9912a5f67"
 }
 ,{
-    "testCaseDescription": "go-function-literal-delete-test",
+    "testCaseDescription": "go-imaginary-literals-delete-test",
     "expectedResult": {
         "changes": {
-            "function-literal.go": [
+            "imaginary-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -397,7 +397,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
@@ -409,17 +409,17 @@
         "errors": {}
     },
     "filePaths": [
-        "function-literal.go"
+        "imaginary-literals.go"
     ],
-    "sha1": "f1c8413582c416c6d6b94569769eee53d294cd92",
+    "sha1": "89eb47193ee859728fc3c4fabea1b7b9912a5f67",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "19ef69cf23b606fd52a7196e2ad1548d714872c3"
+    "sha2": "cbb1ce832b2672cf54933256e2dc4271641f52ad"
 }
 ,{
-    "testCaseDescription": "go-function-literal-delete-rest-test",
+    "testCaseDescription": "go-imaginary-literals-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "function-literal.go": [
+            "imaginary-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -428,7 +428,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
@@ -440,9 +440,9 @@
         "errors": {}
     },
     "filePaths": [
-        "function-literal.go"
+        "imaginary-literals.go"
     ],
-    "sha1": "19ef69cf23b606fd52a7196e2ad1548d714872c3",
+    "sha1": "cbb1ce832b2672cf54933256e2dc4271641f52ad",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "18f2b685e29d85628a72a3d738da1c5c2cc9b4c2"
+    "sha2": "5ded7c6ce2cb364f7b9b0a77fc5631267d11fa2a"
 }]

@@ -1,0 +1,685 @@
+[{
+    "testCaseDescription": "go-rune-literals-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "69edfee9027a1881ebab28527523326018fa4953",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "25653229651369857a3c7ee329638397b9bae288"
+}
+,{
+    "testCaseDescription": "go-rune-literals-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "25653229651369857a3c7ee329638397b9bae288",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "40cce5549e396facdab6d6ba6ac33a0c67b633df"
+}
+,{
+    "testCaseDescription": "go-rune-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    1
+                                ],
+                                "end": [
+                                    9,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'c' identifier in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    5
+                                ],
+                                "end": [
+                                    9,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''1'' rune_literal with the ''\\u0000'' rune_literal in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    5
+                                ],
+                                "end": [
+                                    9,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''1'' rune_literal with the ''\\u0000'' rune_literal in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "40cce5549e396facdab6d6ba6ac33a0c67b633df",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4f27a3ceb34020458b2b4cfa501078ffc701b71b"
+}
+,{
+    "testCaseDescription": "go-rune-literals-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the ''\nc' identifier in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    5
+                                ],
+                                "end": [
+                                    7,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''0'' rune_literal with the ''\\u0011'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    5
+                                ],
+                                "end": [
+                                    7,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''0'' rune_literal with the ''\\u0011'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    1
+                                ],
+                                "end": [
+                                    10,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    5
+                                ],
+                                "end": [
+                                    10,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''\\''' rune_literal with the ''\\U01234568'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    10,
+                                    5
+                                ],
+                                "end": [
+                                    10,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''\\''' rune_literal with the ''\\U01234568'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "4f27a3ceb34020458b2b4cfa501078ffc701b71b",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "9d2992d75be448c79f2dccdf9301f3c3b893db3a"
+}
+,{
+    "testCaseDescription": "go-rune-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "9d2992d75be448c79f2dccdf9301f3c3b893db3a",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "f358d1ef8634f582948b54df5c49c18c70fc6da6"
+}
+,{
+    "testCaseDescription": "go-rune-literals-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "f358d1ef8634f582948b54df5c49c18c70fc6da6",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "80bbf801377db4d41658f37c2c4d8ecc6aeb135d"
+}
+,{
+    "testCaseDescription": "go-rune-literals-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "sha1": "80bbf801377db4d41658f37c2c4d8ecc6aeb135d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "da9cdd2791960f8ef5a1a9a75bec48eaf970b990"
+}]

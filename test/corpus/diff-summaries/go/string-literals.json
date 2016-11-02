@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-int-literal-insert-test",
+    "testCaseDescription": "go-string-literals-insert-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "string-literals.go": [
                 {
                     "span": {
                         "insert": {
@@ -11,53 +11,7 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'variable' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "int-literal.go"
-    ],
-    "sha1": "c517d0acb98bcbef49c0f5bf480fbb868ee06ae3",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "b1ab0ddb550e59aa69a13090c8251fd602556adc"
-}
-,{
-    "testCaseDescription": "go-int-literal-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "int-literal.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'variable' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 6,
-                                1
-                            ],
-                            "end": [
-                                8,
                                 2
                             ]
                         }
@@ -69,43 +23,89 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "string-literals.go"
     ],
-    "sha1": "b1ab0ddb550e59aa69a13090c8251fd602556adc",
+    "sha1": "e82156957bedcd762ee0f550be2cb692c8cfe195",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1310e8dddb038c25e103bd20478fc6f309cb3e83"
+    "sha2": "264b7fdb718e102df813c94e37d1a6494f841f5e"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-insert-test",
+    "testCaseDescription": "go-string-literals-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "string-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'variable' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string-literals.go"
+    ],
+    "sha1": "264b7fdb718e102df813c94e37d1a6494f841f5e",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "111c464fc69ff2b032586b1a43ffce836e8581be"
+}
+,{
+    "testCaseDescription": "go-string-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string-literals.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     4,
-                                    12
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    8
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    12
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the \"2\" string with the \"0\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -113,69 +113,123 @@
                             {
                                 "start": [
                                     4,
-                                    19
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    20
+                                    8
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    19
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    20
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the \"2\" string with the \"0\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "string-literals.go"
     ],
-    "sha1": "1310e8dddb038c25e103bd20478fc6f309cb3e83",
+    "sha1": "111c464fc69ff2b032586b1a43ffce836e8581be",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bc2f43c485e347789faba38ce487203241701051"
+    "sha2": "8ee6d9620b597f728fde95ce4f243480996f2f8a"
 }
 ,{
-    "testCaseDescription": "go-int-literal-replacement-test",
+    "testCaseDescription": "go-string-literals-replacement-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "string-literals.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     4,
-                                    12
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    8
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    12
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the \"0\" string with the \"2\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -183,43 +237,97 @@
                             {
                                 "start": [
                                     4,
-                                    19
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    20
+                                    8
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    19
+                                    5
                                 ],
                                 "end": [
                                     4,
-                                    20
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the \"0\" string with the \"2\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "string-literals.go"
     ],
-    "sha1": "bc2f43c485e347789faba38ce487203241701051",
+    "sha1": "8ee6d9620b597f728fde95ce4f243480996f2f8a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5d240ff1e1cba4e0ca92438b25b6c5cb806eb08a"
+    "sha2": "1440e905cbe8446911909fb14761372b8f01c91e"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-replacement-test",
+    "testCaseDescription": "go-string-literals-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "string-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -228,7 +336,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
@@ -239,11 +347,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                7,
                                 1
                             ],
                             "end": [
-                                8,
+                                10,
                                 2
                             ]
                         }
@@ -254,11 +362,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                7,
                                 1
                             ],
                             "end": [
-                                8,
+                                10,
                                 2
                             ]
                         }
@@ -270,17 +378,17 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "string-literals.go"
     ],
-    "sha1": "5d240ff1e1cba4e0ca92438b25b6c5cb806eb08a",
+    "sha1": "1440e905cbe8446911909fb14761372b8f01c91e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1dbfbb5f4aced649905ed0a192447be057d934f0"
+    "sha2": "6a90535f6a3c434f93d4ef097bebc733045f2393"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-test",
+    "testCaseDescription": "go-string-literals-delete-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "string-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -289,7 +397,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
@@ -301,17 +409,17 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "string-literals.go"
     ],
-    "sha1": "1dbfbb5f4aced649905ed0a192447be057d934f0",
+    "sha1": "6a90535f6a3c434f93d4ef097bebc733045f2393",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d692e806304dc58ba02846cc831eef017e6c1e56"
+    "sha2": "bbb95085c906a4fbba0783fe6d268a64d145e051"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-rest-test",
+    "testCaseDescription": "go-string-literals-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "string-literals.go": [
                 {
                     "span": {
                         "delete": {
@@ -320,7 +428,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
@@ -332,9 +440,9 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "string-literals.go"
     ],
-    "sha1": "d692e806304dc58ba02846cc831eef017e6c1e56",
+    "sha1": "bbb95085c906a4fbba0783fe6d268a64d145e051",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8f13696c49fad55aab85d6533dd781bf28a01fc7"
+    "sha2": "da6ba76c0e36f88a7c6255a43bfccca89a6e85ea"
 }]
