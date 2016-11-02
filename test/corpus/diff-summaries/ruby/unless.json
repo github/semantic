@@ -25,9 +25,9 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "0e62e928c71f53e67a74423a229b59f2c43c4ff1",
+    "sha1": "4d1e872d4f7e282f5904bb57c2093a74ccbbebf2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "54cd53fa306130753ad60013aaac3e08c444eee8"
+    "sha2": "d27597a1f9e2117a042bc3b3fc30b569f80556fd"
 }
 ,{
     "testCaseDescription": "ruby-unless-replacement-insert-test",
@@ -86,9 +86,9 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "54cd53fa306130753ad60013aaac3e08c444eee8",
+    "sha1": "d27597a1f9e2117a042bc3b3fc30b569f80556fd",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "01cf5c615c3b4fec25a486c16506e5d5548059c5"
+    "sha2": "4b4401af331c83374b89e5c75800b3674bfaec96"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-insert-test",
@@ -153,16 +153,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                3
+                                3,
+                                1
                             ],
                             "end": [
-                                4,
-                                6
+                                5,
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 'bat' identifier"
+                    "summary": "Added an else block"
                 },
                 {
                     "span": {
@@ -186,9 +186,9 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "01cf5c615c3b4fec25a486c16506e5d5548059c5",
+    "sha1": "4b4401af331c83374b89e5c75800b3674bfaec96",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "51517b9e75ca318ce36c8871594bf2d90e23ef21"
+    "sha2": "d8805a48c72674afaed694c37593465218485333"
 }
 ,{
     "testCaseDescription": "ruby-unless-replacement-test",
@@ -253,16 +253,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                3
+                                3,
+                                1
                             ],
                             "end": [
-                                4,
-                                6
+                                5,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bat' identifier"
+                    "summary": "Deleted an else block"
                 },
                 {
                     "span": {
@@ -286,9 +286,9 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "51517b9e75ca318ce36c8871594bf2d90e23ef21",
+    "sha1": "d8805a48c72674afaed694c37593465218485333",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5bd7e958226f61794ac3433ef4c52bb6c7d6e868"
+    "sha2": "b511bbeae76feabb464f4d2c26b040c69839009a"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-replacement-test",
@@ -317,9 +317,9 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "5bd7e958226f61794ac3433ef4c52bb6c7d6e868",
+    "sha1": "b511bbeae76feabb464f4d2c26b040c69839009a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3d57c40457ac55fbdf650f5bb7b2955d50e866a2"
+    "sha2": "9661099b4f9b40467e0e2736e04a34ec85b7a742"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-test",
@@ -348,9 +348,9 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "3d57c40457ac55fbdf650f5bb7b2955d50e866a2",
+    "sha1": "9661099b4f9b40467e0e2736e04a34ec85b7a742",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8ec66f369586a4af74b230436d5737f54bcefc72"
+    "sha2": "7bc17f8aa6ab06f14d731175d5c8d5dedaa8ea9b"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-rest-test",
@@ -394,7 +394,7 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "8ec66f369586a4af74b230436d5737f54bcefc72",
+    "sha1": "7bc17f8aa6ab06f14d731175d5c8d5dedaa8ea9b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "71b6ea047c38fa803b820d3d5b9bcffe1a7e45c3"
+    "sha2": "c6074d2900bc75792281ccca5e4cf1385ffd61f4"
 }]

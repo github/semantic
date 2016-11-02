@@ -25,9 +25,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "662fccf89bd39a15900856298a1465bf2a88811f",
+    "sha1": "47b6616835e1b178e9cd9191c1259fcfcbb7aab3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c1d891b5dde86165cdd9cc56844ed76ad894f596"
+    "sha2": "eb80253d00eb9a4187c5ece2b00f8977a83f46fb"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-insert-test",
@@ -86,9 +86,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "c1d891b5dde86165cdd9cc56844ed76ad894f596",
+    "sha1": "eb80253d00eb9a4187c5ece2b00f8977a83f46fb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "222f026c2ec101bcff5e740ee130407e63d536d1"
+    "sha2": "ef60e4a5ed805bef8225af98c89faf70006fa392"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-insert-test",
@@ -183,16 +183,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                3
+                                5,
+                                1
                             ],
                             "end": [
-                                6,
-                                6
+                                7,
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 'bat' identifier"
+                    "summary": "Added an else block"
                 },
                 {
                     "span": {
@@ -216,9 +216,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "222f026c2ec101bcff5e740ee130407e63d536d1",
+    "sha1": "ef60e4a5ed805bef8225af98c89faf70006fa392",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bcd03dee391efa42a2ef44976f167e75deacb882"
+    "sha2": "09b5b42107d0eb08903884b9d68eb610895222f5"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-test",
@@ -313,16 +313,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
-                                3
+                                5,
+                                1
                             ],
                             "end": [
-                                6,
-                                6
+                                7,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bat' identifier"
+                    "summary": "Deleted an else block"
                 },
                 {
                     "span": {
@@ -346,9 +346,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "bcd03dee391efa42a2ef44976f167e75deacb882",
+    "sha1": "09b5b42107d0eb08903884b9d68eb610895222f5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5d074e53ba8f92574242ea397b06b5d1a57894ba"
+    "sha2": "fc5bf170f600299d00bf2812ba3612cd2bf0778a"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-replacement-test",
@@ -377,9 +377,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "5d074e53ba8f92574242ea397b06b5d1a57894ba",
+    "sha1": "fc5bf170f600299d00bf2812ba3612cd2bf0778a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f0fab5a5cae0117c7262aa1839739da9c153f214"
+    "sha2": "ceba7b50c2ba6b2493a0b09ae0c2a394a8a3e56b"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-test",
@@ -408,9 +408,9 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "f0fab5a5cae0117c7262aa1839739da9c153f214",
+    "sha1": "ceba7b50c2ba6b2493a0b09ae0c2a394a8a3e56b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dc09bed9471bfb13127c7899fb02735f4fdfae07"
+    "sha2": "ffc5bf82a50419a853f01325ef94d5f73927a44c"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-rest-test",
@@ -454,7 +454,7 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "dc09bed9471bfb13127c7899fb02735f4fdfae07",
+    "sha1": "ffc5bf82a50419a853f01325ef94d5f73927a44c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0e62e928c71f53e67a74423a229b59f2c43c4ff1"
+    "sha2": "4d1e872d4f7e282f5904bb57c2093a74ccbbebf2"
 }]

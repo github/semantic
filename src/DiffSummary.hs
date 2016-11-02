@@ -54,6 +54,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
           S.Begin{} -> Identifiable
+          S.Else{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -251,6 +252,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
   where
     identifiableDoc (c, t) = case c of
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
+      C.Else -> "in an" <+> catName c
       C.Begin -> "in a" <+> catName c
       _ -> "in the" <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c

@@ -198,6 +198,11 @@
         "syntax": "begin-else",
         "insert": "begin\n  foo()\nend",
         "replacement": "begin\n  foo()\nelse\n  bar()\nend"
+      },
+      {
+        "syntax": "else",
+        "insert": "begin\n  foo()\nelse\nend",
+        "replacement": "begin\n  foo()\nelse\n  bar()\nend"
       }
     ]
   }

@@ -1,39 +1,8 @@
 [{
-    "testCaseDescription": "ruby-case-statement-insert-test",
+    "testCaseDescription": "ruby-else-insert-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "c6074d2900bc75792281ccca5e4cf1385ffd61f4",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3288ef6a638a3a2757505d9b23d4c44abe33c29b"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
+            "else.rb": [
                 {
                     "span": {
                         "insert": {
@@ -47,7 +16,161 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "264e8a80aee14d0effd8b560eba0b756fc977f49",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f94104abf315362c00c98ec8983bc10c015f423e"
+}
+,{
+    "testCaseDescription": "ruby-else-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "f94104abf315362c00c98ec8983bc10c015f423e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "416c6e8a826c994180e96da45cfc165a9ad39998"
+}
+,{
+    "testCaseDescription": "ruby-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar()' function call in an else block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "416c6e8a826c994180e96da45cfc165a9ad39998",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "1309e64764df58212ef4e2ae14dd40b6e213ad6e"
+}
+,{
+    "testCaseDescription": "ruby-else-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar()' function call in an else block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "1309e64764df58212ef4e2ae14dd40b6e213ad6e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "57b4e2e412d9b1fdd7b78db5fadcac2264d0a8f1"
+}
+,{
+    "testCaseDescription": "ruby-else-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
                 },
                 {
                     "span": {
@@ -57,91 +180,29 @@
                                 1
                             ],
                             "end": [
-                                7,
+                                9,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "else.rb"
     ],
-    "sha1": "3288ef6a638a3a2757505d9b23d4c44abe33c29b",
+    "sha1": "57b4e2e412d9b1fdd7b78db5fadcac2264d0a8f1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a676c60cf58f985d18682c713b79b5463851f675"
+    "sha2": "bdfec68ee7acf98cfa10de9f46bcf3891f030f66"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-delete-insert-test",
+    "testCaseDescription": "ruby-else-delete-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted an else block"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "a676c60cf58f985d18682c713b79b5463851f675",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "abaca6882e5f28164dfc23d785202e29a2a1579c"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added an else block"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "abaca6882e5f28164dfc23d785202e29a2a1579c",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dd16b53bc99dbfbdfd31b99fc6c35674df291fc3"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
+            "else.rb": [
                 {
                     "span": {
                         "delete": {
@@ -155,108 +216,47 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
-                },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "bdfec68ee7acf98cfa10de9f46bcf3891f030f66",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "24bbe6d5af40f9c36cdb928aeaa925da59b6a498"
+}
+,{
+    "testCaseDescription": "ruby-else-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
                                 5,
-                                1
-                            ],
-                            "end": [
-                                7,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Deleted a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "else.rb"
     ],
-    "sha1": "dd16b53bc99dbfbdfd31b99fc6c35674df291fc3",
+    "sha1": "24bbe6d5af40f9c36cdb928aeaa925da59b6a498",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f9c9a56769aecf7ff7917fdf5b2c6dc102001af4"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-delete-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "f9c9a56769aecf7ff7917fdf5b2c6dc102001af4",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bbfee7639ee0c9382aaa6d4fd99aa16004b0d382"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "bbfee7639ee0c9382aaa6d4fd99aa16004b0d382",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f39262cb00c1a446c3fb7bcb435732e9ab0384a3"
+    "sha2": "47b6616835e1b178e9cd9191c1259fcfcbb7aab3"
 }]
