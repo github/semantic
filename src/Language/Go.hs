@@ -21,14 +21,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
     case unwrap packageName of
       S.Indexed [identifier] -> withCategory Module (S.Module identifier xs)
       _ -> withCategory Error (S.Error $ packageName : xs)
-  ("import_declaration", imports) -> do
-    imports' <- sequenceA $ toImport <$> imports
-    withDefaultInfo $ S.Indexed (mconcat imports')
-    where
-      toImport i = case toList (unwrap i) of
-        [importName] -> sequenceA [ withCategory Import (S.Import importName []) ]
-        xs@(_:_) -> sequenceA [ withCategory Error (S.Error xs)]
-        [] -> pure []
+  ("import_declaration", imports) -> toImports imports
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) block
   -- TODO: Handle multiple var specs
@@ -39,6 +32,15 @@ termConstructor source sourceSpan name range children = case (name, children) of
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
+    toImports imports = do
+      imports' <- sequenceA $ toImport <$> imports
+      withDefaultInfo $ S.Indexed (mconcat imports')
+      where
+        toImport i = case toList (unwrap i) of
+          [importName] -> sequenceA [ withCategory Import (S.Import importName []) ]
+          xs@(_:_) -> sequenceA [ withCategory Error (S.Error xs)]
+          [] -> pure []
+
     toVarDecl varSpec = do
       assignment' <- case toList (unwrap varSpec) of
         [idList, _, exprs] -> do
