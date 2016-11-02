@@ -32,7 +32,7 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
-import Data.Aeson (toJSON, toEncoding)
+import Data.Aeson (ToJSON, toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
@@ -127,7 +127,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -143,7 +143,7 @@ truncatedDiff arguments sources = pure $ case format arguments of
   Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   let renderedText = case rendered of
