@@ -58,9 +58,9 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "ce28c084cab9c80fe18b5070d3793bd1b51f2a1c",
+    "sha1": "526719ede5a7be8eeba8622a5673659ba064dbdc",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "915f9a143715e9bbf70eeb281b63e76fdf050e77"
+    "sha2": "02eea3ff34bf622cb78f46c10ee6460ed84c76fa"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-insert-test",
@@ -167,9 +167,9 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "915f9a143715e9bbf70eeb281b63e76fdf050e77",
+    "sha1": "02eea3ff34bf622cb78f46c10ee6460ed84c76fa",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "41b5dda76e78dfed6e7c34e59dce69674c6487d1"
+    "sha2": "2a7b80dc6e89b73dd39e7ace1f41cf55082f7e3e"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-insert-test",
@@ -201,7 +201,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the \"net/http\" import statement of the 'main' module statement"
+                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the \"net/http\" import statement of the 'main' module"
                 },
                 {
                     "span": {
@@ -228,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement of the 'main' module statement"
+                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement of the 'main' module"
                 },
                 {
                     "span": {
@@ -264,9 +264,9 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "41b5dda76e78dfed6e7c34e59dce69674c6487d1",
+    "sha1": "2a7b80dc6e89b73dd39e7ace1f41cf55082f7e3e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3de065935ef985cfee5a2e0ad2caccd503a0d5e6"
+    "sha2": "c7018ba158bfc2ac51c93455c25f17aa60f57e9f"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-test",
@@ -298,7 +298,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the \"foo/bar\" import statement of the 'main' module statement"
+                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the \"foo/bar\" import statement of the 'main' module"
                 },
                 {
                     "span": {
@@ -325,7 +325,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement of the 'main' module statement"
+                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement of the 'main' module"
                 },
                 {
                     "span": {
@@ -361,9 +361,9 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "3de065935ef985cfee5a2e0ad2caccd503a0d5e6",
+    "sha1": "c7018ba158bfc2ac51c93455c25f17aa60f57e9f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8ae66e7d06f3a88322f58221c4cf55c6ff9211d2"
+    "sha2": "aa1214037f2bddd52ffa53292906b7256f1dd031"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-replacement-test",
@@ -515,9 +515,9 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "8ae66e7d06f3a88322f58221c4cf55c6ff9211d2",
+    "sha1": "aa1214037f2bddd52ffa53292906b7256f1dd031",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8f91e97cdfe5ea9c278879bf50b96c64f252d0e2"
+    "sha2": "a3bde8c6b694c3241b360a3881ddd14bd115c8f6"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-test",
@@ -579,9 +579,9 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "8f91e97cdfe5ea9c278879bf50b96c64f252d0e2",
+    "sha1": "a3bde8c6b694c3241b360a3881ddd14bd115c8f6",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "22dd1c37ffa56f29855bbac9b8d04eb95cc61387"
+    "sha2": "03ae1771e56d40c7c36a42fc97a5cd2be51f22b4"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-rest-test",
@@ -643,7 +643,7 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "22dd1c37ffa56f29855bbac9b8d04eb95cc61387",
+    "sha1": "03ae1771e56d40c7c36a42fc97a5cd2be51f22b4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8112428073c8e16d93141f15f065d53af04790df"
+    "sha2": "1266b062e938742dcc2715c7e1e0baab430a0194"
 }]

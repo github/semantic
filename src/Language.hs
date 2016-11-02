@@ -57,3 +57,12 @@ termConstructor source sourceSpan name range children =
     withDefaultInfo syntax = do
       sourceSpan' <- sourceSpan
       pure $! cofree ((range .: Other name .: sourceSpan' .: RNil) :< syntax)
+
+toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
+toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
+
+toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
+toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
+toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
+toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
+toTuple child = pure child

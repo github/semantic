@@ -1,0 +1,352 @@
+[{
+    "testCaseDescription": "ruby-while-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "1cda9292af04e8e32459e7947db6705129af8474",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ccc0f8b7ebdbea4583be97bde9e61f8347ffa7a7"
+}
+,{
+    "testCaseDescription": "ruby-while-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "ccc0f8b7ebdbea4583be97bde9e61f8347ffa7a7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "46a3d9d718783adb324062310e31c22b4ea99d1d"
+}
+,{
+    "testCaseDescription": "ruby-while-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "46a3d9d718783adb324062310e31c22b4ea99d1d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cc57d6e60dbcb0ae0d8ec140fcbbf78a88db5664"
+}
+,{
+    "testCaseDescription": "ruby-while-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "cc57d6e60dbcb0ae0d8ec140fcbbf78a88db5664",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "36e72337e431c5aa034e91f9112fbe8d83e229be"
+}
+,{
+    "testCaseDescription": "ruby-while-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'run' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "36e72337e431c5aa034e91f9112fbe8d83e229be",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c99322df426c012caff854061c30f59fd2ca36a3"
+}
+,{
+    "testCaseDescription": "ruby-while-delete-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "c99322df426c012caff854061c30f59fd2ca36a3",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "680f1e37086073733a197ae27258b428cc7eb643"
+}
+,{
+    "testCaseDescription": "ruby-while-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "680f1e37086073733a197ae27258b428cc7eb643",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "afb10073d68a4e2f0fbaac9a77f612de65bbccbe"
+}]

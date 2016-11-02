@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'a' variable"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "d9c2451e8b8fcd1ae7183962f520fc63261e8480",
+    "sha1": "5751ad175114c6179a169ebd32800e99947c6558",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "55f4ad44f28cac7ab9f46bdc9ce1d98c66bdd035"
+    "sha2": "abb322382aaee2086ca2dec7d37d1f987a307071"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'a' variable"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "55f4ad44f28cac7ab9f46bdc9ce1d98c66bdd035",
+    "sha1": "abb322382aaee2086ca2dec7d37d1f987a307071",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a949505df18b8e8c9737eee75b66edc85e342380"
+    "sha2": "b01cdfd3153a45d8034a441c6f0adf5cb0e47f88"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in the a variable of the 'main' module statement"
+                    "summary": "Replaced '5' with '2' in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -132,7 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in the a variable of the 'main' module statement"
+                    "summary": "Replaced '6' with '3' in the a variable of the 'main' module"
                 }
             ]
         },
@@ -141,9 +141,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "a949505df18b8e8c9737eee75b66edc85e342380",
+    "sha1": "b01cdfd3153a45d8034a441c6f0adf5cb0e47f88",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "73132ddf4e5b74435303ac7818d4b5015878dc8e"
+    "sha2": "64025d235d8237fcbe2af27646243d67ccfc1f20"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
@@ -175,7 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5' in the a variable of the 'main' module statement"
+                    "summary": "Replaced '2' with '5' in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -202,7 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in the a variable of the 'main' module statement"
+                    "summary": "Replaced '3' with '6' in the a variable of the 'main' module"
                 }
             ]
         },
@@ -211,9 +211,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "73132ddf4e5b74435303ac7818d4b5015878dc8e",
+    "sha1": "64025d235d8237fcbe2af27646243d67ccfc1f20",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6d2f947fcc146a7cb9bbae38c789c1c146ebd7d7"
+    "sha2": "d7a7227e0f353c244f70268b8e7af59357994736"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
@@ -233,7 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -248,7 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -263,7 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'a' variable"
                 }
             ]
         },
@@ -272,9 +272,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "6d2f947fcc146a7cb9bbae38c789c1c146ebd7d7",
+    "sha1": "d7a7227e0f353c244f70268b8e7af59357994736",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9e5c48529d7443cd45a8c2730971bb70fb5f10bd"
+    "sha2": "9e14c557d46acaeddf3af339d3dcc76e8244ba2a"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-test",
@@ -294,7 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'a' variable"
                 }
             ]
         },
@@ -303,9 +303,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "9e5c48529d7443cd45a8c2730971bb70fb5f10bd",
+    "sha1": "9e14c557d46acaeddf3af339d3dcc76e8244ba2a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f00ab78cb626aa2bf280d625b6913bcb6ab31835"
+    "sha2": "0cf490a98e95eedca37cccbb68bf15cea8dfc17e"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-rest-test",
@@ -325,7 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'a' variable"
                 }
             ]
         },
@@ -334,7 +334,7 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "f00ab78cb626aa2bf280d625b6913bcb6ab31835",
+    "sha1": "0cf490a98e95eedca37cccbb68bf15cea8dfc17e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "107d7e5c4ca869cee5ff0669a2019289326f903d"
+    "sha2": "e264ebaf1dcb30372e6860c30c6b877df45e35d5"
 }]

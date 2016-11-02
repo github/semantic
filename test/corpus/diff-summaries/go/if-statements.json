@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "c353d8f4f94b839580a70ad9f3587fb053d4ea1b",
+    "sha1": "66fb9d10a86f4bdf667dac280ea6b547f110f1bf",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a3621830d8994943efb154fde7e64ef1c63200c9"
+    "sha2": "44954eac6bb17bdc1439c2e3e98d664224f64d40"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-insert-test",
@@ -323,9 +323,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "a3621830d8994943efb154fde7e64ef1c63200c9",
+    "sha1": "44954eac6bb17bdc1439c2e3e98d664224f64d40",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b6e0c69f2e3d032115206f2d0b58e24de6122c8d"
+    "sha2": "ac414090dbc8e6dc1e1147d6e5c954c8f4b7b467"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -420,9 +420,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "b6e0c69f2e3d032115206f2d0b58e24de6122c8d",
+    "sha1": "ac414090dbc8e6dc1e1147d6e5c954c8f4b7b467",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d6b1ef7fbfb1aec2d3a1157690554368e5e1bfaf"
+    "sha2": "26c0b70f812f614833cbb12ab2b3696e9810d43d"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -517,9 +517,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "d6b1ef7fbfb1aec2d3a1157690554368e5e1bfaf",
+    "sha1": "26c0b70f812f614833cbb12ab2b3696e9810d43d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e54ce6a0a397d21b5a45116902dcbe816cb3631f"
+    "sha2": "d3c2c7e4e4486b2ef3769795f37ba3f76ff26893"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -938,9 +938,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "e54ce6a0a397d21b5a45116902dcbe816cb3631f",
+    "sha1": "d3c2c7e4e4486b2ef3769795f37ba3f76ff26893",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "99d9068a815b05a7cfa20673260f49a6af770a6d"
+    "sha2": "fdb1f6fe0954d2ed74d5e0f9ca3ae3837deb2ab3"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-test",
@@ -1089,9 +1089,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "99d9068a815b05a7cfa20673260f49a6af770a6d",
+    "sha1": "fdb1f6fe0954d2ed74d5e0f9ca3ae3837deb2ab3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3320063e6de062ebd8c66129ba3fcd01b89a3cd9"
+    "sha2": "ebbc34b8012a0bdfd8cc9c8a0b27e2879374b901"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-rest-test",
@@ -1117,13 +1117,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -1132,7 +1132,7 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "3320063e6de062ebd8c66129ba3fcd01b89a3cd9",
+    "sha1": "ebbc34b8012a0bdfd8cc9c8a0b27e2879374b901",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9dc5ad6a91be6cff36e283370574578631e25a53"
+    "sha2": "1ecab260ec893769d97234c79920389613200ed8"
 }]

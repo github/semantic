@@ -16,7 +16,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
                 }
             ]
         },
@@ -25,9 +40,9 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "9ceb761546755e65b00bea7b69a48067c839fd92",
+    "sha1": "c2ac2649bbe37066912f27d1a9dd06e502bbd931",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f20a0433d16377bcb44d2335e46215fc8a7b811d"
+    "sha2": "0ee67df85d07b8d8cac7678fc477a4c50f530e0e"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-insert-test",
@@ -47,7 +62,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
                 },
                 {
                     "span": {
@@ -62,7 +92,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
                 }
             ]
         },
@@ -71,9 +116,9 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "f20a0433d16377bcb44d2335e46215fc8a7b811d",
+    "sha1": "0ee67df85d07b8d8cac7678fc477a4c50f530e0e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "371cbac25f550364f1a7e36cda9c9ef7c91365ad"
+    "sha2": "82f2e4920f6c9a30d1b84ba6919ab5817c572596"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-insert-test",
@@ -105,7 +150,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -132,7 +177,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -159,7 +204,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -186,7 +231,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the const (\na = 01i\nb = 1.e+100i\n) variable of the 'main' module"
                 }
             ]
         },
@@ -195,9 +240,9 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "371cbac25f550364f1a7e36cda9c9ef7c91365ad",
+    "sha1": "82f2e4920f6c9a30d1b84ba6919ab5817c572596",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f1ee0e3a0f7bd0e5a66ffa876be791987c89ba38"
+    "sha2": "4576926570f2b1c3a57f924e5051e640e50ad7b9"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-test",
@@ -229,7 +274,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -256,7 +301,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -283,7 +328,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -310,7 +355,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module statement"
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the const (\na = 02i\nb = 1.e+103i\n) variable of the 'main' module"
                 }
             ]
         },
@@ -319,9 +364,9 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "f1ee0e3a0f7bd0e5a66ffa876be791987c89ba38",
+    "sha1": "4576926570f2b1c3a57f924e5051e640e50ad7b9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0b0ccb2b4869480435f0c5ce7dbbf462b9aaaa60"
+    "sha2": "f0e234598523398f63e37fce0b923f8e6bbc2557"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
@@ -341,7 +386,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
                 },
                 {
                     "span": {
@@ -356,7 +416,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
                 },
                 {
                     "span": {
@@ -371,7 +446,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
                 }
             ]
         },
@@ -380,9 +470,9 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "0b0ccb2b4869480435f0c5ce7dbbf462b9aaaa60",
+    "sha1": "f0e234598523398f63e37fce0b923f8e6bbc2557",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ba99f50d6c3612ad449a45b51a89a9b82e6ced02"
+    "sha2": "4876bd70ddcba605b198427251bccb5109c21a82"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-test",
@@ -402,7 +492,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = 01i\nb = 1.e+100i\n)' variable"
                 }
             ]
         },
@@ -411,9 +516,9 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "ba99f50d6c3612ad449a45b51a89a9b82e6ced02",
+    "sha1": "4876bd70ddcba605b198427251bccb5109c21a82",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5331edf81b6258040f39b9b5f29a3bef35b71d14"
+    "sha2": "26b157b84a766f0ac61f2fbd9311daddaa00b537"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-rest-test",
@@ -433,7 +538,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = 02i\nb = 1.e+103i\n)' variable"
                 }
             ]
         },
@@ -442,7 +562,7 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "5331edf81b6258040f39b9b5f29a3bef35b71d14",
+    "sha1": "26b157b84a766f0ac61f2fbd9311daddaa00b537",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "92ffb48d22439626de3426134153fc7d740a7f8b"
+    "sha2": "424e2388d27fd2f4d90e9512a6c7f3c24dfa7f59"
 }]

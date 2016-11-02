@@ -100,9 +100,9 @@
     "filePaths": [
         "type-declarations.go"
     ],
-    "sha1": "7375306bcf77cb08c3af92d3d7ed893e7b6808bb",
+    "sha1": "54c7134cd79c47f785bdbfbae850f9bf6221e561",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c32edf8d506df8e2552d565b8f9aa20500fd69ea"
+    "sha2": "8e71bc405c6f251573ee41123d02b04d89c42146"
 }
 ,{
     "testCaseDescription": "go-type-declarations-replacement-insert-test",
@@ -133,11 +133,41 @@
                             ],
                             "end": [
                                 3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
                 },
                 {
                     "span": {
@@ -163,11 +193,41 @@
                             ],
                             "end": [
                                 5,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
                 },
                 {
                     "span": {
@@ -193,11 +253,41 @@
                             ],
                             "end": [
                                 6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                5
+                            ],
+                            "end": [
+                                6,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the '' d' identifier"
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
                 },
                 {
                     "span": {
@@ -288,6 +378,186 @@
                         }
                     },
                     "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                8
+                            ],
+                            "end": [
+                                13,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                4
+                            ],
+                            "end": [
+                                15,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                2
+                            ],
+                            "end": [
+                                16,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                4
+                            ],
+                            "end": [
+                                5,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                4
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
                 }
             ]
         },
@@ -296,9 +566,9 @@
     "filePaths": [
         "type-declarations.go"
     ],
-    "sha1": "c32edf8d506df8e2552d565b8f9aa20500fd69ea",
+    "sha1": "8e71bc405c6f251573ee41123d02b04d89c42146",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c846bf16b3485289ad0075edb58571b3c75b24ab"
+    "sha2": "204544010a6fabd32d02bee44c57f4ca65008212"
 }
 ,{
     "testCaseDescription": "go-type-declarations-delete-insert-test",
@@ -307,30 +577,33 @@
             "type-declarations.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    7
-                                ],
-                                "end": [
-                                    3,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    8
-                                ],
-                                "end": [
-                                    3,
-                                    9
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '' b' identifier with the 'b' identifier"
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
@@ -394,116 +667,43 @@
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
+                                8,
                                 6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
                             ],
                             "end": [
-                                6,
-                                3
+                                8,
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' d' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "type-declarations.go"
-    ],
-    "sha1": "c846bf16b3485289ad0075edb58571b3c75b24ab",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "e81cb1e271eb09e6d352a6801edf1d810cb00885"
-}
-,{
-    "testCaseDescription": "go-type-declarations-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "type-declarations.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    8
-                                ],
-                                "end": [
-                                    3,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    7
-                                ],
-                                "end": [
-                                    3,
-                                    10
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the '' b' identifier"
+                    "summary": "Added the 'a' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                8,
+                                8
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
                                 2
                             ],
                             "end": [
-                                5,
+                                10,
                                 3
                             ]
                         }
@@ -514,26 +714,26 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
-                                3
+                                10,
+                                4
                             ],
                             "end": [
-                                5,
-                                6
+                                10,
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                11,
                                 2
                             ],
                             "end": [
-                                6,
+                                11,
                                 3
                             ]
                         }
@@ -544,27 +744,117 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                3
+                                11,
+                                4
                             ],
                             "end": [
-                                6,
-                                6
+                                11,
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the '' d' identifier"
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                8
+                            ],
+                            "end": [
+                                13,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                4
+                            ],
+                            "end": [
+                                15,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                2
+                            ],
+                            "end": [
+                                16,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                2
+                                3,
+                                6
                             ],
                             "end": [
-                                5,
-                                3
+                                3,
+                                7
                             ]
                         }
                     },
@@ -574,12 +864,27 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                4
+                                3,
+                                7
                             ],
                             "end": [
-                                5,
-                                5
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                10
                             ]
                         }
                     },
@@ -589,6 +894,81 @@
                     "span": {
                         "delete": {
                             "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 6,
                                 2
                             ],
@@ -605,7 +985,7 @@
                         "delete": {
                             "start": [
                                 6,
-                                4
+                                3
                             ],
                             "end": [
                                 6,
@@ -613,113 +993,37 @@
                             ]
                         }
                     },
+                    "summary": "Deleted the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
                     "summary": "Deleted the 'd' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "type-declarations.go"
-    ],
-    "sha1": "e81cb1e271eb09e6d352a6801edf1d810cb00885",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "0d7aff323d5b6aafa4d01c7fb9d0c6546556e8fe"
-}
-,{
-    "testCaseDescription": "go-type-declarations-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "type-declarations.go": [
+                },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                6,
                                 6
                             ],
                             "end": [
-                                3,
-                                7
+                                7,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' d' identifier"
+                    "summary": "Deleted the ''\n' ERROR"
                 },
                 {
                     "span": {
@@ -813,6 +1117,292 @@
                 },
                 {
                     "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                8
+                            ],
+                            "end": [
+                                13,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                4
+                            ],
+                            "end": [
+                                15,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                2
+                            ],
+                            "end": [
+                                16,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-declarations.go"
+    ],
+    "sha1": "204544010a6fabd32d02bee44c57f4ca65008212",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "40ab157e5b596f3e38dc868e178c461acdfd2cfb"
+}
+,{
+    "testCaseDescription": "go-type-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                9
+                            ],
+                            "end": [
+                                3,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
+                },
+                {
+                    "span": {
                         "insert": {
                             "start": [
                                 8,
@@ -831,15 +1421,15 @@
                         "insert": {
                             "start": [
                                 8,
-                                7
+                                8
                             ],
                             "end": [
                                 8,
-                                10
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
@@ -861,15 +1451,15 @@
                         "insert": {
                             "start": [
                                 10,
-                                3
+                                4
                             ],
                             "end": [
                                 10,
-                                6
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the '' b' identifier"
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
@@ -891,15 +1481,375 @@
                         "insert": {
                             "start": [
                                 11,
-                                3
+                                4
                             ],
                             "end": [
                                 11,
-                                6
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the '' d' identifier"
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                8
+                            ],
+                            "end": [
+                                13,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                4
+                            ],
+                            "end": [
+                                15,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                2
+                            ],
+                            "end": [
+                                16,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                4
+                            ],
+                            "end": [
+                                5,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                4
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                8
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                2
+                            ],
+                            "end": [
+                                10,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                4
+                            ],
+                            "end": [
+                                10,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                2
+                            ],
+                            "end": [
+                                11,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                4
+                            ],
+                            "end": [
+                                11,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                8
+                            ],
+                            "end": [
+                                13,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                2
+                            ],
+                            "end": [
+                                15,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                4
+                            ],
+                            "end": [
+                                15,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                2
+                            ],
+                            "end": [
+                                16,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
                 }
             ]
         },
@@ -908,9 +1858,52 @@
     "filePaths": [
         "type-declarations.go"
     ],
-    "sha1": "0d7aff323d5b6aafa4d01c7fb9d0c6546556e8fe",
+    "sha1": "40ab157e5b596f3e38dc868e178c461acdfd2cfb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "92dc3deaebc72cece950987d07104944bb3f0589"
+    "sha2": "b9bcc07355a3ecdf7e0c8596c6468f5ede80b7ba"
+}
+,{
+    "testCaseDescription": "go-type-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    18,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module with the 'main' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-declarations.go"
+    ],
+    "sha1": "b9bcc07355a3ecdf7e0c8596c6468f5ede80b7ba",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "e1aba23ce1e0e645bb312f03d6849180aa827bde"
 }
 ,{
     "testCaseDescription": "go-type-declarations-delete-test",
@@ -1014,9 +2007,9 @@
     "filePaths": [
         "type-declarations.go"
     ],
-    "sha1": "92dc3deaebc72cece950987d07104944bb3f0589",
+    "sha1": "e1aba23ce1e0e645bb312f03d6849180aa827bde",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ccecaa9b287afc7b4bbafcffce376fe813f18edb"
+    "sha2": "370f9498d28485054792799b52669b5e65eb8706"
 }
 ,{
     "testCaseDescription": "go-type-declarations-delete-rest-test",
@@ -1025,93 +2018,30 @@
             "type-declarations.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    1
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' d' identifier"
+                    "summary": "Replaced the 'main' identifier with the 'main' module"
                 }
             ]
         },
@@ -1120,7 +2050,7 @@
     "filePaths": [
         "type-declarations.go"
     ],
-    "sha1": "ccecaa9b287afc7b4bbafcffce376fe813f18edb",
+    "sha1": "370f9498d28485054792799b52669b5e65eb8706",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b271c3fa0d308f19452a819c58968fd49dff0d13"
+    "sha2": "ca44feac79eebf52dd47dd67b55075a09cf2fea8"
 }]

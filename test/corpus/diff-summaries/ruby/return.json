@@ -1,0 +1,262 @@
+[{
+    "testCaseDescription": "ruby-return-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "932ab2e771298de02435e6560b092f44116db759",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "eccd61ff2d7e39eece6034a0f61e76419caa4b26"
+}
+,{
+    "testCaseDescription": "ruby-return-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "eccd61ff2d7e39eece6034a0f61e76419caa4b26",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e8e3916dc6370cc30aa380c097b96b0f35e7607f"
+}
+,{
+    "testCaseDescription": "ruby-return-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "e8e3916dc6370cc30aa380c097b96b0f35e7607f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "5f8e3137aa3c52ec02dc29d41327038979923564"
+}
+,{
+    "testCaseDescription": "ruby-return-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "5f8e3137aa3c52ec02dc29d41327038979923564",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "95f700610a1f902afd8939ce6655d36c61dcfd15"
+}
+,{
+    "testCaseDescription": "ruby-return-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "95f700610a1f902afd8939ce6655d36c61dcfd15",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "71a7f4e9cc7238c316d61c724882b35e42fca6b3"
+}
+,{
+    "testCaseDescription": "ruby-return-delete-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "71a7f4e9cc7238c316d61c724882b35e42fca6b3",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cda01a8f0c578e8c76906624ad55372b8e30cb44"
+}
+,{
+    "testCaseDescription": "ruby-return-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "return.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return.rb"
+    ],
+    "sha1": "cda01a8f0c578e8c76906624ad55372b8e30cb44",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9b31b02e831a9ab3366e95bcb9f6399451d97d76"
+}]

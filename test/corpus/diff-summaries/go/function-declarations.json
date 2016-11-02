@@ -340,9 +340,9 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "602002fbeead9ddd8750c5f5f19dace772849a7d",
+    "sha1": "305a886d1e741aeb715c8399abd10ec0630c6b12",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9b7dbf8e02cc8c5b65e630ee0666f55150222078"
+    "sha2": "4d61f1d48f8e83a774cba7edb19230f6ee7a9baa"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-insert-test",
@@ -1016,9 +1016,9 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "9b7dbf8e02cc8c5b65e630ee0666f55150222078",
+    "sha1": "4d61f1d48f8e83a774cba7edb19230f6ee7a9baa",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "80c976afb2b0aa9b709a7d775305d4e9141abc47"
+    "sha2": "d06a365f919ad8503a7587df1756a41318f56c1b"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -1050,7 +1050,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fa' identifier with the 'f1' identifier in the f1 function of the 'main' module statement"
+                    "summary": "Replaced the 'fa' identifier with the 'f1' identifier in the f1 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -1140,9 +1140,9 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "80c976afb2b0aa9b709a7d775305d4e9141abc47",
+    "sha1": "d06a365f919ad8503a7587df1756a41318f56c1b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "341d4803352a84ca661498e8f2c0c4b5eeec8b30"
+    "sha2": "0784cbdb4fa20272b239870d0cd5c8ce2e2b0223"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -1174,7 +1174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'fa' identifier in the fa function of the 'main' module statement"
+                    "summary": "Replaced the 'f1' identifier with the 'fa' identifier in the fa function of the 'main' module"
                 },
                 {
                     "span": {
@@ -1264,9 +1264,9 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "341d4803352a84ca661498e8f2c0c4b5eeec8b30",
+    "sha1": "0784cbdb4fa20272b239870d0cd5c8ce2e2b0223",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "76f626ffcee4e82fd9c50a66b84c23413663b950"
+    "sha2": "9db59351f57858a3d21855cacd0a2642f54cbe16"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -2270,9 +2270,9 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "76f626ffcee4e82fd9c50a66b84c23413663b950",
+    "sha1": "9db59351f57858a3d21855cacd0a2642f54cbe16",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "23bdefa46257cd73e0069e10054481378f49d77a"
+    "sha2": "72d99960ded953534c1e3ed7032344f54203e3c7"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-test",
@@ -2616,9 +2616,9 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "23bdefa46257cd73e0069e10054481378f49d77a",
+    "sha1": "72d99960ded953534c1e3ed7032344f54203e3c7",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3b18362b5a0f47c7716648c9e2b4ddfa891d41ca"
+    "sha2": "468eedb0176ac395feb22ffa43a931b3deb7a7d9"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-rest-test",
@@ -2962,7 +2962,7 @@
     "filePaths": [
         "function-declarations.go"
     ],
-    "sha1": "3b18362b5a0f47c7716648c9e2b4ddfa891d41ca",
+    "sha1": "468eedb0176ac395feb22ffa43a931b3deb7a7d9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c62fd0c3f6a911988a043877a6a266a87c8bda85"
+    "sha2": "963af3d86cc194c28945654f8b40ef3d63b192b4"
 }]

@@ -23,12 +23,12 @@ termConstructor source sourceSpan name range children = case (name, children) of
       _ -> withCategory Error (S.Error $ packageName : xs)
   ("import_declaration", imports) -> toImports imports
   ("function_declaration", [id, params, block]) ->
-    withDefaultInfo $ S.Function id (toList $ unwrap params) block
+    withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   -- TODO: Handle multiple var specs
   ("var_declaration", [varSpec]) -> toVarDecl varSpec
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
   ("const_declaration", constSpecs) -> toConsts constSpecs
-  ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) body
+  ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where

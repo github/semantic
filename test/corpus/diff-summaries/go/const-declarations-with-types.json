@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const zero int = 0' variable"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "dd177299b54f3f867fb36408138847db99dbed31",
+    "sha1": "de548a445085884fdfb90d01da226301f4dad242",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0e7650c764cdb2151084609241e28313e07587af"
+    "sha2": "842fb6dba0edfe30b8ac4b77cfd03197ab6a316d"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const one, two uiint64 = 1, 2' variable"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const zero int = 0' variable"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "0e7650c764cdb2151084609241e28313e07587af",
+    "sha1": "842fb6dba0edfe30b8ac4b77cfd03197ab6a316d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ce2d79acdaaf3846c1e4286ef915ee157e82eadd"
+    "sha2": "b2e84b8ac1abd00ed9000af2ee206cd41d3fa622"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -120,7 +120,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' identifier in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Deleted the 'two' identifier in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -147,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'uiint64' identifier with the 'int' identifier in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Replaced the 'uiint64' identifier with the 'int' identifier in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -174,7 +174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '1' with '0' in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -189,7 +189,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Deleted '2' in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -216,7 +216,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'uiint64' identifier with the 'int' identifier in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Replaced the 'uiint64' identifier with the 'int' identifier in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -243,7 +243,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '1' with '0' in the const zero int = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -258,7 +258,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the const zero int = 0 variable of the 'main' module statement"
+                    "summary": "Deleted '2' in the const zero int = 0 variable of the 'main' module"
                 }
             ]
         },
@@ -267,9 +267,9 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "ce2d79acdaaf3846c1e4286ef915ee157e82eadd",
+    "sha1": "b2e84b8ac1abd00ed9000af2ee206cd41d3fa622",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0e0b5e93a7d817dad8f2220f69c16a0e1410acc3"
+    "sha2": "ce7d0cc2806b68536323eff70acf595f9d4f23e0"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-replacement-test",
@@ -301,7 +301,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -316,7 +316,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added the 'two' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -343,7 +343,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'uiint64' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'uiint64' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -370,7 +370,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '0' with '1' in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -385,7 +385,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '2' in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -412,7 +412,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'uiint64' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'uiint64' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -439,7 +439,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '0' with '1' in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -454,7 +454,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '2' in the const one, two uiint64 = 1, 2 variable of the 'main' module"
                 }
             ]
         },
@@ -463,9 +463,9 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "0e0b5e93a7d817dad8f2220f69c16a0e1410acc3",
+    "sha1": "ce7d0cc2806b68536323eff70acf595f9d4f23e0",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9185147d5c6488a519d1ed3871713824da07a4fa"
+    "sha2": "30de098f92b471f08089c6e31bb262e30060b19a"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-replacement-test",
@@ -485,7 +485,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const one, two uiint64 = 1, 2' variable"
                 },
                 {
                     "span": {
@@ -500,7 +500,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const zero int = 0' variable"
                 },
                 {
                     "span": {
@@ -515,7 +515,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const one, two uiint64 = 1, 2' variable"
                 }
             ]
         },
@@ -524,9 +524,9 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "9185147d5c6488a519d1ed3871713824da07a4fa",
+    "sha1": "30de098f92b471f08089c6e31bb262e30060b19a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "96db7781cf689ca248c2f2719ba3da85945fb327"
+    "sha2": "e4b33967157a526fc066a22da314aff63643a78c"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-test",
@@ -546,7 +546,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const zero int = 0' variable"
                 }
             ]
         },
@@ -555,9 +555,9 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "96db7781cf689ca248c2f2719ba3da85945fb327",
+    "sha1": "e4b33967157a526fc066a22da314aff63643a78c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9e8fc3d4de54b03489c0a8e06870e752752d8087"
+    "sha2": "98aee1527562a2affc672548a719868ae124b4c1"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-rest-test",
@@ -577,7 +577,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const one, two uiint64 = 1, 2' variable"
                 }
             ]
         },
@@ -586,7 +586,7 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "9e8fc3d4de54b03489c0a8e06870e752752d8087",
+    "sha1": "98aee1527562a2affc672548a719868ae124b4c1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "67fd15163d0a4d8e8532d27a7309a9106e6abd62"
+    "sha2": "5d7ec8e3b86c67480d8ea3a64ea61860cc1c2e59"
 }]

@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "a1e6f52380d3833dd4bdcc382a860f259d9853bf",
+    "sha1": "e34a14ef239f8b241283178d62a3f7efbf1212d9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "27e6c8e9513f9d6963da3ef51c8307388259012c"
+    "sha2": "62df79e2a800de456753e45d274e3d894f7d321c"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-insert-test",
@@ -113,9 +113,9 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "27e6c8e9513f9d6963da3ef51c8307388259012c",
+    "sha1": "62df79e2a800de456753e45d274e3d894f7d321c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b3a3af526a72605dd58d2594ee1bb502934e680e"
+    "sha2": "fff3d1c798277c09c6fa104c285a68a4204e1671"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -183,9 +183,9 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "b3a3af526a72605dd58d2594ee1bb502934e680e",
+    "sha1": "fff3d1c798277c09c6fa104c285a68a4204e1671",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "033a2913e68ddadb00456066a8dcd4952cb58716"
+    "sha2": "e8294032b9b82742ff3faf92cfd0eed3999e867b"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -253,9 +253,9 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "033a2913e68ddadb00456066a8dcd4952cb58716",
+    "sha1": "e8294032b9b82742ff3faf92cfd0eed3999e867b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b2747baef067752a04bda2e79cd69f8ed17cff85"
+    "sha2": "69c720b760691b35949cb2f52a9835a7d29a2c64"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -359,9 +359,9 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "b2747baef067752a04bda2e79cd69f8ed17cff85",
+    "sha1": "69c720b760691b35949cb2f52a9835a7d29a2c64",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d4214f98b0d8c70defc55e6aee2361dc7ac57957"
+    "sha2": "04024cdd4f06235c74b006efb5d529b83dc45cff"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-test",
@@ -405,9 +405,9 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "d4214f98b0d8c70defc55e6aee2361dc7ac57957",
+    "sha1": "04024cdd4f06235c74b006efb5d529b83dc45cff",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "70d3145886da276f0bb05c42e2eb26aef7f69ed3"
+    "sha2": "616a18d0dae23ac08bbf60a39fdba715fde695ac"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-rest-test",
@@ -433,13 +433,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -448,7 +448,7 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "70d3145886da276f0bb05c42e2eb26aef7f69ed3",
+    "sha1": "616a18d0dae23ac08bbf60a39fdba715fde695ac",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f8f8ce8f9e9aefb2fabeb8fc268b879015888356"
+    "sha2": "af9c44071dea2b1491294d94b985eb7d50b1db23"
 }]

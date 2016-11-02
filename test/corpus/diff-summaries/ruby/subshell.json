@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-subshell-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the `ls -la` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "4cf0b1c84b725b7ecea2d0e2524d4aa83e9aa9f0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "20eb2d66b4a9fa812951035a462e2b8f353431ff"
+}
+,{
+    "testCaseDescription": "ruby-subshell-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the `git status` subshell command"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the `ls -la` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "20eb2d66b4a9fa812951035a462e2b8f353431ff",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fdb9f2acfb3ed9873e84f15d9074908fe0185182"
+}
+,{
+    "testCaseDescription": "ruby-subshell-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the `git status` subshell command with the `ls -la` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "fdb9f2acfb3ed9873e84f15d9074908fe0185182",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2fa537418ba3d387dce14ef9c763e45d4c655b74"
+}
+,{
+    "testCaseDescription": "ruby-subshell-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the `ls -la` subshell command with the `git status` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "2fa537418ba3d387dce14ef9c763e45d4c655b74",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ad62044aa63938576393977e95062643f6197e16"
+}
+,{
+    "testCaseDescription": "ruby-subshell-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the `git status` subshell command"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the `ls -la` subshell command"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the `git status` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "ad62044aa63938576393977e95062643f6197e16",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "957d2351752ecee0264d8b9cc4353348cbb52b75"
+}
+,{
+    "testCaseDescription": "ruby-subshell-delete-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the `ls -la` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "957d2351752ecee0264d8b9cc4353348cbb52b75",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "49e57b7abbf657b91d076a9f8b8e0d97f4becccc"
+}
+,{
+    "testCaseDescription": "ruby-subshell-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "subshell.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the `git status` subshell command"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subshell.rb"
+    ],
+    "sha1": "49e57b7abbf657b91d076a9f8b8e0d97f4becccc",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "625fb3deaae6820d70e1d8cfe393b3d0c19484ff"
+}]

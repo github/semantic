@@ -16,7 +16,37 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
                 }
             ]
         },
@@ -25,9 +55,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "b271c3fa0d308f19452a819c58968fd49dff0d13",
+    "sha1": "ca44feac79eebf52dd47dd67b55075a09cf2fea8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8b5c67ab65922d2708997fab1d31b688690009fa"
+    "sha2": "8608639101229b5dbc6dee3fcc90f538d341e8f7"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-insert-test",
@@ -47,7 +77,37 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
                 },
                 {
                     "span": {
@@ -62,7 +122,37 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
                 }
             ]
         },
@@ -71,9 +161,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "8b5c67ab65922d2708997fab1d31b688690009fa",
+    "sha1": "8608639101229b5dbc6dee3fcc90f538d341e8f7",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2e149e89b44149ca32a98637a3c026f2424a1129"
+    "sha2": "8650869481c5f88510914e47b1a7e227f688f222"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -105,7 +195,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module statement"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -132,7 +222,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -159,7 +249,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module statement"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module"
                 }
             ]
         },
@@ -168,9 +258,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "2e149e89b44149ca32a98637a3c026f2424a1129",
+    "sha1": "8650869481c5f88510914e47b1a7e227f688f222",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "76e664ea7b26b161503a78e9bb640e0efa15cd9f"
+    "sha2": "04a9a39399a279cfc841d6ff0dde512710834fb7"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -202,7 +292,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -229,7 +319,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module statement"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -256,7 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module statement"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module"
                 }
             ]
         },
@@ -265,9 +355,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "76e664ea7b26b161503a78e9bb640e0efa15cd9f",
+    "sha1": "04a9a39399a279cfc841d6ff0dde512710834fb7",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1b0d1bc3886b10e6d66e8a4eff9bef6e50a4f996"
+    "sha2": "95f846d80b29447f1c9290ba0d693ce6b35a92f3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -287,7 +377,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
                 },
                 {
                     "span": {
@@ -302,7 +422,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
                 },
                 {
                     "span": {
@@ -317,7 +467,37 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
                 }
             ]
         },
@@ -326,9 +506,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "1b0d1bc3886b10e6d66e8a4eff9bef6e50a4f996",
+    "sha1": "95f846d80b29447f1c9290ba0d693ce6b35a92f3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7bbf70a51ec40952ba660a4a6b8775889f7d5cd3"
+    "sha2": "49f828ce0fdc9a03d0e042396f8621767af0d5b3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-test",
@@ -348,7 +528,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
                 }
             ]
         },
@@ -357,9 +567,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "7bbf70a51ec40952ba660a4a6b8775889f7d5cd3",
+    "sha1": "49f828ce0fdc9a03d0e042396f8621767af0d5b3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2a6b431db3e038f70cc0011cd851faf97506c390"
+    "sha2": "aa73868cbf19e7f1f4e011b81ef2cdfa5e0229ee"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-rest-test",
@@ -379,7 +589,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
                 }
             ]
         },
@@ -388,7 +628,7 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "2a6b431db3e038f70cc0011cd851faf97506c390",
+    "sha1": "aa73868cbf19e7f1f4e011b81ef2cdfa5e0229ee",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8ee08bc998348eee3cec9bd4454856b40c289205"
+    "sha2": "6854d14b3fbd44b2760df78c70c200e923aa3ec0"
 }]

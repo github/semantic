@@ -145,9 +145,9 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "10bb8501b1f571b99098a372a0aacd3cb1046639",
+    "sha1": "944edd4e789388210277cd2b9e00356c470c46fe",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e682c767d5e02a387da58201f16670bf4a90b0fa"
+    "sha2": "d25a8d43cdd20a97976d3ec49ee63c615fc5e3f8"
 }
 ,{
     "testCaseDescription": "go-switch-statements-replacement-insert-test",
@@ -179,7 +179,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -188,9 +188,9 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "e682c767d5e02a387da58201f16670bf4a90b0fa",
+    "sha1": "d25a8d43cdd20a97976d3ec49ee63c615fc5e3f8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e3746333517b992200a82f491c7b126039694b91"
+    "sha2": "b0ee465aa1ca0a9b27235ab0090d3424c20c7c9a"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-insert-test",
@@ -366,9 +366,9 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "e3746333517b992200a82f491c7b126039694b91",
+    "sha1": "b0ee465aa1ca0a9b27235ab0090d3424c20c7c9a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d13274a174981949f995fbef1383e38d6457ae65"
+    "sha2": "fda038ccf5be5ada6678e3530aef6ad29c3b2817"
 }
 ,{
     "testCaseDescription": "go-switch-statements-replacement-test",
@@ -544,9 +544,9 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "d13274a174981949f995fbef1383e38d6457ae65",
+    "sha1": "fda038ccf5be5ada6678e3530aef6ad29c3b2817",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5697c1b2d1ede50336d31d07176e13b76251d0e0"
+    "sha2": "caf85b1d1b6b98dc14d78e2e990d0bcd6a49e149"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-replacement-test",
@@ -965,9 +965,9 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "5697c1b2d1ede50336d31d07176e13b76251d0e0",
+    "sha1": "caf85b1d1b6b98dc14d78e2e990d0bcd6a49e149",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "42ac0e88c6da64e072dd188a03eccd04b733d011"
+    "sha2": "7112962e24bca126499e0e1ab6684c886d122288"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-test",
@@ -999,7 +999,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -1008,9 +1008,9 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "42ac0e88c6da64e072dd188a03eccd04b733d011",
+    "sha1": "7112962e24bca126499e0e1ab6684c886d122288",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "98ec287e4c0ad12a7ae56cef2b183a1b733a2fe1"
+    "sha2": "1fb369a5d73aa68f845a8983f061bdc357a34fad"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-rest-test",
@@ -1159,7 +1159,7 @@
     "filePaths": [
         "switch-statements.go"
     ],
-    "sha1": "98ec287e4c0ad12a7ae56cef2b183a1b733a2fe1",
+    "sha1": "1fb369a5d73aa68f845a8983f061bdc357a34fad",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d97f836324945c87607cc5f5668eeef60266633c"
+    "sha2": "ee9e9e2b6cafdef28b7cfdf26f25d9fbf1d0ad56"
 }]

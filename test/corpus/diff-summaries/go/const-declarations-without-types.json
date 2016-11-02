@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const zero = 0' variable"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "1f2011e37b147ed302d59c268d2c88acc7ecb21e",
+    "sha1": "6441c54b049af06ea5b207347e8f2dcd7f2d49ac",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cfbaba48e0577f7fbb7916ed7661efdb598674b3"
+    "sha2": "c81859a654e29173459248f0c4c133bb3bc1c75b"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const one, two = 1, 2' variable"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const zero = 0' variable"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "cfbaba48e0577f7fbb7916ed7661efdb598674b3",
+    "sha1": "c81859a654e29173459248f0c4c133bb3bc1c75b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a1dd3cb0412f8ff3a4307096eb2675046e06bfd3"
+    "sha2": "e6a06e727526aa315ecd64d30dd5e91c44f4d408"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -120,7 +120,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' identifier in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Deleted the 'two' identifier in the const zero = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -147,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -162,7 +162,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -189,7 +189,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -204,7 +204,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module"
                 }
             ]
         },
@@ -213,9 +213,9 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "a1dd3cb0412f8ff3a4307096eb2675046e06bfd3",
+    "sha1": "e6a06e727526aa315ecd64d30dd5e91c44f4d408",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "47b9eca0d3d7368aa1733370fbf8e4a5bc6789a9"
+    "sha2": "a70b6f7e7ad30a604f11cc7fa0884d5a88155c47"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-replacement-test",
@@ -247,7 +247,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -262,7 +262,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added the 'two' identifier in the const one, two = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -289,7 +289,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -304,7 +304,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -331,7 +331,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -346,7 +346,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module"
                 }
             ]
         },
@@ -355,9 +355,9 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "47b9eca0d3d7368aa1733370fbf8e4a5bc6789a9",
+    "sha1": "a70b6f7e7ad30a604f11cc7fa0884d5a88155c47",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "06f0bdca2d330e5ee39de9dce2e00a6516c3e841"
+    "sha2": "625fffb9765bafa8911d5a6e719bbea9a0b8913f"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
@@ -377,7 +377,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const one, two = 1, 2' variable"
                 },
                 {
                     "span": {
@@ -392,7 +392,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const zero = 0' variable"
                 },
                 {
                     "span": {
@@ -407,7 +407,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const one, two = 1, 2' variable"
                 }
             ]
         },
@@ -416,9 +416,9 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "06f0bdca2d330e5ee39de9dce2e00a6516c3e841",
+    "sha1": "625fffb9765bafa8911d5a6e719bbea9a0b8913f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8b40144bbc397cbf5efda561526cd22a72044c6f"
+    "sha2": "642cf87f637c311491aeafc48ec28ad857c720d2"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-test",
@@ -438,7 +438,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const zero = 0' variable"
                 }
             ]
         },
@@ -447,9 +447,9 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "8b40144bbc397cbf5efda561526cd22a72044c6f",
+    "sha1": "642cf87f637c311491aeafc48ec28ad857c720d2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4a7b1b4dd7614d308458ca4a8c8f6e48f8a3cc33"
+    "sha2": "8f7a495d5411efc211433f7a59fc75d0142393ff"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-rest-test",
@@ -469,7 +469,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const one, two = 1, 2' variable"
                 }
             ]
         },
@@ -478,7 +478,7 @@
     "filePaths": [
         "const-declarations-without-types.go"
     ],
-    "sha1": "4a7b1b4dd7614d308458ca4a8c8f6e48f8a3cc33",
+    "sha1": "8f7a495d5411efc211433f7a59fc75d0142393ff",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "695775d7de8ee6e7d9459035b5cdb8acf8fd87d0"
+    "sha2": "de548a445085884fdfb90d01da226301f4dad242"
 }]

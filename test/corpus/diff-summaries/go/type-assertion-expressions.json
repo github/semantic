@@ -55,9 +55,9 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "73c559b495f6ff9c8f39dcc10334edd41460eb99",
+    "sha1": "3b0f415e64ca0d6eead8c4daee30aa047a4b23b8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b19ac0923c333fbbc804cfcfea3af2f4302b86cf"
+    "sha2": "70fc2d23169051562ee02343865a4e8935f6c535"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
@@ -89,7 +89,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -98,9 +98,9 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "b19ac0923c333fbbc804cfcfea3af2f4302b86cf",
+    "sha1": "70fc2d23169051562ee02343865a4e8935f6c535",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "70e0c936ce06d176d51e62442bed4c2f473e6526"
+    "sha2": "41c3abaaf3b9aef66bbacca468452c4fbbddf690"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -195,9 +195,9 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "70e0c936ce06d176d51e62442bed4c2f473e6526",
+    "sha1": "41c3abaaf3b9aef66bbacca468452c4fbbddf690",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7f27e82b562de8b5523124c8900c8dfa0a703ab6"
+    "sha2": "da3430e7ace3d04727fbf98f7a20edce8ceea40e"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -292,9 +292,9 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "7f27e82b562de8b5523124c8900c8dfa0a703ab6",
+    "sha1": "da3430e7ace3d04727fbf98f7a20edce8ceea40e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "096b2a7740203c1ebf6248583db8bb5d7abd5361"
+    "sha2": "739196c381079a94a809252bba373accebe996fa"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -443,9 +443,9 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "096b2a7740203c1ebf6248583db8bb5d7abd5361",
+    "sha1": "739196c381079a94a809252bba373accebe996fa",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ea8e0d2deba0338e0bab4dd0726e5f648e398cb3"
+    "sha2": "141cfd9904a0c02b4523070e62910cbdc53e41bf"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-test",
@@ -477,7 +477,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -486,9 +486,9 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "ea8e0d2deba0338e0bab4dd0726e5f648e398cb3",
+    "sha1": "141cfd9904a0c02b4523070e62910cbdc53e41bf",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7a3a44ec1b871b7544cd01387d1d857112007c6b"
+    "sha2": "aff24c1153b23de079a36015940d4f5f9d473122"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
@@ -547,7 +547,7 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "7a3a44ec1b871b7544cd01387d1d857112007c6b",
+    "sha1": "aff24c1153b23de079a36015940d4f5f9d473122",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6ad490616d145a9048a2ff16b8ae6412b32afbd7"
+    "sha2": "945d324da2e8064e4577d73a3ad739cf7a9f6057"
 }]

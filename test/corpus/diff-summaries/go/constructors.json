@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "8ee08bc998348eee3cec9bd4454856b40c289205",
+    "sha1": "6854d14b3fbd44b2760df78c70c200e923aa3ec0",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "14b412aea40f84f0c2981f7a2538be1412a4f38a"
+    "sha2": "a1582de2adbc1ccda3e81806ee8089f6c6bea3bf"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-insert-test",
@@ -443,9 +443,9 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "14b412aea40f84f0c2981f7a2538be1412a4f38a",
+    "sha1": "a1582de2adbc1ccda3e81806ee8089f6c6bea3bf",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d4cbb1a2a98579c2fb39a04ab6a4a837345bb337"
+    "sha2": "fd447b8b8c277f25e4c7bf99503be35a35c95bea"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -648,9 +648,9 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "d4cbb1a2a98579c2fb39a04ab6a4a837345bb337",
+    "sha1": "fd447b8b8c277f25e4c7bf99503be35a35c95bea",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3f7c40b950347c4682e937150a7c2a6d298c3f45"
+    "sha2": "1af751e7f25de1da525a923c9f7acdf30423a1c5"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -853,9 +853,9 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "3f7c40b950347c4682e937150a7c2a6d298c3f45",
+    "sha1": "1af751e7f25de1da525a923c9f7acdf30423a1c5",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "767f6b4f9f6332308a716c3708acb8ac54297cbb"
+    "sha2": "833ea3972d55a24a341319ce53dd046d95bdbd22"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -1454,9 +1454,9 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "767f6b4f9f6332308a716c3708acb8ac54297cbb",
+    "sha1": "833ea3972d55a24a341319ce53dd046d95bdbd22",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "066e981f07063ceb7a90a42a038bdd2f25e7c3b0"
+    "sha2": "686cb242114d21166deca8c833f61a902729cc1e"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-test",
@@ -1665,9 +1665,9 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "066e981f07063ceb7a90a42a038bdd2f25e7c3b0",
+    "sha1": "686cb242114d21166deca8c833f61a902729cc1e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "710a54d8515129cc9e197a18d862767e413d03d6"
+    "sha2": "310a699e8d88599ddea2bb710f397f0e54c2d0d2"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-rest-test",
@@ -1693,13 +1693,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -1708,7 +1708,7 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "710a54d8515129cc9e197a18d862767e413d03d6",
+    "sha1": "310a699e8d88599ddea2bb710f397f0e54c2d0d2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "145ba1102e7e5347dd04c111b164d61d38c9ae31"
+    "sha2": "a5455d6aea307dcbcf3211dbec952478cc49b7d6"
 }]

@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "c59c81e335632fc347fa27748287d80999c2375b",
+    "sha1": "28b0c3a66b80d952364a10f865fabfc73bfce780",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "32e37e3c25ae079a5432b9c6f3e2d516431c2f9c"
+    "sha2": "941ddf4cc85346856ce71f434963aa4ce384bc95"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-replacement-insert-test",
@@ -113,9 +113,9 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "32e37e3c25ae079a5432b9c6f3e2d516431c2f9c",
+    "sha1": "941ddf4cc85346856ce71f434963aa4ce384bc95",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "350ee3aa1729ac00093319a9d0861053d7dc9355"
+    "sha2": "79f22902721ae3e8e76855eb12057c115e834f3a"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
@@ -186,9 +186,9 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "350ee3aa1729ac00093319a9d0861053d7dc9355",
+    "sha1": "79f22902721ae3e8e76855eb12057c115e834f3a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9e1c432791fc6d892280a562e2dcd749174d2b43"
+    "sha2": "2c8f9ef158209a29c52e6698143123937f60e51f"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-replacement-test",
@@ -259,9 +259,9 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "9e1c432791fc6d892280a562e2dcd749174d2b43",
+    "sha1": "2c8f9ef158209a29c52e6698143123937f60e51f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "29fea417dae67e97c06d900175852498166c790d"
+    "sha2": "33e033da26b5da72aaf99f51f6b730dc8c4d58a7"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
@@ -365,9 +365,9 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "29fea417dae67e97c06d900175852498166c790d",
+    "sha1": "33e033da26b5da72aaf99f51f6b730dc8c4d58a7",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9e8fbe1656760ced3768fd954e9f0aa5dc19a675"
+    "sha2": "571d984cb30b25bc8e0da9591763b6e863d9b60e"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-test",
@@ -411,9 +411,9 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "9e8fbe1656760ced3768fd954e9f0aa5dc19a675",
+    "sha1": "571d984cb30b25bc8e0da9591763b6e863d9b60e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4183de6f5eba2fd450991b5eb6e20cea797ca61d"
+    "sha2": "3862809a1e37f209eb9b0056cce98fb47614a3d3"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-rest-test",
@@ -439,13 +439,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -454,7 +454,7 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "4183de6f5eba2fd450991b5eb6e20cea797ca61d",
+    "sha1": "3862809a1e37f209eb9b0056cce98fb47614a3d3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9c95d2e71798f845dfed004c431a9fe472d73712"
+    "sha2": "1d7cbf1ac12aee2949d2bd9e076088bcb41c16d8"
 }]

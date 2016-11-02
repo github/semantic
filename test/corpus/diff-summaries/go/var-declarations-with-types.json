@@ -40,9 +40,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "d4afe933f6ee43100478e802758721ea01d55fc2",
+    "sha1": "49f7c5c11209bf5ebc7898456a3093366058c42f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a5475c188dec5e51769af8c70c004ed5510f790f"
+    "sha2": "f06f169169659731f71a1803aca4a1e29fbce324"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-insert-test",
@@ -116,9 +116,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "a5475c188dec5e51769af8c70c004ed5510f790f",
+    "sha1": "f06f169169659731f71a1803aca4a1e29fbce324",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "45d4789eef7091b81d07eb2ea22a35a60caf4e68"
+    "sha2": "132198ac907ae18bbddaa35edd2d1b45c61ef50e"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -150,7 +150,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module statement"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -177,7 +177,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -204,7 +204,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the var one, two uint64 = 1, 2 variable of the 'main' module"
                 }
             ]
         },
@@ -213,9 +213,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "45d4789eef7091b81d07eb2ea22a35a60caf4e68",
+    "sha1": "132198ac907ae18bbddaa35edd2d1b45c61ef50e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d84cf434a01180a9a57920c679ae04c85831d406"
+    "sha2": "0955436f4771ec6ac2ac6262fb6aad6057ac8373"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -247,7 +247,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -274,7 +274,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -301,7 +301,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the var b, c uint64 = 1, 2 variable of the 'main' module"
                 }
             ]
         },
@@ -310,9 +310,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "d84cf434a01180a9a57920c679ae04c85831d406",
+    "sha1": "0955436f4771ec6ac2ac6262fb6aad6057ac8373",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7a5d5af3fb07561b632653885f03b7b4e4ed33b8"
+    "sha2": "bb2a1a230abc292e3d4094d3c5b4eea9eaea3d83"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -416,9 +416,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "7a5d5af3fb07561b632653885f03b7b4e4ed33b8",
+    "sha1": "bb2a1a230abc292e3d4094d3c5b4eea9eaea3d83",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d2368670210003569a3cf3fdb98b23de1d740f5d"
+    "sha2": "b696c5ffa236bb187860eca9f87ad254bf0738a6"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-test",
@@ -462,9 +462,9 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "d2368670210003569a3cf3fdb98b23de1d740f5d",
+    "sha1": "b696c5ffa236bb187860eca9f87ad254bf0738a6",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a83af033db025592ab9c667ffa2a2b97c03ceae0"
+    "sha2": "52d155c649c1a8fb890097bc78fd43024ee0af08"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-rest-test",
@@ -508,7 +508,7 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "a83af033db025592ab9c667ffa2a2b97c03ceae0",
+    "sha1": "52d155c649c1a8fb890097bc78fd43024ee0af08",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9526674a869db7eb34ea7c0f8f576c8ee39cfdf0"
+    "sha2": "a126270b1db656b7590698e8e22ef0e54e98bc30"
 }]

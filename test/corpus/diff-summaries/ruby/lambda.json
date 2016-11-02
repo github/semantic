@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-lambda-insert-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "2f2168edc8d0acbcdcf2e14df2188f727260ad2f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "34efedfc02ab3c716d99aeccd997b511f934b59c"
+}
+,{
+    "testCaseDescription": "ruby-lambda-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(x) function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "34efedfc02ab3c716d99aeccd997b511f934b59c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7fc22d4c0f96485547cd86ab5793a5ea5cf093e8"
+}
+,{
+    "testCaseDescription": "ruby-lambda-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced an anonymous(x) function with an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "7fc22d4c0f96485547cd86ab5793a5ea5cf093e8",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "55cecf3f169734926d6bc2461f64f191846ed85b"
+}
+,{
+    "testCaseDescription": "ruby-lambda-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced an anonymous() function with an anonymous(x) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "55cecf3f169734926d6bc2461f64f191846ed85b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "742c346748fd07ef606771abb373819572a3a11c"
+}
+,{
+    "testCaseDescription": "ruby-lambda-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(x) function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous() function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(x) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "742c346748fd07ef606771abb373819572a3a11c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7bcf126286a94ea339c4259efd6e09daf621614a"
+}
+,{
+    "testCaseDescription": "ruby-lambda-delete-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous() function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "7bcf126286a94ea339c4259efd6e09daf621614a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3af2c38183a09d4b7136efccd201cc29a98b643e"
+}
+,{
+    "testCaseDescription": "ruby-lambda-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "lambda.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(x) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda.rb"
+    ],
+    "sha1": "3af2c38183a09d4b7136efccd201cc29a98b643e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "82fa376f02abeb45af195e210cd5cee82ab00f07"
+}]

@@ -16,7 +16,67 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
                 }
             ]
         },
@@ -25,9 +85,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "c045ff3f947ef07efb66258da960573d23425ef8",
+    "sha1": "3a61a858942b4899c542089a62db4e48aabe2e0b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "fa41637f26ae9169c56cfcc63c20649f70beaced"
+    "sha2": "1ca98722dc54335828a92a6f907ab275bf9087f8"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-insert-test",
@@ -47,7 +107,67 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
                 },
                 {
                     "span": {
@@ -62,7 +182,67 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
                 }
             ]
         },
@@ -71,9 +251,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "fa41637f26ae9169c56cfcc63c20649f70beaced",
+    "sha1": "1ca98722dc54335828a92a6f907ab275bf9087f8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d2e376622f5540d3b75250c0494b2869c6b0419e"
+    "sha2": "5d9b8caa096a3020ba77b5e2d19b67a3ff75f564"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -150,7 +330,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'c' identifier in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the 'a' identifier with the 'c' identifier in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -177,7 +357,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''1'' rune_literal with the ''\\u0000'' rune_literal in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the ''1'' rune_literal with the ''\\u0000'' rune_literal in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -204,7 +384,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''1'' rune_literal with the ''\\u0000'' rune_literal in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the ''1'' rune_literal with the ''\\u0000'' rune_literal in the const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -288,9 +468,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "d2e376622f5540d3b75250c0494b2869c6b0419e",
+    "sha1": "5d9b8caa096a3020ba77b5e2d19b67a3ff75f564",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e299504d63c8bb06b490afe3d7ec6758965c6ec5"
+    "sha2": "b2c010468e685bb45e9cbd60e42aa97787d18154"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -342,8 +522,8 @@
                             },
                             {
                                 "start": [
-                                    6,
-                                    2
+                                    7,
+                                    1
                                 ],
                                 "end": [
                                     7,
@@ -352,7 +532,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the ''\nc' identifier in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the 'a' identifier with the 'c' identifier in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -379,7 +559,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''0'' rune_literal with the ''\\u0011'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the ''0'' rune_literal with the ''\\u0011'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -406,7 +586,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''0'' rune_literal with the ''\\u0011'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the ''0'' rune_literal with the ''\\u0011'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -448,7 +628,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -475,7 +655,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''\\''' rune_literal with the ''\\U01234568'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the ''\\''' rune_literal with the ''\\U01234568'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -502,7 +682,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''\\''' rune_literal with the ''\\U01234568'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module statement"
+                    "summary": "Replaced the ''\\''' rune_literal with the ''\\U01234568'' rune_literal in the const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n) variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -556,9 +736,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "e299504d63c8bb06b490afe3d7ec6758965c6ec5",
+    "sha1": "b2c010468e685bb45e9cbd60e42aa97787d18154",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ef44f2e21b529886482531bdd2c61218bd7fbea7"
+    "sha2": "1d6520c3c6c2909e82e258789d618e9920ee8483"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -578,7 +758,67 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
                 },
                 {
                     "span": {
@@ -593,7 +833,67 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
                 },
                 {
                     "span": {
@@ -608,7 +908,67 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
                 }
             ]
         },
@@ -617,9 +977,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "ef44f2e21b529886482531bdd2c61218bd7fbea7",
+    "sha1": "1d6520c3c6c2909e82e258789d618e9920ee8483",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c595efe7e96e25c432bd8227f72e2e1023ea7325"
+    "sha2": "1283ba9405675015e964aab10f36a5975cf25338"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-test",
@@ -639,7 +999,67 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' variable"
                 }
             ]
         },
@@ -648,9 +1068,9 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "c595efe7e96e25c432bd8227f72e2e1023ea7325",
+    "sha1": "1283ba9405675015e964aab10f36a5975cf25338",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3399ffa8d6d0e309977383e5a4d6965d4f6a10cb"
+    "sha2": "bfde70b9a4f2658e15fae5f3f6f3bccad9ecdb0e"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-rest-test",
@@ -670,7 +1090,67 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' variable"
                 }
             ]
         },
@@ -679,7 +1159,7 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "3399ffa8d6d0e309977383e5a4d6965d4f6a10cb",
+    "sha1": "bfde70b9a4f2658e15fae5f3f6f3bccad9ecdb0e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9ceb761546755e65b00bea7b69a48067c839fd92"
+    "sha2": "c2ac2649bbe37066912f27d1a9dd06e502bbd931"
 }]

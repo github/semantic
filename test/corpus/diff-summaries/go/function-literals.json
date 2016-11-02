@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s1 = func(s string) (int, int) {\nreturn 1, 2\n}' variable"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "983eb1450c5072209bad90940adbf92b571a9b68",
+    "sha1": "981e8897dfad97ce02faaf965f3bdb5e4843be21",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4ea8aeddec41ed4b6b3253549caea239a0ffdeb3"
+    "sha2": "efa00b7b16e53f8ba37503304db92d9a31a8f4ae"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s1 = func(b int) (string, string) {\nreturn 1, 2\n}' variable"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s1 = func(s string) (int, int) {\nreturn 1, 2\n}' variable"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "4ea8aeddec41ed4b6b3253549caea239a0ffdeb3",
+    "sha1": "efa00b7b16e53f8ba37503304db92d9a31a8f4ae",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5315f0c543b5c7f737e31f0929a8e4dccdfa5387"
+    "sha2": "23a734ac6cf652e91374d4c3bf7f3cef9d484751"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -132,7 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -159,7 +159,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 's' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -186,7 +186,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s1 = func(s string) (int, int) {\nreturn 1, 2\n} variable of the 'main' module"
                 }
             ]
         },
@@ -195,9 +195,9 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "5315f0c543b5c7f737e31f0929a8e4dccdfa5387",
+    "sha1": "23a734ac6cf652e91374d4c3bf7f3cef9d484751",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "53ddca1e353c55bf878ea4779d0cd1ef1a663875"
+    "sha2": "b4c16bb2743eb368f3382b65994ad7fdef7ffbf2"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
@@ -229,7 +229,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 's' identifier with the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -256,7 +256,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -283,7 +283,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 's' identifier with the 'b' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -310,7 +310,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the const s1 = func(b int) (string, string) {\nreturn 1, 2\n} variable of the 'main' module"
                 }
             ]
         },
@@ -319,9 +319,9 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "53ddca1e353c55bf878ea4779d0cd1ef1a663875",
+    "sha1": "b4c16bb2743eb368f3382b65994ad7fdef7ffbf2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "780c6d2300b097caf66e08da85ef5881db8488ff"
+    "sha2": "cbc1bff0282e97f99c8d5dd0dc02641d5011e11b"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
@@ -341,7 +341,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s1 = func(b int) (string, string) {\nreturn 1, 2\n}' variable"
                 },
                 {
                     "span": {
@@ -356,7 +356,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s1 = func(s string) (int, int) {\nreturn 1, 2\n}' variable"
                 },
                 {
                     "span": {
@@ -371,7 +371,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s1 = func(b int) (string, string) {\nreturn 1, 2\n}' variable"
                 }
             ]
         },
@@ -380,9 +380,9 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "780c6d2300b097caf66e08da85ef5881db8488ff",
+    "sha1": "cbc1bff0282e97f99c8d5dd0dc02641d5011e11b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c0a486ce05740222a11ba3e2ba004ae8250195e7"
+    "sha2": "35d96e82d28559a6bd80450c492a74941dd65e95"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-test",
@@ -402,7 +402,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s1 = func(s string) (int, int) {\nreturn 1, 2\n}' variable"
                 }
             ]
         },
@@ -411,9 +411,9 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "c0a486ce05740222a11ba3e2ba004ae8250195e7",
+    "sha1": "35d96e82d28559a6bd80450c492a74941dd65e95",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "40858bf6dee1200b6da2da6b63a315adc8f65d3b"
+    "sha2": "6eef58c074db1cbfa9777aeec085c159091ddb27"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-rest-test",
@@ -433,7 +433,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s1 = func(b int) (string, string) {\nreturn 1, 2\n}' variable"
                 }
             ]
         },
@@ -442,7 +442,7 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "40858bf6dee1200b6da2da6b63a315adc8f65d3b",
+    "sha1": "6eef58c074db1cbfa9777aeec085c159091ddb27",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "100eca47d63aa29d3554dd95b7a8d4078de39b8a"
+    "sha2": "6441c54b049af06ea5b207347e8f2dcd7f2d49ac"
 }]

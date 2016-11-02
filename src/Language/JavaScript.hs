@@ -5,6 +5,7 @@ import Data.Record
 import Info
 import Prologue
 import Source
+import Language
 import qualified Syntax as S
 import Term
 
@@ -59,10 +60,9 @@ termConstructor source sourceSpan name range children
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
-    ("if_statement", [ expr, thenClause, elseClause ]) -> toElseIf expr thenClause elseClause
-    ("if_statement", [ expr, thenClause ]) -> S.If expr thenClause []
+    ("if_statement", expr : rest ) -> S.If expr rest
     ("if_statement", _ ) -> S.Error children
-    ("while_statement", [ expr, body ]) -> S.While expr body
+    ("while_statement", expr : rest ) -> S.While expr rest
     ("while_statement", _ ) -> S.Error children
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
     ("do_statement", _ ) -> S.Error children
@@ -92,15 +92,14 @@ termConstructor source sourceSpan name range children
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
-    -- _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
     _ | name `elem` forStatements -> case unsnoc children of
-          Just (exprs, body) -> S.For exprs body
+          Just (exprs, body) -> S.For exprs [body]
           _ -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
-          [ body ] -> S.AnonymousFunction [] body
-          [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) body
-          [ id, params, body ] -> S.Function id (toList (unwrap params)) body
+          [ body ] -> S.AnonymousFunction [] [body]
+          [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
+          [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
           _ -> S.Error children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
@@ -175,25 +174,3 @@ categoryForJavaScriptProductionName name = case name of
   "import_statement" -> Import
   "export_statement" -> Export
   _ -> Other name
-
-toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
-toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
-
--- | Convert a If Term to If Syntax. This handles nested else-if clauses recursively,
--- | and satisfies arbitrarily long else-if clauses.
-toElseIf :: Term (S.Syntax Text) (Record fields)
-         -> Term (S.Syntax Text) (Record fields)
-         -> Term (S.Syntax Text) (Record fields)
-         -> S.Syntax Text (Term (S.Syntax Text) (Record fields))
-toElseIf expr thenClause elseClause = S.If expr thenClause (elseClause' elseClause)
-  where
-    elseClause' term = case unwrap term of
-      S.If _ _ [] -> [ term ]
-      S.If then' else' children -> [ cofree (extract term :< S.If then' else' []) ] <> (elseClause' =<< children)
-      _ -> [ term ]
-
-toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
-toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
-toTuple child = pure child

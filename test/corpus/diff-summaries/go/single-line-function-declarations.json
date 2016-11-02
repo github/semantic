@@ -55,9 +55,9 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "c62fd0c3f6a911988a043877a6a266a87c8bda85",
+    "sha1": "963af3d86cc194c28945654f8b40ef3d63b192b4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4a3ff00c74849f18c930210fb60ae18674e537ab"
+    "sha2": "a6e1c173ef317526b0231bceba1f20153333c1f4"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-insert-test",
@@ -161,9 +161,9 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "4a3ff00c74849f18c930210fb60ae18674e537ab",
+    "sha1": "a6e1c173ef317526b0231bceba1f20153333c1f4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "91fab6118b27efa523dc1a02d657509dc58bb020"
+    "sha2": "9e3ebf308dd7fb5938baa240ae9cffaffe33053b"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-insert-test",
@@ -195,7 +195,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function of the 'main' module statement"
+                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -222,7 +222,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function of the 'main' module statement"
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -249,7 +249,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function of the 'main' module statement"
+                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function of the 'main' module"
                 }
             ]
         },
@@ -258,9 +258,9 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "91fab6118b27efa523dc1a02d657509dc58bb020",
+    "sha1": "9e3ebf308dd7fb5938baa240ae9cffaffe33053b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2152efba4d3f33c0d84c4a74344f44494888c34e"
+    "sha2": "f67968105669bafc466bdfcb3246cc8891416367"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-test",
@@ -292,7 +292,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function of the 'main' module statement"
+                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -319,7 +319,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function of the 'main' module statement"
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -346,7 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function of the 'main' module statement"
+                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function of the 'main' module"
                 }
             ]
         },
@@ -355,9 +355,9 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "2152efba4d3f33c0d84c4a74344f44494888c34e",
+    "sha1": "f67968105669bafc466bdfcb3246cc8891416367",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b398ba7b59d791e164e17b070ab0ea80148a859f"
+    "sha2": "87528ff17b29928b2c0c8f9ead0d9cf497709726"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-replacement-test",
@@ -506,9 +506,9 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "b398ba7b59d791e164e17b070ab0ea80148a859f",
+    "sha1": "87528ff17b29928b2c0c8f9ead0d9cf497709726",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a47ef6fe83703cc0e2505b9921a1caa646771a49"
+    "sha2": "7dc522e13f322c49a3d2f2cb32272d05db67347a"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-test",
@@ -567,9 +567,9 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "a47ef6fe83703cc0e2505b9921a1caa646771a49",
+    "sha1": "7dc522e13f322c49a3d2f2cb32272d05db67347a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2a3a4808e1a4338f4dac9e7e0ede241d35d228d8"
+    "sha2": "40e62607d3a6b6acf6a64b5db7e8216b07b162b4"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-rest-test",
@@ -628,7 +628,7 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "2a3a4808e1a4338f4dac9e7e0ede241d35d228d8",
+    "sha1": "40e62607d3a6b6acf6a64b5db7e8216b07b162b4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a7f621807353a58b95ec3ac935f932964497f767"
+    "sha2": "f49684f58e6ec16d5644ed2baf457ad0f8a3b4f8"
 }]

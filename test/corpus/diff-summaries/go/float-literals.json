@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "f8f8ce8f9e9aefb2fabeb8fc268b879015888356",
+    "sha1": "af9c44071dea2b1491294d94b985eb7d50b1db23",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "decfb0a573276896557a35182b233da332d1548d"
+    "sha2": "526d783f3545fd9be0093ffa39ff36e647b55576"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-insert-test",
@@ -353,9 +353,9 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "decfb0a573276896557a35182b233da332d1548d",
+    "sha1": "526d783f3545fd9be0093ffa39ff36e647b55576",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3c22c98ee4b1870536c252f98898c8d1bd4017b2"
+    "sha2": "8172994af243c84ec7c9a2437227857d3d1460b4"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-insert-test",
@@ -603,9 +603,9 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "3c22c98ee4b1870536c252f98898c8d1bd4017b2",
+    "sha1": "8172994af243c84ec7c9a2437227857d3d1460b4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e0985a68eaf35d158ee63bc806e593563bbbf549"
+    "sha2": "8b37dcd5ee8df1e4755703a44d07996343ddf157"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-test",
@@ -919,9 +919,9 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "e0985a68eaf35d158ee63bc806e593563bbbf549",
+    "sha1": "8b37dcd5ee8df1e4755703a44d07996343ddf157",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a5f9c49d77e56579422bca3e09f05848a931398f"
+    "sha2": "740f858bbaa224096c96bfae49338029239fd14c"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-replacement-test",
@@ -1385,9 +1385,9 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "a5f9c49d77e56579422bca3e09f05848a931398f",
+    "sha1": "740f858bbaa224096c96bfae49338029239fd14c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b2506c379e3fea4b8f3b347729f63367b536b71a"
+    "sha2": "0cdc8aeacbfa88bf1386cf49abdaf689cf7fbc2c"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-test",
@@ -1551,9 +1551,9 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "b2506c379e3fea4b8f3b347729f63367b536b71a",
+    "sha1": "0cdc8aeacbfa88bf1386cf49abdaf689cf7fbc2c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "04b1a4a5a07771156fded99cbf234c6447cda08c"
+    "sha2": "cceb8c2bbd739f4de26d66d44b2999e79e149392"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-rest-test",
@@ -1579,13 +1579,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -1594,7 +1594,7 @@
     "filePaths": [
         "float-literals.go"
     ],
-    "sha1": "04b1a4a5a07771156fded99cbf234c6447cda08c",
+    "sha1": "cceb8c2bbd739f4de26d66d44b2999e79e149392",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c045ff3f947ef07efb66258da960573d23425ef8"
+    "sha2": "3a61a858942b4899c542089a62db4e48aabe2e0b"
 }]

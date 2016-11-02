@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n}' variable"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "2926f76aaec01c436ab4b47d2b9cd747bf3b9fa7",
+    "sha1": "1c76e1a79f5693b09e77783a8edc048b2c4021eb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "70cd8707f1229eaa2b7150cc33b5e60dd2141cd8"
+    "sha2": "940065062c40ebf7a804690510c2c40a47be14a2"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n}' variable"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n}' variable"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "70cd8707f1229eaa2b7150cc33b5e60dd2141cd8",
+    "sha1": "940065062c40ebf7a804690510c2c40a47be14a2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bfb40162b91db3250d17240e9dd480dcec465e3e"
+    "sha2": "4d8541fff32ce32cb2f2e4c778f7b0e75d101c8a"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -132,7 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -159,7 +159,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -186,7 +186,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -213,7 +213,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -240,7 +240,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -267,7 +267,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -294,7 +294,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -321,7 +321,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -348,7 +348,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n} variable of the 'main' module"
                 }
             ]
         },
@@ -357,9 +357,9 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "bfb40162b91db3250d17240e9dd480dcec465e3e",
+    "sha1": "4d8541fff32ce32cb2f2e4c778f7b0e75d101c8a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3696a236dc14eb582974ff7008702a9542e410e3"
+    "sha2": "387072cbc62d10f75f9937444d43766ced85609f"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-test",
@@ -379,7 +379,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Deleted the 'string' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -394,7 +394,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Added the 'int' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -409,7 +409,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"foo\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Added the \"foo\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -424,7 +424,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"bar\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Added the \"bar\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -451,7 +451,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -466,7 +466,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"bye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Deleted the \"bye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -481,7 +481,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"goodbye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Deleted the \"goodbye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -496,7 +496,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Deleted the 'string' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -511,7 +511,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Added the 'int' identifier in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -526,7 +526,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"foo\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Added the \"foo\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -541,7 +541,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"bar\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Added the \"bar\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -568,7 +568,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -583,7 +583,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"bye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Deleted the \"bye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -598,7 +598,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"goodbye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module statement"
+                    "summary": "Deleted the \"goodbye\" string in the const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n} variable of the 'main' module"
                 }
             ]
         },
@@ -607,9 +607,9 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "3696a236dc14eb582974ff7008702a9542e410e3",
+    "sha1": "387072cbc62d10f75f9937444d43766ced85609f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5881494b8ddd42ae7c405f8a0be0c822d9aea996"
+    "sha2": "f5ca6cc8c3c429ee13dc11c166a4d6d5caae389c"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-replacement-test",
@@ -629,7 +629,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n}' variable"
                 },
                 {
                     "span": {
@@ -644,7 +644,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n}' variable"
                 },
                 {
                     "span": {
@@ -659,7 +659,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'variable' variable"
+                    "summary": "Added the 'const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n}' variable"
                 }
             ]
         },
@@ -668,9 +668,9 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "5881494b8ddd42ae7c405f8a0be0c822d9aea996",
+    "sha1": "f5ca6cc8c3c429ee13dc11c166a4d6d5caae389c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "959e787f143cda07c6733f0b9d96426a7448373d"
+    "sha2": "94b9d841fae0600f846fb030e0aefda2c4f01369"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-test",
@@ -690,7 +690,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s = map[string]string{\n\"hi\": \"hello\",\n\"bye\": \"goodbye\",\n}' variable"
                 }
             ]
         },
@@ -699,9 +699,9 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "959e787f143cda07c6733f0b9d96426a7448373d",
+    "sha1": "94b9d841fae0600f846fb030e0aefda2c4f01369",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e9e0e5a6a5feb6932465e6f76e425a844f361f43"
+    "sha2": "fa27edc1e4abe6cf44d66c222fb9f64de900aef5"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-rest-test",
@@ -721,7 +721,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'variable' variable"
+                    "summary": "Deleted the 'const s = map[string]int{\n\"foo\": \"bar\",\n\"baz\": \"hello\",\n}' variable"
                 }
             ]
         },
@@ -730,7 +730,7 @@
     "filePaths": [
         "map-literals.go"
     ],
-    "sha1": "e9e0e5a6a5feb6932465e6f76e425a844f361f43",
+    "sha1": "fa27edc1e4abe6cf44d66c222fb9f64de900aef5",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b8ab52c67b64545630b064786a830245f0f3e923"
+    "sha2": "2a84ca72f3317af6335480d69f4b155e133a4a3f"
 }]

@@ -22,7 +22,7 @@ import Term
 import qualified Data.Map as Map
 
 -- | Render a diff to a string representing its JSON.
-json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
+json :: (ToJSON (Record fields), HasField fields Category, HasField fields Range) => Renderer (Record fields)
 json blobs diff = JSONOutput $ Map.fromList [
   ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
   ("oids", toJSON (oid <$> blobs)),
@@ -32,7 +32,7 @@ json blobs diff = JSONOutput $ Map.fromList [
 -- | A numbered 'a'.
 newtype NumberedLine a = NumberedLine (Int, a)
 
-instance (HasField fields Category, HasField fields Range) => ToJSON (NumberedLine (SplitSyntaxDiff leaf fields)) where
+instance (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range) => ToJSON (NumberedLine (SplitSyntaxDiff leaf fields)) where
   toJSON (NumberedLine (n, a)) = object (lineFields n a (getRange a))
   toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n a (getRange a))
 
@@ -51,7 +51,7 @@ instance ToJSON a => ToJSON (Join These a) where
 instance ToJSON a => ToJSON (Join (,) a) where
   toJSON (Join (a, b)) = A.Array . Vector.fromList $ toJSON <$> [ a, b ]
 
-instance (HasField fields Category, HasField fields Range) => ToJSON (SplitSyntaxDiff leaf fields) where
+instance (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range) => ToJSON (SplitSyntaxDiff leaf fields) where
   toJSON splitDiff = case runFree splitDiff of
     (Free (info :< syntax)) -> object (termFields info syntax)
     (Pure patch)            -> object (patchFields patch)
@@ -59,11 +59,13 @@ instance (HasField fields Category, HasField fields Range) => ToJSON (SplitSynta
     (Free (info :< syntax)) -> pairs $ mconcat (termFields info syntax)
     (Pure patch)            -> pairs $ mconcat (patchFields patch)
 
-instance (HasField fields Category, HasField fields Range) => ToJSON (SyntaxTerm leaf fields) where
-  toJSON term     | (info :< syntax) <- runCofree term = object (termFields info syntax)
-  toEncoding term | (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
+instance (ToJSON (Record fields), ToJSON leaf, HasField fields Category, HasField fields Range) => ToJSON (SyntaxTerm leaf fields) where
+  toJSON term     |
+    (info :< syntax) <- runCofree term = object (termFields info syntax)
+  toEncoding term |
+    (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
 
-lineFields :: (HasField fields Category, HasField fields Range) => KeyValue kv => Int -> SplitSyntaxDiff leaf fields -> Range -> [kv]
+lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range) => KeyValue kv => Int -> SplitSyntaxDiff leaf fields -> Range -> [kv]
 lineFields n term range = [ "number" .= n
                           , "terms" .= [ term ]
                           , "range" .= range
@@ -76,12 +78,14 @@ termFields :: (ToJSON recur, KeyValue kv, HasField fields Category, HasField fie
   [kv]
 termFields info syntax = "range" .= characterRange info : "category" .= category info : syntaxToTermField syntax
 
-patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
+patchFields :: (ToJSON (Record fields), ToJSON leaf, KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
 patchFields patch = case patch of
   SplitInsert term -> fields "insert" term
   SplitDelete term -> fields "delete" term
   SplitReplace term -> fields "replace" term
-  where fields kind term | (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax
+  where
+    fields kind term |
+      (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax
 
 syntaxToTermField :: (ToJSON recur, KeyValue kv) => Syntax leaf recur -> [kv]
 syntaxToTermField syntax = case syntax of
@@ -118,8 +122,12 @@ syntaxToTermField syntax = case syntax of
   S.Array c -> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier parameters definitions -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
-  S.If expression thenClause elseClause -> [ "expression" .= expression ] <> [ "thenClause" .=  thenClause ] <> [ "elseClause" .= elseClause ]
+  S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
   S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
+  S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
+  S.Yield expr -> [ "yieldExpression" .= expr ]
+  S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
+  S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
   where childrenFields c = [ "children" .= c ]

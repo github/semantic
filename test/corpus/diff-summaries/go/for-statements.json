@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "c58a83bbf602ce57397e0c47701657a2eeef4743",
+    "sha1": "42c8c935a7c1551e95018796bad419be71492b95",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4abacb0b5aa74ec3de6d1dac8152d78c357928bd"
+    "sha2": "059c8287fd91738a531084356de2c9a451155ca7"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-insert-test",
@@ -59,7 +59,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'main' module statement"
+                    "summary": "Added the 'main' module"
                 },
                 {
                     "span": {
@@ -419,7 +419,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'main' module statement"
+                    "summary": "Deleted the 'main' module"
                 },
                 {
                     "span": {
@@ -563,9 +563,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "4abacb0b5aa74ec3de6d1dac8152d78c357928bd",
+    "sha1": "059c8287fd91738a531084356de2c9a451155ca7",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "135cdd572d9b008d411cd91cd174db3f403b327f"
+    "sha2": "f9284067e1cc1f8f7fabe5551fdd14c4eab4c5a5"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -585,7 +585,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'main' module statement"
+                    "summary": "Added the 'main' module"
                 },
                 {
                     "span": {
@@ -1035,7 +1035,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'main' module statement"
+                    "summary": "Deleted the 'main' module"
                 },
                 {
                     "span": {
@@ -1389,9 +1389,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "135cdd572d9b008d411cd91cd174db3f403b327f",
+    "sha1": "f9284067e1cc1f8f7fabe5551fdd14c4eab4c5a5",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2879a7c386785c287782dc5286f026f3bb4dae30"
+    "sha2": "c0c5aeeed497ceb98e8ebba5f4898b5d091145b6"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -1411,7 +1411,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'main' module statement"
+                    "summary": "Added the 'main' module"
                 },
                 {
                     "span": {
@@ -1771,7 +1771,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'main' module statement"
+                    "summary": "Deleted the 'main' module"
                 },
                 {
                     "span": {
@@ -2215,9 +2215,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "2879a7c386785c287782dc5286f026f3bb4dae30",
+    "sha1": "c0c5aeeed497ceb98e8ebba5f4898b5d091145b6",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "40023fe2683119f96ea0d241592e763a7f82c0dc"
+    "sha2": "cb3acf47b43daeef489dcaae854d7917376f3bff"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -2237,7 +2237,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'main' module statement"
+                    "summary": "Added the 'main' module"
                 },
                 {
                     "span": {
@@ -2762,7 +2762,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'main' module statement"
+                    "summary": "Deleted the 'main' module"
                 },
                 {
                     "span": {
@@ -3116,9 +3116,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "40023fe2683119f96ea0d241592e763a7f82c0dc",
+    "sha1": "cb3acf47b43daeef489dcaae854d7917376f3bff",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b7d6eccbd2d44c954286798a480efb2734b05373"
+    "sha2": "7109c4c6966d880c970803a88bbac22e1cb449bb"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-test",
@@ -3138,7 +3138,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'main' module statement"
+                    "summary": "Added the 'main' module"
                 },
                 {
                     "span": {
@@ -3228,7 +3228,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'main' module statement"
+                    "summary": "Deleted the 'main' module"
                 },
                 {
                     "span": {
@@ -3747,9 +3747,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "b7d6eccbd2d44c954286798a480efb2734b05373",
+    "sha1": "7109c4c6966d880c970803a88bbac22e1cb449bb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2a5b9c44bff8753b8b66a77f761c27ec94d2a07e"
+    "sha2": "bf67cb076d45f7985e5d4a46022c846389480f53"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-rest-test",
@@ -3775,13 +3775,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -3790,7 +3790,7 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "2a5b9c44bff8753b8b66a77f761c27ec94d2a07e",
+    "sha1": "bf67cb076d45f7985e5d4a46022c846389480f53",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "602002fbeead9ddd8750c5f5f19dace772849a7d"
+    "sha2": "305a886d1e741aeb715c8399abd10ec0630c6b12"
 }]

@@ -12,8 +12,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             },
                             {
@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -37,9 +37,9 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "13df9701af605c4280df078280e08d6ab1968968",
+    "sha1": "3dbb88110076ebab6cb0b0937d3cba0eb50c8438",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ce4bfd2a4247e364b1c272fdcbac1b3bac4bc8e9"
+    "sha2": "5409673b619631be39bfdd86545216a84f1de96d"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-insert-test",
@@ -323,9 +323,9 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "ce4bfd2a4247e364b1c272fdcbac1b3bac4bc8e9",
+    "sha1": "5409673b619631be39bfdd86545216a84f1de96d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ccab9eaab8618f123ac97579820c9d697d0ec834"
+    "sha2": "b75f26b11601dc0c01d2659923263008412b6699"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-insert-test",
@@ -609,9 +609,9 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "ccab9eaab8618f123ac97579820c9d697d0ec834",
+    "sha1": "b75f26b11601dc0c01d2659923263008412b6699",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4059b60b3b7a9e7e2285a1ce167f98a3d7e45300"
+    "sha2": "8b45a3089420566f74a251179c54cf2977e123f0"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-test",
@@ -895,9 +895,9 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "4059b60b3b7a9e7e2285a1ce167f98a3d7e45300",
+    "sha1": "8b45a3089420566f74a251179c54cf2977e123f0",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b1652f1671658dcee352e4a604117f6f76c2b7d8"
+    "sha2": "1bc737345727f56fb52b7cb42eee08e7d4db02c7"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-replacement-test",
@@ -1316,9 +1316,9 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "b1652f1671658dcee352e4a604117f6f76c2b7d8",
+    "sha1": "1bc737345727f56fb52b7cb42eee08e7d4db02c7",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cef6aefcee5f4cedc5a14166298e49f4e9e2bc30"
+    "sha2": "1ae030b4609ef419ef7899284d03ac47dc576bea"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-test",
@@ -1467,9 +1467,9 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "cef6aefcee5f4cedc5a14166298e49f4e9e2bc30",
+    "sha1": "1ae030b4609ef419ef7899284d03ac47dc576bea",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d4917f915054c0d4fc755c74d357d2f6868605ab"
+    "sha2": "bccd1d9ce186e9b6f51e3a8e117d85566459ffd3"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-rest-test",
@@ -1495,13 +1495,13 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    13
+                                    3,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -1510,7 +1510,7 @@
     "filePaths": [
         "call-expressions.go"
     ],
-    "sha1": "d4917f915054c0d4fc755c74d357d2f6868605ab",
+    "sha1": "bccd1d9ce186e9b6f51e3a8e117d85566459ffd3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "983eb1450c5072209bad90940adbf92b571a9b68"
+    "sha2": "981e8897dfad97ce02faaf965f3bdb5e4843be21"
 }]

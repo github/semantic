@@ -1,0 +1,292 @@
+[{
+    "testCaseDescription": "ruby-and-or-insert-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo and bar' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "f9e62bf41467cae8ada35780dd97dbbbddf57da5",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3dbda12dac387b0d37ca78e7f01809e8f3e7a39b"
+}
+,{
+    "testCaseDescription": "ruby-and-or-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo or bar' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a or b and c' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo and bar' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "3dbda12dac387b0d37ca78e7f01809e8f3e7a39b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e28ff49e1a934201eb081645ddbbd5983b7cff3e"
+}
+,{
+    "testCaseDescription": "ruby-and-or-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a or b and c' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "e28ff49e1a934201eb081645ddbbd5983b7cff3e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c3983115a7ed26e52980b39fbb57d1f26a31e1fe"
+}
+,{
+    "testCaseDescription": "ruby-and-or-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a or b and c' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "c3983115a7ed26e52980b39fbb57d1f26a31e1fe",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f6e7e8cee1becdcc3ecfb253d5004399b90c7638"
+}
+,{
+    "testCaseDescription": "ruby-and-or-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo or bar' boolean operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a or b and c' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a or b and c' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "f6e7e8cee1becdcc3ecfb253d5004399b90c7638",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a31ed69713710a876f50a672b66f36a10b49a681"
+}
+,{
+    "testCaseDescription": "ruby-and-or-delete-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo and bar' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "a31ed69713710a876f50a672b66f36a10b49a681",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d9e002237b1f453c85a84df06bc86a871b453d97"
+}
+,{
+    "testCaseDescription": "ruby-and-or-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo or bar' boolean operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a or b and c' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "d9e002237b1f453c85a84df06bc86a871b453d97",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e9bfaab31e3a83e3c8e8d890bd8e2a6cf1f5a529"
+}]
