@@ -14,73 +14,114 @@
       },
       {
         "syntax": "int-literal",
-        "repoFilePath": "int-literal.go",
         "insert": "const (\na = 1, b = 2, c = 3\n)",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/int-literal.json",
         "replacement": "const (\na = 4, b = 5, c = 6\n)"
       },
       {
         "syntax": "assignment",
-        "repoFilePath": "assignment.go",
         "insert": "var foo int = 42",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/assignment.json",
         "replacement": "var bar string = \"hello\""
       },
       {
-        "syntax": "function-call",
-        "repoFilePath": "function-call.go",
+        "syntax": "call-expressions.go",
         "insert": "a()",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/function-call.json",
         "replacement": "b()"
       },
       {
         "syntax": "function-literal",
-        "repoFilePath": "function-literal.go",
         "insert": "const s1 = func(s string) (int, int) {\nreturn 1, 2\n}",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/function-literal.json",
         "replacement": "const s1 = func(b int) (string, string) {\nreturn 1, 2\n}"
       },
       {
         "syntax": "const-declarations",
-        "repoFilePath": "const-declarations.go",
         "insert": "const zero = 0",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/const-declarations.json",
         "replacement": "const one, two = 1, 2"
       },
       {
         "syntax": "var-declarations",
-        "repoFilePath": "var-declarations.go",
         "insert": "var zero = 0",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
         "replacement": "var one, two = 1, 2"
       },
       {
         "syntax": "var-declarations",
-        "repoFilePath": "var-declarations.go",
         "insert": "var zero = 0",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
         "replacement": "var one, two = 1, 2"
       },
       {
         "syntax": "switch-statements",
-        "repoFilePath": "switch-statements.go",
         "insert": "switch { case x < y: f1()\ncase x < z: g()\ncase x == 4: h()\n}",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
         "replacement": "switch { case a < b: f1()\ncase c < d: g()\ncase e == 4: f()\n}"
       },
       {
         "syntax": "for-statements",
-        "repoFilePath": "for-statements.go",
         "insert": "for { case x < y: f1()\ncase x < z: g()\ncase x == 4: h()\n}",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
         "replacement": "func main() { for { a() goto loop }\nloop: for i := 0; i < 5; i++\n{ a()\nbreak loop\n}\nloop2: for ; i < 10; i++ \n{ \na()\ncontinue loop2\n}\nfor ;; { a() continue }\nfor x := range y { a(x)\nbreak }\n}"
       },
       {
         "syntax": "function-declarations",
-        "repoFilePath": "function-declarations.go",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/function-declarations.json",
         "insert": "func f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}",
         "replacement": "func fa() {}\nfunc fb(a int, b, c, d string) int {}\nfunc fc() (int, error) {}\nfunc fd() (result int, err error) {}"
+      },
+      {
+        "syntax": "function-declarations",
+        "repoFilePath": "function-declarations.go",
+        "insert": "func f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}",
+        "replacement": "func fa() {}\nfunc fb(a int, b, c, d string) int {}\nfunc fc() (int, error) {}\nfunc fd() (result int, err error) {}"
+      },
+      {
+        "syntax": "method-declarations",
+        "insert": "func (self Person) Equals(other Person) bool {}",
+        "replacement": "func (self Num) Equals(other Num) bool {}"
+      },
+      {
+        "syntax": "type-declarations",
+        "insert": "type a b\ntype (\n a b\n c d\n )",
+        "replacement": "type a' b'\ntype (\n a' b'\n c' d'\n )"
+      },
+      {
+        "syntax": "type-declarations",
+        "insert": "type a b\ntype (\n a b\n c d\n )",
+        "replacement": "type a' b'\ntype (\n a' b'\n c' d'\n )"
+      },
+      {
+        "syntax": "const-with-implicit-values",
+        "insert": "const (\n zero = iota\n one\n two\n )",
+        "replacement": "const (\n a = iota\n b\n c\n )"
+      },
+      {
+        "syntax": "const-with-implicit-values",
+        "insert": "const (\n zero = iota\n one\n two\n )",
+        "replacement": "const (\n a = iota\n b\n c\n )"
+      },
+      {
+        "syntax": "constructors",
+        "insert": "make(chan<- int)\nmake(chan<- int, (new - old))\nmake(chan<- int, 5, 10)\n new(map[string]string)",
+        "replacement": "make(chan<- string)\nmake(chan<- string, (new - old))\nmake(chan<- string, 7, 11)\n new(map[int]int)"
+      },
+      {
+        "syntax": "selector expressions",
+        "insert": "a.b.c()",
+        "replacement": "x.y.z()"
+      },
+      {
+        "syntax": "indexing expressions",
+        "insert": "a[1]\n b[:]\n c[1:]\n d[1:2]\n e[:2:3]\n f[1:2:3]",
+        "replacement": "z[:2]\n y[:1]\n x[1:]\n d[1:2]\n e[:2:3]\n f[1:2:3]"
+      }
+      {
+        "syntax": "type-assertion-expression",
+        "insert": "x.(z.Person)",
+        "replacement": "b.(c.Dog)"
+      },
+      {
+        "syntax": "type-conversion-expression",
+        "insert": "[]a.b(c.d)\n ([]a.b)(c.d)\n e.f(g)\n (e.f)(g)",
+        "replacement": "[]x.y(z.e)\n ([]f.g)(h.i)\n j.k(l)\n (m.n)(o)"
+      },
+      {
+        "syntax": "unary-expressions",
+        "insert": "!<-a\n*foo()",
+        "replacement": "!<-b\n*bar()"
       }
     ]
   }
