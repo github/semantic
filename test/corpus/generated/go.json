@@ -46,6 +46,13 @@
         "insert": "const zero = 0",
         "testCaseFilePath": "test/corpus/diff-summaries/go/const-declarations.json",
         "replacement": "const one, two = 1, 2"
+      },
+      {
+        "syntax": "var-declarations",
+        "repoFilePath": "var-declarations.go",
+        "insert": "var zero = 0",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
+        "replacement": "var one, two = 1, 2"
       }
     ]
   }
