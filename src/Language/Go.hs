@@ -32,22 +32,25 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) block
   -- TODO: Handle multiple var specs
-  ("var_declaration", [varSpec]) -> do
-    assignment' <- case toList (unwrap varSpec) of
-      [idList, _, exprs] -> do
-        identifier' <- idOrError idList
-        withDefaultInfo $ S.VarAssignment identifier' exprs
-      _ -> withCategory Error (S.Error [varSpec])
-    withDefaultInfo $ S.VarDecl assignment'
+  ("var_declaration", [varSpec]) -> toVarDecl varSpec
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
   ("const_declaration", constSpecs) -> toConsts constSpecs
   ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) body
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
+    toVarDecl varSpec = do
+      assignment' <- case toList (unwrap varSpec) of
+        [idList, _, exprs] -> do
+          identifier' <- idOrError idList
+          withDefaultInfo $ S.VarAssignment identifier' exprs
+        _ -> withCategory Error (S.Error [varSpec])
+      pure assignment'
+
     idOrError idList = case toList (unwrap idList) of
       [identifier] -> pure identifier
       _ -> withCategory Error (S.Error [idList])
+
     toConsts constSpecs = do
       assignments' <- sequenceA $ toVarAssignment <$> constSpecs
       constSpecs'<- withDefaultInfo (S.Indexed assignments')
