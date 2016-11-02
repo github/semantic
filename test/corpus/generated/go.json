@@ -6,6 +6,13 @@
     "templateText": "package main\n",
     "syntaxes": [
       {
+        "syntax": "imports",
+        "repoFilePath": "imports",
+        "insert": "import \"net/http\"\nimport . \"some/dsl\"\nimport alias \"some/package\"",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/imports.json",
+        "replacement": "import \"foo/bar\"\nimport . \"types/dsl\"\nimport alias \"awesome/packages\""
+      },
+      {
         "syntax": "int-literal",
         "repoFilePath": "int-literal.go",
         "insert": "const (\na = 1, b = 2, c = 3\n)",
