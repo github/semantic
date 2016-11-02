@@ -25,9 +25,8 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   -- TODO: Handle multiple var specs
-  ("var_declaration", varSpecs) -> do
-    varSpecs' <- mapM toVarDecl varSpecs
-    withDefaultInfo $ S.Indexed varSpecs'
+  ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
+  ("short_var_declaration", children) -> listToVarDecls children
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
   ("const_declaration", constSpecs) -> toConsts constSpecs
   ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
@@ -43,19 +42,18 @@ termConstructor source sourceSpan name range children = case (name, children) of
           xs@(_:_) -> sequenceA [ withCategory Error (S.Error xs)]
           [] -> pure []
 
-    toVarDecl varSpec = do
-      assignment' <- case toList (unwrap varSpec) of
-        [idList, exprs] | category (extract exprs) == Other "expression_list" -> do
-          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
-          withDefaultInfo (S.Indexed assignments')
-        [idList, _, exprs] -> do
-          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
-          withDefaultInfo (S.Indexed assignments')
-        idList : _ -> do
-           varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
-           withDefaultInfo (S.Indexed varDecls)
-        _ -> withCategory Error (S.Error [varSpec])
-      pure assignment'
+    toVarDecl varSpec = listToVarDecls (toList $ unwrap varSpec)
+    listToVarDecls list = case list of
+      [idList, exprs] | category (extract exprs) == Other "expression_list" -> do
+        assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
+        withDefaultInfo (S.Indexed assignments')
+      [idList, _, exprs] -> do
+        assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
+        withDefaultInfo (S.Indexed assignments')
+      idList : _ -> do
+         varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
+         withDefaultInfo (S.Indexed varDecls)
+      _ -> withCategory Error (S.Error list)
 
     toConsts constSpecs = do
       assignments' <- sequenceA $ toVarAssignment <$> constSpecs
