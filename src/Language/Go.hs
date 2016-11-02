@@ -7,6 +7,8 @@ import Source
 import Term
 import qualified Syntax as S
 import Data.Record
+import Range (unionRangesFrom)
+import SourceSpan (unionSourceSpansFrom)
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
@@ -27,14 +29,24 @@ termConstructor source sourceSpan name range children = case (name, children) of
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
+  ("if_statement", children) -> toIfStatement children
   ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
   ("const_declaration", constSpecs) -> toConsts constSpecs
   ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
+    toIfStatement clauses = case clauses of
+      [clause, block] ->
+        withDefaultInfo $ S.If clause (toList $ unwrap block)
+      [expr, block, elseBlock] | category (extract block) == Other "block" ->
+        withDefaultInfo $ S.If expr (toList (unwrap block) <> toList (unwrap elseBlock))
+      [expr, clause, block] -> do
+        clause' <- withRanges range If [expr, clause] (S.Indexed [expr, clause])
+        withDefaultInfo $ S.If clause' (toList $ unwrap block)
+      _ -> withCategory Error (S.Error clauses)
     toImports imports = do
-      imports' <- sequenceA $ toImport <$> imports
+      imports' <- mapM toImport imports
       withDefaultInfo $ S.Indexed (mconcat imports')
       where
         toImport i = case toList (unwrap i) of
@@ -71,6 +83,12 @@ termConstructor source sourceSpan name range children = case (name, children) of
            withDefaultInfo (S.Indexed varDecls)
         _ -> withCategory Error (S.Error [constSpec])
 
+    withRanges originalRange category' terms syntax = do
+      let ranges' = getField . extract <$> terms
+      sourceSpan' <- sourceSpan
+      let sourceSpans' = getField . extract <$> terms
+      pure $! cofree ((unionRangesFrom originalRange ranges' .: category' .: unionSourceSpansFrom sourceSpan' sourceSpans' .: RNil) :< syntax)
+
     withCategory category syntax = do
       sourceSpan' <- sourceSpan
       pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)
@@ -97,5 +115,6 @@ categoryForGoName = \case
   "assignment_statement" -> Assignment
   "source_file" -> Module
   "const_declaration" -> VarDecl
+  "if_statement" -> If
   s -> Other (toS s)
 

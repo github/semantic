@@ -37,9 +37,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "ae948d5012e6a04567eacf083e70f96375ffdd4c",
+    "sha1": "df19efe0f9c7778e2d07b53ee7eb0c542af2d71c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "13f3930aff04fb759c856029f8c5a987a7267ab1"
+    "sha2": "3f82812907f84a6ee493eee399fc421defbc3272"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-insert-test",
@@ -51,240 +51,90 @@
                         "insert": {
                             "start": [
                                 3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                5,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added the 'x()' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                14
-                            ],
-                            "end": [
-                                6,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
                                 1
                             ],
                             "end": [
-                                7,
-                                4
+                                8,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'd()' function call"
+                    "summary": "Added the 'y := b(); c' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 9,
-                                4
-                            ],
-                            "end": [
-                                9,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
                                 1
                             ],
                             "end": [
-                                10,
-                                4
+                                13,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c()' function call"
+                    "summary": "Added the 'z()' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 14,
-                                4
-                            ],
-                            "end": [
-                                14,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
                                 1
                             ],
                             "end": [
-                                15,
-                                4
+                                16,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added the 'a()' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 17,
-                                4
-                            ],
-                            "end": [
-                                17,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                14
-                            ],
-                            "end": [
-                                17,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                18,
                                 1
                             ],
                             "end": [
-                                18,
-                                4
+                                19,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'd()' function call"
+                    "summary": "Added the 'a := b(); c' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 20,
-                                4
-                            ],
-                            "end": [
-                                20,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                21,
                                 1
                             ],
                             "end": [
-                                21,
-                                4
+                                24,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                23,
-                                1
-                            ],
-                            "end": [
-                                23,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c()' function call"
+                    "summary": "Added the 'a()' if statement"
                 }
             ]
         },
@@ -293,9 +143,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "13f3930aff04fb759c856029f8c5a987a7267ab1",
+    "sha1": "3f82812907f84a6ee493eee399fc421defbc3272",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "91d8667207881cd241f043dd872d5752f634f516"
+    "sha2": "80127c59524c95aadde6e5e7394ee2cad8b867c1"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -390,9 +240,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "91d8667207881cd241f043dd872d5752f634f516",
+    "sha1": "80127c59524c95aadde6e5e7394ee2cad8b867c1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "df0f65cdcd21ade59b00e07348a59037e2628e64"
+    "sha2": "ec7de16aef0714bea2beecccc70f9684dfc4d7e2"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -487,9 +337,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "df0f65cdcd21ade59b00e07348a59037e2628e64",
+    "sha1": "ec7de16aef0714bea2beecccc70f9684dfc4d7e2",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "960f2fba1e3cc5ffab4d2bef069f23e2145f7663"
+    "sha2": "8a1ef67a111b7ff44f3875df346de9e299aa9e58"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -501,360 +351,135 @@
                         "delete": {
                             "start": [
                                 3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                5,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted the 'x()' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                14
-                            ],
-                            "end": [
-                                6,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
                                 1
                             ],
                             "end": [
-                                7,
-                                4
+                                8,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd()' function call"
+                    "summary": "Deleted the 'y := b(); c' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 9,
-                                4
-                            ],
-                            "end": [
-                                9,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
                                 1
                             ],
                             "end": [
-                                10,
-                                4
+                                13,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c()' function call"
+                    "summary": "Deleted the 'z()' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 14,
-                                4
-                            ],
-                            "end": [
-                                14,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
                                 1
                             ],
                             "end": [
-                                15,
-                                4
+                                16,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted the 'a()' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 17,
-                                4
-                            ],
-                            "end": [
-                                17,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                14
-                            ],
-                            "end": [
-                                17,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                18,
                                 1
                             ],
                             "end": [
-                                18,
-                                4
+                                19,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd()' function call"
+                    "summary": "Deleted the 'a := b(); c' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 20,
-                                4
-                            ],
-                            "end": [
-                                20,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                21,
                                 1
                             ],
                             "end": [
-                                21,
-                                4
+                                24,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                23,
-                                1
-                            ],
-                            "end": [
-                                23,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c()' function call"
+                    "summary": "Deleted the 'a()' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 14,
-                                4
-                            ],
-                            "end": [
-                                14,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
                                 1
                             ],
                             "end": [
-                                15,
-                                4
+                                16,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
+                    "summary": "Added the 'x()' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 17,
-                                4
-                            ],
-                            "end": [
-                                17,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                14
-                            ],
-                            "end": [
-                                17,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                18,
                                 1
                             ],
                             "end": [
-                                18,
-                                4
+                                19,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'd()' function call"
+                    "summary": "Added the 'y := b(); c' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 20,
-                                4
-                            ],
-                            "end": [
-                                20,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                21,
                                 1
                             ],
                             "end": [
-                                21,
-                                4
+                                24,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'b()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                23,
-                                1
-                            ],
-                            "end": [
-                                23,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c()' function call"
+                    "summary": "Added the 'z()' if statement"
                 }
             ]
         },
@@ -863,9 +488,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "960f2fba1e3cc5ffab4d2bef069f23e2145f7663",
+    "sha1": "8a1ef67a111b7ff44f3875df346de9e299aa9e58",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a40c8e1c0947cf1a231accfa231b661221616a2e"
+    "sha2": "814d0f761dac47c9a377d8c888c5be926e4eceb1"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-test",
@@ -877,120 +502,45 @@
                         "delete": {
                             "start": [
                                 3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                5,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
+                    "summary": "Deleted the 'a()' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                14
-                            ],
-                            "end": [
-                                6,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
                                 1
                             ],
                             "end": [
-                                7,
-                                4
+                                8,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd()' function call"
+                    "summary": "Deleted the 'a := b(); c' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 9,
-                                4
-                            ],
-                            "end": [
-                                9,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
                                 1
                             ],
                             "end": [
-                                10,
-                                4
+                                13,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c()' function call"
+                    "summary": "Deleted the 'a()' if statement"
                 }
             ]
         },
@@ -999,9 +549,9 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "a40c8e1c0947cf1a231accfa231b661221616a2e",
+    "sha1": "814d0f761dac47c9a377d8c888c5be926e4eceb1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8293c0a5ac57c143014fe6948fdfc1ed352cd337"
+    "sha2": "94a66f44b7271a7d1c3fb0e5907b8eb55dcbc6a1"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-rest-test",
@@ -1042,7 +592,7 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "8293c0a5ac57c143014fe6948fdfc1ed352cd337",
+    "sha1": "94a66f44b7271a7d1c3fb0e5907b8eb55dcbc6a1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4961ece78a5ae3daeec52eddce0a3a5ded25ca57"
+    "sha2": "a87789c4ba756c69611642c5ff1d87406a577d2b"
 }]
