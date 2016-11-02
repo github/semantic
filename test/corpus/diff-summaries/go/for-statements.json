@@ -1,0 +1,3796 @@
+[{
+    "testCaseDescription": "go-for-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "0e5ecd7b7ecd5661b6c9dd9a5876a1e51072cee7",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "7bd04c07c20ab3f7a67d8e0d0f3ea07732dd5efb"
+}
+,{
+    "testCaseDescription": "go-for-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                16
+                            ],
+                            "end": [
+                                14,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                20
+                            ],
+                            "end": [
+                                14,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                22
+                            ],
+                            "end": [
+                                14,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                12
+                            ],
+                            "end": [
+                                17,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                16
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                19
+                            ],
+                            "end": [
+                                17,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                6
+                            ],
+                            "end": [
+                                18,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                10
+                            ],
+                            "end": [
+                                18,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                13
+                            ],
+                            "end": [
+                                18,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                6
+                            ],
+                            "end": [
+                                19,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                11
+                            ],
+                            "end": [
+                                19,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                14
+                            ],
+                            "end": [
+                                19,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                12
+                            ],
+                            "end": [
+                                21,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                16
+                            ],
+                            "end": [
+                                21,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                19
+                            ],
+                            "end": [
+                                21,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                6
+                            ],
+                            "end": [
+                                22,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                10
+                            ],
+                            "end": [
+                                22,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                13
+                            ],
+                            "end": [
+                                22,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                6
+                            ],
+                            "end": [
+                                23,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                11
+                            ],
+                            "end": [
+                                23,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                14
+                            ],
+                            "end": [
+                                23,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "7bd04c07c20ab3f7a67d8e0d0f3ea07732dd5efb",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "28f170e4389165f681f487988ec94c381eb08bc3"
+}
+,{
+    "testCaseDescription": "go-for-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the '}\nfor {' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                12
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                16
+                            ],
+                            "end": [
+                                7,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                19
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                11
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                14
+                            ],
+                            "end": [
+                                9,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the '}\nfor {' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                12
+                            ],
+                            "end": [
+                                11,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                16
+                            ],
+                            "end": [
+                                11,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                19
+                            ],
+                            "end": [
+                                11,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                6
+                            ],
+                            "end": [
+                                12,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                10
+                            ],
+                            "end": [
+                                12,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                13
+                            ],
+                            "end": [
+                                12,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                11
+                            ],
+                            "end": [
+                                13,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                14
+                            ],
+                            "end": [
+                                13,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                16
+                            ],
+                            "end": [
+                                14,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                20
+                            ],
+                            "end": [
+                                14,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                22
+                            ],
+                            "end": [
+                                14,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                12
+                            ],
+                            "end": [
+                                17,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                16
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                19
+                            ],
+                            "end": [
+                                17,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                6
+                            ],
+                            "end": [
+                                18,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                10
+                            ],
+                            "end": [
+                                18,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                13
+                            ],
+                            "end": [
+                                18,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                6
+                            ],
+                            "end": [
+                                19,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                11
+                            ],
+                            "end": [
+                                19,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                14
+                            ],
+                            "end": [
+                                19,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                12
+                            ],
+                            "end": [
+                                21,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                16
+                            ],
+                            "end": [
+                                21,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                19
+                            ],
+                            "end": [
+                                21,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                6
+                            ],
+                            "end": [
+                                22,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                10
+                            ],
+                            "end": [
+                                22,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                13
+                            ],
+                            "end": [
+                                22,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                6
+                            ],
+                            "end": [
+                                23,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                11
+                            ],
+                            "end": [
+                                23,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                14
+                            ],
+                            "end": [
+                                23,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "28f170e4389165f681f487988ec94c381eb08bc3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6232e5dbb00bf0347680bc4e1f2746557ea24644"
+}
+,{
+    "testCaseDescription": "go-for-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                16
+                            ],
+                            "end": [
+                                14,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                20
+                            ],
+                            "end": [
+                                14,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                22
+                            ],
+                            "end": [
+                                14,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                12
+                            ],
+                            "end": [
+                                17,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                16
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                19
+                            ],
+                            "end": [
+                                17,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                6
+                            ],
+                            "end": [
+                                18,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                10
+                            ],
+                            "end": [
+                                18,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                13
+                            ],
+                            "end": [
+                                18,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                6
+                            ],
+                            "end": [
+                                19,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                11
+                            ],
+                            "end": [
+                                19,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                14
+                            ],
+                            "end": [
+                                19,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                12
+                            ],
+                            "end": [
+                                21,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                16
+                            ],
+                            "end": [
+                                21,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                19
+                            ],
+                            "end": [
+                                21,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                6
+                            ],
+                            "end": [
+                                22,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                10
+                            ],
+                            "end": [
+                                22,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                13
+                            ],
+                            "end": [
+                                22,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                6
+                            ],
+                            "end": [
+                                23,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                11
+                            ],
+                            "end": [
+                                23,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                14
+                            ],
+                            "end": [
+                                23,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '}\nfor {' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                12
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                16
+                            ],
+                            "end": [
+                                7,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                19
+                            ],
+                            "end": [
+                                7,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                11
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                14
+                            ],
+                            "end": [
+                                9,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '}\nfor {' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                12
+                            ],
+                            "end": [
+                                11,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                16
+                            ],
+                            "end": [
+                                11,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                19
+                            ],
+                            "end": [
+                                11,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                6
+                            ],
+                            "end": [
+                                12,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                10
+                            ],
+                            "end": [
+                                12,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                13
+                            ],
+                            "end": [
+                                12,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                6
+                            ],
+                            "end": [
+                                13,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                11
+                            ],
+                            "end": [
+                                13,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                14
+                            ],
+                            "end": [
+                                13,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "6232e5dbb00bf0347680bc4e1f2746557ea24644",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "0b2b9d379a381099508f182d958a3825a23923ea"
+}
+,{
+    "testCaseDescription": "go-for-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                7
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                22
+                            ],
+                            "end": [
+                                7,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                31
+                            ],
+                            "end": [
+                                7,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                11
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                16
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the '0'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                19
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                26
+                            ],
+                            "end": [
+                                8,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                3
+                            ],
+                            "end": [
+                                9,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                7
+                            ],
+                            "end": [
+                                10,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                14
+                            ],
+                            "end": [
+                                12,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                18
+                            ],
+                            "end": [
+                                12,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the '10'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                22
+                            ],
+                            "end": [
+                                12,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                10
+                            ],
+                            "end": [
+                                15,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'loop2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the ';;' for_clause"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                10
+                            ],
+                            "end": [
+                                17,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                14
+                            ],
+                            "end": [
+                                17,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'continue' continue_statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                5
+                            ],
+                            "end": [
+                                18,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                16
+                            ],
+                            "end": [
+                                18,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                20
+                            ],
+                            "end": [
+                                18,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                22
+                            ],
+                            "end": [
+                                18,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                16
+                            ],
+                            "end": [
+                                14,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                20
+                            ],
+                            "end": [
+                                14,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                22
+                            ],
+                            "end": [
+                                14,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                12
+                            ],
+                            "end": [
+                                17,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                16
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                19
+                            ],
+                            "end": [
+                                17,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                6
+                            ],
+                            "end": [
+                                18,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                10
+                            ],
+                            "end": [
+                                18,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                13
+                            ],
+                            "end": [
+                                18,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                6
+                            ],
+                            "end": [
+                                19,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                11
+                            ],
+                            "end": [
+                                19,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                14
+                            ],
+                            "end": [
+                                19,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                12
+                            ],
+                            "end": [
+                                21,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                16
+                            ],
+                            "end": [
+                                21,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                19
+                            ],
+                            "end": [
+                                21,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                6
+                            ],
+                            "end": [
+                                22,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                10
+                            ],
+                            "end": [
+                                22,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                13
+                            ],
+                            "end": [
+                                22,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                6
+                            ],
+                            "end": [
+                                23,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                11
+                            ],
+                            "end": [
+                                23,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                14
+                            ],
+                            "end": [
+                                23,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "0b2b9d379a381099508f182d958a3825a23923ea",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "77a50ff1e0963e1269e80e461547a5ee88b0e688"
+}
+,{
+    "testCaseDescription": "go-for-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                16
+                            ],
+                            "end": [
+                                14,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                20
+                            ],
+                            "end": [
+                                14,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                22
+                            ],
+                            "end": [
+                                14,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                7
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                22
+                            ],
+                            "end": [
+                                7,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                31
+                            ],
+                            "end": [
+                                7,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                11
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                16
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                19
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                23
+                            ],
+                            "end": [
+                                8,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                26
+                            ],
+                            "end": [
+                                8,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                3
+                            ],
+                            "end": [
+                                9,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                7
+                            ],
+                            "end": [
+                                10,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                14
+                            ],
+                            "end": [
+                                12,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                18
+                            ],
+                            "end": [
+                                12,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '10'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                22
+                            ],
+                            "end": [
+                                12,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                10
+                            ],
+                            "end": [
+                                15,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'loop2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ';;' for_clause"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                10
+                            ],
+                            "end": [
+                                17,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                14
+                            ],
+                            "end": [
+                                17,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'continue' continue_statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                5
+                            ],
+                            "end": [
+                                18,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                16
+                            ],
+                            "end": [
+                                18,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                20
+                            ],
+                            "end": [
+                                18,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                22
+                            ],
+                            "end": [
+                                18,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "77a50ff1e0963e1269e80e461547a5ee88b0e688",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "f7261cd714c0c33509462fbdf6f6b958c4e226f6"
+}
+,{
+    "testCaseDescription": "go-for-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    14,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "sha1": "f7261cd714c0c33509462fbdf6f6b958c4e226f6",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "7fb636bd0a2f7dbd4a01b0ffee6238214989ae94"
+}]

@@ -1,8 +1,9 @@
 [{
-    "testCaseDescription": "go-assignment-insert-test",
+    "testCaseDescription": "go-var-declarations-insert-test",
     "expectedResult": {
-        "changes": {
-            "assignment.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations.go": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +13,28 @@
                             ],
                             "end": [
                                 3,
-                                17
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' variable"
+                    "summary": "Added the 'var zero = 0' at line 3, column 1 - line 3, column 13"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "7aa9a12a6e58f1686c56ddd7825e77db291b4364",
+    "sha1": "d27175faa64dfac6894fb55022b0facb043ef69b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3786c210b1bd007d404c0d80c3ca9d567bda664f"
+    "sha2": "407dbdd571697d0b057b9f00191257c145e412bb"
 }
 ,{
-    "testCaseDescription": "go-assignment-replacement-insert-test",
+    "testCaseDescription": "go-var-declarations-replacement-insert-test",
     "expectedResult": {
-        "changes": {
-            "assignment.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations.go": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +44,11 @@
                             ],
                             "end": [
                                 3,
-                                25
+                                20
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' variable"
+                    "summary": "Added the 'var one, two = 1, 2' at line 3, column 1 - line 3, column 20"
                 },
                 {
                     "span": {
@@ -58,28 +59,27 @@
                             ],
                             "end": [
                                 4,
-                                17
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' variable"
+                    "summary": "Added the 'var zero = 0' at line 4, column 1 - line 4, column 13"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "3786c210b1bd007d404c0d80c3ca9d567bda664f",
+    "sha1": "407dbdd571697d0b057b9f00191257c145e412bb",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b2e39ba74d9eb4327940e780ea949af12710dfc9"
+    "sha2": "ad5a35f4621ccf016860f7af89a49648ec84666c"
 }
 ,{
-    "testCaseDescription": "go-assignment-delete-insert-test",
+    "testCaseDescription": "go-var-declarations-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.go": [
+            "var-declarations.go": [
                 {
                     "span": {
                         "replace": [
@@ -100,59 +100,86 @@
                                 ],
                                 "end": [
                                     3,
-                                    8
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the foo variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                15
-                            ],
-                            "end": [
-                                3,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added '42' in the foo variable of the 'main' module statement"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                18
+                                10
                             ],
                             "end": [
                                 3,
-                                25
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the \"hello\" string in the foo variable of the 'main' module statement"
+                    "summary": "Deleted the 'two' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    16
+                                ],
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "b2e39ba74d9eb4327940e780ea949af12710dfc9",
+    "sha1": "ad5a35f4621ccf016860f7af89a49648ec84666c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "deabe8787508cd7c2111c98e0b6ce35b82e7de84"
+    "sha2": "62f40a87dede9fd7e19cc877da8c9cce45f9cc22"
 }
 ,{
-    "testCaseDescription": "go-assignment-replacement-test",
+    "testCaseDescription": "go-var-declarations-replacement-test",
     "expectedResult": {
         "changes": {
-            "assignment.go": [
+            "var-declarations.go": [
                 {
                     "span": {
                         "replace": [
@@ -163,7 +190,7 @@
                                 ],
                                 "end": [
                                     3,
-                                    8
+                                    9
                                 ]
                             },
                             {
@@ -178,54 +205,82 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the bar variable of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                18
+                                10
                             ],
                             "end": [
                                 3,
-                                25
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the \"hello\" string in the bar variable of the 'main' module statement"
+                    "summary": "Added the 'two' identifier"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    16
+                                ],
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
                             "start": [
                                 3,
-                                15
+                                19
                             ],
                             "end": [
                                 3,
-                                17
+                                20
                             ]
                         }
                     },
-                    "summary": "Deleted '42' in the bar variable of the 'main' module statement"
+                    "summary": "Added '2'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "deabe8787508cd7c2111c98e0b6ce35b82e7de84",
+    "sha1": "62f40a87dede9fd7e19cc877da8c9cce45f9cc22",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e7027f3828dab3ac18b5ee50a2173f15630b62a5"
+    "sha2": "decc9983150d6064b9d80064a1cd05ff94367ad9"
 }
 ,{
-    "testCaseDescription": "go-assignment-delete-replacement-test",
+    "testCaseDescription": "go-var-declarations-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "assignment.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations.go": [
                 {
                     "span": {
                         "delete": {
@@ -235,11 +290,11 @@
                             ],
                             "end": [
                                 3,
-                                25
+                                20
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' variable"
+                    "summary": "Deleted the 'var one, two = 1, 2' at line 3, column 1 - line 3, column 20"
                 },
                 {
                     "span": {
@@ -250,11 +305,11 @@
                             ],
                             "end": [
                                 4,
-                                17
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' variable"
+                    "summary": "Deleted the 'var zero = 0' at line 4, column 1 - line 4, column 13"
                 },
                 {
                     "span": {
@@ -265,28 +320,28 @@
                             ],
                             "end": [
                                 4,
-                                25
+                                20
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' variable"
+                    "summary": "Added the 'var one, two = 1, 2' at line 4, column 1 - line 4, column 20"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "e7027f3828dab3ac18b5ee50a2173f15630b62a5",
+    "sha1": "decc9983150d6064b9d80064a1cd05ff94367ad9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "eee7dc54fd101e81f394cf203266606169b4152f"
+    "sha2": "dc6dcf80bfac90eb727bb928827596c7c8aaafdc"
 }
 ,{
-    "testCaseDescription": "go-assignment-delete-test",
+    "testCaseDescription": "go-var-declarations-delete-test",
     "expectedResult": {
-        "changes": {
-            "assignment.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations.go": [
                 {
                     "span": {
                         "delete": {
@@ -296,28 +351,28 @@
                             ],
                             "end": [
                                 3,
-                                17
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' variable"
+                    "summary": "Deleted the 'var zero = 0' at line 3, column 1 - line 3, column 13"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "eee7dc54fd101e81f394cf203266606169b4152f",
+    "sha1": "dc6dcf80bfac90eb727bb928827596c7c8aaafdc",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3965d30a0a6da27ee0ec807d3c00d811dfc6a8fe"
+    "sha2": "f6107e3bdb154b465545e9197f389f85a017e264"
 }
 ,{
-    "testCaseDescription": "go-assignment-delete-rest-test",
+    "testCaseDescription": "go-var-declarations-delete-rest-test",
     "expectedResult": {
-        "changes": {
-            "assignment.go": [
+        "changes": {},
+        "errors": {
+            "var-declarations.go": [
                 {
                     "span": {
                         "delete": {
@@ -327,20 +382,19 @@
                             ],
                             "end": [
                                 3,
-                                25
+                                20
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' variable"
+                    "summary": "Deleted the 'var one, two = 1, 2' at line 3, column 1 - line 3, column 20"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
-        "assignment.go"
+        "var-declarations.go"
     ],
-    "sha1": "3965d30a0a6da27ee0ec807d3c00d811dfc6a8fe",
+    "sha1": "f6107e3bdb154b465545e9197f389f85a017e264",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "914e6a5d1b9382291702d5919357687ee4e01fa5"
+    "sha2": "efe8f631421f665151190221f890a13ef4565dfa"
 }]

@@ -1,0 +1,1165 @@
+[{
+    "testCaseDescription": "go-switch-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                22
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'h()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "efe8f631421f665151190221f890a13ef4565dfa",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8151390ef4009abbf1af7e04102533d99ef6b3a5"
+}
+,{
+    "testCaseDescription": "go-switch-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "8151390ef4009abbf1af7e04102533d99ef6b3a5",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8a3130e1b42ba62c1ad73ce9d7eaf5f8e90f4aaa"
+}
+,{
+    "testCaseDescription": "go-switch-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    15
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    15
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    19
+                                ],
+                                "end": [
+                                    3,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    19
+                                ],
+                                "end": [
+                                    3,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f' identifier with the 'h' identifier in the h() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "8a3130e1b42ba62c1ad73ce9d7eaf5f8e90f4aaa",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "a7af43456f4faadda1a21370d078dd9abed94bea"
+}
+,{
+    "testCaseDescription": "go-switch-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    15
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    15
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    19
+                                ],
+                                "end": [
+                                    3,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    19
+                                ],
+                                "end": [
+                                    3,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    14
+                                ],
+                                "end": [
+                                    5,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'f' identifier in the f() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "a7af43456f4faadda1a21370d078dd9abed94bea",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "9beba5e0533be22de15a608e952bf020d5ec1dbd"
+}
+,{
+    "testCaseDescription": "go-switch-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                22
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                15
+                            ],
+                            "end": [
+                                7,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                19
+                            ],
+                            "end": [
+                                7,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                22
+                            ],
+                            "end": [
+                                7,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                11
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                14
+                            ],
+                            "end": [
+                                9,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                15
+                            ],
+                            "end": [
+                                7,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                19
+                            ],
+                            "end": [
+                                7,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                22
+                            ],
+                            "end": [
+                                7,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                8,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                11
+                            ],
+                            "end": [
+                                9,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '4'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                14
+                            ],
+                            "end": [
+                                9,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "9beba5e0533be22de15a608e952bf020d5ec1dbd",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "89a85255bb215995166f5c0c20ab3cde5fc7e8fa"
+}
+,{
+    "testCaseDescription": "go-switch-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "89a85255bb215995166f5c0c20ab3cde5fc7e8fa",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "86db9d582093f7ff0317dc4efc26e2a2b53722c3"
+}
+,{
+    "testCaseDescription": "go-switch-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                22
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                13
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                11
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '4'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "sha1": "86db9d582093f7ff0317dc4efc26e2a2b53722c3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "0e5ecd7b7ecd5661b6c9dd9a5876a1e51072cee7"
+}]

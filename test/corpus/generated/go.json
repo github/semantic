@@ -53,6 +53,34 @@
         "insert": "var zero = 0",
         "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
         "replacement": "var one, two = 1, 2"
+      },
+      {
+        "syntax": "var-declarations",
+        "repoFilePath": "var-declarations.go",
+        "insert": "var zero = 0",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
+        "replacement": "var one, two = 1, 2"
+      },
+      {
+        "syntax": "switch-statements",
+        "repoFilePath": "switch-statements.go",
+        "insert": "switch { case x < y: f1()\ncase x < z: g()\ncase x == 4: h()\n}",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
+        "replacement": "switch { case a < b: f1()\ncase c < d: g()\ncase e == 4: f()\n}"
+      },
+      {
+        "syntax": "for-statements",
+        "repoFilePath": "for-statements.go",
+        "insert": "for { case x < y: f1()\ncase x < z: g()\ncase x == 4: h()\n}",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/var-declarations.json",
+        "replacement": "func main() { for { a() goto loop }\nloop: for i := 0; i < 5; i++\n{ a()\nbreak loop\n}\nloop2: for ; i < 10; i++ \n{ \na()\ncontinue loop2\n}\nfor ;; { a() continue }\nfor x := range y { a(x)\nbreak }\n}"
+      },
+      {
+        "syntax": "function-declarations",
+        "repoFilePath": "function-declarations.go",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/function-declarations.json",
+        "insert": "func f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}",
+        "replacement": "func fa() {}\nfunc fb(a int, b, c, d string) int {}\nfunc fc() (int, error) {}\nfunc fd() (result int, err error) {}"
       }
     ]
   }
