@@ -25,9 +25,9 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "f9e62bf41467cae8ada35780dd97dbbbddf57da5",
+    "sha1": "5671141da4d82da04a1bcf712bc895b83bf57688",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3dbda12dac387b0d37ca78e7f01809e8f3e7a39b"
+    "sha2": "3cf508fd548c1c51deb05431ecb809314ee58a74"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-insert-test",
@@ -86,9 +86,9 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "3dbda12dac387b0d37ca78e7f01809e8f3e7a39b",
+    "sha1": "3cf508fd548c1c51deb05431ecb809314ee58a74",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e28ff49e1a934201eb081645ddbbd5983b7cff3e"
+    "sha2": "1c395abc8d9395aa24f9ac2781bd6c721855e1f3"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-insert-test",
@@ -117,9 +117,9 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "e28ff49e1a934201eb081645ddbbd5983b7cff3e",
+    "sha1": "1c395abc8d9395aa24f9ac2781bd6c721855e1f3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c3983115a7ed26e52980b39fbb57d1f26a31e1fe"
+    "sha2": "baf33059ed6123098f5dfa9a19ce3f2d33392945"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-test",
@@ -148,9 +148,9 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "c3983115a7ed26e52980b39fbb57d1f26a31e1fe",
+    "sha1": "baf33059ed6123098f5dfa9a19ce3f2d33392945",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f6e7e8cee1becdcc3ecfb253d5004399b90c7638"
+    "sha2": "d051dcedc2f1775c45bf220045c532b4909f1b98"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-replacement-test",
@@ -209,9 +209,9 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "f6e7e8cee1becdcc3ecfb253d5004399b90c7638",
+    "sha1": "d051dcedc2f1775c45bf220045c532b4909f1b98",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a31ed69713710a876f50a672b66f36a10b49a681"
+    "sha2": "d07ece8663a1027ac9b5bab3dee7f8a68ceafe0d"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-test",
@@ -240,9 +240,9 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "a31ed69713710a876f50a672b66f36a10b49a681",
+    "sha1": "d07ece8663a1027ac9b5bab3dee7f8a68ceafe0d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d9e002237b1f453c85a84df06bc86a871b453d97"
+    "sha2": "5a27c85e41403dc3c2ad827c21ab477ea9cdc955"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-rest-test",
@@ -286,7 +286,7 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "d9e002237b1f453c85a84df06bc86a871b453d97",
+    "sha1": "5a27c85e41403dc3c2ad827c21ab477ea9cdc955",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e9bfaab31e3a83e3c8e8d890bd8e2a6cf1f5a529"
+    "sha2": "d9a7f64e2e53a08c0edc907c3748a1ebc305f16b"
 }]

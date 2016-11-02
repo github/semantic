@@ -83,6 +83,7 @@ data Syntax a f
   | Until { untilExpr :: f, untilBody :: [f] }
   -- | An unless statement with an expression and maybe more expression clauses.
   | Unless f [f]
+  | Begin [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

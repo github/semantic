@@ -1,39 +1,8 @@
 [{
-    "testCaseDescription": "ruby-module-insert-test",
+    "testCaseDescription": "ruby-begin-insert-test",
     "expectedResult": {
         "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Foo' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "sha1": "bbab8bcbdaf0110874eea67f72672a7c975516c3",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3e3d0047c4d893c9abd544bd7ed512190618da49"
-}
-,{
-    "testCaseDescription": "ruby-module-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
+            "begin.rb": [
                 {
                     "span": {
                         "insert": {
@@ -47,7 +16,161 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'Bar::' class"
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "ce1c0def9460d28b4eaef38a52d16af8d0d78a7a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cf00e66572d01b61a048a7fbf8788d04995bee6d"
+}
+,{
+    "testCaseDescription": "ruby-begin-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "cf00e66572d01b61a048a7fbf8788d04995bee6d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3f19cee364384a71061eafae8494acfedf3690d9"
+}
+,{
+    "testCaseDescription": "ruby-begin-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' function call in a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "3f19cee364384a71061eafae8494acfedf3690d9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d590dfd44d464a5576b2fd278482c69bdfc94903"
+}
+,{
+    "testCaseDescription": "ruby-begin-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' function call in a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "d590dfd44d464a5576b2fd278482c69bdfc94903",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7264bec0192d8e06f0aaaa727ee1e60dd55c400c"
+}
+,{
+    "testCaseDescription": "ruby-begin-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
                 },
                 {
                     "span": {
@@ -57,78 +180,32 @@
                                 1
                             ],
                             "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Foo' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "sha1": "3e3d0047c4d893c9abd544bd7ed512190618da49",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "698c583e6b28ec82defe886a632f52c55573240f"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
                                 5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'Foo' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Bar::' class"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "module.rb"
+        "begin.rb"
     ],
-    "sha1": "698c583e6b28ec82defe886a632f52c55573240f",
+    "sha1": "7264bec0192d8e06f0aaaa727ee1e60dd55c400c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a425bf439348c5eaf0f81eb7be10ffe99ebaa096"
+    "sha2": "da0a142e4cfc94565cbde4000fa5f77554500a8a"
 }
 ,{
-    "testCaseDescription": "ruby-module-replacement-test",
+    "testCaseDescription": "ruby-begin-delete-test",
     "expectedResult": {
         "changes": {
-            "module.rb": [
+            "begin.rb": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -139,39 +216,24 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'Bar::' class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Foo' module"
+                    "summary": "Deleted a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "module.rb"
+        "begin.rb"
     ],
-    "sha1": "a425bf439348c5eaf0f81eb7be10ffe99ebaa096",
+    "sha1": "da0a142e4cfc94565cbde4000fa5f77554500a8a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "502828506c6f4178a0cd4235caaba8b1ec906b21"
+    "sha2": "b4ce6198f8e856fbaeeed5db1e593d6340124b66"
 }
 ,{
-    "testCaseDescription": "ruby-module-delete-replacement-test",
+    "testCaseDescription": "ruby-begin-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "module.rb": [
+            "begin.rb": [
                 {
                     "span": {
                         "delete": {
@@ -180,113 +242,21 @@
                                 1
                             ],
                             "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Bar::' class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 3,
-                                1
-                            ],
-                            "end": [
-                                7,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Foo' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Bar::' class"
+                    "summary": "Deleted a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "module.rb"
+        "begin.rb"
     ],
-    "sha1": "502828506c6f4178a0cd4235caaba8b1ec906b21",
+    "sha1": "b4ce6198f8e856fbaeeed5db1e593d6340124b66",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "522ecc11769f1368a2b7f5dcbb123fd9c0cd7d34"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Foo' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "sha1": "522ecc11769f1368a2b7f5dcbb123fd9c0cd7d34",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4b0958f1b13860898a3df40eb881b326685c3bce"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Bar::' class"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "sha1": "4b0958f1b13860898a3df40eb881b326685c3bce",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "51890fa66037f034f535d9ac524c50a62ceb519e"
+    "sha2": "7b6af2586beb21bf33227b781a0b07d9d074c81a"
 }]

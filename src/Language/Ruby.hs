@@ -29,6 +29,7 @@ termConstructor source sourceSpan name range children
     ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
+    ("begin_statement", _) -> S.Begin children
     ("case_statement", expr : rest) -> S.Switch expr rest
     ("case_statement", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
@@ -95,7 +96,7 @@ categoryForRubyName = \case
   "argument_list" -> Args
   "array" -> ArrayLiteral
   "assignment" -> Assignment
-  "begin_statement" -> ExpressionStatements
+  "begin_statement" -> Begin
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
   "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
