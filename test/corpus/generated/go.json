@@ -132,6 +132,11 @@
         "syntax": "rune-literals",
         "insert": "const (\na = '0'\nb = '\\''\nc = '\\\\'\nc = '\\n'\nc = '\\u0000'\nc = '\\U01234567'\n)",
         "replacement": "const (\na = '1'\nb = '\\n''\nc = '\\u0011'\nc = '\\\\'\nc = '\\u0022'\nc = '\\U01234568'\n)"
+      },
+      {
+        "syntax": "imaginary-literals",
+        "insert": "const (\na = 01i\nb = 1.e+100i\n)",
+        "replacement": "const (\na = 02i\nb = 1.e+103i\n)"
       }
     ]
   }
