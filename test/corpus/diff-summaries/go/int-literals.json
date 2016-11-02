@@ -16,7 +16,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'number' variable"
                 }
             ]
         },
@@ -25,9 +40,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "5751ad175114c6179a169ebd32800e99947c6558",
+    "sha1": "42d8dbf248a017d1e04237abda0060d957562c6b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "abb322382aaee2086ca2dec7d37d1f987a307071"
+    "sha2": "3f0634a2676d51d62b1517f9f8ea912e601fc28e"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-insert-test",
@@ -47,7 +62,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'number' variable"
                 },
                 {
                     "span": {
@@ -62,7 +92,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'number' variable"
                 }
             ]
         },
@@ -71,9 +116,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "abb322382aaee2086ca2dec7d37d1f987a307071",
+    "sha1": "3f0634a2676d51d62b1517f9f8ea912e601fc28e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b01cdfd3153a45d8034a441c6f0adf5cb0e47f88"
+    "sha2": "ea0b984f954c321127221e16e989062e10a8729c"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-insert-test",
@@ -105,7 +150,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in the a variable of the 'main' module"
+                    "summary": "Replaced '5' with '2' in the identifier variable of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '1' in the number variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -132,7 +204,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in the a variable of the 'main' module"
+                    "summary": "Replaced '6' with '3' in the number variable of the 'main' module"
                 }
             ]
         },
@@ -141,9 +213,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "b01cdfd3153a45d8034a441c6f0adf5cb0e47f88",
+    "sha1": "ea0b984f954c321127221e16e989062e10a8729c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "64025d235d8237fcbe2af27646243d67ccfc1f20"
+    "sha2": "701a693e9fdf364803cf75a0881267a9fda6883f"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
@@ -175,7 +247,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5' in the a variable of the 'main' module"
+                    "summary": "Replaced '2' with '5' in the identifier variable of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '4' in the number variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -202,7 +301,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in the a variable of the 'main' module"
+                    "summary": "Replaced '3' with '6' in the number variable of the 'main' module"
                 }
             ]
         },
@@ -211,9 +310,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "64025d235d8237fcbe2af27646243d67ccfc1f20",
+    "sha1": "701a693e9fdf364803cf75a0881267a9fda6883f",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d7a7227e0f353c244f70268b8e7af59357994736"
+    "sha2": "7dd26f6f588b5ee6f90ef7111b10a77a223e36aa"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
@@ -233,7 +332,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Deleted the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'number' variable"
                 },
                 {
                     "span": {
@@ -248,7 +362,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Deleted the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'number' variable"
                 },
                 {
                     "span": {
@@ -263,7 +392,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'number' variable"
                 }
             ]
         },
@@ -272,9 +416,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "d7a7227e0f353c244f70268b8e7af59357994736",
+    "sha1": "7dd26f6f588b5ee6f90ef7111b10a77a223e36aa",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9e14c557d46acaeddf3af339d3dcc76e8244ba2a"
+    "sha2": "4082964a5f69a4be49c24cac9a992abd5a59a988"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-test",
@@ -294,7 +438,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Deleted the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'number' variable"
                 }
             ]
         },
@@ -303,9 +462,9 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "9e14c557d46acaeddf3af339d3dcc76e8244ba2a",
+    "sha1": "4082964a5f69a4be49c24cac9a992abd5a59a988",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0cf490a98e95eedca37cccbb68bf15cea8dfc17e"
+    "sha2": "cb000ddff6902c98734ec7fcb0ddf0d8edb33616"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-rest-test",
@@ -325,7 +484,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Deleted the 'identifier' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'number' variable"
                 }
             ]
         },
@@ -334,7 +508,7 @@
     "filePaths": [
         "int-literals.go"
     ],
-    "sha1": "0cf490a98e95eedca37cccbb68bf15cea8dfc17e",
+    "sha1": "cb000ddff6902c98734ec7fcb0ddf0d8edb33616",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e264ebaf1dcb30372e6860c30c6b877df45e35d5"
+    "sha2": "625868f0ead583109be9c503910b32c1bef797b2"
 }]

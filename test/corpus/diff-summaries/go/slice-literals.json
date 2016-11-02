@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = []string{}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = []string{\"hi\"}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = []string{\n\"hi\",\n \"hello\",\n}' variable"
+                    "summary": "Added the 's3' variable"
                 }
             ]
         },
@@ -55,9 +55,9 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "d30b530285e291c61e905294debc16aef5899d90",
+    "sha1": "4835c36f7962a7adb6865b26cbbd879c3ca5ec12",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "606eacb816f45e75fe5dc75368f2b4f143e9862b"
+    "sha2": "2dc24f70c7024f40ed40468103554445ba2c6297"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-insert-test",
@@ -77,7 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = []string{\"sup\"}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -92,7 +92,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = []string{\"hello\"}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -107,7 +107,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = []string{\n\"bar\",\n \"baz\",\n}' variable"
+                    "summary": "Added the 's3' variable"
                 },
                 {
                     "span": {
@@ -122,7 +122,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = []string{}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -137,7 +137,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = []string{\"hi\"}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -152,7 +152,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = []string{\n\"hi\",\n \"hello\",\n}' variable"
+                    "summary": "Added the 's3' variable"
                 }
             ]
         },
@@ -161,9 +161,9 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "606eacb816f45e75fe5dc75368f2b4f143e9862b",
+    "sha1": "2dc24f70c7024f40ed40468103554445ba2c6297",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "67b638bb5af9c437535e4d889cdc6f23e4f0a2e6"
+    "sha2": "51e90407a4212911477de9802ed06b3ca12a9e12"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
@@ -172,48 +172,6 @@
             "slice-literals.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'const s1 = []string{}' variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    7
-                                ],
-                                "end": [
-                                    3,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    7
-                                ],
-                                "end": [
-                                    4,
-                                    9
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 's1' identifier with the 's2' identifier in the const s2 = []string{\"hi\"} variable of the 'main' module"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -223,6 +181,33 @@
                                 "end": [
                                     3,
                                     26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    20
+                                ],
+                                "end": [
+                                    3,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"sup\" string with the '{}' literal_value in the s1 variable of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    28
                                 ]
                             },
                             {
@@ -237,79 +222,61 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"sup\" string with the \"hi\" string in the const s2 = []string{\"hi\"} variable of the 'main' module"
+                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
-                                    21
+                                    6,
+                                    1
                                 ],
                                 "end": [
-                                    3,
-                                    26
+                                    6,
+                                    6
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
-                                    21
+                                    6,
+                                    1
                                 ],
                                 "end": [
-                                    4,
-                                    25
+                                    6,
+                                    5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"sup\" string with the \"hi\" string in the const s2 = []string{\"hi\"} variable of the 'main' module"
+                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the s3 variable of the 'main' module"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    9
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'const s3 = []string{\n\"hi\",\n \"hello\",\n}' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'const s2 = []string{\"hello\"}' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'const s3 = []string{\n\"bar\",\n \"baz\",\n}' variable"
+                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the s3 variable of the 'main' module"
                 }
             ]
         },
@@ -318,9 +285,9 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "67b638bb5af9c437535e4d889cdc6f23e4f0a2e6",
+    "sha1": "51e90407a4212911477de9802ed06b3ca12a9e12",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "740445f8cd0fd6fbd098cd3391c70e7795fef0cc"
+    "sha2": "0de90ef264fae8602891cc5957bd832c3cea0098"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
@@ -352,34 +319,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '{}' literal_value with the \"sup\" string in the const s1 = []string{\"sup\"} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    20
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    26
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '{}' literal_value with the \"sup\" string in the const s1 = []string{\"sup\"} variable of the 'main' module"
+                    "summary": "Replaced the '{}' literal_value with the \"sup\" string in the s1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -406,34 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the const s2 = []string{\"hello\"} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    21
-                                ],
-                                "end": [
-                                    4,
-                                    25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    21
-                                ],
-                                "end": [
-                                    4,
-                                    28
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the const s2 = []string{\"hello\"} variable of the 'main' module"
+                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -460,7 +373,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the const s3 = []string{\n\"bar\",\n \"baz\",\n} variable of the 'main' module"
+                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the s3 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -487,61 +400,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the const s3 = []string{\n\"bar\",\n \"baz\",\n} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the const s3 = []string{\n\"bar\",\n \"baz\",\n} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    2
-                                ],
-                                "end": [
-                                    7,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    2
-                                ],
-                                "end": [
-                                    7,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the const s3 = []string{\n\"bar\",\n \"baz\",\n} variable of the 'main' module"
+                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the s3 variable of the 'main' module"
                 }
             ]
         },
@@ -550,9 +409,9 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "740445f8cd0fd6fbd098cd3391c70e7795fef0cc",
+    "sha1": "0de90ef264fae8602891cc5957bd832c3cea0098",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "676657bca8b8d1ef701ea338b3a4b2ba5c3165d1"
+    "sha2": "c51de0f5dafd3c50134bd99df7e0230e536f0212"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
@@ -572,7 +431,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = []string{\"sup\"}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -587,7 +446,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = []string{\"hello\"}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -602,7 +461,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = []string{\n\"bar\",\n \"baz\",\n}' variable"
+                    "summary": "Deleted the 's3' variable"
                 },
                 {
                     "span": {
@@ -617,7 +476,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = []string{}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -632,7 +491,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = []string{\"hi\"}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -647,7 +506,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = []string{\n\"hi\",\n \"hello\",\n}' variable"
+                    "summary": "Deleted the 's3' variable"
                 },
                 {
                     "span": {
@@ -662,7 +521,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = []string{\"sup\"}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -677,7 +536,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = []string{\"hello\"}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -692,7 +551,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = []string{\n\"bar\",\n \"baz\",\n}' variable"
+                    "summary": "Added the 's3' variable"
                 }
             ]
         },
@@ -701,9 +560,9 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "676657bca8b8d1ef701ea338b3a4b2ba5c3165d1",
+    "sha1": "c51de0f5dafd3c50134bd99df7e0230e536f0212",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "685a5760201d45711f3bee97a3b280142d23e3f5"
+    "sha2": "eace70e2a9b1a0f745f681c6c9e76793f74e00a9"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-test",
@@ -723,7 +582,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = []string{}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -738,7 +597,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = []string{\"hi\"}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -753,7 +612,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = []string{\n\"hi\",\n \"hello\",\n}' variable"
+                    "summary": "Deleted the 's3' variable"
                 }
             ]
         },
@@ -762,9 +621,9 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "685a5760201d45711f3bee97a3b280142d23e3f5",
+    "sha1": "eace70e2a9b1a0f745f681c6c9e76793f74e00a9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9499dbe6667807f32102339e95f518bb258fd077"
+    "sha2": "d71ca301094e02bcd68fa7fe408c1329539852e8"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-rest-test",
@@ -784,7 +643,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = []string{\"sup\"}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -799,7 +658,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = []string{\"hello\"}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -814,7 +673,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = []string{\n\"bar\",\n \"baz\",\n}' variable"
+                    "summary": "Deleted the 's3' variable"
                 }
             ]
         },
@@ -823,7 +682,7 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "9499dbe6667807f32102339e95f518bb258fd077",
+    "sha1": "d71ca301094e02bcd68fa7fe408c1329539852e8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8c85c91b7af89c811cad3055e5b6c870fb9b6b9d"
+    "sha2": "fb0dc8406d6edc4fac954583201b7d42c9f04223"
 }]

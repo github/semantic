@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = struct{i int;}{i: 5}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = time.Time{}' variable"
+                    "summary": "Added the 's3' variable"
                 }
             ]
         },
@@ -55,9 +55,9 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "2a84ca72f3317af6335480d69f4b155e133a4a3f",
+    "sha1": "716fb44cff7e21bdacd97b6567e5c597164fd6f4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "663e9e5b3391e7939860e7e5929e2d6069a68ddb"
+    "sha2": "213b1551f14b9724933078ebb8117b12fd6cca88"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-insert-test",
@@ -77,7 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -92,7 +92,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = struct{i float;}{j: 6}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -107,7 +107,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = time.Month{}' variable"
+                    "summary": "Added the 's3' variable"
                 },
                 {
                     "span": {
@@ -122,7 +122,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -137,7 +137,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = struct{i int;}{i: 5}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -152,7 +152,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = time.Time{}' variable"
+                    "summary": "Added the 's3' variable"
                 }
             ]
         },
@@ -161,9 +161,9 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "663e9e5b3391e7939860e7e5929e2d6069a68ddb",
+    "sha1": "213b1551f14b9724933078ebb8117b12fd6cca88",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "36edff92e06a0593f40c5b31ab1ac742aaae8594"
+    "sha2": "140edcd1bf1e016050aba30d248bd8a365cc8ab6"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
@@ -195,34 +195,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    12
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    12
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n} variable of the 'main' module"
+                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the s1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -249,7 +222,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the const s2 = struct{i int;}{i: 5} variable of the 'main' module"
+                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -276,7 +249,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the const s2 = struct{i int;}{i: 5} variable of the 'main' module"
+                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -303,88 +276,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '5' in the const s2 = struct{i int;}{i: 5} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    21
-                                ],
-                                "end": [
-                                    7,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    21
-                                ],
-                                "end": [
-                                    7,
-                                    24
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the const s2 = struct{i int;}{i: 5} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    29
-                                ],
-                                "end": [
-                                    7,
-                                    30
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    27
-                                ],
-                                "end": [
-                                    7,
-                                    28
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the const s2 = struct{i int;}{i: 5} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    32
-                                ],
-                                "end": [
-                                    7,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    30
-                                ],
-                                "end": [
-                                    7,
-                                    31
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '6' with '5' in the const s2 = struct{i int;}{i: 5} variable of the 'main' module"
+                    "summary": "Replaced '6' with '5' in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -411,34 +303,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the const s3 = time.Time{} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    17
-                                ],
-                                "end": [
-                                    8,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    17
-                                ],
-                                "end": [
-                                    8,
-                                    21
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the const s3 = time.Time{} variable of the 'main' module"
+                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the s3 variable of the 'main' module"
                 }
             ]
         },
@@ -447,9 +312,9 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "36edff92e06a0593f40c5b31ab1ac742aaae8594",
+    "sha1": "140edcd1bf1e016050aba30d248bd8a365cc8ab6",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "13492e5b1cf9fede215b1a4c8f7fac86ebbb9e39"
+    "sha2": "f8a90a7a7d9f915ab884c0ca96cdb50ebffb39f6"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
@@ -481,34 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    12
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    12
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n} variable of the 'main' module"
+                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the s1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -535,7 +373,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the const s2 = struct{i float;}{j: 6} variable of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -562,7 +400,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the const s2 = struct{i float;}{j: 6} variable of the 'main' module"
+                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -589,88 +427,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '6' in the const s2 = struct{i float;}{j: 6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    21
-                                ],
-                                "end": [
-                                    7,
-                                    24
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    21
-                                ],
-                                "end": [
-                                    7,
-                                    26
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the const s2 = struct{i float;}{j: 6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    27
-                                ],
-                                "end": [
-                                    7,
-                                    28
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    29
-                                ],
-                                "end": [
-                                    7,
-                                    30
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the const s2 = struct{i float;}{j: 6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    30
-                                ],
-                                "end": [
-                                    7,
-                                    31
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    32
-                                ],
-                                "end": [
-                                    7,
-                                    33
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '6' in the const s2 = struct{i float;}{j: 6} variable of the 'main' module"
+                    "summary": "Replaced '5' with '6' in the s2 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -697,34 +454,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the const s3 = time.Month{} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    17
-                                ],
-                                "end": [
-                                    8,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    17
-                                ],
-                                "end": [
-                                    8,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the const s3 = time.Month{} variable of the 'main' module"
+                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the s3 variable of the 'main' module"
                 }
             ]
         },
@@ -733,9 +463,9 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "13492e5b1cf9fede215b1a4c8f7fac86ebbb9e39",
+    "sha1": "f8a90a7a7d9f915ab884c0ca96cdb50ebffb39f6",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "408b253417f296ca55acbfaf836f22fdbcb4cac8"
+    "sha2": "2523e64063d3dcd752eed6f1d059894ef7e33fda"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
@@ -755,7 +485,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -770,7 +500,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = struct{i float;}{j: 6}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -785,7 +515,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = time.Month{}' variable"
+                    "summary": "Deleted the 's3' variable"
                 },
                 {
                     "span": {
@@ -800,7 +530,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -815,7 +545,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = struct{i int;}{i: 5}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -830,7 +560,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = time.Time{}' variable"
+                    "summary": "Deleted the 's3' variable"
                 },
                 {
                     "span": {
@@ -845,7 +575,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Added the 's1' variable"
                 },
                 {
                     "span": {
@@ -860,7 +590,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s2 = struct{i float;}{j: 6}' variable"
+                    "summary": "Added the 's2' variable"
                 },
                 {
                     "span": {
@@ -875,7 +605,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const s3 = time.Month{}' variable"
+                    "summary": "Added the 's3' variable"
                 }
             ]
         },
@@ -884,9 +614,9 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "408b253417f296ca55acbfaf836f22fdbcb4cac8",
+    "sha1": "2523e64063d3dcd752eed6f1d059894ef7e33fda",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5cc421acb78b392c5a6b2e8c65b8296b84bac07d"
+    "sha2": "edf7ffaabe4f5decb017a025984eb7e190e35213"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-test",
@@ -906,7 +636,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = Person{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -921,7 +651,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = struct{i int;}{i: 5}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -936,7 +666,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = time.Time{}' variable"
+                    "summary": "Deleted the 's3' variable"
                 }
             ]
         },
@@ -945,9 +675,9 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "5cc421acb78b392c5a6b2e8c65b8296b84bac07d",
+    "sha1": "edf7ffaabe4f5decb017a025984eb7e190e35213",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "408ca3761e659f2264ceaa8e993272497ac06edd"
+    "sha2": "bf93b58939cab4a4ef0f1aa0877a83e654dc129a"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-rest-test",
@@ -967,7 +697,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s1 = Dog{\nname: \"Frank\",\nAge: \"5 months\",\n}' variable"
+                    "summary": "Deleted the 's1' variable"
                 },
                 {
                     "span": {
@@ -982,7 +712,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s2 = struct{i float;}{j: 6}' variable"
+                    "summary": "Deleted the 's2' variable"
                 },
                 {
                     "span": {
@@ -997,7 +727,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const s3 = time.Month{}' variable"
+                    "summary": "Deleted the 's3' variable"
                 }
             ]
         },
@@ -1006,7 +736,7 @@
     "filePaths": [
         "struct-literals.go"
     ],
-    "sha1": "408ca3761e659f2264ceaa8e993272497ac06edd",
+    "sha1": "bf93b58939cab4a4ef0f1aa0877a83e654dc129a",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ed8d39e3da1d734318a28b270ae0622437b84e21"
+    "sha2": "09f5402b016facf58e02e1258a4f33b56e1594c3"
 }]

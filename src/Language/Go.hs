@@ -58,6 +58,10 @@ termConstructor source sourceSpan name range children = case (name, children) of
       withDefaultInfo (S.Indexed assignments')
     toVarAssignment constSpec = do
       assignment <- case toList (unwrap constSpec) of
+        [idList, expressionList] -> do
+          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+          withDefaultInfo (S.Indexed assignments')
+
         idList : rest -> do
           identifier' <- case toList (unwrap idList) of
             id : _ -> case toList (unwrap id) of
@@ -67,7 +71,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
           rest' <- withDefaultInfo (S.Indexed rest)
           withDefaultInfo $ S.VarAssignment identifier' rest'
         _ -> withCategory Error (S.Error [constSpec])
-      withDefaultInfo $ S.VarDecl assignment
+      pure assignment
     withCategory category syntax = do
       sourceSpan' <- sourceSpan
       pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)

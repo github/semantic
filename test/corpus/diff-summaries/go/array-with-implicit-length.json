@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const a1 = [...]int{1, 2, 3}' variable"
+                    "summary": "Added the 'a1' variable"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "8c85c91b7af89c811cad3055e5b6c870fb9b6b9d",
+    "sha1": "fb0dc8406d6edc4fac954583201b7d42c9f04223",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1e000195cde8058742276564f3a969278ab26ddd"
+    "sha2": "6db87e0a44c2f88b96cefad3d254f5533aefb1d4"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const a1 = [...]int{4,5,6}' variable"
+                    "summary": "Added the 'a1' variable"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const a1 = [...]int{1, 2, 3}' variable"
+                    "summary": "Added the 'a1' variable"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "1e000195cde8058742276564f3a969278ab26ddd",
+    "sha1": "6db87e0a44c2f88b96cefad3d254f5533aefb1d4",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e30053054e04c8717e8436900db14a4dac7ef34b"
+    "sha2": "d44e18d61ff6bc1905703c093a72692cad85db25"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '1' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
+                    "summary": "Replaced '4' with '1' in the a1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -120,7 +120,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
+                    "summary": "Added '2' in the a1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -147,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '3' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
+                    "summary": "Replaced '5' with '3' in the a1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -162,91 +162,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '6' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '4' with '1' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                24
-                            ],
-                            "end": [
-                                3,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Added '2' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    23
-                                ],
-                                "end": [
-                                    3,
-                                    24
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    27
-                                ],
-                                "end": [
-                                    3,
-                                    28
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '3' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                25
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '6' in the const a1 = [...]int{1, 2, 3} variable of the 'main' module"
+                    "summary": "Deleted '6' in the a1 variable of the 'main' module"
                 }
             ]
         },
@@ -255,9 +171,9 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "e30053054e04c8717e8436900db14a4dac7ef34b",
+    "sha1": "d44e18d61ff6bc1905703c093a72692cad85db25",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "acb53dfab743934863e97fd00df6e74e3e312a89"
+    "sha2": "c627dd220a8eaeacf1b7822af5a8b2c34e6cf006"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -289,7 +205,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '4' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
+                    "summary": "Replaced '1' with '4' in the a1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -304,7 +220,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '5' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
+                    "summary": "Added '5' in the a1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -331,7 +247,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '6' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
+                    "summary": "Replaced '2' with '6' in the a1 variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -346,91 +262,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '3' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '4' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                23
-                            ],
-                            "end": [
-                                3,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added '5' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    24
-                                ],
-                                "end": [
-                                    3,
-                                    25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    25
-                                ],
-                                "end": [
-                                    3,
-                                    26
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '2' with '6' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                27
-                            ],
-                            "end": [
-                                3,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3' in the const a1 = [...]int{4,5,6} variable of the 'main' module"
+                    "summary": "Deleted '3' in the a1 variable of the 'main' module"
                 }
             ]
         },
@@ -439,9 +271,9 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "acb53dfab743934863e97fd00df6e74e3e312a89",
+    "sha1": "c627dd220a8eaeacf1b7822af5a8b2c34e6cf006",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "190cf104502fd3a332610d956cdd44cc147df861"
+    "sha2": "fb8d32cc6ca60425abc83b5472604468687e569b"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -461,7 +293,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const a1 = [...]int{4,5,6}' variable"
+                    "summary": "Deleted the 'a1' variable"
                 },
                 {
                     "span": {
@@ -476,7 +308,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const a1 = [...]int{1, 2, 3}' variable"
+                    "summary": "Deleted the 'a1' variable"
                 },
                 {
                     "span": {
@@ -491,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const a1 = [...]int{4,5,6}' variable"
+                    "summary": "Added the 'a1' variable"
                 }
             ]
         },
@@ -500,9 +332,9 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "190cf104502fd3a332610d956cdd44cc147df861",
+    "sha1": "fb8d32cc6ca60425abc83b5472604468687e569b",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0006ea38de3d9d8e26062655ff597c7b183ebc10"
+    "sha2": "26bda78d092e6ae0e4ff83eac5f0ebf3c38a086c"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-test",
@@ -522,7 +354,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const a1 = [...]int{1, 2, 3}' variable"
+                    "summary": "Deleted the 'a1' variable"
                 }
             ]
         },
@@ -531,9 +363,9 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "0006ea38de3d9d8e26062655ff597c7b183ebc10",
+    "sha1": "26bda78d092e6ae0e4ff83eac5f0ebf3c38a086c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3aa668782668d3ede4242f9fe4d133fef822d7ef"
+    "sha2": "94608a65051cc30745f80fa22ce21cc34277f039"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-rest-test",
@@ -553,7 +385,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const a1 = [...]int{4,5,6}' variable"
+                    "summary": "Deleted the 'a1' variable"
                 }
             ]
         },
@@ -562,7 +394,7 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "3aa668782668d3ede4242f9fe4d133fef822d7ef",
+    "sha1": "94608a65051cc30745f80fa22ce21cc34277f039",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1c76e1a79f5693b09e77783a8edc048b2c4021eb"
+    "sha2": "f587778a2e726da2222768fbe601248397bbbf48"
 }]

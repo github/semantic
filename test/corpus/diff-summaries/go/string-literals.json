@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -40,9 +40,9 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "424e2388d27fd2f4d90e9512a6c7f3c24dfa7f59",
+    "sha1": "09aeb9c55b03dbbc85258a230eea0539c9f07cc1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6a528c331ddf8916114e6c1503ff650b0c2af6d4"
+    "sha2": "34d494e7566a1017be437ecc8251493c8f251573"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-insert-test",
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -77,7 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Added the 'b' variable"
                 },
                 {
                     "span": {
@@ -92,7 +92,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -107,7 +107,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -116,9 +116,9 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "6a528c331ddf8916114e6c1503ff650b0c2af6d4",
+    "sha1": "34d494e7566a1017be437ecc8251493c8f251573",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f3e3962be87866cf7f93c0a737d120c04b4876dd"
+    "sha2": "d3781999e8fe31e31537e458c8d43bd90c6bee50"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-insert-test",
@@ -150,34 +150,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"2\" string with the \"0\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"2\" string with the \"0\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module"
+                    "summary": "Replaced the \"2\" string with the \"0\" string in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -204,34 +177,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    5
-                                ],
-                                "end": [
-                                    5,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    5
-                                ],
-                                "end": [
-                                    5,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the const (\na = \"0\"\nb = \"hello world\"\n) variable of the 'main' module"
+                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the b variable of the 'main' module"
                 }
             ]
         },
@@ -240,9 +186,9 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "f3e3962be87866cf7f93c0a737d120c04b4876dd",
+    "sha1": "d3781999e8fe31e31537e458c8d43bd90c6bee50",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "57dcbe046e3f8ff0a868b386318eb83a958be050"
+    "sha2": "a6a6eef06b43c765412c66d06694e61e7bf12b21"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-test",
@@ -274,34 +220,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"0\" string with the \"2\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"0\" string with the \"2\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module"
+                    "summary": "Replaced the \"0\" string with the \"2\" string in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -328,34 +247,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    5
-                                ],
-                                "end": [
-                                    5,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    5
-                                ],
-                                "end": [
-                                    5,
-                                    9
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the const (\na = \"2\"\nb = \"hi\"\n) variable of the 'main' module"
+                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the b variable of the 'main' module"
                 }
             ]
         },
@@ -364,9 +256,9 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "57dcbe046e3f8ff0a868b386318eb83a958be050",
+    "sha1": "a6a6eef06b43c765412c66d06694e61e7bf12b21",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "068622276d63ccc76158d873573a9e5636bae296"
+    "sha2": "4cfb42995ee378202bb255bd22edfc751bbff6ce"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-replacement-test",
@@ -386,7 +278,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -401,7 +293,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Deleted the 'b' variable"
                 },
                 {
                     "span": {
@@ -416,7 +308,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -431,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Deleted the 'b' variable"
                 },
                 {
                     "span": {
@@ -446,7 +338,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -461,7 +353,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -470,9 +362,9 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "068622276d63ccc76158d873573a9e5636bae296",
+    "sha1": "4cfb42995ee378202bb255bd22edfc751bbff6ce",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cdb36c847c6e725f2814e06c1eda2ca4c411831d"
+    "sha2": "b54fea7e43458777e0a92c634c38656eddc3b262"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-test",
@@ -492,7 +384,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -507,7 +399,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"0\"\nb = \"hello world\"\n)' variable"
+                    "summary": "Deleted the 'b' variable"
                 }
             ]
         },
@@ -516,9 +408,9 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "cdb36c847c6e725f2814e06c1eda2ca4c411831d",
+    "sha1": "b54fea7e43458777e0a92c634c38656eddc3b262",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ff45ee189c30a707023ff356426ba3b30b609b69"
+    "sha2": "6f34e4b10e23606e79d0919b2b11326b32da9938"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-rest-test",
@@ -538,7 +430,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -553,7 +445,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = \"2\"\nb = \"hi\"\n)' variable"
+                    "summary": "Deleted the 'b' variable"
                 }
             ]
         },
@@ -562,7 +454,7 @@
     "filePaths": [
         "string-literals.go"
     ],
-    "sha1": "ff45ee189c30a707023ff356426ba3b30b609b69",
+    "sha1": "6f34e4b10e23606e79d0919b2b11326b32da9938",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d30b530285e291c61e905294debc16aef5899d90"
+    "sha2": "4835c36f7962a7adb6865b26cbbd879c3ca5ec12"
 }]

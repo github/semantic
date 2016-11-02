@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
+                    "summary": "Added the 'zero' variable"
                 },
                 {
                     "span": {
@@ -55,9 +55,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "ca44feac79eebf52dd47dd67b55075a09cf2fea8",
+    "sha1": "cf110c7b445b1bf24faa920c275ae73f07804dee",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8608639101229b5dbc6dee3fcc90f538d341e8f7"
+    "sha2": "26c9f7ef635e5a8736227d65f2782f84da8659c5"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-insert-test",
@@ -77,7 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -122,7 +122,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\n zero = iota\n one\n two\n )' variable"
+                    "summary": "Added the 'zero' variable"
                 },
                 {
                     "span": {
@@ -161,9 +161,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "8608639101229b5dbc6dee3fcc90f538d341e8f7",
+    "sha1": "26c9f7ef635e5a8736227d65f2782f84da8659c5",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8650869481c5f88510914e47b1a7e227f688f222"
+    "sha2": "78bf537c3122a3d54783ff371dd363c7075520d3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -195,7 +195,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -258,9 +258,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "8650869481c5f88510914e47b1a7e227f688f222",
+    "sha1": "78bf537c3122a3d54783ff371dd363c7075520d3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "04a9a39399a279cfc841d6ff0dde512710834fb7"
+    "sha2": "4542cc4469b8a535b74db8ecf067fddf3a0eb364"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -292,7 +292,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module"
                 },
                 {
                     "span": {
@@ -355,9 +355,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "04a9a39399a279cfc841d6ff0dde512710834fb7",
+    "sha1": "4542cc4469b8a535b74db8ecf067fddf3a0eb364",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "95f846d80b29447f1c9290ba0d693ce6b35a92f3"
+    "sha2": "0aefb1def5ef4c19789f5f7396dabeebd30b5f2d"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -377,7 +377,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -422,7 +422,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
@@ -467,7 +467,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\n a = iota\n b\n c\n )' variable"
+                    "summary": "Added the 'a' variable"
                 },
                 {
                     "span": {
@@ -506,9 +506,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "95f846d80b29447f1c9290ba0d693ce6b35a92f3",
+    "sha1": "0aefb1def5ef4c19789f5f7396dabeebd30b5f2d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "49f828ce0fdc9a03d0e042396f8621767af0d5b3"
+    "sha2": "cdf5151d5ea4c0af4fda4d5b3346b1854dda26a1"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-test",
@@ -528,7 +528,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\n zero = iota\n one\n two\n )' variable"
+                    "summary": "Deleted the 'zero' variable"
                 },
                 {
                     "span": {
@@ -567,9 +567,9 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "49f828ce0fdc9a03d0e042396f8621767af0d5b3",
+    "sha1": "cdf5151d5ea4c0af4fda4d5b3346b1854dda26a1",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "aa73868cbf19e7f1f4e011b81ef2cdfa5e0229ee"
+    "sha2": "f851771235eff96fab77f50f8b8e28dfe90c8af0"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-rest-test",
@@ -589,7 +589,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\n a = iota\n b\n c\n )' variable"
+                    "summary": "Deleted the 'a' variable"
                 },
                 {
                     "span": {
@@ -628,7 +628,7 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "aa73868cbf19e7f1f4e011b81ef2cdfa5e0229ee",
+    "sha1": "f851771235eff96fab77f50f8b8e28dfe90c8af0",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6854d14b3fbd44b2760df78c70c200e923aa3ec0"
+    "sha2": "f10c60d2ed450d603e9381b9365970fb51ab826d"
 }]
