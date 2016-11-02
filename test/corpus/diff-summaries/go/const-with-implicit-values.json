@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-int-literal-insert-test",
+    "testCaseDescription": "go-const-with-implicit-values-insert-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "const-with-implicit-values.go": [
                 {
                     "span": {
                         "insert": {
@@ -11,8 +11,8 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
+                                7,
+                                3
                             ]
                         }
                     },
@@ -23,17 +23,17 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "const-with-implicit-values.go"
     ],
-    "sha1": "41010d621c7e9722ed4eb0b9436bde2f80206d80",
+    "sha1": "1b0ebbe74424d7c3ca73992c5dc99b3135092f0c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bb890f64e1c118bc3cef831f6f77e0094edf64fb"
+    "sha2": "b550f4f2212de2cc77a76090a31b8336bb33e457"
 }
 ,{
-    "testCaseDescription": "go-int-literal-replacement-insert-test",
+    "testCaseDescription": "go-const-with-implicit-values-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "const-with-implicit-values.go": [
                 {
                     "span": {
                         "insert": {
@@ -42,8 +42,8 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
+                                7,
+                                3
                             ]
                         }
                     },
@@ -53,12 +53,12 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
                                 8,
-                                2
+                                1
+                            ],
+                            "end": [
+                                12,
+                                3
                             ]
                         }
                     },
@@ -69,157 +69,211 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "const-with-implicit-values.go"
     ],
-    "sha1": "bb890f64e1c118bc3cef831f6f77e0094edf64fb",
+    "sha1": "b550f4f2212de2cc77a76090a31b8336bb33e457",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bec1afe2208bacbe6367ba93b7242b4faf615525"
+    "sha2": "5829d793f7419c8b7efeae7cba0c538db43a9369"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-insert-test",
+    "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "const-with-implicit-values.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     4,
-                                    12
+                                    2
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    3
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    12
+                                    2
                                 ],
                                 "end": [
                                     4,
-                                    13
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
-                                    19
+                                    5,
+                                    2
                                 ],
                                 "end": [
-                                    4,
-                                    20
+                                    5,
+                                    3
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
-                                    19
+                                    5,
+                                    2
                                 ],
                                 "end": [
-                                    4,
-                                    20
+                                    5,
+                                    5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in the a variable of the 'main' module statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "int-literal.go"
-    ],
-    "sha1": "bec1afe2208bacbe6367ba93b7242b4faf615525",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "3ee0fa10c2854bdbc4f0d46cb84b53ac167b8428"
-}
-,{
-    "testCaseDescription": "go-int-literal-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "int-literal.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    12
-                                ],
-                                "end": [
-                                    4,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    12
-                                ],
-                                "end": [
-                                    4,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '2' with '5' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
-                                    19
+                                    6,
+                                    2
                                 ],
                                 "end": [
-                                    4,
-                                    20
+                                    6,
+                                    3
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
-                                    19
+                                    6,
+                                    2
                                 ],
                                 "end": [
-                                    4,
-                                    20
+                                    6,
+                                    5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in the a variable of the 'main' module statement"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the const (\n zero = iota\n one\n two\n ) variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "const-with-implicit-values.go"
     ],
-    "sha1": "3ee0fa10c2854bdbc4f0d46cb84b53ac167b8428",
+    "sha1": "5829d793f7419c8b7efeae7cba0c538db43a9369",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e87f194e36121d5b6c4bfa5cee34aa4a241402c9"
+    "sha2": "d1d05a9c5f40b1f32a5f8a86d06d11957c41af27"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-replacement-test",
+    "testCaseDescription": "go-const-with-implicit-values-replacement-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "const-with-implicit-values.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    2
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    2
+                                ],
+                                "end": [
+                                    4,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the const (\n a = iota\n b\n c\n ) variable of the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-with-implicit-values.go"
+    ],
+    "sha1": "d1d05a9c5f40b1f32a5f8a86d06d11957c41af27",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "79cf9e7940dec378863f50ef3ffd16d8c1cd138c"
+}
+,{
+    "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-with-implicit-values.go": [
                 {
                     "span": {
                         "delete": {
@@ -228,8 +282,8 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
+                                7,
+                                3
                             ]
                         }
                     },
@@ -239,12 +293,12 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                8,
                                 1
                             ],
                             "end": [
-                                8,
-                                2
+                                12,
+                                3
                             ]
                         }
                     },
@@ -254,12 +308,12 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                8,
                                 1
                             ],
                             "end": [
-                                8,
-                                2
+                                12,
+                                3
                             ]
                         }
                     },
@@ -270,17 +324,17 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "const-with-implicit-values.go"
     ],
-    "sha1": "e87f194e36121d5b6c4bfa5cee34aa4a241402c9",
+    "sha1": "79cf9e7940dec378863f50ef3ffd16d8c1cd138c",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8deb31840870de630823b48579cedfe40e653996"
+    "sha2": "0af4de2150addb2bb852c12f8fa98a1da08774a8"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-test",
+    "testCaseDescription": "go-const-with-implicit-values-delete-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "const-with-implicit-values.go": [
                 {
                     "span": {
                         "delete": {
@@ -289,8 +343,8 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
+                                7,
+                                3
                             ]
                         }
                     },
@@ -301,17 +355,17 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "const-with-implicit-values.go"
     ],
-    "sha1": "8deb31840870de630823b48579cedfe40e653996",
+    "sha1": "0af4de2150addb2bb852c12f8fa98a1da08774a8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f2f6816bed557be984dfdf6efa236f19c1845e94"
+    "sha2": "c287f3afe3f18132c92b5f75650d25b9d0895b17"
 }
 ,{
-    "testCaseDescription": "go-int-literal-delete-rest-test",
+    "testCaseDescription": "go-const-with-implicit-values-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "int-literal.go": [
+            "const-with-implicit-values.go": [
                 {
                     "span": {
                         "delete": {
@@ -320,8 +374,8 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                2
+                                7,
+                                3
                             ]
                         }
                     },
@@ -332,9 +386,9 @@
         "errors": {}
     },
     "filePaths": [
-        "int-literal.go"
+        "const-with-implicit-values.go"
     ],
-    "sha1": "f2f6816bed557be984dfdf6efa236f19c1845e94",
+    "sha1": "c287f3afe3f18132c92b5f75650d25b9d0895b17",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "40d1102e3a530342a160c83a3e1da3023eec6e98"
+    "sha2": "fd23e7c00a55557c26aeeb7977e6230307c37186"
 }]

@@ -1,0 +1,295 @@
+[{
+    "testCaseDescription": "go-call-expressions.go-insert-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "0e2de7a46804918ba28978690342612a40e2ad24",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "025bd4b2e2a2087a8c2dcfdb95b9f37ec868a6b5"
+}
+,{
+    "testCaseDescription": "go-call-expressions.go-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "025bd4b2e2a2087a8c2dcfdb95b9f37ec868a6b5",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "364b6ad894167e85d8474e44e35968f932fc2556"
+}
+,{
+    "testCaseDescription": "go-call-expressions.go-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the a() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "364b6ad894167e85d8474e44e35968f932fc2556",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "f31e322eea43734a39f074fec78ac6a2acaacb5a"
+}
+,{
+    "testCaseDescription": "go-call-expressions.go-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the b() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "f31e322eea43734a39f074fec78ac6a2acaacb5a",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "541f4e7528d49f86458abaa9acd20004bbddc17d"
+}
+,{
+    "testCaseDescription": "go-call-expressions.go-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "541f4e7528d49f86458abaa9acd20004bbddc17d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "56ba420c1372c5b60dc51221b9d3b9da1a9bef22"
+}
+,{
+    "testCaseDescription": "go-call-expressions.go-delete-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'main' module statement with the 'main' module statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "56ba420c1372c5b60dc51221b9d3b9da1a9bef22",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8a9b862024f928895dab2a3fc5048ceda8c9da3f"
+}
+,{
+    "testCaseDescription": "go-call-expressions.go-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go.go"
+    ],
+    "sha1": "8a9b862024f928895dab2a3fc5048ceda8c9da3f",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "392da796d4c36bcf9d233abd04e726798db3d073"
+}]

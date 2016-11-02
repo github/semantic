@@ -1,0 +1,91 @@
+[{
+    "testCaseDescription": "go-selector expressions-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "9228b9ece2bcfaed3a353179363387396ab933ed",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "249a62a68546221dc5d29833055c68420c4c9aae"
+}
+,{
+    "testCaseDescription": "go-selector expressions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "249a62a68546221dc5d29833055c68420c4c9aae",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "24d5409dbac55cea9fcf635c599f0adf2cbc985c"
+}
+,{
+    "testCaseDescription": "go-selector expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "24d5409dbac55cea9fcf635c599f0adf2cbc985c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "78ce56cd9fa86f5d624488d231c4552aa213f0b9"
+}
+,{
+    "testCaseDescription": "go-selector expressions-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "78ce56cd9fa86f5d624488d231c4552aa213f0b9",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "943e03b2cc66d80f59308c1182e90f87f21b3c07"
+}
+,{
+    "testCaseDescription": "go-selector expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "943e03b2cc66d80f59308c1182e90f87f21b3c07",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "70af18fd7dac0a990284a7d6ff6a4c6501109460"
+}
+,{
+    "testCaseDescription": "go-selector expressions-delete-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "70af18fd7dac0a990284a7d6ff6a4c6501109460",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "dd2d88bdd327b4dfea68e539494e1837228fafbf"
+}
+,{
+    "testCaseDescription": "go-selector expressions-delete-rest-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "selector expressions.go"
+    ],
+    "sha1": "dd2d88bdd327b4dfea68e539494e1837228fafbf",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "d98546b2bc399c6cd577c4f18b856aa10c05aa2c"
+}]

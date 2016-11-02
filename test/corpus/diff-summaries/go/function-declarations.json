@@ -1,0 +1,2968 @@
+[{
+    "testCaseDescription": "go-function-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                11
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                19
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                22
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                32
+                            ],
+                            "end": [
+                                4,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                36
+                            ],
+                            "end": [
+                                4,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                8
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                17
+                            ],
+                            "end": [
+                                5,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                24
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                19
+                            ],
+                            "end": [
+                                6,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                24
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                35
+                            ],
+                            "end": [
+                                6,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "9d04169f56619b32eedabd0b324fc2a026c795a9",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "3ed0639741774d7815b744c89ea13c24be30108b"
+}
+,{
+    "testCaseDescription": "go-function-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fa' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fb' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                11
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                19
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                22
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                32
+                            ],
+                            "end": [
+                                4,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                36
+                            ],
+                            "end": [
+                                4,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fc' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                8
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                17
+                            ],
+                            "end": [
+                                5,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                24
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                19
+                            ],
+                            "end": [
+                                6,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                24
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                35
+                            ],
+                            "end": [
+                                6,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f1' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                11
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                16
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                19
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                22
+                            ],
+                            "end": [
+                                8,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                24
+                            ],
+                            "end": [
+                                8,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                32
+                            ],
+                            "end": [
+                                8,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                36
+                            ],
+                            "end": [
+                                8,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                12
+                            ],
+                            "end": [
+                                9,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                17
+                            ],
+                            "end": [
+                                9,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                24
+                            ],
+                            "end": [
+                                9,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                6
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                8
+                            ],
+                            "end": [
+                                10,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                12
+                            ],
+                            "end": [
+                                10,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                19
+                            ],
+                            "end": [
+                                10,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                24
+                            ],
+                            "end": [
+                                10,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                28
+                            ],
+                            "end": [
+                                10,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                35
+                            ],
+                            "end": [
+                                10,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "3ed0639741774d7815b744c89ea13c24be30108b",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "b283f73691d122b09501c160972af2f597418485"
+}
+,{
+    "testCaseDescription": "go-function-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fa' identifier with the 'f1' identifier in the f1 function of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "b283f73691d122b09501c160972af2f597418485",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "698ca8cba72b5f270838741ab6ad505c3c23ef16"
+}
+,{
+    "testCaseDescription": "go-function-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f1' identifier with the 'fa' identifier in the fa function of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "698ca8cba72b5f270838741ab6ad505c3c23ef16",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "97851f0d5265b2d14441b04f2ef0558940cef1eb"
+}
+,{
+    "testCaseDescription": "go-function-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fa' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fb' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                11
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                19
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                22
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                32
+                            ],
+                            "end": [
+                                4,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                36
+                            ],
+                            "end": [
+                                4,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fc' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                8
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                17
+                            ],
+                            "end": [
+                                5,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                24
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                19
+                            ],
+                            "end": [
+                                6,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                24
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                35
+                            ],
+                            "end": [
+                                6,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                11
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                16
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                19
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                22
+                            ],
+                            "end": [
+                                8,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                24
+                            ],
+                            "end": [
+                                8,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                32
+                            ],
+                            "end": [
+                                8,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                36
+                            ],
+                            "end": [
+                                8,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                12
+                            ],
+                            "end": [
+                                9,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                17
+                            ],
+                            "end": [
+                                9,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                24
+                            ],
+                            "end": [
+                                9,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                6
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                8
+                            ],
+                            "end": [
+                                10,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                12
+                            ],
+                            "end": [
+                                10,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                19
+                            ],
+                            "end": [
+                                10,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                24
+                            ],
+                            "end": [
+                                10,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                28
+                            ],
+                            "end": [
+                                10,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                35
+                            ],
+                            "end": [
+                                10,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fa' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fb' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                11
+                            ],
+                            "end": [
+                                8,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                16
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                19
+                            ],
+                            "end": [
+                                8,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                22
+                            ],
+                            "end": [
+                                8,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                24
+                            ],
+                            "end": [
+                                8,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                32
+                            ],
+                            "end": [
+                                8,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                36
+                            ],
+                            "end": [
+                                8,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fc' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                12
+                            ],
+                            "end": [
+                                9,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                17
+                            ],
+                            "end": [
+                                9,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                24
+                            ],
+                            "end": [
+                                9,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                6
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'fd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                8
+                            ],
+                            "end": [
+                                10,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '()' arguments"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                12
+                            ],
+                            "end": [
+                                10,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                19
+                            ],
+                            "end": [
+                                10,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                24
+                            ],
+                            "end": [
+                                10,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                28
+                            ],
+                            "end": [
+                                10,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                35
+                            ],
+                            "end": [
+                                10,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "97851f0d5265b2d14441b04f2ef0558940cef1eb",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "5feb53ac47ce3a89c07a24cd111bff9a4b1489b7"
+}
+,{
+    "testCaseDescription": "go-function-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                11
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                19
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                22
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                32
+                            ],
+                            "end": [
+                                4,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                36
+                            ],
+                            "end": [
+                                4,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                8
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                17
+                            ],
+                            "end": [
+                                5,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                24
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                19
+                            ],
+                            "end": [
+                                6,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                24
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                35
+                            ],
+                            "end": [
+                                6,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "5feb53ac47ce3a89c07a24cd111bff9a4b1489b7",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "6cf9a072e430185922688bbd9d7ce59b789d241b"
+}
+,{
+    "testCaseDescription": "go-function-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fa' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fb' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                11
+                            ],
+                            "end": [
+                                4,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                19
+                            ],
+                            "end": [
+                                4,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                22
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                32
+                            ],
+                            "end": [
+                                4,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                36
+                            ],
+                            "end": [
+                                4,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fc' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                8
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                17
+                            ],
+                            "end": [
+                                5,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                24
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                6,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'fd' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '()' arguments"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'result' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                19
+                            ],
+                            "end": [
+                                6,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                24
+                            ],
+                            "end": [
+                                6,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'err' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                35
+                            ],
+                            "end": [
+                                6,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "sha1": "6cf9a072e430185922688bbd9d7ce59b789d241b",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "82a8b871542ce6b7859c0111c9717fe2c5644092"
+}]

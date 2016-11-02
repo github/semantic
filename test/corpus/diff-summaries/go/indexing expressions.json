@@ -1,0 +1,91 @@
+[{
+    "testCaseDescription": "go-indexing expressions-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "d98546b2bc399c6cd577c4f18b856aa10c05aa2c",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "64817927f9f660d5c9423511543d8ac3b5f33fcb"
+}
+,{
+    "testCaseDescription": "go-indexing expressions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "64817927f9f660d5c9423511543d8ac3b5f33fcb",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "ed7fe524b4b669cfb21866ded5fe46ab91d148c3"
+}
+,{
+    "testCaseDescription": "go-indexing expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "ed7fe524b4b669cfb21866ded5fe46ab91d148c3",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "3fa169b295e9d0bc568c2ae4cf4cfccc6197e880"
+}
+,{
+    "testCaseDescription": "go-indexing expressions-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "3fa169b295e9d0bc568c2ae4cf4cfccc6197e880",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "c6cf4565c549fd0ac12c77968b3eb8e69956874a"
+}
+,{
+    "testCaseDescription": "go-indexing expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "c6cf4565c549fd0ac12c77968b3eb8e69956874a",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8e090556a997a8af9521616208ce7c036c0d3ca6"
+}
+,{
+    "testCaseDescription": "go-indexing expressions-delete-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "8e090556a997a8af9521616208ce7c036c0d3ca6",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8ede29a14a120030bc78fa37dad8c3b225048a59"
+}
+,{
+    "testCaseDescription": "go-indexing expressions-delete-rest-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing expressions.go"
+    ],
+    "sha1": "8ede29a14a120030bc78fa37dad8c3b225048a59",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8fc5b4daf016aef771b5d5f4a4d6f0389fd903fa"
+}]

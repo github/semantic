@@ -1,0 +1,1060 @@
+[{
+    "testCaseDescription": "go-method-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                20
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                27
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                41
+                            ],
+                            "end": [
+                                3,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                46
+                            ],
+                            "end": [
+                                3,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "82a8b871542ce6b7859c0111c9717fe2c5644092",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "e914d658702d138d04f463ef3d7339885c7bc5a4"
+}
+,{
+    "testCaseDescription": "go-method-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                24
+                            ],
+                            "end": [
+                                3,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                30
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                35
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                40
+                            ],
+                            "end": [
+                                3,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                20
+                            ],
+                            "end": [
+                                4,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                27
+                            ],
+                            "end": [
+                                4,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                33
+                            ],
+                            "end": [
+                                4,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                41
+                            ],
+                            "end": [
+                                4,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                46
+                            ],
+                            "end": [
+                                4,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "e914d658702d138d04f463ef3d7339885c7bc5a4",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4711c79f5bf37603debb9d55fc33caac9f6b109d"
+}
+,{
+    "testCaseDescription": "go-method-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    30
+                                ],
+                                "end": [
+                                    3,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    33
+                                ],
+                                "end": [
+                                    3,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "4711c79f5bf37603debb9d55fc33caac9f6b109d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "f4f0326e46451baf2c97df2dab42fd2299d7c6ad"
+}
+,{
+    "testCaseDescription": "go-method-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    33
+                                ],
+                                "end": [
+                                    3,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    30
+                                ],
+                                "end": [
+                                    3,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "f4f0326e46451baf2c97df2dab42fd2299d7c6ad",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "8d776d282b32487e2b0a7411f80064f679d63a97"
+}
+,{
+    "testCaseDescription": "go-method-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                24
+                            ],
+                            "end": [
+                                3,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                30
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                35
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                40
+                            ],
+                            "end": [
+                                3,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                20
+                            ],
+                            "end": [
+                                4,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                27
+                            ],
+                            "end": [
+                                4,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                33
+                            ],
+                            "end": [
+                                4,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                41
+                            ],
+                            "end": [
+                                4,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                46
+                            ],
+                            "end": [
+                                4,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                17
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                30
+                            ],
+                            "end": [
+                                4,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                35
+                            ],
+                            "end": [
+                                4,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                40
+                            ],
+                            "end": [
+                                4,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "8d776d282b32487e2b0a7411f80064f679d63a97",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "df8122b93495fd218664c3136bd2f2ad66d43961"
+}
+,{
+    "testCaseDescription": "go-method-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                20
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                27
+                            ],
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                33
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                41
+                            ],
+                            "end": [
+                                3,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                46
+                            ],
+                            "end": [
+                                3,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "df8122b93495fd218664c3136bd2f2ad66d43961",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "ccc73f9868d483b44987f7d26ff2c9db82ed95ba"
+}
+,{
+    "testCaseDescription": "go-method-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                12
+                            ],
+                            "end": [
+                                3,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                17
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Equals' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                24
+                            ],
+                            "end": [
+                                3,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'other' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                30
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Num' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                35
+                            ],
+                            "end": [
+                                3,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                40
+                            ],
+                            "end": [
+                                3,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declarations.go"
+    ],
+    "sha1": "ccc73f9868d483b44987f7d26ff2c9db82ed95ba",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "cbe29dac94d8f749fe6c9865adde2a6f147ecfb8"
+}]
