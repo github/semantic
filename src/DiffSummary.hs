@@ -176,10 +176,6 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
-  -- S.BlockExpression _ children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
-  S.BlockExpression maybeExpr children -> case maybeExpr of
-    Just expr -> termNameFromSource expr
-    Nothing -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
@@ -245,6 +241,9 @@ toTermName source term = case unwrap term of
   S.ConditionalAssignment id _ -> toTermName' id
   S.Until expr _ -> toTermName' expr
   S.Unless expr _ -> termNameFromSource expr
+  S.BlockExpression maybeExpr children -> case maybeExpr of
+    Just expr -> termNameFromSource expr
+    Nothing -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
