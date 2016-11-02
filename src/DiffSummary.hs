@@ -141,6 +141,7 @@ determiner (LeafInfo "number" _ _) = ""
 determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "begin statement" _ _) = "a"
+determiner (LeafInfo "else block" _ _) = "an"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
@@ -155,6 +156,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"begin statement" _ _) -> toDoc cName
+  (LeafInfo cName@"else block" _ _) -> toDoc cName
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
@@ -167,6 +169,7 @@ toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => So
 toTermName source term = case unwrap term of
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Begin children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Else children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
@@ -360,6 +363,7 @@ instance HasCategory Category where
     C.Until -> "until statement"
     C.Unless -> "unless statement"
     C.Begin -> "begin statement"
+    C.Else -> "else block"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

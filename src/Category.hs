@@ -127,6 +127,7 @@ data Category
   -- | A unless/else expression.
   | Unless
   | Begin
+  | Else
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -188,6 +189,7 @@ instance Arbitrary Category where
     , pure Until
     , pure Unless
     , pure Begin
+    , pure Else
     , Other <$> arbitrary
     ]
 

@@ -84,6 +84,7 @@ data Syntax a f
   -- | An unless statement with an expression and maybe more expression clauses.
   | Unless f [f]
   | Begin [f]
+  | Else [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

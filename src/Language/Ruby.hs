@@ -30,6 +30,7 @@ termConstructor source sourceSpan name range children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
     ("begin_statement", _) -> S.Begin children
+    ("else_block", _) -> S.Else children
     ("case_statement", expr : rest) -> S.Switch expr rest
     ("case_statement", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
@@ -109,7 +110,7 @@ categoryForRubyName = \case
   "conditional_assignment" -> ConditionalAssignment
   "conditional" -> Ternary
   "element_reference" -> SubscriptAccess
-  "else_block" -> ExpressionStatements
+  "else_block" -> Else
   "elsif_block" -> ExpressionStatements
   "ensure_block" -> ExpressionStatements
   "ERROR" -> Error
