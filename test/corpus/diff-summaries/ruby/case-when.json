@@ -1,8 +1,39 @@
 [{
-    "testCaseDescription": "ruby-case-statement-insert-test",
+    "testCaseDescription": "ruby-case-when-insert-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "case-when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-when.rb"
+    ],
+    "sha1": "9bfa7c381a92f82cdb383553b99a258f0b8e646a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cd480951b46d71bb07610fcdfa32dc58258184ea"
+}
+,{
+    "testCaseDescription": "ruby-case-when-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "case-when.rb": [
                 {
                     "span": {
                         "insert": {
@@ -16,132 +47,101 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "c6074d2900bc75792281ccca5e4cf1385ffd61f4",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3288ef6a638a3a2757505d9b23d4c44abe33c29b"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added the 'foo' case statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
                                 5,
-                                1
-                            ],
-                            "end": [
-                                7,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "case-when.rb"
     ],
-    "sha1": "3288ef6a638a3a2757505d9b23d4c44abe33c29b",
+    "sha1": "cd480951b46d71bb07610fcdfa32dc58258184ea",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a676c60cf58f985d18682c713b79b5463851f675"
+    "sha2": "d1c0b9ce0908a270c7a7f58f739d65800879e4e5"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-delete-insert-test",
+    "testCaseDescription": "ruby-case-when-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "case-when.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                2,
                                 1
                             ],
                             "end": [
                                 3,
-                                5
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted an else block"
+                    "summary": "Deleted the 'bar' when comparison in a case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "case-when.rb"
     ],
-    "sha1": "a676c60cf58f985d18682c713b79b5463851f675",
+    "sha1": "d1c0b9ce0908a270c7a7f58f739d65800879e4e5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "abaca6882e5f28164dfc23d785202e29a2a1579c"
+    "sha2": "2121bc50c94562e1fbbbc10449f6634ba6afb15f"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-replacement-test",
+    "testCaseDescription": "ruby-case-when-replacement-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "case-when.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                2,
                                 1
                             ],
                             "end": [
                                 3,
-                                5
+                                1
                             ]
                         }
                     },
-                    "summary": "Added an else block"
+                    "summary": "Added the 'bar' when comparison in a case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "case-when.rb"
     ],
-    "sha1": "abaca6882e5f28164dfc23d785202e29a2a1579c",
+    "sha1": "2121bc50c94562e1fbbbc10449f6634ba6afb15f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dd16b53bc99dbfbdfd31b99fc6c35674df291fc3"
+    "sha2": "7b3433fa88e6bbbbe26143cb7c4e4b3639d74df2"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-delete-replacement-test",
+    "testCaseDescription": "ruby-case-when-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "case-when.rb": [
                 {
                     "span": {
                         "delete": {
@@ -150,59 +150,90 @@
                                 1
                             ],
                             "end": [
-                                4,
+                                3,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
+                    "summary": "Deleted the 'foo' case statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
                                 5,
-                                1
-                            ],
-                            "end": [
-                                7,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
+                    "summary": "Deleted the 'foo' case statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                3,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "case-when.rb"
     ],
-    "sha1": "dd16b53bc99dbfbdfd31b99fc6c35674df291fc3",
+    "sha1": "7b3433fa88e6bbbbe26143cb7c4e4b3639d74df2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f9c9a56769aecf7ff7917fdf5b2c6dc102001af4"
+    "sha2": "840953000093da540af7204788baa198dcf9cbc7"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-delete-test",
+    "testCaseDescription": "ruby-case-when-delete-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "case-when.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-when.rb"
+    ],
+    "sha1": "840953000093da540af7204788baa198dcf9cbc7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "41f337d1125500767bcb4b83c895f0a2b9f953fb"
+}
+,{
+    "testCaseDescription": "ruby-case-when-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "case-when.rb": [
                 {
                     "span": {
                         "delete": {
@@ -216,47 +247,16 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
+                    "summary": "Deleted the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "case-when.rb"
     ],
-    "sha1": "f9c9a56769aecf7ff7917fdf5b2c6dc102001af4",
+    "sha1": "41f337d1125500767bcb4b83c895f0a2b9f953fb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bbfee7639ee0c9382aaa6d4fd99aa16004b0d382"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "bbfee7639ee0c9382aaa6d4fd99aa16004b0d382",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f39262cb00c1a446c3fb7bcb435732e9ab0384a3"
+    "sha2": "7699a00ae4f2db5a3570048f56b83158c513a7e1"
 }]

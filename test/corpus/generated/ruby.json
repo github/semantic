@@ -100,11 +100,6 @@
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)"
       },
       {
-        "syntax": "case-statement",
-        "insert": "case foo\nwhen bar\nend",
-        "replacement": "case foo\nwhen bar\nelse\nend"
-      },
-      {
         "syntax": "class",
         "insert": "class Foo < Super\n  def test; end\nend",
         "replacement": "class Foo\n  def test; end\nend"
@@ -233,6 +228,16 @@
         "syntax": "rescue",
         "insert": "begin\n  foo\nrescue x\nend",
         "replacement": "begin\n  foo\nrescue x\n  bar\nend"
+      },
+      {
+        "syntax": "case-when",
+        "insert": "case foo\nend",
+        "replacement": "case foo\nwhen bar\nend"
+      },
+      {
+        "syntax": "when",
+        "insert": "case foo\nwhen bar\nend",
+        "replacement": "case foo\nwhen bar\n  baz\nend"
       }
     ]
   }

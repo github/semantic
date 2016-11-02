@@ -19,7 +19,7 @@ blocks :: [Text]
 blocks = [ "begin_statement", "else_block", "ensure_block" ]
 
 conditionalBlocks :: [Text]
-conditionalBlocks = [ "rescue_block", "elsif_block" ]
+conditionalBlocks = [ "elsif_block", "rescue_block", "case_statement", "when_block" ]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
@@ -35,8 +35,6 @@ termConstructor source sourceSpan name range children
     ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
-    ("case_statement", expr : rest) -> S.Switch expr rest
-    ("case_statement", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class_declaration", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
     ("class_declaration", _ ) -> S.Error children
@@ -83,8 +81,10 @@ termConstructor source sourceSpan name range children
     ("yield", _) -> S.Yield (listToMaybe children)
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
     ("for_statement", _ ) -> S.Error children
-    _ | name `elem` blocks -> S.BlockExpression children
-    _ | name `elem` conditionalBlocks -> S.ConditionalBlockExpression children
+    _ | name `elem` blocks -> S.BlockExpression Nothing children
+    _ | name `elem` conditionalBlocks -> case children of
+      ( condition: rest ) -> S.BlockExpression (Just condition) rest
+      _ -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
@@ -109,7 +109,7 @@ categoryForRubyName = \case
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
   "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
-  "case_statement" -> Switch
+  "case_statement" -> Case
   "class_declaration"  -> Class
   "comment" -> Comment
   "comparison" -> RelationalOperator -- comparison operator, e.g. <, <=, >=, >.
@@ -150,7 +150,7 @@ categoryForRubyName = \case
   "unless_statement" -> Unless
   "until_modifier" -> Until
   "until_statement" -> Until
-  "when_block" -> ExpressionStatements
+  "when_block" -> When
   "while_modifier" -> While
   "while_statement" -> While
   "yield" -> Yield
