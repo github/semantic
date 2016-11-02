@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-const-declarations-insert-test",
+    "testCaseDescription": "go-const-declarations-with-types-insert-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "insert": {
@@ -12,7 +12,7 @@
                             ],
                             "end": [
                                 3,
-                                15
+                                19
                             ]
                         }
                     },
@@ -23,17 +23,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "3ba0c5fa5af4ff296115957cfdb1131de7c23097",
+    "sha1": "dd177299b54f3f867fb36408138847db99dbed31",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "769d6b98d8e9c178d34cee5602e70e6787f89d61"
+    "sha2": "0e7650c764cdb2151084609241e28313e07587af"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-replacement-insert-test",
+    "testCaseDescription": "go-const-declarations-with-types-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "insert": {
@@ -43,7 +43,7 @@
                             ],
                             "end": [
                                 3,
-                                22
+                                30
                             ]
                         }
                     },
@@ -58,7 +58,7 @@
                             ],
                             "end": [
                                 4,
-                                15
+                                19
                             ]
                         }
                     },
@@ -69,17 +69,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "769d6b98d8e9c178d34cee5602e70e6787f89d61",
+    "sha1": "0e7650c764cdb2151084609241e28313e07587af",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "280da57d4126b546277911bcdd364a94b10b8b4e"
+    "sha2": "ce2d79acdaaf3846c1e4286ef915ee157e82eadd"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-insert-test",
+    "testCaseDescription": "go-const-declarations-with-types-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "replace": [
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the const zero int = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -120,11 +120,48 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' identifier in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Deleted the 'two' identifier in the const zero int = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    16
+                                ],
+                                "end": [
+                                    3,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'uiint64' identifier with the 'int' identifier in the const zero int = 0 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    26
+                                ],
+                                "end": [
+                                    3,
+                                    27
+                                ]
+                            },
                             {
                                 "start": [
                                     3,
@@ -134,11 +171,43 @@
                                     3,
                                     19
                                 ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in the const zero int = 0 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                29
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the const zero int = 0 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    16
+                                ],
+                                "end": [
+                                    3,
+                                    23
+                                ]
                             },
                             {
                                 "start": [
                                     3,
-                                    14
+                                    12
                                 ],
                                 "end": [
                                     3,
@@ -147,26 +216,21 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced the 'uiint64' identifier with the 'int' identifier in the const zero int = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    26
+                                ],
+                                "end": [
+                                    3,
+                                    27
+                                ]
+                            },
                             {
                                 "start": [
                                     3,
@@ -176,52 +240,42 @@
                                     3,
                                     19
                                 ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    14
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Replaced '1' with '0' in the const zero int = 0 variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                21
+                                29
                             ],
                             "end": [
                                 3,
-                                22
+                                30
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the const zero = 0 variable of the 'main' module statement"
+                    "summary": "Deleted '2' in the const zero int = 0 variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "280da57d4126b546277911bcdd364a94b10b8b4e",
+    "sha1": "ce2d79acdaaf3846c1e4286ef915ee157e82eadd",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d08fdc76419200fa06087428523aea779817b797"
+    "sha2": "0e0b5e93a7d817dad8f2220f69c16a0e1410acc3"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-replacement-test",
+    "testCaseDescription": "go-const-declarations-with-types-replacement-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "replace": [
@@ -247,7 +301,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -262,7 +316,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added the 'two' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -270,7 +324,7 @@
                             {
                                 "start": [
                                     3,
-                                    14
+                                    12
                                 ],
                                 "end": [
                                     3,
@@ -280,31 +334,16 @@
                             {
                                 "start": [
                                     3,
-                                    18
+                                    16
                                 ],
                                 "end": [
                                     3,
-                                    19
+                                    23
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced the 'int' identifier with the 'uiint64' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
@@ -312,7 +351,49 @@
                             {
                                 "start": [
                                     3,
-                                    14
+                                    18
+                                ],
+                                "end": [
+                                    3,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    26
+                                ],
+                                "end": [
+                                    3,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                29
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
                                 ],
                                 "end": [
                                     3,
@@ -322,48 +403,75 @@
                             {
                                 "start": [
                                     3,
+                                    16
+                                ],
+                                "end": [
+                                    3,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'uiint64' identifier in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
                                     18
                                 ],
                                 "end": [
                                     3,
                                     19
                                 ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    26
+                                ],
+                                "end": [
+                                    3,
+                                    27
+                                ]
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Replaced '0' with '1' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                21
+                                29
                             ],
                             "end": [
                                 3,
-                                22
+                                30
                             ]
                         }
                     },
-                    "summary": "Added '2' in the const one, two = 1, 2 variable of the 'main' module statement"
+                    "summary": "Added '2' in the const one, two uiint64 = 1, 2 variable of the 'main' module statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "d08fdc76419200fa06087428523aea779817b797",
+    "sha1": "0e0b5e93a7d817dad8f2220f69c16a0e1410acc3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "810e9f558045d9c115d2024c34957e588763b8ef"
+    "sha2": "9185147d5c6488a519d1ed3871713824da07a4fa"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-replacement-test",
+    "testCaseDescription": "go-const-declarations-with-types-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "delete": {
@@ -373,7 +481,7 @@
                             ],
                             "end": [
                                 3,
-                                22
+                                30
                             ]
                         }
                     },
@@ -388,7 +496,7 @@
                             ],
                             "end": [
                                 4,
-                                15
+                                19
                             ]
                         }
                     },
@@ -403,7 +511,7 @@
                             ],
                             "end": [
                                 4,
-                                22
+                                30
                             ]
                         }
                     },
@@ -414,17 +522,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "810e9f558045d9c115d2024c34957e588763b8ef",
+    "sha1": "9185147d5c6488a519d1ed3871713824da07a4fa",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b03f91acbe84e07505cddad0634af413360e3b11"
+    "sha2": "96db7781cf689ca248c2f2719ba3da85945fb327"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-test",
+    "testCaseDescription": "go-const-declarations-with-types-delete-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "delete": {
@@ -434,7 +542,7 @@
                             ],
                             "end": [
                                 3,
-                                15
+                                19
                             ]
                         }
                     },
@@ -445,17 +553,17 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "b03f91acbe84e07505cddad0634af413360e3b11",
+    "sha1": "96db7781cf689ca248c2f2719ba3da85945fb327",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c13f182011fe16b97b3fe1b158fa6bb5f29613dc"
+    "sha2": "9e8fc3d4de54b03489c0a8e06870e752752d8087"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-delete-rest-test",
+    "testCaseDescription": "go-const-declarations-with-types-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "const-declarations.go": [
+            "const-declarations-with-types.go": [
                 {
                     "span": {
                         "delete": {
@@ -465,7 +573,7 @@
                             ],
                             "end": [
                                 3,
-                                22
+                                30
                             ]
                         }
                     },
@@ -476,9 +584,9 @@
         "errors": {}
     },
     "filePaths": [
-        "const-declarations.go"
+        "const-declarations-with-types.go"
     ],
-    "sha1": "c13f182011fe16b97b3fe1b158fa6bb5f29613dc",
+    "sha1": "9e8fc3d4de54b03489c0a8e06870e752752d8087",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "952d1b46e882bdbb09783d3af1790bedba413106"
+    "sha2": "67fd15163d0a4d8e8532d27a7309a9106e6abd62"
 }]

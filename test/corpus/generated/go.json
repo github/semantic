@@ -46,9 +46,14 @@
         "replacement": "const s1 = func(b int) (string, string) {\nreturn 1, 2\n}"
       },
       {
-        "syntax": "const-declarations",
+        "syntax": "const-declarations-without-types",
         "insert": "const zero = 0",
         "replacement": "const one, two = 1, 2"
+      },
+      {
+        "syntax": "const-declarations-with-types",
+        "insert": "const zero int = 0",
+        "replacement": "const one, two uiint64 = 1, 2"
       },
       {
         "syntax": "var-declarations-without-types",

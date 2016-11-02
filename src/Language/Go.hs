@@ -55,8 +55,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
 
     toConsts constSpecs = do
       assignments' <- sequenceA $ toVarAssignment <$> constSpecs
-      constSpecs'<- withDefaultInfo (S.Indexed assignments')
-      withDefaultInfo $ S.VarDecl constSpecs'
+      withDefaultInfo (S.Indexed assignments')
     toVarAssignment constSpec = do
       assignment <- case toList (unwrap constSpec) of
         idList : rest -> do
