@@ -43,15 +43,17 @@ termConstructor source sourceSpan name range children = case (name, children) of
 
     toVarDecl varSpec = do
       assignment' <- case toList (unwrap varSpec) of
+        [idList, exprs] | category (extract exprs) == Other "expression_list" -> do
+          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
+          withDefaultInfo (S.Indexed assignments')
         [idList, _, exprs] -> do
-          identifier' <- idOrError idList
-          withDefaultInfo $ S.VarAssignment identifier' exprs
+          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
+          withDefaultInfo (S.Indexed assignments')
+        idList : _ -> do
+           varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
+           withDefaultInfo (S.Indexed varDecls)
         _ -> withCategory Error (S.Error [varSpec])
       pure assignment'
-
-    idOrError idList = case toList (unwrap idList) of
-      [identifier] -> pure identifier
-      _ -> withCategory Error (S.Error [idList])
 
     toConsts constSpecs = do
       assignments' <- sequenceA $ toVarAssignment <$> constSpecs
