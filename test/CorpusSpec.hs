@@ -11,6 +11,7 @@ import Diffing
 import GHC.Show (Show(..))
 import Info
 import Prologue hiding (fst, snd, lookup)
+import Parse
 import Renderer
 import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
