@@ -20,7 +20,7 @@ import System.FilePath
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
-import Renderer.JSON
+import Renderer.JSON()
 
 run :: Arguments -> IO ()
 run args@Arguments{..} = do
