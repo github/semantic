@@ -84,7 +84,7 @@ testDiff renderer paths diff matcher = do
       expected <- Verbatim <$> readFile file
       matcher actual (Just expected)
   where diffFiles' sources parser = diffFiles parser renderer (sourceBlobs sources paths)
-        parser = parserForFilepath <$> runBothWith (<|>) paths
+        parser = parserWithCost <$> runBothWith (<|>) paths
         sourceBlobs :: Both (Maybe (S.Source Char)) -> Both (Maybe FilePath) -> Both S.SourceBlob
         sourceBlobs sources paths = case runJoin paths of
           (Nothing, Nothing) -> Join (S.emptySourceBlob "", S.emptySourceBlob "")
