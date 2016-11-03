@@ -58,6 +58,7 @@ library
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson
+                     , aeson-pretty
                      , async-pool
                      , bifunctors
                      , blaze-html
