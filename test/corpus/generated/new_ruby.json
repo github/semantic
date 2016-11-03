@@ -5,10 +5,10 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "template": "if bar\n  foo()\n{0}end",
-        "syntax": "elsif",
-        "insert": "elsif baz\n",
-        "replacement": "elsif baz\n  qoz()\n"
+        "syntax": "when",
+        "template": "case foo\n{0}end",
+        "insert": "when bar\n",
+        "replacement": "when bar\n  baz\n"
       }
     ]
   }

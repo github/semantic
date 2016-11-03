@@ -185,29 +185,20 @@
         "replacement": "x[\"b\"]\nx[:\"c\"]"
       },
       {
-        "syntax": "begin",
-        "insert": "begin\nend",
-        "replacement": "begin\n  foo()\nend"
-      },
-      {
-        "syntax": "begin-else",
-        "insert": "begin\n  foo()\nend",
-        "replacement": "begin\n  foo()\nelse\n  bar()\nend"
-      },
-      {
         "syntax": "else",
-        "insert": "begin\n  foo()\nelse\nend",
-        "replacement": "begin\n  foo()\nelse\n  bar()\nend"
+        "template": "begin\n  foo()\n{0}end",
+        "insert": "else\n",
+        "replacement": "else\n  bar()\n"
       },
       {
-        "template": "if bar\n  foo()\n{0}end",
         "syntax": "elsif",
+        "template": "if bar\n  foo()\n{0}end",
         "insert": "elsif baz\n",
         "replacement": "elsif baz\n  qoz()\n"
       },
       {
-        "template": "begin\n  foo\n{0}end",
         "syntax": "ensure",
+        "template": "begin\n  foo\n{0}end",
         "insert": "ensure\n",
         "replacement": "ensure\n  bar\n"
       },
@@ -242,14 +233,10 @@
         "replacement": "bar rescue nil"
       },
       {
-        "syntax": "case-when",
-        "insert": "case foo\nend",
-        "replacement": "case foo\nwhen bar\nend"
-      },
-      {
         "syntax": "when",
-        "insert": "case foo\nwhen bar\nend",
-        "replacement": "case foo\nwhen bar\n  baz\nend"
+        "template": "case foo\n{0}end",
+        "insert": "when bar\n",
+        "replacement": "when bar\n  baz\n"
       },
       {
         "syntax": "case-when-else",

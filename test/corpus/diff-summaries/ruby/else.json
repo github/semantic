@@ -1,4 +1,35 @@
 [{
+    "testCaseDescription": "ruby-else-setup-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "185f388c63b93f9018e84d711803adf1636308ae",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e2fc31372d94660e3d757b5264a776be67da4e38"
+}
+,{
     "testCaseDescription": "ruby-else-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,16 +38,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                3,
+                                5
                             ]
                         }
                     },
-                    "summary": "Added a begin statement"
+                    "summary": "Added an else block in a begin statement"
                 }
             ]
         },
@@ -25,86 +56,9 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "264e8a80aee14d0effd8b560eba0b756fc977f49",
+    "sha1": "e2fc31372d94660e3d757b5264a776be67da4e38",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f94104abf315362c00c98ec8983bc10c015f423e"
-}
-,{
-    "testCaseDescription": "ruby-else-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "else.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added a begin statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added a begin statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "else.rb"
-    ],
-    "sha1": "f94104abf315362c00c98ec8983bc10c015f423e",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "416c6e8a826c994180e96da45cfc165a9ad39998"
-}
-,{
-    "testCaseDescription": "ruby-else-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "else.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar()' function call in an else block"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "else.rb"
-    ],
-    "sha1": "416c6e8a826c994180e96da45cfc165a9ad39998",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1309e64764df58212ef4e2ae14dd40b6e213ad6e"
+    "sha2": "d767bcf390d01661e9055a2f29a6657e3f2ab689"
 }
 ,{
     "testCaseDescription": "ruby-else-replacement-test",
@@ -133,9 +87,9 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "1309e64764df58212ef4e2ae14dd40b6e213ad6e",
+    "sha1": "d767bcf390d01661e9055a2f29a6657e3f2ab689",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "57b4e2e412d9b1fdd7b78db5fadcac2264d0a8f1"
+    "sha2": "bc85fe626575dac5acb16e87a60627a0119f03d7"
 }
 ,{
     "testCaseDescription": "ruby-else-delete-replacement-test",
@@ -146,77 +100,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted a begin statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted a begin statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added a begin statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "else.rb"
-    ],
-    "sha1": "57b4e2e412d9b1fdd7b78db5fadcac2264d0a8f1",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bdfec68ee7acf98cfa10de9f46bcf3891f030f66"
-}
-,{
-    "testCaseDescription": "ruby-else-delete-test",
-    "expectedResult": {
-        "changes": {
-            "else.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
+                                4,
+                                3
                             ],
                             "end": [
                                 4,
-                                4
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted a begin statement"
+                    "summary": "Deleted the 'bar()' function call in an else block"
                 }
             ]
         },
@@ -225,12 +118,43 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "bdfec68ee7acf98cfa10de9f46bcf3891f030f66",
+    "sha1": "bc85fe626575dac5acb16e87a60627a0119f03d7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "24bbe6d5af40f9c36cdb928aeaa925da59b6a498"
+    "sha2": "d31b7dd1d21ef27dd0ec35c9543bcd0a4abe11c1"
 }
 ,{
-    "testCaseDescription": "ruby-else-delete-rest-test",
+    "testCaseDescription": "ruby-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "else.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an else block in a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "else.rb"
+    ],
+    "sha1": "d31b7dd1d21ef27dd0ec35c9543bcd0a4abe11c1",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0751a900aa120d758b0fc61918d6a3d50e89cff1"
+}
+,{
+    "testCaseDescription": "ruby-else-teardown-test",
     "expectedResult": {
         "changes": {
             "else.rb": [
@@ -242,7 +166,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 4
                             ]
                         }
@@ -256,7 +180,7 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "24bbe6d5af40f9c36cdb928aeaa925da59b6a498",
+    "sha1": "0751a900aa120d758b0fc61918d6a3d50e89cff1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "47b6616835e1b178e9cd9191c1259fcfcbb7aab3"
+    "sha2": "c1aa0372df373a9df1f3c5c38088bacc3b638fbb"
 }]

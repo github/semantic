@@ -1,4 +1,35 @@
 [{
+    "testCaseDescription": "ruby-when-setup-test",
+    "expectedResult": {
+        "changes": {
+            "when.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' case statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when.rb"
+    ],
+    "sha1": "c1aa0372df373a9df1f3c5c38088bacc3b638fbb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "5fb46e0291f509dd6478ec4a95919740260e2682"
+}
+,{
     "testCaseDescription": "ruby-when-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,16 +38,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                2,
                                 1
                             ],
                             "end": [
                                 3,
-                                4
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Added the 'bar' when comparison in the 'foo' case statement"
                 }
             ]
         },
@@ -25,86 +56,9 @@
     "filePaths": [
         "when.rb"
     ],
-    "sha1": "7699a00ae4f2db5a3570048f56b83158c513a7e1",
+    "sha1": "5fb46e0291f509dd6478ec4a95919740260e2682",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c27a43cc441ebb84e2fecd86ad9569bda89b6f66"
-}
-,{
-    "testCaseDescription": "ruby-when-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "when.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' case statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' case statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "when.rb"
-    ],
-    "sha1": "c27a43cc441ebb84e2fecd86ad9569bda89b6f66",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7d9e6213787892e24789ffd2ff01cde77d7ae296"
-}
-,{
-    "testCaseDescription": "ruby-when-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "when.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'baz' identifier in a when comparison"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "when.rb"
-    ],
-    "sha1": "7d9e6213787892e24789ffd2ff01cde77d7ae296",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c41aa9aae0ac7962a4424529f5fc7979c5981ba0"
+    "sha2": "998ea776459e452dd5056605237ceb22c36846b1"
 }
 ,{
     "testCaseDescription": "ruby-when-replacement-test",
@@ -133,9 +87,9 @@
     "filePaths": [
         "when.rb"
     ],
-    "sha1": "c41aa9aae0ac7962a4424529f5fc7979c5981ba0",
+    "sha1": "998ea776459e452dd5056605237ceb22c36846b1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9e3e5119a2fd787bd1d50679f739811a95258a95"
+    "sha2": "9a49ec9031437eae17e82bf50a9ebe7f594585d5"
 }
 ,{
     "testCaseDescription": "ruby-when-delete-replacement-test",
@@ -146,46 +100,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                1
+                                3,
+                                3
                             ],
                             "end": [
-                                4,
-                                4
+                                3,
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' case statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Deleted the 'baz' identifier in a when comparison"
                 }
             ]
         },
@@ -194,12 +118,12 @@
     "filePaths": [
         "when.rb"
     ],
-    "sha1": "9e3e5119a2fd787bd1d50679f739811a95258a95",
+    "sha1": "9a49ec9031437eae17e82bf50a9ebe7f594585d5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6b668407a0448f0bc0d1390c7a9d5a27d894c0fb"
+    "sha2": "e377ba38188bc00279e3e687d0ee767aedcfb25d"
 }
 ,{
-    "testCaseDescription": "ruby-when-delete-test",
+    "testCaseDescription": "ruby-when-delete-insert-test",
     "expectedResult": {
         "changes": {
             "when.rb": [
@@ -207,16 +131,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                2,
                                 1
                             ],
                             "end": [
                                 3,
-                                4
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
+                    "summary": "Deleted the 'bar' when comparison in the 'foo' case statement"
                 }
             ]
         },
@@ -225,12 +149,12 @@
     "filePaths": [
         "when.rb"
     ],
-    "sha1": "6b668407a0448f0bc0d1390c7a9d5a27d894c0fb",
+    "sha1": "e377ba38188bc00279e3e687d0ee767aedcfb25d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "46deadb9ce696bf99314411f7cf56519dc9d9a03"
+    "sha2": "50d8aab92b52837ff04e6f7c22f4f2e8da553cd1"
 }
 ,{
-    "testCaseDescription": "ruby-when-delete-rest-test",
+    "testCaseDescription": "ruby-when-teardown-test",
     "expectedResult": {
         "changes": {
             "when.rb": [
@@ -242,7 +166,7 @@
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 4
                             ]
                         }
@@ -256,7 +180,7 @@
     "filePaths": [
         "when.rb"
     ],
-    "sha1": "46deadb9ce696bf99314411f7cf56519dc9d9a03",
+    "sha1": "50d8aab92b52837ff04e6f7c22f4f2e8da553cd1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ff122969324986ab2efa865790c05098cf5bf7eb"
+    "sha2": "4271016dbb96667635e707fced1ae9261e704536"
 }]
