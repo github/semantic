@@ -138,9 +138,16 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "042a288ab3f8ef27e53f4354c48b71c03de8b2d2",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index e69de29..7421e18 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -0,0 +1 @@",
+        "+{ add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0b4b757145a89090f1d9fda258af68796f49599a"
+    "shas": "d85c24526768ef13d44a0e8cce5aefe270e43c4a..8eea4fae7706338a3f452fd4bd3055b37c97016a"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
@@ -601,9 +608,18 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "0b4b757145a89090f1d9fda258af68796f49599a",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 7421e18..59eb3a3 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1 +1,3 @@",
+        "+{ subtract(a, b) { return a - b; } };",
+        "+{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "262cd20347ec498fb9d0869124aeef7ff4c30f9b"
+    "shas": "8eea4fae7706338a3f452fd4bd3055b37c97016a..6eff566d865d623bc9da78e1d3effc0e71359b64"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
@@ -1262,9 +1278,19 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "262cd20347ec498fb9d0869124aeef7ff4c30f9b",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 59eb3a3..05689b1 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ subtract(a, b) { return a - b; } };",
+        "+{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "740ffd48f65ede4fe5602775c91fd73b31344c45"
+    "shas": "6eff566d865d623bc9da78e1d3effc0e71359b64..5e157004b3bbcf754390b5ea0b16a1293f239d41"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-test",
@@ -1923,9 +1949,19 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "740ffd48f65ede4fe5602775c91fd73b31344c45",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 05689b1..59eb3a3 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ add(a, b) { return a + b; } };",
+        "+{ subtract(a, b) { return a - b; } };",
+        " { add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "da7ba70730e97d6b0ddefb3dba28cfada5d6490d"
+    "shas": "5e157004b3bbcf754390b5ea0b16a1293f239d41..c31bcd1e44f97b7db87ff2b5a6cf0406e0d9e081"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
@@ -2488,9 +2524,19 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "da7ba70730e97d6b0ddefb3dba28cfada5d6490d",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 59eb3a3..29d3998 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,2 @@",
+        "-{ subtract(a, b) { return a - b; } };",
+        "-{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };",
+        "+{ subtract(a, b) { return a - b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1b6d7679d710850ec80ce067cce52a7953abc291"
+    "shas": "c31bcd1e44f97b7db87ff2b5a6cf0406e0d9e081..9224e4bb69acfd7cae9b2c42bef700ee0193975f"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-test",
@@ -2849,9 +2895,17 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "1b6d7679d710850ec80ce067cce52a7953abc291",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 29d3998..80ad7f0 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,2 +1 @@",
+        "-{ add(a, b) { return a + b; } };",
+        " { subtract(a, b) { return a - b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ce0d8eb8162000c66e5bb9d49f36c0187e6b15c8"
+    "shas": "9224e4bb69acfd7cae9b2c42bef700ee0193975f..09865379a4ced5df31bdfc3432abeeb525fa8b53"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
@@ -2993,7 +3047,14 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "ce0d8eb8162000c66e5bb9d49f36c0187e6b15c8",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 80ad7f0..e69de29 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1 +0,0 @@",
+        "-{ subtract(a, b) { return a - b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "954f6de645b21a3305ee051f7baf71d6c2d28f00"
+    "shas": "09865379a4ced5df31bdfc3432abeeb525fa8b53..b4b7955f8a8306e856b260875bdf3039b29612a8"
 }]

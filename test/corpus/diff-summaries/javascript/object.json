@@ -25,9 +25,16 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "00efe14aec8ad3006518ee149f738adee0aeba5d",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index e69de29..fe17bb2 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -0,0 +1 @@",
+        "+{ \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9503250634810e806419552ad9ad18891bbc219e"
+    "shas": "aaba67c460efdf59f04a498c4699fcb690d9b490..7faf2acf9f69d7f3b03dde0d6a5e1d2f65871d01"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "9503250634810e806419552ad9ad18891bbc219e",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index fe17bb2..741c3dc 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1 +1,3 @@",
+        "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        "+{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6f5f810bf7512233cd31d12a0324e3fee4a476d2"
+    "shas": "7faf2acf9f69d7f3b03dde0d6a5e1d2f65871d01..0b2c6e3141cb23beeb872694d5f1587716ac4040"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-insert-test",
@@ -117,9 +133,19 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "6f5f810bf7512233cd31d12a0324e3fee4a476d2",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 741c3dc..701239d 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        "+{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b4c00c718fe8766bce38b8c8bb263a6a24b4f29e"
+    "shas": "0b2c6e3141cb23beeb872694d5f1587716ac4040..fd282261939913a45699187bcebd1df33dd8f354"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-test",
@@ -163,9 +189,19 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "b4c00c718fe8766bce38b8c8bb263a6a24b4f29e",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 701239d..741c3dc 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ \"key1\": \"value1\" };",
+        "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        " { \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9a21cddbf2e326d66db1d30048a505c7b4114a17"
+    "shas": "fd282261939913a45699187bcebd1df33dd8f354..cf63812f1b4711a1dff84db2df97b987df9cfb6d"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-replacement-test",
@@ -224,9 +260,19 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "9a21cddbf2e326d66db1d30048a505c7b4114a17",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 741c3dc..9e48273 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,3 +1,2 @@",
+        "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        "-{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };",
+        "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c67dbc109159cb73130a14bff8efb22969fa3e7d"
+    "shas": "cf63812f1b4711a1dff84db2df97b987df9cfb6d..1b3cdfbad081f4c455fa9534d9cba4547f5ab6f1"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-test",
@@ -255,9 +301,17 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "c67dbc109159cb73130a14bff8efb22969fa3e7d",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 9e48273..12d063a 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,2 +1 @@",
+        "-{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "575cfe90651d66ddda91b0764d9107f1718c1bfb"
+    "shas": "1b3cdfbad081f4c455fa9534d9cba4547f5ab6f1..607a72ed7ff28c76667ef67aca1472e2aa4be099"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-rest-test",
@@ -286,7 +340,14 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "575cfe90651d66ddda91b0764d9107f1718c1bfb",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 12d063a..e69de29 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1 +0,0 @@",
+        "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c3ba4a1505773022c8c9750803b2f78c821f80a1"
+    "shas": "607a72ed7ff28c76667ef67aca1472e2aa4be099..5f4dfa791577127cebc7f5fa8c7d94b7427980f3"
 }]

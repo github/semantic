@@ -25,9 +25,16 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "e01da1d7da05b823873a3d54668f908216c92694",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index e69de29..d205614 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -0,0 +1 @@",
+        "+function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c40a8da30fd77e505774c5124454d46f5e07f608"
+    "shas": "b916dd0d4e57f46f672acd9dc9130eef9e0bcc60..b60cbbceaf5939517572a1c7ebc7fd80db858b96"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "c40a8da30fd77e505774c5124454d46f5e07f608",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index d205614..5dfcca6 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -1 +1,3 @@",
+        "+function f(arg1, arg2) { do { something(arg2); } while (arg1); }",
+        "+function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        " function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8d1f422c1d1af152ae1d8ed0fa4391ac6ec6f1e6"
+    "shas": "b60cbbceaf5939517572a1c7ebc7fd80db858b96..3da97953dcda4f775d102a777c46bf8476ac6ee6"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-insert-test",
@@ -141,9 +157,19 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "8d1f422c1d1af152ae1d8ed0fa4391ac6ec6f1e6",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index 5dfcca6..49cff7e 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function f(arg1, arg2) { do { something(arg2); } while (arg1); }",
+        "+function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        " function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        " function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e04397861769262f0c682e6ac4050be04302616c"
+    "shas": "3da97953dcda4f775d102a777c46bf8476ac6ee6..d91742e7e9daa195667f006f6eb20e19c6f16c00"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-replacement-test",
@@ -211,9 +237,19 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "e04397861769262f0c682e6ac4050be04302616c",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index 49cff7e..5dfcca6 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        "+function f(arg1, arg2) { do { something(arg2); } while (arg1); }",
+        " function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        " function f(arg1, arg2) { do { something(arg1); } while (arg2); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "da3be5ae932bfa8baf3d88de70ba76dc3503a756"
+    "shas": "d91742e7e9daa195667f006f6eb20e19c6f16c00..f4842813b2ac2a5996ad23bbeeb6d022a3c29f8e"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-replacement-test",
@@ -272,9 +308,19 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "da3be5ae932bfa8baf3d88de70ba76dc3503a756",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index 5dfcca6..babb1e6 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -1,3 +1,2 @@",
+        "-function f(arg1, arg2) { do { something(arg2); } while (arg1); }",
+        "-function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        " function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        "+function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8b1f6a80d4434515e3129552987804e58ee95182"
+    "shas": "f4842813b2ac2a5996ad23bbeeb6d022a3c29f8e..39c63fc4aa834c62a569d089f3c660ff87519271"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-test",
@@ -303,9 +349,17 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "8b1f6a80d4434515e3129552987804e58ee95182",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index babb1e6..2b15580 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -1,2 +1 @@",
+        "-function f(arg1, arg2) { do { something(arg1); } while (arg2); }",
+        " function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "78e6515b27f094beeb4b3b6dec2bbe60bb57a088"
+    "shas": "39c63fc4aa834c62a569d089f3c660ff87519271..6cdad31d7f48683bfe6ff831cd286c79d2467e8f"
 }
 ,{
     "testCaseDescription": "javascript-nested-do-while-in-function-delete-rest-test",
@@ -334,7 +388,14 @@
     "filePaths": [
         "nested-do-while-in-function.js"
     ],
-    "sha1": "78e6515b27f094beeb4b3b6dec2bbe60bb57a088",
+    "patch": [
+        "diff --git a/nested-do-while-in-function.js b/nested-do-while-in-function.js",
+        "index 2b15580..e69de29 100644",
+        "--- a/nested-do-while-in-function.js",
+        "+++ b/nested-do-while-in-function.js",
+        "@@ -1 +0,0 @@",
+        "-function f(arg1, arg2) { do { something(arg2); } while (arg1); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1011ea99d2c513437073a38030c1290fcc06cac4"
+    "shas": "6cdad31d7f48683bfe6ff831cd286c79d2467e8f..94d7e0ef831c81697b130d8e7c032b876c270e33"
 }]

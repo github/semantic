@@ -55,9 +55,18 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "5f9fe76e7b8fa65bdfeb40a3dcd3b5e9a2539a0f",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index e69de29..a596f03 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -0,0 +1,3 @@",
+        "+a | b",
+        "+a >> b",
+        "+a ^ b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ed483f14948463ce6fcb3c696be1632d61010527"
+    "shas": "70d36a6a9817b1e91707c1f7f830a0568b959efa..ce65ef18e5032a270bbfcef7d593c68d270abaf4"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-replacement-insert-test",
@@ -146,9 +155,23 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "ed483f14948463ce6fcb3c696be1632d61010527",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index a596f03..826d98f 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -1,3 +1,8 @@",
+        "+a & b",
+        "+a << b",
+        "+a | b",
+        "+a >> b",
+        "+a ^ b",
+        " a | b",
+        " a >> b",
+        " a ^ b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fb2e6020a7f4bdac05a709cf3a1681bf4f0a1c17"
+    "shas": "ce65ef18e5032a270bbfcef7d593c68d270abaf4..3710a2840202f8625b9a440d8b556a6d30d2b6f6"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-insert-test",
@@ -177,9 +200,23 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "fb2e6020a7f4bdac05a709cf3a1681bf4f0a1c17",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index 826d98f..8f874fc 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -1,5 +1,6 @@",
+        "-a & b",
+        "-a << b",
+        "+a | b",
+        "+a >> b",
+        "+a ^ b",
+        " a | b",
+        " a >> b",
+        " a ^ b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "574e6e7d2fef94d354fecf250e46f3653aa16aa1"
+    "shas": "3710a2840202f8625b9a440d8b556a6d30d2b6f6..88289eb5fde1222a010efda881ce7888c282fe61"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-replacement-test",
@@ -208,9 +245,23 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "574e6e7d2fef94d354fecf250e46f3653aa16aa1",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index 8f874fc..826d98f 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -1,6 +1,5 @@",
+        "-a | b",
+        "-a >> b",
+        "-a ^ b",
+        "+a & b",
+        "+a << b",
+        " a | b",
+        " a >> b",
+        " a ^ b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "faa9df404b1d1919cf0863e35b8cf4e875a4c6fe"
+    "shas": "88289eb5fde1222a010efda881ce7888c282fe61..5ae589defd184d837cb3d384ab225f42299801d8"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-replacement-test",
@@ -269,9 +320,25 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "faa9df404b1d1919cf0863e35b8cf4e875a4c6fe",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index 826d98f..1a2a6da 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -1,8 +1,5 @@",
+        "-a & b",
+        "-a << b",
+        "-a | b",
+        "-a >> b",
+        "-a ^ b",
+        " a | b",
+        " a >> b",
+        " a ^ b",
+        "+a & b",
+        "+a << b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4ff49b702959f3853fb82b51c85dee616f922613"
+    "shas": "5ae589defd184d837cb3d384ab225f42299801d8..29cf76ea1e49cdef2e616fed189fec268693ca87"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-test",
@@ -330,9 +397,20 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "4ff49b702959f3853fb82b51c85dee616f922613",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index 1a2a6da..97e763b 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -1,5 +1,2 @@",
+        "-a | b",
+        "-a >> b",
+        "-a ^ b",
+        " a & b",
+        " a << b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "648beb1be1a18e4ac13e3ac8c988d27e79f48735"
+    "shas": "29cf76ea1e49cdef2e616fed189fec268693ca87..4bb4fee464aeaf7f957b7750b0947e7c02f2a8a8"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-rest-test",
@@ -376,7 +454,15 @@
     "filePaths": [
         "bitwise-operator.rb"
     ],
-    "sha1": "648beb1be1a18e4ac13e3ac8c988d27e79f48735",
+    "patch": [
+        "diff --git a/bitwise-operator.rb b/bitwise-operator.rb",
+        "index 97e763b..e69de29 100644",
+        "--- a/bitwise-operator.rb",
+        "+++ b/bitwise-operator.rb",
+        "@@ -1,2 +0,0 @@",
+        "-a & b",
+        "-a << b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d973e53299f87c5bc7984468597013bd32fc0300"
+    "shas": "4bb4fee464aeaf7f957b7750b0947e7c02f2a8a8..8b196e55798c1a5f125a87a869f770dca83665d6"
 }]

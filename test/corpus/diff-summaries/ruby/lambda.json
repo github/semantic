@@ -25,9 +25,16 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "9ecc2a471ad5c0c86f510ca09aac442da2bd6a8b",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index e69de29..943ace3 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -0,0 +1 @@",
+        "+lambda { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c0546cb82a30cc134cb1093d632373a2f3b9c7bc"
+    "shas": "18022ae6ebbe9a88b3eaf0cfa0654e8f8bc5dd01..3056cfc87793da5967931201f46bc12dc4186bf5"
 }
 ,{
     "testCaseDescription": "ruby-lambda-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "c0546cb82a30cc134cb1093d632373a2f3b9c7bc",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index 943ace3..cb843af 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -1 +1,3 @@",
+        "+lambda { |x| x + 1 }",
+        "+lambda { foo }",
+        " lambda { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "769b0017d54af5460b9314f6505d01bca84b26d0"
+    "shas": "3056cfc87793da5967931201f46bc12dc4186bf5..a33da9171f4f363df081fa60a58279175ea6bbc7"
 }
 ,{
     "testCaseDescription": "ruby-lambda-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "769b0017d54af5460b9314f6505d01bca84b26d0",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index cb843af..447bfb7 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -1,3 +1,3 @@",
+        "-lambda { |x| x + 1 }",
+        "+lambda { foo }",
+        " lambda { foo }",
+        " lambda { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5cdd114b41a2b4b9944046c460bfb5ebd6fe5ca5"
+    "shas": "a33da9171f4f363df081fa60a58279175ea6bbc7..e52658a62a6c3953d8382d0296c267b2a9a3b3dc"
 }
 ,{
     "testCaseDescription": "ruby-lambda-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "5cdd114b41a2b4b9944046c460bfb5ebd6fe5ca5",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index 447bfb7..cb843af 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -1,3 +1,3 @@",
+        "-lambda { foo }",
+        "+lambda { |x| x + 1 }",
+        " lambda { foo }",
+        " lambda { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "69e98d81bbcec1aaacd06d6f393e025452c82b4e"
+    "shas": "e52658a62a6c3953d8382d0296c267b2a9a3b3dc..522cd601966aa3e9f5fc0f033f81cbefcd706669"
 }
 ,{
     "testCaseDescription": "ruby-lambda-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "69e98d81bbcec1aaacd06d6f393e025452c82b4e",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index cb843af..4ebf1f8 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -1,3 +1,2 @@",
+        "-lambda { |x| x + 1 }",
+        "-lambda { foo }",
+        " lambda { foo }",
+        "+lambda { |x| x + 1 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f16e9d8ef1296bc000d691d0ffca85fee00c5580"
+    "shas": "522cd601966aa3e9f5fc0f033f81cbefcd706669..1f004455547e75075f1c16f62433c080571f69ae"
 }
 ,{
     "testCaseDescription": "ruby-lambda-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "f16e9d8ef1296bc000d691d0ffca85fee00c5580",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index 4ebf1f8..dfe1b8b 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -1,2 +1 @@",
+        "-lambda { foo }",
+        " lambda { |x| x + 1 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ea7b398f8e338e5b7118003a40bcad036eb9db19"
+    "shas": "1f004455547e75075f1c16f62433c080571f69ae..fb578efc5242fd49d72fc4e06e75adf0320ef31d"
 }
 ,{
     "testCaseDescription": "ruby-lambda-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "lambda.rb"
     ],
-    "sha1": "ea7b398f8e338e5b7118003a40bcad036eb9db19",
+    "patch": [
+        "diff --git a/lambda.rb b/lambda.rb",
+        "index dfe1b8b..e69de29 100644",
+        "--- a/lambda.rb",
+        "+++ b/lambda.rb",
+        "@@ -1 +0,0 @@",
+        "-lambda { |x| x + 1 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "11c1f670003a6d95a99b37f02ad9c5628e60c3cd"
+    "shas": "fb578efc5242fd49d72fc4e06e75adf0320ef31d..b8e7a4d5034214328f3391e3c6001076f5bb6ec9"
 }]

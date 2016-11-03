@@ -85,9 +85,20 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "185e7c7a223bdfca3c8cf6068abbcbe3558f859b",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index e69de29..9c3bd32 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -0,0 +1,5 @@",
+        "+x += 1",
+        "+x -= 1",
+        "+x *= 1",
+        "+x /= 1",
+        "+x **= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "13327fb10cbddd239c6cd2b0e3a2e9a2e67ae085"
+    "shas": "b8a1e5f549bc1fa5a1424093d499d32fa0987cee..5438892990d5ecfa57ee99c577aa175b73ffbabe"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-replacement-insert-test",
@@ -251,9 +262,28 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "13327fb10cbddd239c6cd2b0e3a2e9a2e67ae085",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index 9c3bd32..ebf1cd7 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -1,3 +1,13 @@",
+        "+x+= 2",
+        "+x -= 1",
+        "+x *= 1",
+        "+x /= 1",
+        "+x **= 1",
+        "+x += 1",
+        "+x -= 1",
+        "+x *= 1",
+        "+x /= 1",
+        "+x **= 1",
+        " x += 1",
+        " x -= 1",
+        " x *= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2e0c255d5542489a665130d27875f28c34d37fa0"
+    "shas": "5438892990d5ecfa57ee99c577aa175b73ffbabe..f70cdf5d64b650094018ccee6d9b42009ad22fde"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-insert-test",
@@ -294,9 +324,20 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "2e0c255d5542489a665130d27875f28c34d37fa0",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index ebf1cd7..8751768 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -1,4 +1,4 @@",
+        "-x+= 2",
+        "+x += 1",
+        " x -= 1",
+        " x *= 1",
+        " x /= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5ba6ffd3ac7bd6c72f85997ae92b5d45f7d3a583"
+    "shas": "f70cdf5d64b650094018ccee6d9b42009ad22fde..e9c35072aff21a20a3e388f9cf3c172194218160"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-replacement-test",
@@ -337,9 +378,20 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "5ba6ffd3ac7bd6c72f85997ae92b5d45f7d3a583",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index 8751768..ebf1cd7 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -1,4 +1,4 @@",
+        "-x += 1",
+        "+x+= 2",
+        " x -= 1",
+        " x *= 1",
+        " x /= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "84d14853b7a5840a44e47ae9d6255dad0ee8a9f8"
+    "shas": "e9c35072aff21a20a3e388f9cf3c172194218160..76a45dcf02f834864ade4b2ed1ec5fd0dd0c7f76"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-replacement-test",
@@ -458,9 +510,30 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "84d14853b7a5840a44e47ae9d6255dad0ee8a9f8",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index ebf1cd7..207ee13 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -1,14 +1,9 @@",
+        "-x+= 2",
+        "-x -= 1",
+        "-x *= 1",
+        "-x /= 1",
+        "-x **= 1",
+        " x += 1",
+        " x -= 1",
+        " x *= 1",
+        " x /= 1",
+        " x **= 1",
+        "-x += 1",
+        "+x+= 2",
+        " x -= 1",
+        " x *= 1",
+        " x /= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "651ab65a64bd3d59e00efc32039ceafa09f1d49f"
+    "shas": "76a45dcf02f834864ade4b2ed1ec5fd0dd0c7f76..33f478735db5f9a23c2760a55dfc3e4acbdc46f8"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-test",
@@ -549,9 +622,23 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "651ab65a64bd3d59e00efc32039ceafa09f1d49f",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index 207ee13..fd6ee10 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -1,8 +1,3 @@",
+        "-x += 1",
+        "-x -= 1",
+        "-x *= 1",
+        "-x /= 1",
+        "-x **= 1",
+        " x+= 2",
+        " x -= 1",
+        " x *= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "32c596683c310341506da4bdd7a9ee51ce2f2759"
+    "shas": "33f478735db5f9a23c2760a55dfc3e4acbdc46f8..f81054ebeafb1e11c934903a5f5bc2341f79a500"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-rest-test",
@@ -640,7 +727,18 @@
     "filePaths": [
         "math-assignment.rb"
     ],
-    "sha1": "32c596683c310341506da4bdd7a9ee51ce2f2759",
+    "patch": [
+        "diff --git a/math-assignment.rb b/math-assignment.rb",
+        "index fd6ee10..e69de29 100644",
+        "--- a/math-assignment.rb",
+        "+++ b/math-assignment.rb",
+        "@@ -1,5 +0,0 @@",
+        "-x+= 2",
+        "-x -= 1",
+        "-x *= 1",
+        "-x /= 1",
+        "-x **= 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ec81c632ff6bbf19d755cb08b9172568e8d986a8"
+    "shas": "f81054ebeafb1e11c934903a5f5bc2341f79a500..6564c9c8832540d910a4118a6130305613ef9772"
 }]

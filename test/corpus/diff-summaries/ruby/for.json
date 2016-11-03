@@ -25,9 +25,18 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "11c1f670003a6d95a99b37f02ad9c5628e60c3cd",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index e69de29..e4ea259 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -0,0 +1,3 @@",
+        "+for x in y",
+        "+  f",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4cdb7c74cf51031620d90781a3fa2e806d82dcd3"
+    "shas": "b8e7a4d5034214328f3391e3c6001076f5bb6ec9..1e4b5ce7ca850c42c111c21fd9d8f38990fc3cbf"
 }
 ,{
     "testCaseDescription": "ruby-for-replacement-insert-test",
@@ -71,9 +80,24 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "4cdb7c74cf51031620d90781a3fa2e806d82dcd3",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index e4ea259..1ec5fb3 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -1,3 +1,9 @@",
+        "+for i in [1,2,3] do",
+        "+  print i",
+        "+end",
+        "+for x in y",
+        "+  f",
+        "+end",
+        " for x in y",
+        "   f",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "17e1ea04b22d68a01e3d5fdf82e072ec4f1931be"
+    "shas": "1e4b5ce7ca850c42c111c21fd9d8f38990fc3cbf..c2e6812edb506dd8a3b9419e33f6d21c4998a1b7"
 }
 ,{
     "testCaseDescription": "ruby-for-delete-insert-test",
@@ -114,9 +138,22 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "17e1ea04b22d68a01e3d5fdf82e072ec4f1931be",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index 1ec5fb3..b6b5bdd 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -1,5 +1,5 @@",
+        "-for i in [1,2,3] do",
+        "-  print i",
+        "+for x in y",
+        "+  f",
+        " end",
+        " for x in y",
+        "   f"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "281d83003bf56b54afdb80a361ed037a9697929b"
+    "shas": "c2e6812edb506dd8a3b9419e33f6d21c4998a1b7..bd3974e67a2154631e5a3348a1c4d13d38277cf7"
 }
 ,{
     "testCaseDescription": "ruby-for-replacement-test",
@@ -157,9 +194,22 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "281d83003bf56b54afdb80a361ed037a9697929b",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index b6b5bdd..1ec5fb3 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -1,5 +1,5 @@",
+        "-for x in y",
+        "-  f",
+        "+for i in [1,2,3] do",
+        "+  print i",
+        " end",
+        " for x in y",
+        "   f"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "de3fea29885e59d72365364319ff86ae53d56bfc"
+    "shas": "bd3974e67a2154631e5a3348a1c4d13d38277cf7..7547579e6c4c271afb05ba08271f0ed4b4b678ea"
 }
 ,{
     "testCaseDescription": "ruby-for-delete-replacement-test",
@@ -218,9 +268,26 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "de3fea29885e59d72365364319ff86ae53d56bfc",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index 1ec5fb3..543a0c8 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -1,9 +1,6 @@",
+        "-for i in [1,2,3] do",
+        "-  print i",
+        "-end",
+        " for x in y",
+        "   f",
+        " end",
+        "-for x in y",
+        "-  f",
+        "+for i in [1,2,3] do",
+        "+  print i",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bd869c38211dbfc3a4a60c3540c6f51d161e32ad"
+    "shas": "7547579e6c4c271afb05ba08271f0ed4b4b678ea..467953257426ae06a5f6026a93d2820676c903c0"
 }
 ,{
     "testCaseDescription": "ruby-for-delete-test",
@@ -249,9 +316,21 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "bd869c38211dbfc3a4a60c3540c6f51d161e32ad",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index 543a0c8..9031ee4 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -1,6 +1,3 @@",
+        "-for x in y",
+        "-  f",
+        "-end",
+        " for i in [1,2,3] do",
+        "   print i",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "41027fb036f9dae593152c10c224c0cdc80763f1"
+    "shas": "467953257426ae06a5f6026a93d2820676c903c0..1fd6b5413c62cdb0f0b1822736dfdacdbbc267a0"
 }
 ,{
     "testCaseDescription": "ruby-for-delete-rest-test",
@@ -280,7 +359,16 @@
     "filePaths": [
         "for.rb"
     ],
-    "sha1": "41027fb036f9dae593152c10c224c0cdc80763f1",
+    "patch": [
+        "diff --git a/for.rb b/for.rb",
+        "index 9031ee4..e69de29 100644",
+        "--- a/for.rb",
+        "+++ b/for.rb",
+        "@@ -1,3 +0,0 @@",
+        "-for i in [1,2,3] do",
+        "-  print i",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a61d0fc144c41fdbac85a0a3f7972d0a414282b5"
+    "shas": "1fd6b5413c62cdb0f0b1822736dfdacdbbc267a0..72f935172c31da7ddd21bf1a12c7baeb4fdb3419"
 }]

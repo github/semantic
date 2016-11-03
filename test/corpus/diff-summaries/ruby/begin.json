@@ -25,9 +25,17 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "03c9f263611a1073e5d99cfe3750c34bfd34ca72",
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index e69de29..ff7bbbe 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "71c803a5fcf8ba2ae10f24d37aa2ee026dbd74c6"
+    "shas": "72e1f4912f54a936266422abbb53a9c2fc864992..d9be702e11b41377baa2f5fb3ccd4e3cf3dd81e4"
 }
 ,{
     "testCaseDescription": "ruby-begin-insert-test",
@@ -56,9 +64,19 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "71c803a5fcf8ba2ae10f24d37aa2ee026dbd74c6",
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index ff7bbbe..7b4a3be 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,2 +1,4 @@",
+        " def foo",
+        "+begin",
+        "+end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "03ad6520b0ee07f99a2462a3352de193158072a2"
+    "shas": "d9be702e11b41377baa2f5fb3ccd4e3cf3dd81e4..1f7c992ecbf8dc5434ec7da2bc396e814e91adc9"
 }
 ,{
     "testCaseDescription": "ruby-begin-replacement-test",
@@ -87,9 +105,20 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "03ad6520b0ee07f99a2462a3352de193158072a2",
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index 7b4a3be..7879e55 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,4 +1,5 @@",
+        " def foo",
+        " begin",
+        "+  puts 'hi'",
+        " end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3dbbe3b3a1688734d517256a99ebd6e20ce1afd1"
+    "shas": "1f7c992ecbf8dc5434ec7da2bc396e814e91adc9..a72bbedc16a6b300edf51b665ebaf90e62662ab8"
 }
 ,{
     "testCaseDescription": "ruby-begin-delete-replacement-test",
@@ -118,9 +147,20 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "3dbbe3b3a1688734d517256a99ebd6e20ce1afd1",
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index 7879e55..7b4a3be 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,5 +1,4 @@",
+        " def foo",
+        " begin",
+        "-  puts 'hi'",
+        " end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "00dd270fd0b0c958bc2d00860c2eae8128ad14c7"
+    "shas": "a72bbedc16a6b300edf51b665ebaf90e62662ab8..4ba57f34c39daab00f1b9fc48f1e162ced2e9a44"
 }
 ,{
     "testCaseDescription": "ruby-begin-delete-insert-test",
@@ -149,9 +189,19 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "00dd270fd0b0c958bc2d00860c2eae8128ad14c7",
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index 7b4a3be..ff7bbbe 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,4 +1,2 @@",
+        " def foo",
+        "-begin",
+        "-end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f15dcec33c1402a158c0f63486d7c2dd77adc11d"
+    "shas": "4ba57f34c39daab00f1b9fc48f1e162ced2e9a44..9995f52897de0441895de23887b80cd4c9b7ea75"
 }
 ,{
     "testCaseDescription": "ruby-begin-teardown-test",
@@ -180,7 +230,15 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "f15dcec33c1402a158c0f63486d7c2dd77adc11d",
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index ff7bbbe..e69de29 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d17161b34383c7680aadb5b411bc13814e53148d"
+    "shas": "9995f52897de0441895de23887b80cd4c9b7ea75..cc81318f97e858789ab75eb6e9c4a9ef9a96807c"
 }]

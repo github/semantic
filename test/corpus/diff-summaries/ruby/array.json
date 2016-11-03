@@ -25,9 +25,16 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "fba342a18fffa0aa07e6efa94bbd78865f152e2a",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index e69de29..a900520 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -0,0 +1 @@",
+        "+[ 1, 2, 3]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f27f87e8dda43fbaeaf23377498d7ad3add5e620"
+    "shas": "e8c4c9b4ba151237a0e88d5a650d34ee5a5a1b61..92505afbaea485d23aecf7f8edb66dfad7e17fd8"
 }
 ,{
     "testCaseDescription": "ruby-array-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "f27f87e8dda43fbaeaf23377498d7ad3add5e620",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index a900520..c3ae0a1 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -1 +1,3 @@",
+        "+['a', 'b', 'c']",
+        "+[ 1, 2, 3]",
+        " [ 1, 2, 3]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5c195f22e8a087a75d33782dd06ed24dda0d60c9"
+    "shas": "92505afbaea485d23aecf7f8edb66dfad7e17fd8..4f3473df5291027b89f3b4fe9ca1854e49454cc4"
 }
 ,{
     "testCaseDescription": "ruby-array-delete-insert-test",
@@ -177,9 +193,19 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "5c195f22e8a087a75d33782dd06ed24dda0d60c9",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index c3ae0a1..9d0ec26 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -1,3 +1,3 @@",
+        "-['a', 'b', 'c']",
+        "+[ 1, 2, 3]",
+        " [ 1, 2, 3]",
+        " [ 1, 2, 3]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8d0ab17a3cfb3ecf5ebb189711cc2eb32e73c607"
+    "shas": "4f3473df5291027b89f3b4fe9ca1854e49454cc4..9def16756eb5f54b2e6b55b6a4cdfeb4a8d5de46"
 }
 ,{
     "testCaseDescription": "ruby-array-replacement-test",
@@ -283,9 +309,19 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "8d0ab17a3cfb3ecf5ebb189711cc2eb32e73c607",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index 9d0ec26..c3ae0a1 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -1,3 +1,3 @@",
+        "-[ 1, 2, 3]",
+        "+['a', 'b', 'c']",
+        " [ 1, 2, 3]",
+        " [ 1, 2, 3]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "203b745805e5313ec2a53cf95cd511f5ad22eb64"
+    "shas": "9def16756eb5f54b2e6b55b6a4cdfeb4a8d5de46..201d96f51f94a1a40acc9278b6adc775bea84b0f"
 }
 ,{
     "testCaseDescription": "ruby-array-delete-replacement-test",
@@ -344,9 +380,19 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "203b745805e5313ec2a53cf95cd511f5ad22eb64",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index c3ae0a1..102a972 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -1,3 +1,2 @@",
+        "-['a', 'b', 'c']",
+        "-[ 1, 2, 3]",
+        " [ 1, 2, 3]",
+        "+['a', 'b', 'c']"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "52d8ec56aa7e6e7ad351686e12cb9bc278b2ab6d"
+    "shas": "201d96f51f94a1a40acc9278b6adc775bea84b0f..b5284048ab1c80b398b60b7c632c733adde8df2e"
 }
 ,{
     "testCaseDescription": "ruby-array-delete-test",
@@ -375,9 +421,17 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "52d8ec56aa7e6e7ad351686e12cb9bc278b2ab6d",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index 102a972..939152e 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -1,2 +1 @@",
+        "-[ 1, 2, 3]",
+        " ['a', 'b', 'c']"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "862d71dafabd312dca56a5b61da24797436024f2"
+    "shas": "b5284048ab1c80b398b60b7c632c733adde8df2e..aff7086bf8fd3b7fc3be8f3bd49c41c46a049729"
 }
 ,{
     "testCaseDescription": "ruby-array-delete-rest-test",
@@ -406,7 +460,14 @@
     "filePaths": [
         "array.rb"
     ],
-    "sha1": "862d71dafabd312dca56a5b61da24797436024f2",
+    "patch": [
+        "diff --git a/array.rb b/array.rb",
+        "index 939152e..e69de29 100644",
+        "--- a/array.rb",
+        "+++ b/array.rb",
+        "@@ -1 +0,0 @@",
+        "-['a', 'b', 'c']"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "73a673c5ff7f561a8ba38db6dcb6296a8f35ecb5"
+    "shas": "aff7086bf8fd3b7fc3be8f3bd49c41c46a049729..79b196cace027a076f4ba235171fd4f409bdaba9"
 }]

@@ -25,9 +25,16 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "4d9fc65bb52020e3b2c9ad28a7e960166a39cf3e",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index e69de29..45ff4a6 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -0,0 +1 @@",
+        "+print unless foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d0e0c6bef9d2e9053e7d72f116d2812dfc5b39c0"
+    "shas": "4e2fff03bd38fd80461d8cac1a09c40ca80b2390..a156c775baf7ff53bfebb34f0b044ceca96516e0"
 }
 ,{
     "testCaseDescription": "ruby-if-unless-modifiers-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "d0e0c6bef9d2e9053e7d72f116d2812dfc5b39c0",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index 45ff4a6..cb2925a 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -1 +1,3 @@",
+        "+print if foo",
+        "+print unless foo",
+        " print unless foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ddafb94d4c98213f7fd6f2d54b815b6b795a39fd"
+    "shas": "a156c775baf7ff53bfebb34f0b044ceca96516e0..935c4f046aca16b663c3b7bbf15bb4e3b89df95f"
 }
 ,{
     "testCaseDescription": "ruby-if-unless-modifiers-delete-insert-test",
@@ -117,9 +133,19 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "ddafb94d4c98213f7fd6f2d54b815b6b795a39fd",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index cb2925a..04f425e 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -1,3 +1,3 @@",
+        "-print if foo",
+        "+print unless foo",
+        " print unless foo",
+        " print unless foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a780a1f13fe7a82ac0a41e0309fdb38d87a12f22"
+    "shas": "935c4f046aca16b663c3b7bbf15bb4e3b89df95f..2f5c75839c978eb166b5ce29ddcb0c663222be8e"
 }
 ,{
     "testCaseDescription": "ruby-if-unless-modifiers-replacement-test",
@@ -163,9 +189,19 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "a780a1f13fe7a82ac0a41e0309fdb38d87a12f22",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index 04f425e..cb2925a 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -1,3 +1,3 @@",
+        "-print unless foo",
+        "+print if foo",
+        " print unless foo",
+        " print unless foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "11fa7a1afa76afd572783d590e1fe148a3cdd440"
+    "shas": "2f5c75839c978eb166b5ce29ddcb0c663222be8e..85ce995a212ec872107b09fd0baba8b62286c999"
 }
 ,{
     "testCaseDescription": "ruby-if-unless-modifiers-delete-replacement-test",
@@ -224,9 +260,19 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "11fa7a1afa76afd572783d590e1fe148a3cdd440",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index cb2925a..a3f9060 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -1,3 +1,2 @@",
+        "-print if foo",
+        "-print unless foo",
+        " print unless foo",
+        "+print if foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3d9e349260720ac3b55c44a546dd37ea330fe96c"
+    "shas": "85ce995a212ec872107b09fd0baba8b62286c999..38fd6b10133d898160cd44223c081010ca440b6f"
 }
 ,{
     "testCaseDescription": "ruby-if-unless-modifiers-delete-test",
@@ -255,9 +301,17 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "3d9e349260720ac3b55c44a546dd37ea330fe96c",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index a3f9060..2021b1b 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -1,2 +1 @@",
+        "-print unless foo",
+        " print if foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "257db930d15b47f49685597c939fcab03fd878cf"
+    "shas": "38fd6b10133d898160cd44223c081010ca440b6f..52722842753439887074cefb1075c6a31015bc82"
 }
 ,{
     "testCaseDescription": "ruby-if-unless-modifiers-delete-rest-test",
@@ -286,7 +340,14 @@
     "filePaths": [
         "if-unless-modifiers.rb"
     ],
-    "sha1": "257db930d15b47f49685597c939fcab03fd878cf",
+    "patch": [
+        "diff --git a/if-unless-modifiers.rb b/if-unless-modifiers.rb",
+        "index 2021b1b..e69de29 100644",
+        "--- a/if-unless-modifiers.rb",
+        "+++ b/if-unless-modifiers.rb",
+        "@@ -1 +0,0 @@",
+        "-print if foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8d166baa11f8169c2af89a181fad5de9da57a7b4"
+    "shas": "52722842753439887074cefb1075c6a31015bc82..c7d3f438c72d2ab2a09e3fa47ba1cf9b175d2a9b"
 }]

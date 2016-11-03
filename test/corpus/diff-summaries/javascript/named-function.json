@@ -25,9 +25,16 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "437d13155925d96902bc67c5d88d607d97762adf",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index e69de29..94b19f8 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -0,0 +1 @@",
+        "+function myFunction(arg1, arg2) { arg2; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6cd566b50dac1a965d30e07f4df3cfb6a5b82ceb"
+    "shas": "973cce7b94116a9e6e8b399f9f0a50bd107fb9b5..0af41b91893fcc8e9172616a4e5a71c70ee47985"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "6cd566b50dac1a965d30e07f4df3cfb6a5b82ceb",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index 94b19f8..cb766a0 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1 +1,3 @@",
+        "+function anotherFunction() { return false; };",
+        "+function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7a7e01292865470514c072bb9c4f104c27c45f78"
+    "shas": "0af41b91893fcc8e9172616a4e5a71c70ee47985..2fe69bd38fe1db507331dc14063479b66eb2a880"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-insert-test",
@@ -174,9 +190,19 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "7a7e01292865470514c072bb9c4f104c27c45f78",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index cb766a0..c9cff07 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function anotherFunction() { return false; };",
+        "+function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0dcb7d069e3c25a64997ec5a0aae69c7326c3afd"
+    "shas": "2fe69bd38fe1db507331dc14063479b66eb2a880..4b0a0bcf80003eb74b67b8947f8a0443cb2ad80f"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-test",
@@ -277,9 +303,19 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "0dcb7d069e3c25a64997ec5a0aae69c7326c3afd",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index c9cff07..cb766a0 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function myFunction(arg1, arg2) { arg2; };",
+        "+function anotherFunction() { return false; };",
+        " function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1cb329c5a156713abab6084c18234ca7d7344b45"
+    "shas": "4b0a0bcf80003eb74b67b8947f8a0443cb2ad80f..785a621c11eb5f6e1e93d2ea1e40828c8786ae2d"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-replacement-test",
@@ -338,9 +374,19 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "1cb329c5a156713abab6084c18234ca7d7344b45",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index cb766a0..148bcc7 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,3 +1,2 @@",
+        "-function anotherFunction() { return false; };",
+        "-function myFunction(arg1, arg2) { arg2; };",
+        " function myFunction(arg1, arg2) { arg2; };",
+        "+function anotherFunction() { return false; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a1a233d56416a2ca9c51276a1c9f05a6540037c3"
+    "shas": "785a621c11eb5f6e1e93d2ea1e40828c8786ae2d..7ecdd3334fd0090f017044bd0780b5a5df128eda"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-test",
@@ -369,9 +415,17 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "a1a233d56416a2ca9c51276a1c9f05a6540037c3",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index 148bcc7..80e11b0 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1,2 +1 @@",
+        "-function myFunction(arg1, arg2) { arg2; };",
+        " function anotherFunction() { return false; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5cd383e1c4c3e1e1177a5242f5815e9a4078d8bc"
+    "shas": "7ecdd3334fd0090f017044bd0780b5a5df128eda..92cb451c62ab6f9a63bad5a24b21beb2cbe9bdde"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-rest-test",
@@ -400,7 +454,14 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "5cd383e1c4c3e1e1177a5242f5815e9a4078d8bc",
+    "patch": [
+        "diff --git a/named-function.js b/named-function.js",
+        "index 80e11b0..e69de29 100644",
+        "--- a/named-function.js",
+        "+++ b/named-function.js",
+        "@@ -1 +0,0 @@",
+        "-function anotherFunction() { return false; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "00c3afcb0bf345232b8117cd6726492a096d4c5a"
+    "shas": "92cb451c62ab6f9a63bad5a24b21beb2cbe9bdde..0cbc55e481f01ab536c7832c5ebbc21d7f9e9021"
 }]

@@ -57,7 +57,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -439,7 +439,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -555,9 +555,23 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "81765d4b8506ea59264b4bdc0c5b8c2c78a0a1a2",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index e69de29..491cb15 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -0,0 +1,8 @@",
+        "+import defaultMember from \"foo\";",
+        "+import * as name from \"aardvark\";",
+        "+import { member } from \"ant\";",
+        "+import { member1 , member2 } from \"antelope\";",
+        "+import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "+import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "+import defaultMember, * as name from \"alligator\";",
+        "+import \"arctic-tern\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7764a1ed5e5cadc806e7c7d90c914646836fc246"
+    "shas": "81a41e72cb6728374f1f2c700f5656622f0966ec..7797a9819842490dcdc548a3dae02898cd7b1939"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -618,7 +632,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -1000,7 +1014,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -1137,7 +1151,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -1519,7 +1533,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -1697,7 +1711,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -1748,7 +1762,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -2434,7 +2448,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -2492,7 +2506,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -2658,9 +2672,34 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "7764a1ed5e5cadc806e7c7d90c914646836fc246",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 491cb15..045c536 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,3 +1,19 @@",
+        "+import defaultMember from \"babirusa\";",
+        "+import * as otherName from \"baboon\";",
+        "+import { element } from \"badger\";",
+        "+import { element1 , element2 } from \"bald-eagle\";",
+        "+import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "+import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "+import defaultMember, * as element from \"barbet\";",
+        "+import \"basilisk\";",
+        "+import defaultMember from \"foo\";",
+        "+import * as name from \"aardvark\";",
+        "+import { member } from \"ant\";",
+        "+import { member1 , member2 } from \"antelope\";",
+        "+import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "+import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "+import defaultMember, * as name from \"alligator\";",
+        "+import \"arctic-tern\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "573862dc0acbd88e67e2bdb92045820677d5b308"
+    "shas": "7797a9819842490dcdc548a3dae02898cd7b1939..4f93e4a12682c20523777c8ff21c23637b93b2c3"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
@@ -2764,7 +2803,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -2817,7 +2856,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -3261,7 +3300,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -3580,7 +3619,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -3796,7 +3835,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -3847,7 +3886,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -4533,7 +4572,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -4591,7 +4630,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -4802,7 +4841,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -4853,7 +4892,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -5539,7 +5578,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -5597,7 +5636,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -5763,9 +5802,34 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "573862dc0acbd88e67e2bdb92045820677d5b308",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 045c536..cbad5a4 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,11 +1,11 @@",
+        "-import defaultMember from \"babirusa\";",
+        "-import * as otherName from \"baboon\";",
+        "-import { element } from \"badger\";",
+        "-import { element1 , element2 } from \"bald-eagle\";",
+        "-import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "-import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "-import defaultMember, * as element from \"barbet\";",
+        "-import \"basilisk\";",
+        "+import defaultMember from \"foo\";",
+        "+import * as name from \"aardvark\";",
+        "+import { member } from \"ant\";",
+        "+import { member1 , member2 } from \"antelope\";",
+        "+import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "+import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "+import defaultMember, * as name from \"alligator\";",
+        "+import \"arctic-tern\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dcdfd23a76fd5d4401d602c8d689f4881882f910"
+    "shas": "4f93e4a12682c20523777c8ff21c23637b93b2c3..1a2c0ee4f2d6d47acc0e0b75adfd77412cdb5208"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
@@ -5869,7 +5933,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -5922,7 +5986,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -6366,7 +6430,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -6685,7 +6749,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -6901,7 +6965,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -6952,7 +7016,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -7638,7 +7702,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -7696,7 +7760,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -7907,7 +7971,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -7958,7 +8022,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -8644,7 +8708,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -8702,7 +8766,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -8868,9 +8932,34 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "dcdfd23a76fd5d4401d602c8d689f4881882f910",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index cbad5a4..045c536 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,11 +1,11 @@",
+        "-import defaultMember from \"foo\";",
+        "-import * as name from \"aardvark\";",
+        "-import { member } from \"ant\";",
+        "-import { member1 , member2 } from \"antelope\";",
+        "-import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "-import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "-import defaultMember, * as name from \"alligator\";",
+        "-import \"arctic-tern\";",
+        "+import defaultMember from \"babirusa\";",
+        "+import * as otherName from \"baboon\";",
+        "+import { element } from \"badger\";",
+        "+import { element1 , element2 } from \"bald-eagle\";",
+        "+import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "+import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "+import defaultMember, * as element from \"barbet\";",
+        "+import \"basilisk\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0723e121a3ee09cd5f62dec4af4e33a7d700c977"
+    "shas": "1a2c0ee4f2d6d47acc0e0b75adfd77412cdb5208..9cee417f36dc72559f8005d43c1c64e38d14b260"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -8931,7 +9020,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -9313,7 +9402,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -9450,7 +9539,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -9832,7 +9921,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -10010,7 +10099,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -10061,7 +10150,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -10747,7 +10836,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -10805,7 +10894,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -10975,7 +11064,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -11357,7 +11446,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -11490,9 +11579,46 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "0723e121a3ee09cd5f62dec4af4e33a7d700c977",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 045c536..873ff75 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,19 +1,3 @@",
+        "-import defaultMember from \"babirusa\";",
+        "-import * as otherName from \"baboon\";",
+        "-import { element } from \"badger\";",
+        "-import { element1 , element2 } from \"bald-eagle\";",
+        "-import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "-import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "-import defaultMember, * as element from \"barbet\";",
+        "-import \"basilisk\";",
+        "-import defaultMember from \"foo\";",
+        "-import * as name from \"aardvark\";",
+        "-import { member } from \"ant\";",
+        "-import { member1 , member2 } from \"antelope\";",
+        "-import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "-import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "-import defaultMember, * as name from \"alligator\";",
+        "-import \"arctic-tern\";",
+        " import defaultMember from \"foo\";",
+        " import * as name from \"aardvark\";",
+        " import { member } from \"ant\";",
+        "@@ -22,3 +6,11 @@ import { member1 , member2 as alias2 } from \"ant-eater\";",
+        " import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        " import defaultMember, * as name from \"alligator\";",
+        " import \"arctic-tern\";",
+        "+import defaultMember from \"babirusa\";",
+        "+import * as otherName from \"baboon\";",
+        "+import { element } from \"badger\";",
+        "+import { element1 , element2 } from \"bald-eagle\";",
+        "+import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "+import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "+import defaultMember, * as element from \"barbet\";",
+        "+import \"basilisk\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "93209ee02dddd72a77185a98cec4286530c3e0c8"
+    "shas": "9cee417f36dc72559f8005d43c1c64e38d14b260..04525879004b8577a357fe3fa2c7c5937218f3f4"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -11553,7 +11679,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -11935,7 +12061,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -12113,7 +12239,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -12164,7 +12290,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -12850,7 +12976,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -12908,7 +13034,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -13074,9 +13200,26 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "93209ee02dddd72a77185a98cec4286530c3e0c8",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index 873ff75..db72339 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,11 +1,3 @@",
+        "-import defaultMember from \"foo\";",
+        "-import * as name from \"aardvark\";",
+        "-import { member } from \"ant\";",
+        "-import { member1 , member2 } from \"antelope\";",
+        "-import { member1 , member2 as alias2 } from \"ant-eater\";",
+        "-import defaultMember, { member1, member2 as alias2 } from \"anaconda\";",
+        "-import defaultMember, * as name from \"alligator\";",
+        "-import \"arctic-tern\";",
+        " import defaultMember from \"babirusa\";",
+        " import * as otherName from \"baboon\";",
+        " import { element } from \"badger\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "702f5e0c40d63fdedd28a48286bd9dda6280ead2"
+    "shas": "04525879004b8577a357fe3fa2c7c5937218f3f4..31410516cd8aa6df7e993b64253cb523aab15729"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -13137,7 +13280,7 @@
                                     "category": "Import",
                                     "children": [
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -13519,7 +13662,7 @@
                                             ]
                                         },
                                         {
-                                            "category": "NamespaceImport",
+                                            "category": "namespace_import",
                                             "children": [
                                                 {
                                                     "category": "Identifier",
@@ -13635,7 +13778,21 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "702f5e0c40d63fdedd28a48286bd9dda6280ead2",
+    "patch": [
+        "diff --git a/import.js b/import.js",
+        "index db72339..e69de29 100644",
+        "--- a/import.js",
+        "+++ b/import.js",
+        "@@ -1,8 +0,0 @@",
+        "-import defaultMember from \"babirusa\";",
+        "-import * as otherName from \"baboon\";",
+        "-import { element } from \"badger\";",
+        "-import { element1 , element2 } from \"bald-eagle\";",
+        "-import { element1 , element2 as elementAlias2 } from \"bandicoot\";",
+        "-import defaultMember, { element1, element2 as elementAlias2 } from \"banteng\";",
+        "-import defaultMember, * as element from \"barbet\";",
+        "-import \"basilisk\";"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "22db42187b94dca9b3ba3ce80361c21a8b48b777"
+    "shas": "31410516cd8aa6df7e993b64253cb523aab15729..0bb74af8eede739c6d9a6b79a13e61263d3c52e6"
 }]

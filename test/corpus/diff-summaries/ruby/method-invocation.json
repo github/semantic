@@ -55,9 +55,18 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "e5721328087e5be744c5b668e305fc99890b37e9",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index e69de29..fbe3bdc 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -0,0 +1,3 @@",
+        "+print",
+        "+foo.bar",
+        "+bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2b9043afb10a2ca6411519a90e0a9c5aa4f44281"
+    "shas": "38847e533e9d63b067fd46b4e3bf8e4bcd68f0db..337912159e09103c0f9708052b84b68f93ff3543"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-replacement-insert-test",
@@ -176,9 +185,25 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "2b9043afb10a2ca6411519a90e0a9c5aa4f44281",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index fbe3bdc..c34b65a 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -1,3 +1,10 @@",
+        "+print(\"hello world\")",
+        "+foo.bar()",
+        "+bar 2, 3",
+        "+bar(2, 3)",
+        "+print",
+        "+foo.bar",
+        "+bar",
+        " print",
+        " foo.bar",
+        " bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f07df28e8d9ad60d4729009bcf9fb8b89fc6b6aa"
+    "shas": "337912159e09103c0f9708052b84b68f93ff3543..ea127bd5909b83d6dee0fb6be0dcc5d7bc4988fd"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-insert-test",
@@ -297,9 +322,25 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "f07df28e8d9ad60d4729009bcf9fb8b89fc6b6aa",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index c34b65a..02ba81a 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -1,7 +1,6 @@",
+        "-print(\"hello world\")",
+        "-foo.bar()",
+        "-bar 2, 3",
+        "-bar(2, 3)",
+        "+print",
+        "+foo.bar",
+        "+bar",
+        " print",
+        " foo.bar",
+        " bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4b74eb4caf4334ffd92a7eab1d1461e2d0d4afc2"
+    "shas": "ea127bd5909b83d6dee0fb6be0dcc5d7bc4988fd..d1a8f6f9af6a5bfd0c1668a3d18dc3843c47e114"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-replacement-test",
@@ -418,9 +459,25 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "4b74eb4caf4334ffd92a7eab1d1461e2d0d4afc2",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index 02ba81a..c34b65a 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -1,6 +1,7 @@",
+        "-print",
+        "-foo.bar",
+        "-bar",
+        "+print(\"hello world\")",
+        "+foo.bar()",
+        "+bar 2, 3",
+        "+bar(2, 3)",
+        " print",
+        " foo.bar",
+        " bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "041be1fe13cc2e5db3d68d034c1f5a97478f19dd"
+    "shas": "d1a8f6f9af6a5bfd0c1668a3d18dc3843c47e114..5fe58e778dc1c9be8f575f594e744ffefeeb4fc7"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-replacement-test",
@@ -479,9 +536,28 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "041be1fe13cc2e5db3d68d034c1f5a97478f19dd",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index c34b65a..4e17a42 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -1,10 +1,7 @@",
+        "+print",
+        "+foo.bar",
+        "+bar",
+        " print(\"hello world\")",
+        " foo.bar()",
+        " bar 2, 3",
+        " bar(2, 3)",
+        "-print",
+        "-foo.bar",
+        "-bar",
+        "-print",
+        "-foo.bar",
+        "-bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "776d591d642251decec4df060ce412906ee42fe0"
+    "shas": "5fe58e778dc1c9be8f575f594e744ffefeeb4fc7..ec527d127ee949363d1abf4cb103ecfaf766c82a"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-test",
@@ -540,9 +616,21 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "776d591d642251decec4df060ce412906ee42fe0",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index 4e17a42..2db15c7 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -1,6 +1,3 @@",
+        "-print",
+        "-foo.bar",
+        "-bar",
+        " print(\"hello world\")",
+        " foo.bar()",
+        " bar 2, 3"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e4483c3d44fb57c5a00b52078403ef79f335101d"
+    "shas": "ec527d127ee949363d1abf4cb103ecfaf766c82a..f373fd312755ca8a3de02ecce462b619ad8460dc"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-rest-test",
@@ -616,7 +704,17 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "e4483c3d44fb57c5a00b52078403ef79f335101d",
+    "patch": [
+        "diff --git a/method-invocation.rb b/method-invocation.rb",
+        "index 2db15c7..e69de29 100644",
+        "--- a/method-invocation.rb",
+        "+++ b/method-invocation.rb",
+        "@@ -1,4 +0,0 @@",
+        "-print(\"hello world\")",
+        "-foo.bar()",
+        "-bar 2, 3",
+        "-bar(2, 3)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6df292caffa4c25ba3e2043d1d6074b9ebed31d6"
+    "shas": "f373fd312755ca8a3de02ecce462b619ad8460dc..98200bee05decb871fcfdf6858ee954898880f72"
 }]

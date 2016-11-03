@@ -25,9 +25,20 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "f75d3205ca0b14b24910456e7aa4315ae73e02e0",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index e69de29..dd4d758 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -0,0 +1,5 @@",
+        "+unless foo",
+        "+  bar",
+        "+else",
+        "+  bat",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "11ce77dfb5345f36b3b2f306a32ea11bb44b7d3d"
+    "shas": "8faf69d7a7d6454f74fea1b6ecf0dae989609b0c..8044cc943ad63fc15f21e305e0702aa8f1f8ca00"
 }
 ,{
     "testCaseDescription": "ruby-unless-replacement-insert-test",
@@ -86,9 +97,27 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "11ce77dfb5345f36b3b2f306a32ea11bb44b7d3d",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index dd4d758..6e36f98 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,3 +1,12 @@",
+        "+unless x",
+        "+end",
+        "+unless y then",
+        "+end",
+        "+unless foo",
+        "+  bar",
+        "+else",
+        "+  bat",
+        "+end",
+        " unless foo",
+        "   bar",
+        " else"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3cf691b245c28e7a38d77d50daed4715706a4833"
+    "shas": "8044cc943ad63fc15f21e305e0702aa8f1f8ca00..421fd298292352aad4ed144da4828d0a0d9cbd88"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-insert-test",
@@ -174,9 +203,25 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "3cf691b245c28e7a38d77d50daed4715706a4833",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 6e36f98..39ae1f8 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,6 +1,7 @@",
+        "-unless x",
+        "-end",
+        "-unless y then",
+        "+unless foo",
+        "+  bar",
+        "+else",
+        "+  bat",
+        " end",
+        " unless foo",
+        "   bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "604a74a2aeb4475ffb5ae05b0490f77127f929ec"
+    "shas": "421fd298292352aad4ed144da4828d0a0d9cbd88..68e1d0c143e9543158ca85f1b64b45bff282e3cf"
 }
 ,{
     "testCaseDescription": "ruby-unless-replacement-test",
@@ -262,9 +307,25 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "604a74a2aeb4475ffb5ae05b0490f77127f929ec",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 39ae1f8..6e36f98 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,7 +1,6 @@",
+        "-unless foo",
+        "-  bar",
+        "-else",
+        "-  bat",
+        "+unless x",
+        "+end",
+        "+unless y then",
+        " end",
+        " unless foo",
+        "   bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "28bc03d4e3157eee003bb41708ac27ad3995f7b0"
+    "shas": "68e1d0c143e9543158ca85f1b64b45bff282e3cf..9f55db52729087f221c9ce91cc85bb6e19ee369e"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-replacement-test",
@@ -293,9 +354,32 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "28bc03d4e3157eee003bb41708ac27ad3995f7b0",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 6e36f98..5efe10d 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,14 +1,9 @@",
+        "-unless x",
+        "-end",
+        "-unless y then",
+        "-end",
+        " unless foo",
+        "   bar",
+        " else",
+        "   bat",
+        " end",
+        "-unless foo",
+        "-  bar",
+        "-else",
+        "-  bat",
+        "+unless x",
+        "+end",
+        "+unless y then",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0a8b28c2712bc135947d8a9387b20d6dc1bdc228"
+    "shas": "9f55db52729087f221c9ce91cc85bb6e19ee369e..68e4d44b8e476737c8fad32f27eaa39789b3b41b"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-test",
@@ -324,9 +408,23 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "0a8b28c2712bc135947d8a9387b20d6dc1bdc228",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index 5efe10d..a38714d 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,8 +1,3 @@",
+        "-unless foo",
+        "-  bar",
+        "-else",
+        "-  bat",
+        "-end",
+        " unless x",
+        " end",
+        " unless y then"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "47ebc30edd5281c6ac6bcca8f64e79d3a18a4b95"
+    "shas": "68e4d44b8e476737c8fad32f27eaa39789b3b41b..ca237de3933e84e5242f5cbd7dadf86c15058020"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-rest-test",
@@ -370,7 +468,17 @@
     "filePaths": [
         "unless.rb"
     ],
-    "sha1": "47ebc30edd5281c6ac6bcca8f64e79d3a18a4b95",
+    "patch": [
+        "diff --git a/unless.rb b/unless.rb",
+        "index a38714d..e69de29 100644",
+        "--- a/unless.rb",
+        "+++ b/unless.rb",
+        "@@ -1,4 +0,0 @@",
+        "-unless x",
+        "-end",
+        "-unless y then",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4d9fc65bb52020e3b2c9ad28a7e960166a39cf3e"
+    "shas": "ca237de3933e84e5242f5cbd7dadf86c15058020..4e2fff03bd38fd80461d8cac1a09c40ca80b2390"
 }]

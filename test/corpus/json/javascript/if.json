@@ -115,9 +115,16 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "f6609017b201ccacdd96341f8be7440ed0396418",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index e69de29..52d4b4f 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -0,0 +1 @@",
+        "+if (x) { log(y); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "17fac07d795c26d5134ff41ddd477e52433845a8"
+    "shas": "1414e435bed741828bc662b2617b65f006198115..f925589600daebd1c530948026f8ca735c3d2295"
 }
 ,{
     "testCaseDescription": "javascript-if-replacement-insert-test",
@@ -518,9 +525,18 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "17fac07d795c26d5134ff41ddd477e52433845a8",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index 52d4b4f..ae4ee32 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -1 +1,3 @@",
+        "+if (a.b) { log(c); d; }",
+        "+if (x) { log(y); }",
+        " if (x) { log(y); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "911d1f22fec27d977cb2b723c0db868de665fb89"
+    "shas": "f925589600daebd1c530948026f8ca735c3d2295..953b51e76de53d368e5aaeedb84b46cec9e2ac83"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-insert-test",
@@ -1073,9 +1089,19 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "911d1f22fec27d977cb2b723c0db868de665fb89",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index ae4ee32..df55832 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -1,3 +1,3 @@",
+        "-if (a.b) { log(c); d; }",
+        "+if (x) { log(y); }",
+        " if (x) { log(y); }",
+        " if (x) { log(y); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "84d8877b6c823ebd388caa98883aea87e020c1b2"
+    "shas": "953b51e76de53d368e5aaeedb84b46cec9e2ac83..bed63a4361da46793cece7c3f1370d78fd311348"
 }
 ,{
     "testCaseDescription": "javascript-if-replacement-test",
@@ -1628,9 +1654,19 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "84d8877b6c823ebd388caa98883aea87e020c1b2",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index df55832..ae4ee32 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -1,3 +1,3 @@",
+        "-if (x) { log(y); }",
+        "+if (a.b) { log(c); d; }",
+        " if (x) { log(y); }",
+        " if (x) { log(y); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c74eae90461b324c7a660df1882ccf08d6a8af37"
+    "shas": "bed63a4361da46793cece7c3f1370d78fd311348..1d1e851c9148d9e8b3e8d6d7ff8e46412e33b7f5"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-replacement-test",
@@ -2142,9 +2178,19 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "c74eae90461b324c7a660df1882ccf08d6a8af37",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index ae4ee32..38b83ef 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -1,3 +1,2 @@",
+        "-if (a.b) { log(c); d; }",
+        "-if (x) { log(y); }",
+        " if (x) { log(y); }",
+        "+if (a.b) { log(c); d; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4be85c44602984a459303b6dfbbdc106893cff03"
+    "shas": "1d1e851c9148d9e8b3e8d6d7ff8e46412e33b7f5..bfee3fdff9441afb2bfac9650139f2fe3517d1fb"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-test",
@@ -2498,9 +2544,17 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "4be85c44602984a459303b6dfbbdc106893cff03",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index 38b83ef..f67163b 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -1,2 +1 @@",
+        "-if (x) { log(y); }",
+        " if (a.b) { log(c); d; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a963890501b7fd3668285ac04cc911f3d42aee6"
+    "shas": "bfee3fdff9441afb2bfac9650139f2fe3517d1fb..199fb9c9073c557c909722b9586409dc8ca619d7"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-rest-test",
@@ -2651,7 +2705,14 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "4a963890501b7fd3668285ac04cc911f3d42aee6",
+    "patch": [
+        "diff --git a/if.js b/if.js",
+        "index f67163b..e69de29 100644",
+        "--- a/if.js",
+        "+++ b/if.js",
+        "@@ -1 +0,0 @@",
+        "-if (a.b) { log(c); d; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0d04a39119475382fd1b236c00355a271286be24"
+    "shas": "199fb9c9073c557c909722b9586409dc8ca619d7..a7c68af9b8e2a95ea64781f7701d616d9831d54b"
 }]

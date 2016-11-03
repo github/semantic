@@ -90,9 +90,16 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "a919283c34de839a761ede23220cbfb06d95fc5e",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index e69de29..4021910 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -0,0 +1 @@",
+        "+x < y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6f0b4481386af74840df4ebfdb08231f5c84e131"
+    "shas": "ba72732ac272c8ae8487ba0af9045dea54eb02d9..3e474168119e157dd78cc58193422367455f7d4b"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-replacement-insert-test",
@@ -361,9 +368,18 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "6f0b4481386af74840df4ebfdb08231f5c84e131",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index 4021910..dbef050 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -1 +1,3 @@",
+        "+x <= y;",
+        "+x < y;",
+        " x < y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dd659ba5e7a414307340a5a4570a21bbcc384d8a"
+    "shas": "3e474168119e157dd78cc58193422367455f7d4b..80299a9d43818b539001b6d79fc5b2a4060e7c51"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-delete-insert-test",
@@ -732,9 +748,19 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "dd659ba5e7a414307340a5a4570a21bbcc384d8a",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index dbef050..a9ff7f6 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x <= y;",
+        "+x < y;",
+        " x < y;",
+        " x < y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8d831be60c4871818beb03d2ebb6bceb3d95eac8"
+    "shas": "80299a9d43818b539001b6d79fc5b2a4060e7c51..d908f67a8ee9d6610371bb8343c67b172f915b23"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-replacement-test",
@@ -1103,9 +1129,19 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "8d831be60c4871818beb03d2ebb6bceb3d95eac8",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index a9ff7f6..dbef050 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x < y;",
+        "+x <= y;",
+        " x < y;",
+        " x < y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "59ebb3564bdf427b5b5ddb5df4541bf09dc5d5b4"
+    "shas": "d908f67a8ee9d6610371bb8343c67b172f915b23..b553dcd439cdfb5d1b6846389ed69bbff93ada3d"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-delete-replacement-test",
@@ -1424,9 +1460,19 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "59ebb3564bdf427b5b5ddb5df4541bf09dc5d5b4",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index dbef050..1ee42eb 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-x <= y;",
+        "-x < y;",
+        " x < y;",
+        "+x <= y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b04246c2e0dd010ca1c49e6f440f60b71f136b4a"
+    "shas": "b553dcd439cdfb5d1b6846389ed69bbff93ada3d..b0570894175ea4fdd408d62919b08db9d82eac0d"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-delete-test",
@@ -1641,9 +1687,17 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "b04246c2e0dd010ca1c49e6f440f60b71f136b4a",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index 1ee42eb..3be8450 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -1,2 +1 @@",
+        "-x < y;",
+        " x <= y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8011c74e25c32e350a110f23ea5d183f48b6adbe"
+    "shas": "b0570894175ea4fdd408d62919b08db9d82eac0d..f90601d7c97c8e74625f9724a011cb40ee870ec2"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-delete-rest-test",
@@ -1737,7 +1791,14 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "8011c74e25c32e350a110f23ea5d183f48b6adbe",
+    "patch": [
+        "diff --git a/relational-operator.js b/relational-operator.js",
+        "index 3be8450..e69de29 100644",
+        "--- a/relational-operator.js",
+        "+++ b/relational-operator.js",
+        "@@ -1 +0,0 @@",
+        "-x <= y;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f6f1a76087498759b09a64e05a2d7c1867a77ff3"
+    "shas": "f90601d7c97c8e74625f9724a011cb40ee870ec2..6ca5e77d4063360bcd0a90d891c3e81e09835b84"
 }]

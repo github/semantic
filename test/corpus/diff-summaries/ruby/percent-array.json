@@ -25,9 +25,16 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "73a673c5ff7f561a8ba38db6dcb6296a8f35ecb5",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index e69de29..f2bc7a3 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -0,0 +1 @@",
+        "+%w(one two)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d2aaf2b77d08affba89edc7610292f6122da55b0"
+    "shas": "79b196cace027a076f4ba235171fd4f409bdaba9..60bbbb2dee1ceb124b3a5732a1f3ee63ec515497"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "d2aaf2b77d08affba89edc7610292f6122da55b0",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index f2bc7a3..a706392 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -1 +1,3 @@",
+        "+%W(one #{b} three)",
+        "+%w(one two)",
+        " %w(one two)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0aa802faab688ceed0d689a5031ee7f1b7ddb2fd"
+    "shas": "60bbbb2dee1ceb124b3a5732a1f3ee63ec515497..7331cd0d8952471a92cddf2c85b3a8a3ce74846d"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-insert-test",
@@ -102,9 +118,19 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "0aa802faab688ceed0d689a5031ee7f1b7ddb2fd",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index a706392..339b21e 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -1,3 +1,3 @@",
+        "-%W(one #{b} three)",
+        "+%w(one two)",
+        " %w(one two)",
+        " %w(one two)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "20f895e7d7dbc3b26c40cd0b35ab60e4c63fe193"
+    "shas": "7331cd0d8952471a92cddf2c85b3a8a3ce74846d..0a03996c67d51dc60959a36d35bb2bb781eff19b"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-replacement-test",
@@ -133,9 +159,19 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "20f895e7d7dbc3b26c40cd0b35ab60e4c63fe193",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index 339b21e..a706392 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -1,3 +1,3 @@",
+        "-%w(one two)",
+        "+%W(one #{b} three)",
+        " %w(one two)",
+        " %w(one two)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8f72579033f74de3d76050cc8c9aceff5e3b37af"
+    "shas": "0a03996c67d51dc60959a36d35bb2bb781eff19b..864617da3f66a3b16b6ab2c7c63a0a449669fc01"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-replacement-test",
@@ -194,9 +230,19 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "8f72579033f74de3d76050cc8c9aceff5e3b37af",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index a706392..1e3e29b 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -1,3 +1,2 @@",
+        "-%W(one #{b} three)",
+        "-%w(one two)",
+        " %w(one two)",
+        "+%W(one #{b} three)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7c981302ac08edc31f3c29e2cba8a2e5e62df0f2"
+    "shas": "864617da3f66a3b16b6ab2c7c63a0a449669fc01..0bee45a0f42e71f1162b4150b0647cf13a05b8f8"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-test",
@@ -225,9 +271,17 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "7c981302ac08edc31f3c29e2cba8a2e5e62df0f2",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index 1e3e29b..54153c4 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -1,2 +1 @@",
+        "-%w(one two)",
+        " %W(one #{b} three)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "483497707eede1713815707db1c4d3fd9024317f"
+    "shas": "0bee45a0f42e71f1162b4150b0647cf13a05b8f8..4a8ac79d914f73b9e92da2948689badc6676ca31"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-rest-test",
@@ -256,7 +310,14 @@
     "filePaths": [
         "percent-array.rb"
     ],
-    "sha1": "483497707eede1713815707db1c4d3fd9024317f",
+    "patch": [
+        "diff --git a/percent-array.rb b/percent-array.rb",
+        "index 54153c4..e69de29 100644",
+        "--- a/percent-array.rb",
+        "+++ b/percent-array.rb",
+        "@@ -1 +0,0 @@",
+        "-%W(one #{b} three)"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a5e754fb3003e912c8c00843afb2a6fdcac6c2a3"
+    "shas": "4a8ac79d914f73b9e92da2948689badc6676ca31..39e3abbd0e3332afc2314759fdd350cba39b8e28"
 }]

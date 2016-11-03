@@ -138,9 +138,16 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "95e0c499ee3b410bdb68dc5dfdc10f6779f9cc5e",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index e69de29..0344667 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -0,0 +1 @@",
+        "+i + j * 3 - j % 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "443da40886cb1866b1d657ceceab618352be8675"
+    "shas": "349ec3f8639b7b854f6fcfdaaf8e2ef63c05fef7..c10213a914cc4c581935c845587b1615f782b23d"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -601,9 +608,18 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "443da40886cb1866b1d657ceceab618352be8675",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index 0344667..79f5f20 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -1 +1,3 @@",
+        "+i + j * 2 - j % 4;",
+        "+i + j * 3 - j % 5;",
+        " i + j * 3 - j % 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7312c61f5d5ee29c95555b42f7d11f60cd344fec"
+    "shas": "c10213a914cc4c581935c845587b1615f782b23d..8d0e873b6e585bc5d038b3597e50375979bab9d7"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
@@ -1264,9 +1280,19 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "7312c61f5d5ee29c95555b42f7d11f60cd344fec",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index 79f5f20..284561c 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i + j * 2 - j % 4;",
+        "+i + j * 3 - j % 5;",
+        " i + j * 3 - j % 5;",
+        " i + j * 3 - j % 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9507cc1561104c8afe3e064ebc6126d48f016736"
+    "shas": "8d0e873b6e585bc5d038b3597e50375979bab9d7..410a2f6f9d81e855cad2997c46445446d9a969d3"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
@@ -1927,9 +1953,19 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "9507cc1561104c8afe3e064ebc6126d48f016736",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index 284561c..79f5f20 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i + j * 3 - j % 5;",
+        "+i + j * 2 - j % 4;",
+        " i + j * 3 - j % 5;",
+        " i + j * 3 - j % 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "56fd5e9fe2c66f3f5299a59c5dcef92a2e25cd37"
+    "shas": "410a2f6f9d81e855cad2997c46445446d9a969d3..2682d71eb0c050080c252a74b5086466a18fbeac"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-replacement-test",
@@ -2492,9 +2528,19 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "56fd5e9fe2c66f3f5299a59c5dcef92a2e25cd37",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index 79f5f20..d1055f7 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-i + j * 2 - j % 4;",
+        "-i + j * 3 - j % 5;",
+        " i + j * 3 - j % 5;",
+        "+i + j * 2 - j % 4;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a934414df2234ddfb241b47bd04e8acc77a85e75"
+    "shas": "2682d71eb0c050080c252a74b5086466a18fbeac..e94c4f98fb944fbc75a8f45d35f143b51d1eb642"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -2853,9 +2899,17 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "a934414df2234ddfb241b47bd04e8acc77a85e75",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index d1055f7..79ba2b3 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -1,2 +1 @@",
+        "-i + j * 3 - j % 5;",
+        " i + j * 2 - j % 4;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "423a0a8085dc2ccba9e0a11c8c321b53672d524e"
+    "shas": "e94c4f98fb944fbc75a8f45d35f143b51d1eb642..946717e49735f8b580f7b162468c366784e6678d"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -2997,7 +3051,14 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "423a0a8085dc2ccba9e0a11c8c321b53672d524e",
+    "patch": [
+        "diff --git a/math-operator.js b/math-operator.js",
+        "index 79ba2b3..e69de29 100644",
+        "--- a/math-operator.js",
+        "+++ b/math-operator.js",
+        "@@ -1 +0,0 @@",
+        "-i + j * 2 - j % 4;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "714e5a0dfd44d739d9669ab32c1f32160436e5a2"
+    "shas": "946717e49735f8b580f7b162468c366784e6678d..b0194f4ccae027de9b6fbbc4ceefe070cf51555c"
 }]

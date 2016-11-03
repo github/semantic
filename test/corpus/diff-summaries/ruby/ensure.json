@@ -25,9 +25,18 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "141ffb684fc9a6254fc51dec118d0a7626dc5cf1",
+    "patch": [
+        "diff --git a/ensure.rb b/ensure.rb",
+        "index e69de29..dbcd28c 100644",
+        "--- a/ensure.rb",
+        "+++ b/ensure.rb",
+        "@@ -0,0 +1,3 @@",
+        "+begin",
+        "+  foo",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8bad468d53bd6c32d15a51179e935968a960e147"
+    "shas": "291c23618b5574de7402f710d7feba58b0edbcc2..f52d02d0007fbcf6d4447578ae0f085e5c995bef"
 }
 ,{
     "testCaseDescription": "ruby-ensure-insert-test",
@@ -56,9 +65,19 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "8bad468d53bd6c32d15a51179e935968a960e147",
+    "patch": [
+        "diff --git a/ensure.rb b/ensure.rb",
+        "index dbcd28c..4332810 100644",
+        "--- a/ensure.rb",
+        "+++ b/ensure.rb",
+        "@@ -1,3 +1,4 @@",
+        " begin",
+        "   foo",
+        "+ensure",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c72c59b2ce6fabc05b4b5a470931b6ffefaf1fea"
+    "shas": "f52d02d0007fbcf6d4447578ae0f085e5c995bef..999a581cd8dc26f89cd2145133271109ef2504f3"
 }
 ,{
     "testCaseDescription": "ruby-ensure-replacement-test",
@@ -87,9 +106,20 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "c72c59b2ce6fabc05b4b5a470931b6ffefaf1fea",
+    "patch": [
+        "diff --git a/ensure.rb b/ensure.rb",
+        "index 4332810..ddde828 100644",
+        "--- a/ensure.rb",
+        "+++ b/ensure.rb",
+        "@@ -1,4 +1,5 @@",
+        " begin",
+        "   foo",
+        " ensure",
+        "+  bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a5341bb19b676eb4e5d9eedb719f1229775a0568"
+    "shas": "999a581cd8dc26f89cd2145133271109ef2504f3..fad947ef36d88b7e323747c024af8904eceedede"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-replacement-test",
@@ -118,9 +148,20 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "a5341bb19b676eb4e5d9eedb719f1229775a0568",
+    "patch": [
+        "diff --git a/ensure.rb b/ensure.rb",
+        "index ddde828..4332810 100644",
+        "--- a/ensure.rb",
+        "+++ b/ensure.rb",
+        "@@ -1,5 +1,4 @@",
+        " begin",
+        "   foo",
+        " ensure",
+        "-  bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "950565bd986bcf48a582580f8eacb49e268001e5"
+    "shas": "fad947ef36d88b7e323747c024af8904eceedede..5bb953c9575b80ac5bc457ceed86b67092944a8c"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-insert-test",
@@ -149,9 +190,19 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "950565bd986bcf48a582580f8eacb49e268001e5",
+    "patch": [
+        "diff --git a/ensure.rb b/ensure.rb",
+        "index 4332810..dbcd28c 100644",
+        "--- a/ensure.rb",
+        "+++ b/ensure.rb",
+        "@@ -1,4 +1,3 @@",
+        " begin",
+        "   foo",
+        "-ensure",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3bf1b2d209a8db9e529c98f65e2730736128af78"
+    "shas": "5bb953c9575b80ac5bc457ceed86b67092944a8c..9e3babd9f3ba565f0d1d9ab6e24a2de63adefb87"
 }
 ,{
     "testCaseDescription": "ruby-ensure-teardown-test",
@@ -180,7 +231,16 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "3bf1b2d209a8db9e529c98f65e2730736128af78",
+    "patch": [
+        "diff --git a/ensure.rb b/ensure.rb",
+        "index dbcd28c..e69de29 100644",
+        "--- a/ensure.rb",
+        "+++ b/ensure.rb",
+        "@@ -1,3 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b5bc784487b6cdf785d63aa3a7ecf97e75882c99"
+    "shas": "9e3babd9f3ba565f0d1d9ab6e24a2de63adefb87..7d242e1a703020b3d44a44dfca02698401fd5888"
 }]

@@ -40,9 +40,18 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "2805eacfed4e1c7dedc5454014c9c547a862492d",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index e69de29..9990bdf 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -0,0 +1,3 @@",
+        "+while foo do",
+        "+end",
+        "+foo while run"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "578f029c22f34f30a191f522440966e2823064c7"
+    "shas": "0ea1cbaad545a54267144f11a8d792fca30cf547..1c849fa3191de04f500a9534aae7f04708bae91e"
 }
 ,{
     "testCaseDescription": "ruby-while-replacement-insert-test",
@@ -101,9 +110,24 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "578f029c22f34f30a191f522440966e2823064c7",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index 9990bdf..5a24260 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -1,3 +1,9 @@",
+        "+while foo",
+        "+  bar",
+        "+end",
+        "+while foo do",
+        "+end",
+        "+foo while run",
+        " while foo do",
+        " end",
+        " foo while run"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "af98a12f36269e01cfb7b60a8a414c004b3268f2"
+    "shas": "1c849fa3191de04f500a9534aae7f04708bae91e..ce45201d611ff1a381bee7c0d7b4eba2a5261228"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-insert-test",
@@ -147,9 +171,23 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "af98a12f36269e01cfb7b60a8a414c004b3268f2",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index 5a24260..c0c26cd 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -1,6 +1,6 @@",
+        "-while foo",
+        "-  bar",
+        "+while foo do",
+        " end",
+        "+foo while run",
+        " while foo do",
+        " end",
+        " foo while run"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1fa5158696fbe0c5c107236cfbe895e979c33402"
+    "shas": "ce45201d611ff1a381bee7c0d7b4eba2a5261228..76f1616d8999184e0058a66f6871ca4f039f5e1c"
 }
 ,{
     "testCaseDescription": "ruby-while-replacement-test",
@@ -193,9 +231,23 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "1fa5158696fbe0c5c107236cfbe895e979c33402",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index c0c26cd..5a24260 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -1,6 +1,6 @@",
+        "-while foo do",
+        "+while foo",
+        "+  bar",
+        " end",
+        "-foo while run",
+        " while foo do",
+        " end",
+        " foo while run"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6bfd16a5bb07f0bebe270df335dfdabcb006e0f4"
+    "shas": "76f1616d8999184e0058a66f6871ca4f039f5e1c..d2fb5c6486f918b1d250f5561389fec71fadc005"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-replacement-test",
@@ -269,9 +321,26 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "6bfd16a5bb07f0bebe270df335dfdabcb006e0f4",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index 5a24260..3763a72 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -1,9 +1,6 @@",
+        "-while foo",
+        "-  bar",
+        "-end",
+        " while foo do",
+        " end",
+        " foo while run",
+        "-while foo do",
+        "+while foo",
+        "+  bar",
+        " end",
+        "-foo while run"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4b947da81435734d75c757f120bbd9032a8d547f"
+    "shas": "d2fb5c6486f918b1d250f5561389fec71fadc005..deb693d7595e21ca8bf5d127aba20362b01259ee"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-test",
@@ -315,9 +384,21 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "4b947da81435734d75c757f120bbd9032a8d547f",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index 3763a72..57e673b 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -1,6 +1,3 @@",
+        "-while foo do",
+        "-end",
+        "-foo while run",
+        " while foo",
+        "   bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "69436b371d23ca40eb312d819bfb8e64e23e0867"
+    "shas": "deb693d7595e21ca8bf5d127aba20362b01259ee..b96838d1e529db101b960f04c66dd54aeec21d92"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-rest-test",
@@ -346,7 +427,16 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "69436b371d23ca40eb312d819bfb8e64e23e0867",
+    "patch": [
+        "diff --git a/while.rb b/while.rb",
+        "index 57e673b..e69de29 100644",
+        "--- a/while.rb",
+        "+++ b/while.rb",
+        "@@ -1,3 +0,0 @@",
+        "-while foo",
+        "-  bar",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "182cede4a37df9525c92596e09fa0e91ff7cb3c7"
+    "shas": "b96838d1e529db101b960f04c66dd54aeec21d92..527524ae442ea64d2a0f8d057a8f3f29091b94b7"
 }]

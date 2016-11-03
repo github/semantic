@@ -74,9 +74,16 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "57942e93fabda394bc01cee76c0313089454e309",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index e69de29..01f859b 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -0,0 +1 @@",
+        "+`one line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e614a872cd77eefb0bd2dfea4bb7da0794c152fb"
+    "shas": "c32361c31b256ea32638cead8a9639d9d3bb55d4..eadba66cb97d885739f3686453ed93fc62b92191"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-insert-test",
@@ -281,9 +288,18 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "e614a872cd77eefb0bd2dfea4bb7da0794c152fb",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 01f859b..777fde6 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1 +1,3 @@",
+        "+`multi line`",
+        "+`one line`",
+        " `one line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1c977e732d2d54bc59ae6691d06e1ed62856276e"
+    "shas": "eadba66cb97d885739f3686453ed93fc62b92191..ca0bde0a439c7163f90ffc1bab26d92e478ff307"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-insert-test",
@@ -558,9 +574,19 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "1c977e732d2d54bc59ae6691d06e1ed62856276e",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 777fde6..657129f 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,3 +1,3 @@",
+        "-`multi line`",
+        "+`one line`",
+        " `one line`",
+        " `one line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a7d5d98e3dd6c17cd69e2f159944e86bbbb5b57d"
+    "shas": "ca0bde0a439c7163f90ffc1bab26d92e478ff307..a3a14c9ce30d30111bd78c7b386af50661fca52b"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-test",
@@ -835,9 +861,19 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "a7d5d98e3dd6c17cd69e2f159944e86bbbb5b57d",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 657129f..777fde6 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,3 +1,3 @@",
+        "-`one line`",
+        "+`multi line`",
+        " `one line`",
+        " `one line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "25915946c7be6b67c020087c1df3affef492f627"
+    "shas": "a3a14c9ce30d30111bd78c7b386af50661fca52b..a399a38524f70be2dab1dada1b2ca68a46c824dc"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-replacement-test",
@@ -1080,9 +1116,19 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "25915946c7be6b67c020087c1df3affef492f627",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 777fde6..2b8c0dd 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,3 +1,2 @@",
+        "-`multi line`",
+        "-`one line`",
+        " `one line`",
+        "+`multi line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "306055d34967da8625d9e90a36fb695920513a40"
+    "shas": "a399a38524f70be2dab1dada1b2ca68a46c824dc..6b3a90c35b12bd9740d672836684fcc748793a5c"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-test",
@@ -1249,9 +1295,17 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "306055d34967da8625d9e90a36fb695920513a40",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 2b8c0dd..399f117 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1,2 +1 @@",
+        "-`one line`",
+        " `multi line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "746d7591f68aebc6443c2b7301b056a1b62635fe"
+    "shas": "6b3a90c35b12bd9740d672836684fcc748793a5c..30a0c41d47115adb0e6133f2b347a536a97dc59b"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-rest-test",
@@ -1329,7 +1383,14 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "746d7591f68aebc6443c2b7301b056a1b62635fe",
+    "patch": [
+        "diff --git a/template-string.js b/template-string.js",
+        "index 399f117..e69de29 100644",
+        "--- a/template-string.js",
+        "+++ b/template-string.js",
+        "@@ -1 +0,0 @@",
+        "-`multi line`"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f23716f158172021ba81a7189a8e49480c956764"
+    "shas": "30a0c41d47115adb0e6133f2b347a536a97dc59b..52f50b42f461e7840a4f2f57f62530561ab97768"
 }]

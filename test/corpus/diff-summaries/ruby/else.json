@@ -25,9 +25,18 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "d17161b34383c7680aadb5b411bc13814e53148d",
+    "patch": [
+        "diff --git a/else.rb b/else.rb",
+        "index e69de29..d2757f9 100644",
+        "--- a/else.rb",
+        "+++ b/else.rb",
+        "@@ -0,0 +1,3 @@",
+        "+begin",
+        "+  foo()",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "feb0921202167020982b2548326443f6056e3944"
+    "shas": "cc81318f97e858789ab75eb6e9c4a9ef9a96807c..33bc769c08469883737fe1140d2144dc561d0d81"
 }
 ,{
     "testCaseDescription": "ruby-else-insert-test",
@@ -56,9 +65,19 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "feb0921202167020982b2548326443f6056e3944",
+    "patch": [
+        "diff --git a/else.rb b/else.rb",
+        "index d2757f9..09f6b12 100644",
+        "--- a/else.rb",
+        "+++ b/else.rb",
+        "@@ -1,3 +1,4 @@",
+        " begin",
+        "   foo()",
+        "+else",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f4607e4dfbe342d152326b89d04f7fa7e7e0f7dc"
+    "shas": "33bc769c08469883737fe1140d2144dc561d0d81..96b6809efbb8797d78b2b81d56d17340c9035538"
 }
 ,{
     "testCaseDescription": "ruby-else-replacement-test",
@@ -87,9 +106,20 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "f4607e4dfbe342d152326b89d04f7fa7e7e0f7dc",
+    "patch": [
+        "diff --git a/else.rb b/else.rb",
+        "index 09f6b12..f9c269d 100644",
+        "--- a/else.rb",
+        "+++ b/else.rb",
+        "@@ -1,4 +1,5 @@",
+        " begin",
+        "   foo()",
+        " else",
+        "+  bar()",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "451799080746e1dcc5eec7d96159f64147e4c9bb"
+    "shas": "96b6809efbb8797d78b2b81d56d17340c9035538..e57a5478d9f5f42241e37c822610bf478930673f"
 }
 ,{
     "testCaseDescription": "ruby-else-delete-replacement-test",
@@ -118,9 +148,20 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "451799080746e1dcc5eec7d96159f64147e4c9bb",
+    "patch": [
+        "diff --git a/else.rb b/else.rb",
+        "index f9c269d..09f6b12 100644",
+        "--- a/else.rb",
+        "+++ b/else.rb",
+        "@@ -1,5 +1,4 @@",
+        " begin",
+        "   foo()",
+        " else",
+        "-  bar()",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8d4d890d46ac49e5d5a336938782a1767822317e"
+    "shas": "e57a5478d9f5f42241e37c822610bf478930673f..876365e1b571b6c9641bf92e5baca7662e0ebc4f"
 }
 ,{
     "testCaseDescription": "ruby-else-delete-insert-test",
@@ -149,9 +190,19 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "8d4d890d46ac49e5d5a336938782a1767822317e",
+    "patch": [
+        "diff --git a/else.rb b/else.rb",
+        "index 09f6b12..d2757f9 100644",
+        "--- a/else.rb",
+        "+++ b/else.rb",
+        "@@ -1,4 +1,3 @@",
+        " begin",
+        "   foo()",
+        "-else",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "33e21bc30b5fec1651ef4f7940c9c340c345d3c1"
+    "shas": "876365e1b571b6c9641bf92e5baca7662e0ebc4f..3067849e0a352190b4d636187878720d8d6e6b17"
 }
 ,{
     "testCaseDescription": "ruby-else-teardown-test",
@@ -180,7 +231,16 @@
     "filePaths": [
         "else.rb"
     ],
-    "sha1": "33e21bc30b5fec1651ef4f7940c9c340c345d3c1",
+    "patch": [
+        "diff --git a/else.rb b/else.rb",
+        "index d2757f9..e69de29 100644",
+        "--- a/else.rb",
+        "+++ b/else.rb",
+        "@@ -1,3 +0,0 @@",
+        "-begin",
+        "-  foo()",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "94ca7b95dd13dc6bb6bd514c8a7a081042e1ff4c"
+    "shas": "3067849e0a352190b4d636187878720d8d6e6b17..d571b61c3d53f568ed84cc6dad1c76cea2abe08d"
 }]

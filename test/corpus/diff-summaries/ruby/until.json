@@ -40,9 +40,18 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "182cede4a37df9525c92596e09fa0e91ff7cb3c7",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index e69de29..2785b0d 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -0,0 +1,3 @@",
+        "+until foo do",
+        "+end",
+        "+foo until done"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3c29375d894445dbd6f9ff9a03be4f56e5172df0"
+    "shas": "527524ae442ea64d2a0f8d057a8f3f29091b94b7..7195bbfd7970acfb3f61a3a04144c6ed735d95f8"
 }
 ,{
     "testCaseDescription": "ruby-until-replacement-insert-test",
@@ -101,9 +110,24 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "3c29375d894445dbd6f9ff9a03be4f56e5172df0",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index 2785b0d..7c5868e 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -1,3 +1,9 @@",
+        "+until foo",
+        "+  bar",
+        "+end",
+        "+until foo do",
+        "+end",
+        "+foo until done",
+        " until foo do",
+        " end",
+        " foo until done"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4f2c7ddca9997d0648feabfda0f2d99c14f57e33"
+    "shas": "7195bbfd7970acfb3f61a3a04144c6ed735d95f8..a9c0d66a0ce29c04ddfdb3eeb9fd5133df7ad7c4"
 }
 ,{
     "testCaseDescription": "ruby-until-delete-insert-test",
@@ -147,9 +171,23 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "4f2c7ddca9997d0648feabfda0f2d99c14f57e33",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index 7c5868e..c51b0d0 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -1,6 +1,6 @@",
+        "-until foo",
+        "-  bar",
+        "+until foo do",
+        " end",
+        "+foo until done",
+        " until foo do",
+        " end",
+        " foo until done"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "41d2400f230cbf0bf9bff08b1336145a2f725f1b"
+    "shas": "a9c0d66a0ce29c04ddfdb3eeb9fd5133df7ad7c4..5e66fb4320749066c271c6ee5922a6662f0f66fc"
 }
 ,{
     "testCaseDescription": "ruby-until-replacement-test",
@@ -193,9 +231,23 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "41d2400f230cbf0bf9bff08b1336145a2f725f1b",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index c51b0d0..7c5868e 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -1,6 +1,6 @@",
+        "-until foo do",
+        "+until foo",
+        "+  bar",
+        " end",
+        "-foo until done",
+        " until foo do",
+        " end",
+        " foo until done"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ec90f5d64466a89661e80b9a64a638ec78f090ab"
+    "shas": "5e66fb4320749066c271c6ee5922a6662f0f66fc..aee5892096fa1235af544e9f239aea971a299847"
 }
 ,{
     "testCaseDescription": "ruby-until-delete-replacement-test",
@@ -269,9 +321,26 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "ec90f5d64466a89661e80b9a64a638ec78f090ab",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index 7c5868e..c543483 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -1,9 +1,6 @@",
+        "-until foo",
+        "-  bar",
+        "-end",
+        " until foo do",
+        " end",
+        " foo until done",
+        "-until foo do",
+        "+until foo",
+        "+  bar",
+        " end",
+        "-foo until done"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6163a8ff15e5fa7965c91cdaef1468d0441aaca9"
+    "shas": "aee5892096fa1235af544e9f239aea971a299847..9fc09b78cdd42bc642860cebd38a3d5baff394b4"
 }
 ,{
     "testCaseDescription": "ruby-until-delete-test",
@@ -315,9 +384,21 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "6163a8ff15e5fa7965c91cdaef1468d0441aaca9",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index c543483..347b5ff 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -1,6 +1,3 @@",
+        "-until foo do",
+        "-end",
+        "-foo until done",
+        " until foo",
+        "   bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "eeddd7b4ce4a631ea33b49233d9f5a1d9b6c3005"
+    "shas": "9fc09b78cdd42bc642860cebd38a3d5baff394b4..f878f5c2c585d3cab149cd4d3402426421383914"
 }
 ,{
     "testCaseDescription": "ruby-until-delete-rest-test",
@@ -346,7 +427,16 @@
     "filePaths": [
         "until.rb"
     ],
-    "sha1": "eeddd7b4ce4a631ea33b49233d9f5a1d9b6c3005",
+    "patch": [
+        "diff --git a/until.rb b/until.rb",
+        "index 347b5ff..e69de29 100644",
+        "--- a/until.rb",
+        "+++ b/until.rb",
+        "@@ -1,3 +0,0 @@",
+        "-until foo",
+        "-  bar",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "214e09e87f3e1e6bfdd4c3c5a47d96d9a6ce4e29"
+    "shas": "f878f5c2c585d3cab149cd4d3402426421383914..9a18b4c80b2e7e2bdca5da3ea6388d1cb4727f8f"
 }]

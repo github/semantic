@@ -25,9 +25,19 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "76ddf3715f8fde859890e26fc3c9f0c824a1201a",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index e69de29..a5dbb28 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -0,0 +1,4 @@",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5e15d96d1d7a2fcd53f09fe766cde185a7b23fbc"
+    "shas": "e805bb575511867c24e67d81ccae909f2668e660..57fbaa6c0752b39141df6d2229a40d52ab46eec2"
 }
 ,{
     "testCaseDescription": "ruby-rescue-last-ex-replacement-insert-test",
@@ -71,9 +81,28 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "5e15d96d1d7a2fcd53f09fe766cde185a7b23fbc",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index a5dbb28..9c0bf85 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,4 +1,13 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b7f3feb97cafe3ec7049d557c41b1af2cd8e2dcc"
+    "shas": "57fbaa6c0752b39141df6d2229a40d52ab46eec2..1abc809f7c5f4bce8b655282c1a89c80acdb4719"
 }
 ,{
     "testCaseDescription": "ruby-rescue-last-ex-delete-insert-test",
@@ -102,9 +131,22 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "b7f3feb97cafe3ec7049d557c41b1af2cd8e2dcc",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 9c0bf85..e6fe0ab 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,7 +1,6 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0270f492822fa9dcdf87bb16863bc950a583fd24"
+    "shas": "1abc809f7c5f4bce8b655282c1a89c80acdb4719..4d3835c45aaafa64cf2ea5d23c0e0a7ca25f50ba"
 }
 ,{
     "testCaseDescription": "ruby-rescue-last-ex-replacement-test",
@@ -133,9 +175,22 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "0270f492822fa9dcdf87bb16863bc950a583fd24",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index e6fe0ab..9c0bf85 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,6 +1,7 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d29bcb40342ec37bed9c7038abc28a6ee43020ed"
+    "shas": "4d3835c45aaafa64cf2ea5d23c0e0a7ca25f50ba..1a1c77e9e42914a1ec12b746fa9bfaf045f39be6"
 }
 ,{
     "testCaseDescription": "ruby-rescue-last-ex-delete-replacement-test",
@@ -194,9 +249,29 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "d29bcb40342ec37bed9c7038abc28a6ee43020ed",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 9c0bf85..23c7c1b 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,13 +1,9 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-  bar",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        " end",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "cf4649bd14458cfd6b832ec5cdad68c22a81564e"
+    "shas": "1a1c77e9e42914a1ec12b746fa9bfaf045f39be6..fba897776dd4e1be1f36e4a3685fcdb77e2fdd77"
 }
 ,{
     "testCaseDescription": "ruby-rescue-last-ex-delete-test",
@@ -225,9 +300,24 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "cf4649bd14458cfd6b832ec5cdad68c22a81564e",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 23c7c1b..c247b6d 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,9 +1,5 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        "   bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "051c542c2eafd22c2f080db8b61bbc666b58260f"
+    "shas": "fba897776dd4e1be1f36e4a3685fcdb77e2fdd77..c605c98f25261242ec2e73cc56004de8524dea2e"
 }
 ,{
     "testCaseDescription": "ruby-rescue-last-ex-delete-rest-test",
@@ -256,7 +346,18 @@
     "filePaths": [
         "rescue-last-ex.rb"
     ],
-    "sha1": "051c542c2eafd22c2f080db8b61bbc666b58260f",
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index c247b6d..e69de29 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,5 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        "-  bar",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d6b69ee323e0c9ee00230a75c2b4a2934e9c3e71"
+    "shas": "c605c98f25261242ec2e73cc56004de8524dea2e..875face60282636c8ba6fbd9db4a50c6b8b38fd2"
 }]

@@ -25,9 +25,19 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "a5e754fb3003e912c8c00843afb2a6fdcac6c2a3",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index e69de29..87e5852 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -0,0 +1,4 @@",
+        "+-> (a, b, c) {",
+        "+  1",
+        "+  2",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "930dddccc7092cf80fcb74972d4788ca00432580"
+    "shas": "39e3abbd0e3332afc2314759fdd350cba39b8e28..39eba620219e1cc7172b218e7f7f4cc0b945515e"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-replacement-insert-test",
@@ -71,9 +81,23 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "930dddccc7092cf80fcb74972d4788ca00432580",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index 87e5852..3daf118 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -1,3 +1,8 @@",
+        "+-> { foo }",
+        "+-> (a, b, c) {",
+        "+  1",
+        "+  2",
+        "+}",
+        " -> (a, b, c) {",
+        "   1",
+        "   2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fe885d3d878e3e9889eb0646934ba7e511bf13c8"
+    "shas": "39eba620219e1cc7172b218e7f7f4cc0b945515e..db5ebcd81ad82fbb223f7ba862191d01280823bd"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-insert-test",
@@ -114,9 +138,23 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "fe885d3d878e3e9889eb0646934ba7e511bf13c8",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index 3daf118..53ea219 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -1,4 +1,7 @@",
+        "--> { foo }",
+        "+-> (a, b, c) {",
+        "+  1",
+        "+  2",
+        "+}",
+        " -> (a, b, c) {",
+        "   1",
+        "   2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0f504084d295994962f8e79e54b0fb2b58f89264"
+    "shas": "db5ebcd81ad82fbb223f7ba862191d01280823bd..f31ea619acedac7aafa78d4821e3359c29837a2e"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-replacement-test",
@@ -157,9 +195,23 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "0f504084d295994962f8e79e54b0fb2b58f89264",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index 53ea219..3daf118 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -1,7 +1,4 @@",
+        "--> (a, b, c) {",
+        "-  1",
+        "-  2",
+        "-}",
+        "+-> { foo }",
+        " -> (a, b, c) {",
+        "   1",
+        "   2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7264ba40a87bf4ec3b2f2b6f03ae057f5179df9e"
+    "shas": "f31ea619acedac7aafa78d4821e3359c29837a2e..78558177fbe1e8a9b635366d37dca7bc63c35a89"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-replacement-test",
@@ -218,9 +270,25 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "7264ba40a87bf4ec3b2f2b6f03ae057f5179df9e",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index 3daf118..5e26f49 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -1,9 +1,5 @@",
+        "--> { foo }",
+        "--> (a, b, c) {",
+        "-  1",
+        "-  2",
+        "-}",
+        " -> (a, b, c) {",
+        "   1",
+        "   2",
+        " }",
+        "+-> { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "eb9db26a6641c0121d1d4d1c908375a7caacf37c"
+    "shas": "78558177fbe1e8a9b635366d37dca7bc63c35a89..1b5da246d2f7c8e084437f516a1e0acef8a668b5"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-test",
@@ -249,9 +317,20 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "eb9db26a6641c0121d1d4d1c908375a7caacf37c",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index 5e26f49..72c62f8 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -1,5 +1 @@",
+        "--> (a, b, c) {",
+        "-  1",
+        "-  2",
+        "-}",
+        " -> { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "02b89aaab641e4d9340251a3b1a1ef5f36b63096"
+    "shas": "1b5da246d2f7c8e084437f516a1e0acef8a668b5..885c3dd4bc6b78521a51d05585cd3600901ebc5f"
 }
 ,{
     "testCaseDescription": "ruby-lambda-dash-rocket-delete-rest-test",
@@ -280,7 +359,14 @@
     "filePaths": [
         "lambda-dash-rocket.rb"
     ],
-    "sha1": "02b89aaab641e4d9340251a3b1a1ef5f36b63096",
+    "patch": [
+        "diff --git a/lambda-dash-rocket.rb b/lambda-dash-rocket.rb",
+        "index 72c62f8..e69de29 100644",
+        "--- a/lambda-dash-rocket.rb",
+        "+++ b/lambda-dash-rocket.rb",
+        "@@ -1 +0,0 @@",
+        "--> { foo }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9ecc2a471ad5c0c86f510ca09aac442da2bd6a8b"
+    "shas": "885c3dd4bc6b78521a51d05585cd3600901ebc5f..18022ae6ebbe9a88b3eaf0cfa0654e8f8bc5dd01"
 }]

@@ -25,9 +25,18 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "94ca7b95dd13dc6bb6bd514c8a7a081042e1ff4c",
+    "patch": [
+        "diff --git a/elsif.rb b/elsif.rb",
+        "index e69de29..89b5cd5 100644",
+        "--- a/elsif.rb",
+        "+++ b/elsif.rb",
+        "@@ -0,0 +1,3 @@",
+        "+if bar",
+        "+  foo()",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c235c7ae6f69d4d9cf2441cbe539c59aa754ffb2"
+    "shas": "d571b61c3d53f568ed84cc6dad1c76cea2abe08d..adfbf640ca01c2a8140a30b71499b03d8e9602db"
 }
 ,{
     "testCaseDescription": "ruby-elsif-insert-test",
@@ -56,9 +65,19 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "c235c7ae6f69d4d9cf2441cbe539c59aa754ffb2",
+    "patch": [
+        "diff --git a/elsif.rb b/elsif.rb",
+        "index 89b5cd5..945e953 100644",
+        "--- a/elsif.rb",
+        "+++ b/elsif.rb",
+        "@@ -1,3 +1,4 @@",
+        " if bar",
+        "   foo()",
+        "+elsif baz",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "074fc552f8f99d5ee0ee0cd775275e7314a1d0c9"
+    "shas": "adfbf640ca01c2a8140a30b71499b03d8e9602db..c56c2c77e578103675c05343baa6ac9b57de69c9"
 }
 ,{
     "testCaseDescription": "ruby-elsif-replacement-test",
@@ -87,9 +106,20 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "074fc552f8f99d5ee0ee0cd775275e7314a1d0c9",
+    "patch": [
+        "diff --git a/elsif.rb b/elsif.rb",
+        "index 945e953..8e4733f 100644",
+        "--- a/elsif.rb",
+        "+++ b/elsif.rb",
+        "@@ -1,4 +1,5 @@",
+        " if bar",
+        "   foo()",
+        " elsif baz",
+        "+  qoz()",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "40957312978a663c403790b436bca9638e089afe"
+    "shas": "c56c2c77e578103675c05343baa6ac9b57de69c9..9d868b4d65a258ca50a0432f32d6ce476a0ec90b"
 }
 ,{
     "testCaseDescription": "ruby-elsif-delete-replacement-test",
@@ -118,9 +148,20 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "40957312978a663c403790b436bca9638e089afe",
+    "patch": [
+        "diff --git a/elsif.rb b/elsif.rb",
+        "index 8e4733f..945e953 100644",
+        "--- a/elsif.rb",
+        "+++ b/elsif.rb",
+        "@@ -1,5 +1,4 @@",
+        " if bar",
+        "   foo()",
+        " elsif baz",
+        "-  qoz()",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e0a27b711317613600c72ab35a8118fe45d0c610"
+    "shas": "9d868b4d65a258ca50a0432f32d6ce476a0ec90b..ae5492ab9e3097846c7c9365e1dba37799da7cf0"
 }
 ,{
     "testCaseDescription": "ruby-elsif-delete-insert-test",
@@ -149,9 +190,19 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "e0a27b711317613600c72ab35a8118fe45d0c610",
+    "patch": [
+        "diff --git a/elsif.rb b/elsif.rb",
+        "index 945e953..89b5cd5 100644",
+        "--- a/elsif.rb",
+        "+++ b/elsif.rb",
+        "@@ -1,4 +1,3 @@",
+        " if bar",
+        "   foo()",
+        "-elsif baz",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f750d245cd81332a5f2294a4007a8641f48e65c7"
+    "shas": "ae5492ab9e3097846c7c9365e1dba37799da7cf0..3c79699074347065dc50d414845fc7dada45dc0e"
 }
 ,{
     "testCaseDescription": "ruby-elsif-teardown-test",
@@ -180,7 +231,16 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "f750d245cd81332a5f2294a4007a8641f48e65c7",
+    "patch": [
+        "diff --git a/elsif.rb b/elsif.rb",
+        "index 89b5cd5..e69de29 100644",
+        "--- a/elsif.rb",
+        "+++ b/elsif.rb",
+        "@@ -1,3 +0,0 @@",
+        "-if bar",
+        "-  foo()",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "141ffb684fc9a6254fc51dec118d0a7626dc5cf1"
+    "shas": "3c79699074347065dc50d414845fc7dada45dc0e..291c23618b5574de7402f710d7feba58b0edbcc2"
 }]

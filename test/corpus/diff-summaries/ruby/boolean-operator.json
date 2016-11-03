@@ -25,9 +25,16 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "9e2b0ce9c04114e21b8cdb405b293197159fc2df",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index e69de29..ba0778d 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -0,0 +1 @@",
+        "+a || b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "30bd58703c37c94eda4f80e5cb9acef96527ad39"
+    "shas": "5b279526f66afb77b2588f5173ce44d7cc693f97..53ec9b4615b8872e47ba643814f579eb3d74ef32"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "30bd58703c37c94eda4f80e5cb9acef96527ad39",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index ba0778d..2d34b94 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -1 +1,3 @@",
+        "+a && b",
+        "+a || b",
+        " a || b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b658c377af5d16e5ec71606cc00be6875fc3af4f"
+    "shas": "53ec9b4615b8872e47ba643814f579eb3d74ef32..02c804c5e37002a6843f3fc329c5db03ad4d51f6"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-insert-test",
@@ -84,9 +100,19 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "b658c377af5d16e5ec71606cc00be6875fc3af4f",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index 2d34b94..2c61248 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -1,3 +1,3 @@",
+        "-a && b",
+        "+a || b",
+        " a || b",
+        " a || b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6a1838f8ce75f6c1613c5846697a6dc86617b277"
+    "shas": "02c804c5e37002a6843f3fc329c5db03ad4d51f6..144d5b79b707781d8b5d1d56e281bcaa8598ae17"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-replacement-test",
@@ -97,9 +123,19 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "6a1838f8ce75f6c1613c5846697a6dc86617b277",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index 2c61248..2d34b94 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -1,3 +1,3 @@",
+        "-a || b",
+        "+a && b",
+        " a || b",
+        " a || b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "55a7586791a96a87faee186858fe3f6b96e3fcbc"
+    "shas": "144d5b79b707781d8b5d1d56e281bcaa8598ae17..000c0198a566086df4d95a1ffd575748b7721552"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-replacement-test",
@@ -128,9 +164,19 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "55a7586791a96a87faee186858fe3f6b96e3fcbc",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index 2d34b94..32a41c9 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -1,3 +1,2 @@",
+        "-a && b",
+        "-a || b",
+        " a || b",
+        "+a && b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a077fab47b56c1bb3ccd70cf10145ddefbbfb4be"
+    "shas": "000c0198a566086df4d95a1ffd575748b7721552..f363216d5459fb0eafeb0168cc3f4af6d11f8cd5"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-test",
@@ -159,9 +205,17 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "a077fab47b56c1bb3ccd70cf10145ddefbbfb4be",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index 32a41c9..b0af58d 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -1,2 +1 @@",
+        "-a || b",
+        " a && b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1a4a8e88ba24d12b40cf15da28e39269950143b6"
+    "shas": "f363216d5459fb0eafeb0168cc3f4af6d11f8cd5..57a8c0847390f2f78910231321007d7b2c86cc7a"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-rest-test",
@@ -190,7 +244,14 @@
     "filePaths": [
         "boolean-operator.rb"
     ],
-    "sha1": "1a4a8e88ba24d12b40cf15da28e39269950143b6",
+    "patch": [
+        "diff --git a/boolean-operator.rb b/boolean-operator.rb",
+        "index b0af58d..e69de29 100644",
+        "--- a/boolean-operator.rb",
+        "+++ b/boolean-operator.rb",
+        "@@ -1 +0,0 @@",
+        "-a && b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "62646a74ce8b5fd0313d5758fcc8001f3277cc83"
+    "shas": "57a8c0847390f2f78910231321007d7b2c86cc7a..0c8195a0d30149b84b53bc2c98687d24a787f4dd"
 }]

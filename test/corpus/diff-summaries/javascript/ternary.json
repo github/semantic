@@ -25,9 +25,16 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "26df3b54cd036f1ed2bff8a0ca225ad680e23432",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index e69de29..a62be2e 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -0,0 +1 @@",
+        "+condition ? case1 : case2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "275a09584d8d33199f73045e1f070e2b9a714fc9"
+    "shas": "0ccf8092231ebc8ac92cc60fe614f1681bc03a89..9667649b2849f1e590a44feec0a6c62c3c2135cc"
 }
 ,{
     "testCaseDescription": "javascript-ternary-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "275a09584d8d33199f73045e1f070e2b9a714fc9",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index a62be2e..17b4f8e 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -1 +1,3 @@",
+        "+x.y = some.condition ? some.case : some.other.case;",
+        "+condition ? case1 : case2;",
+        " condition ? case1 : case2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c3245f5cb3dca8b5fcf3d1ea1e16e77602560442"
+    "shas": "9667649b2849f1e590a44feec0a6c62c3c2135cc..3d5e67c4dc00b3bbf85a3bbe1afd847c77703bbf"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-insert-test",
@@ -117,9 +133,19 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "c3245f5cb3dca8b5fcf3d1ea1e16e77602560442",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index 17b4f8e..aedee54 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -1,3 +1,3 @@",
+        "-x.y = some.condition ? some.case : some.other.case;",
+        "+condition ? case1 : case2;",
+        " condition ? case1 : case2;",
+        " condition ? case1 : case2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dcc065cf8b2bab2519aaaac434f17e88abe22965"
+    "shas": "3d5e67c4dc00b3bbf85a3bbe1afd847c77703bbf..6cba7001515f3956a69b73f69608b7cca7f625f0"
 }
 ,{
     "testCaseDescription": "javascript-ternary-replacement-test",
@@ -163,9 +189,19 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "dcc065cf8b2bab2519aaaac434f17e88abe22965",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index aedee54..17b4f8e 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -1,3 +1,3 @@",
+        "-condition ? case1 : case2;",
+        "+x.y = some.condition ? some.case : some.other.case;",
+        " condition ? case1 : case2;",
+        " condition ? case1 : case2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1d1e9bb19ab493af77f9e987c01bdacd45b8db15"
+    "shas": "6cba7001515f3956a69b73f69608b7cca7f625f0..7e01f0008705a5f7ffced4f2b9cfaf1431c408fb"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-replacement-test",
@@ -224,9 +260,19 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "1d1e9bb19ab493af77f9e987c01bdacd45b8db15",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index 17b4f8e..6fa999d 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -1,3 +1,2 @@",
+        "-x.y = some.condition ? some.case : some.other.case;",
+        "-condition ? case1 : case2;",
+        " condition ? case1 : case2;",
+        "+x.y = some.condition ? some.case : some.other.case;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9d63fa6989fd2bfaffab6531784de14af800bff7"
+    "shas": "7e01f0008705a5f7ffced4f2b9cfaf1431c408fb..7d3393632b17cc8c73de9dac1a7538f7fd60e2ca"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-test",
@@ -255,9 +301,17 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "9d63fa6989fd2bfaffab6531784de14af800bff7",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index 6fa999d..b63b46d 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -1,2 +1 @@",
+        "-condition ? case1 : case2;",
+        " x.y = some.condition ? some.case : some.other.case;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e67b7193d675b0801d962b2fc9d4e8dfdc69936"
+    "shas": "7d3393632b17cc8c73de9dac1a7538f7fd60e2ca..361260c5dc31603f665fefc889640330903dbafd"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-rest-test",
@@ -286,7 +340,14 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "8e67b7193d675b0801d962b2fc9d4e8dfdc69936",
+    "patch": [
+        "diff --git a/ternary.js b/ternary.js",
+        "index b63b46d..e69de29 100644",
+        "--- a/ternary.js",
+        "+++ b/ternary.js",
+        "@@ -1 +0,0 @@",
+        "-x.y = some.condition ? some.case : some.other.case;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0f2f0f6f7ae9bb6ee07a66ff1021c512e7ff727a"
+    "shas": "361260c5dc31603f665fefc889640330903dbafd..38dbecd6735244d4c2c50c6608e64fd7df72b900"
 }]

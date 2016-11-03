@@ -25,9 +25,19 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "5513d900ce05598c0cfb38566161b2de611b46f9",
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index e69de29..3c8eff2 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -0,0 +1,4 @@",
+        "+case foo",
+        "+when bar",
+        "+  baz",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5f4c5f1e6fa59f26495d1de8d8e808158ea4ae1e"
+    "shas": "c723ad6d1865bc31b8b6d554c0768635937c0ab3..283ae1e6221f0617fd5ec6d20db443579bfa869b"
 }
 ,{
     "testCaseDescription": "ruby-when-else-insert-test",
@@ -56,9 +66,20 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "5f4c5f1e6fa59f26495d1de8d8e808158ea4ae1e",
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index 3c8eff2..fb2be92 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -1,4 +1,5 @@",
+        " case foo",
+        " when bar",
+        "   baz",
+        "+else",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e78645da3ee2ba6c9e07ffd6b473f8103a5b95d3"
+    "shas": "283ae1e6221f0617fd5ec6d20db443579bfa869b..639f5d0d1b1e4ae8a3f7aa870c4edaa8de2e1658"
 }
 ,{
     "testCaseDescription": "ruby-when-else-replacement-test",
@@ -87,9 +108,20 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "e78645da3ee2ba6c9e07ffd6b473f8103a5b95d3",
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index fb2be92..028bb59 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -2,4 +2,5 @@ case foo",
+        " when bar",
+        "   baz",
+        " else",
+        "+  qoz",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4f0e16a79a4a5b3e37e8f9a2789a53a4530e4524"
+    "shas": "639f5d0d1b1e4ae8a3f7aa870c4edaa8de2e1658..60681cda49b81c0c9372b049209a373135f2da77"
 }
 ,{
     "testCaseDescription": "ruby-when-else-delete-replacement-test",
@@ -118,9 +150,20 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "4f0e16a79a4a5b3e37e8f9a2789a53a4530e4524",
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index 028bb59..fb2be92 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -2,5 +2,4 @@ case foo",
+        " when bar",
+        "   baz",
+        " else",
+        "-  qoz",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8e52dcd19263f5aeb2a9acf69cfcf375a7190db3"
+    "shas": "60681cda49b81c0c9372b049209a373135f2da77..13946aba199ec4be3a9a7d11815fd5dd987c3c3b"
 }
 ,{
     "testCaseDescription": "ruby-when-else-delete-insert-test",
@@ -149,9 +192,20 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "8e52dcd19263f5aeb2a9acf69cfcf375a7190db3",
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index fb2be92..3c8eff2 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -1,5 +1,4 @@",
+        " case foo",
+        " when bar",
+        "   baz",
+        "-else",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ced6c32ff092198cd659755ca7e39557181e50dd"
+    "shas": "13946aba199ec4be3a9a7d11815fd5dd987c3c3b..53011c7928dc7a14a2e1aa5605dd08cd4ad34de5"
 }
 ,{
     "testCaseDescription": "ruby-when-else-teardown-test",
@@ -180,7 +234,17 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "ced6c32ff092198cd659755ca7e39557181e50dd",
+    "patch": [
+        "diff --git a/when-else.rb b/when-else.rb",
+        "index 3c8eff2..e69de29 100644",
+        "--- a/when-else.rb",
+        "+++ b/when-else.rb",
+        "@@ -1,4 +0,0 @@",
+        "-case foo",
+        "-when bar",
+        "-  baz",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ac7d38e4ecbfcf7f44e03c5127d837da112419e8"
+    "shas": "53011c7928dc7a14a2e1aa5605dd08cd4ad34de5..dbbf1ed8a8cafe556ea468af463f118f3ca0f4ba"
 }]

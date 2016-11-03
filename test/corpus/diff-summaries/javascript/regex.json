@@ -25,9 +25,16 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "97a7c83a9e020ac198c1fbf23d38b3089f4484b1",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index e69de29..b381842 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -0,0 +1 @@",
+        "+/one/g;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7f8c1785dae66151e5dd0a4d623d23aba69ee46b"
+    "shas": "734bede3c6c3771f011aa729a417011d310ec5cc..9dbffbb28707342ebcd361c29b0d670a271ddb04"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "7f8c1785dae66151e5dd0a4d623d23aba69ee46b",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index b381842..6ed4b42 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -1 +1,3 @@",
+        "+/on[^/]afe/gim;",
+        "+/one/g;",
+        " /one/g;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c983dec6883ab781783d20943e8751acca12e517"
+    "shas": "9dbffbb28707342ebcd361c29b0d670a271ddb04..f294c4a4aac8d0a945272edb200af0866b0d5a0f"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "c983dec6883ab781783d20943e8751acca12e517",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index 6ed4b42..abb87ec 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -1,3 +1,3 @@",
+        "-/on[^/]afe/gim;",
+        "+/one/g;",
+        " /one/g;",
+        " /one/g;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7afab11946dbc25be5a0bd44395e35c43a52dce5"
+    "shas": "f294c4a4aac8d0a945272edb200af0866b0d5a0f..c158c5219c063572ee6664525f8fb4377178cdc3"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "7afab11946dbc25be5a0bd44395e35c43a52dce5",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index abb87ec..6ed4b42 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -1,3 +1,3 @@",
+        "-/one/g;",
+        "+/on[^/]afe/gim;",
+        " /one/g;",
+        " /one/g;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "555b1cad7a4da4e9a9efe0c97f6a1896e4e16aa2"
+    "shas": "c158c5219c063572ee6664525f8fb4377178cdc3..38ad972ed8f499cb320e4584c4ae1b95d4e70f41"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "555b1cad7a4da4e9a9efe0c97f6a1896e4e16aa2",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index 6ed4b42..9f57e91 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -1,3 +1,2 @@",
+        "-/on[^/]afe/gim;",
+        "-/one/g;",
+        " /one/g;",
+        "+/on[^/]afe/gim;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "035f601809f5818ed358b56e52e2d3888b51de9a"
+    "shas": "38ad972ed8f499cb320e4584c4ae1b95d4e70f41..79078d16f7a00fca2b3dbf3cf7dadd8f5ba7929c"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "035f601809f5818ed358b56e52e2d3888b51de9a",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index 9f57e91..9b04194 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -1,2 +1 @@",
+        "-/one/g;",
+        " /on[^/]afe/gim;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "725dc154b47967e008f928e59eb777bab1a08d59"
+    "shas": "79078d16f7a00fca2b3dbf3cf7dadd8f5ba7929c..f293398786080c6f5b99e7c36ba482702f5cbbae"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "725dc154b47967e008f928e59eb777bab1a08d59",
+    "patch": [
+        "diff --git a/regex.js b/regex.js",
+        "index 9b04194..e69de29 100644",
+        "--- a/regex.js",
+        "+++ b/regex.js",
+        "@@ -1 +0,0 @@",
+        "-/on[^/]afe/gim;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dc9aa0f5ce2176319c7eb9475db8787876afb4d9"
+    "shas": "f293398786080c6f5b99e7c36ba482702f5cbbae..4951403c16600a8ebe50779236bcbc480c823807"
 }]

@@ -25,9 +25,19 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "9e50ecb353fbd3ccce70bbe595d2be9f3a15002a",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index e69de29..5b4fe96 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -0,0 +1,4 @@",
+        "+begin",
+        "+  foo",
+        "+rescue",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1f8148f811905227ac345716ea55d5d1c60032c0"
+    "shas": "759d04410984c3b7b0c25212ef74986fba96a76f..48354aa04a6e30841aa1b0ba10f934aba9d877bb"
 }
 ,{
     "testCaseDescription": "ruby-rescue-empty-replacement-insert-test",
@@ -71,9 +81,28 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "1f8148f811905227ac345716ea55d5d1c60032c0",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index 5b4fe96..d74e034 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,4 +1,13 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "+  bar",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "472247a9b69d72b6dd9495b31064923c7e5ec202"
+    "shas": "48354aa04a6e30841aa1b0ba10f934aba9d877bb..ffef7ac3bf0c394c4b150fc38e7d84bcc0116a90"
 }
 ,{
     "testCaseDescription": "ruby-rescue-empty-delete-insert-test",
@@ -102,9 +131,22 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "472247a9b69d72b6dd9495b31064923c7e5ec202",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index d74e034..afdc934 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,7 +1,6 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "-  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ac1ad76dc8c3a9e32eda4795b29ada0f4cb29683"
+    "shas": "ffef7ac3bf0c394c4b150fc38e7d84bcc0116a90..dbf6e3412604ec2bdd35156d5b9ea52e220c5464"
 }
 ,{
     "testCaseDescription": "ruby-rescue-empty-replacement-test",
@@ -133,9 +175,22 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "ac1ad76dc8c3a9e32eda4795b29ada0f4cb29683",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index afdc934..d74e034 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,6 +1,7 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "+  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c5c5c29784a5fc11f72bdc584807d7575e43dc83"
+    "shas": "dbf6e3412604ec2bdd35156d5b9ea52e220c5464..3df29e631fd2d388ec3f1aaca908e6b1945e7481"
 }
 ,{
     "testCaseDescription": "ruby-rescue-empty-delete-replacement-test",
@@ -194,9 +249,29 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "c5c5c29784a5fc11f72bdc584807d7575e43dc83",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index d74e034..f8a72a7 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,13 +1,9 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "-  bar",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue",
+        " end",
+        " begin",
+        "   foo",
+        " rescue",
+        "+  bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d4c6fff0388c8869751470d1b5451b05bd5c7f0c"
+    "shas": "3df29e631fd2d388ec3f1aaca908e6b1945e7481..70c02489eb082cc5dd59b661bae79c8df0997ea9"
 }
 ,{
     "testCaseDescription": "ruby-rescue-empty-delete-test",
@@ -225,9 +300,24 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "d4c6fff0388c8869751470d1b5451b05bd5c7f0c",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index f8a72a7..17dffb3 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,9 +1,5 @@",
+        " begin",
+        "   foo",
+        " rescue",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue",
+        "   bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a2b3b399b709e56b7ef468ececb328a03603e11a"
+    "shas": "70c02489eb082cc5dd59b661bae79c8df0997ea9..7a71af57bd14a190b95e66a932a58c1f64b3983b"
 }
 ,{
     "testCaseDescription": "ruby-rescue-empty-delete-rest-test",
@@ -256,7 +346,18 @@
     "filePaths": [
         "rescue-empty.rb"
     ],
-    "sha1": "a2b3b399b709e56b7ef468ececb328a03603e11a",
+    "patch": [
+        "diff --git a/rescue-empty.rb b/rescue-empty.rb",
+        "index 17dffb3..e69de29 100644",
+        "--- a/rescue-empty.rb",
+        "+++ b/rescue-empty.rb",
+        "@@ -1,5 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-rescue",
+        "-  bar",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "76ddf3715f8fde859890e26fc3c9f0c824a1201a"
+    "shas": "7a71af57bd14a190b95e66a932a58c1f64b3983b..e805bb575511867c24e67d81ccae909f2668e660"
 }]
