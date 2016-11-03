@@ -7,6 +7,8 @@ import Test.QuickCheck
 import Category
 import Range
 import SourceSpan
+import Data.Aeson
+import Data.Aeson.Types
 
 
 -- | A type alias for HasField constraints commonly used throughout semantic-diff.
@@ -60,6 +62,12 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
 
 instance Show (Record '[]) where
   showsPrec n RNil = showParen (n > 0) ("RNil" <>)
+
+instance (ToJSON a, ToJSON b, ToJSON c, ToJSON d) => ToJSON (Record (a ': b ': c ': d ': '[])) where
+  toJSON (RCons a (RCons b (RCons c (RCons d RNil)))) = toJSONList [toJSON a, toJSON b, toJSON c, toJSON d]
+
+instance ToJSON (Record '[]) where
+  toJSON _ = emptyArray
 
 
 instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where
