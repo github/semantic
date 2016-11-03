@@ -93,7 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'qoz()' function call in an elsif block"
+                    "summary": "Deleted the 'qoz()' function call in the 'baz' elsif block"
                 }
             ]
         },
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'qoz()' function call in an elsif block"
+                    "summary": "Added the 'qoz()' function call in the 'baz' elsif block"
                 }
             ]
         },

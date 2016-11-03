@@ -93,7 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an rescue block in a begin statement"
+                    "summary": "Deleted the 'x' rescue block in a begin statement"
                 }
             ]
         },
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an rescue block in a begin statement"
+                    "summary": "Added the 'x' rescue block in a begin statement"
                 }
             ]
         },

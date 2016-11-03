@@ -93,7 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an elsif block"
+                    "summary": "Deleted the 'baz' elsif block"
                 }
             ]
         },
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an elsif block"
+                    "summary": "Added the 'baz' elsif block"
                 }
             ]
         },

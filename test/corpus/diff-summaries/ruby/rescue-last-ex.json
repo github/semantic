@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-case-when-else-insert-test",
+    "testCaseDescription": "ruby-rescue-last-ex-insert-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "insert": {
@@ -16,24 +16,24 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "7b88300c1604ec1f6e775ac48ea3f43087545738",
+    "sha1": "38a1c2b8c754125402640be198510c28f65f9e7b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "cba20046e29c4a43a6a2f7a20fbe71372ea2f485"
+    "sha2": "eee2f6bb5c666769a652940dcd85e81ee768bfa1"
 }
 ,{
-    "testCaseDescription": "ruby-case-when-else-replacement-insert-test",
+    "testCaseDescription": "ruby-rescue-last-ex-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "insert": {
@@ -42,106 +42,106 @@
                                 1
                             ],
                             "end": [
-                                6,
+                                5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Added a begin statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                6,
                                 1
                             ],
                             "end": [
-                                10,
+                                9,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "cba20046e29c4a43a6a2f7a20fbe71372ea2f485",
+    "sha1": "eee2f6bb5c666769a652940dcd85e81ee768bfa1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "31387a19632065bd797ebae9c680b375b46e72a4"
+    "sha2": "b8ed6f50d399f51348d31c22f44d9ceb41eb33e5"
 }
 ,{
-    "testCaseDescription": "ruby-case-when-else-delete-insert-test",
+    "testCaseDescription": "ruby-rescue-last-ex-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                3
                             ],
                             "end": [
-                                6,
-                                1
+                                4,
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted an else block in the 'foo' case statement"
+                    "summary": "Deleted the 'bar' identifier in the 'Error => x' rescue block"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "31387a19632065bd797ebae9c680b375b46e72a4",
+    "sha1": "b8ed6f50d399f51348d31c22f44d9ceb41eb33e5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "299fdb0e06b8397dc6fe2ba240ba90134d006a07"
+    "sha2": "a523bab23bb3f052f3afde7e88514d8bb0c55033"
 }
 ,{
-    "testCaseDescription": "ruby-case-when-else-replacement-test",
+    "testCaseDescription": "ruby-rescue-last-ex-replacement-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                3
                             ],
                             "end": [
-                                6,
-                                1
+                                4,
+                                6
                             ]
                         }
                     },
-                    "summary": "Added an else block in the 'foo' case statement"
+                    "summary": "Added the 'bar' identifier in the 'Error => x' rescue block"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "299fdb0e06b8397dc6fe2ba240ba90134d006a07",
+    "sha1": "a523bab23bb3f052f3afde7e88514d8bb0c55033",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d1c0e2fa239eae1685645481516402d0219bc59e"
+    "sha2": "cbfb406bf30baac8e5d6e4a93f8e4955ce250581"
 }
 ,{
-    "testCaseDescription": "ruby-case-when-else-delete-replacement-test",
+    "testCaseDescription": "ruby-rescue-last-ex-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "delete": {
@@ -150,27 +150,27 @@
                                 1
                             ],
                             "end": [
-                                6,
+                                5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
+                    "summary": "Deleted a begin statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                6,
                                 1
                             ],
                             "end": [
-                                10,
+                                9,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
+                    "summary": "Deleted a begin statement"
                 },
                 {
                     "span": {
@@ -180,29 +180,29 @@
                                 1
                             ],
                             "end": [
-                                10,
+                                9,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "d1c0e2fa239eae1685645481516402d0219bc59e",
+    "sha1": "cbfb406bf30baac8e5d6e4a93f8e4955ce250581",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "df3f41005b7a453a3eaf77ef4192a25bfa8aee5a"
+    "sha2": "b777dec626f5e6b8daeeb6a22db0f2bf669d39a5"
 }
 ,{
-    "testCaseDescription": "ruby-case-when-else-delete-test",
+    "testCaseDescription": "ruby-rescue-last-ex-delete-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "delete": {
@@ -216,24 +216,24 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
+                    "summary": "Deleted a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "df3f41005b7a453a3eaf77ef4192a25bfa8aee5a",
+    "sha1": "b777dec626f5e6b8daeeb6a22db0f2bf669d39a5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "65383838c56a79f86304217a71799ce62d24e416"
+    "sha2": "712f1ceccd22a6994f29adf6960671be567657a4"
 }
 ,{
-    "testCaseDescription": "ruby-case-when-else-delete-rest-test",
+    "testCaseDescription": "ruby-rescue-last-ex-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "case-when-else.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "delete": {
@@ -242,21 +242,21 @@
                                 1
                             ],
                             "end": [
-                                6,
+                                5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
+                    "summary": "Deleted a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-when-else.rb"
+        "rescue-last-ex.rb"
     ],
-    "sha1": "65383838c56a79f86304217a71799ce62d24e416",
+    "sha1": "712f1ceccd22a6994f29adf6960671be567657a4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f7e62e18ec0e13cd8261dee63a3b1559d6c5c8cd"
+    "sha2": "d00fdf73e29c3ee54c0d74ee0083b049c296c0de"
 }]

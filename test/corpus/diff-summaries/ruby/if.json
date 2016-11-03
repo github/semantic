@@ -150,7 +150,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an elsif block"
+                    "summary": "Added the 'quux' elsif block"
                 },
                 {
                     "span": {
@@ -253,7 +253,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an elsif block"
+                    "summary": "Deleted the 'quux' elsif block"
                 },
                 {
                     "span": {

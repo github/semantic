@@ -93,7 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier in an rescue block"
+                    "summary": "Deleted the 'bar' identifier in the 'x' rescue block"
                 }
             ]
         },
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier in an rescue block"
+                    "summary": "Added the 'bar' identifier in the 'x' rescue block"
                 }
             ]
         },

@@ -89,6 +89,13 @@ styleName category = "category-" <> case category of
   C.Yield -> "yield_statement"
   C.Until -> "until"
   C.Unless -> "unless_statement"
+  C.Begin -> "begin_statement"
+  C.Else -> "else_block"
+  C.Elsif -> "elsif_block"
+  C.Ensure -> "ensure_block"
+  C.Rescue -> "rescue_block"
+  C.When -> "when_block"
+  C.LastException -> "last_exception"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

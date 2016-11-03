@@ -19,7 +19,7 @@ blocks :: [Text]
 blocks = [ "begin_statement", "else_block", "ensure_block" ]
 
 conditionalBlocks :: [Text]
-conditionalBlocks = [ "elsif_block", "rescue_block", "case_statement", "when_block" ]
+conditionalBlocks = [ "elsif_block", "case_statement", "when_block" ]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
@@ -56,6 +56,10 @@ termConstructor source sourceSpan name range children
     ("if_statement", _ ) -> S.Error children
     ("element_reference", [ base, element ]) -> S.SubscriptAccess base element
     ("element_reference", _ ) -> S.Error children
+    ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
+    ("for_statement", _ ) -> S.Error children
+    ("last_exception", [ ex ]) -> S.LastException ex
+    ("last_exception", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
@@ -65,6 +69,11 @@ termConstructor source sourceSpan name range children
     ("method_declaration", _ ) -> S.Error children
     ("module_declaration", identifier : body ) -> S.Module identifier body
     ("module_declaration", _ ) -> S.Error children
+    ("rescue_block", _) -> case runCofree <$> children of
+      (args@(_ :< S.Args _) : e@(_ :< S.LastException _) : rest) -> S.Rescue (Just (cofree args)) (Just (cofree e)) (cofree <$> rest)
+      (args@(_ :< S.Args _) : rest) -> S.Rescue (Just (cofree args)) Nothing (cofree <$> rest)
+      -- (args:rest) -> S.Rescue (Just (cofree args)) Nothing (cofree <$> rest)
+      _ -> S.Rescue Nothing Nothing children
     ("return_statement", _ ) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
     ("unless_modifier", _ ) -> S.Error children
@@ -79,11 +88,9 @@ termConstructor source sourceSpan name range children
     ("while_statement", expr : rest ) -> S.While expr rest
     ("while_statement", _ ) -> S.Error children
     ("yield", _) -> S.Yield (listToMaybe children)
-    ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
-    ("for_statement", _ ) -> S.Error children
     _ | name `elem` blocks -> S.BlockExpression Nothing children
     _ | name `elem` conditionalBlocks -> case children of
-      ( condition: rest ) -> S.BlockExpression (Just condition) rest
+      ( condition : rest ) -> S.BlockExpression (Just condition) rest
       _ -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
@@ -131,6 +138,7 @@ categoryForRubyName = \case
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
+  "last_exception" -> LastException
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method

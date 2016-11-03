@@ -85,6 +85,9 @@ data Syntax a f
   | Unless f [f]
   -- | A block expression might have a conditional expression and always has a list of expressions (e.g. begin, else, ensure in Ruby).
   | BlockExpression (Maybe f) [f]
+  -- | A rescue block: maybe Args to rescue, maybe a local var for the last exception, and a list of expressions.
+  | Rescue (Maybe f) (Maybe f) [f]
+  | LastException f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

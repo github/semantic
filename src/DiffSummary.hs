@@ -54,6 +54,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
           S.BlockExpression{} -> Identifiable
+          S.Rescue{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -142,9 +143,7 @@ determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "begin statement" _ _) = "a"
 determiner (LeafInfo "else block" _ _) = "an"
-determiner (LeafInfo "elsif block" _ _) = "an"
 determiner (LeafInfo "ensure block" _ _) = "an"
-determiner (LeafInfo "rescue block" _ _) = "an"
 determiner (LeafInfo "when block" _ _) = "an"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
@@ -161,9 +160,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"begin statement" _ _) -> toDoc cName
   (LeafInfo cName@"else block" _ _) -> toDoc cName
-  (LeafInfo cName@"elsif block" _ _) -> toDoc cName
   (LeafInfo cName@"ensure block" _ _) -> toDoc cName
-  (LeafInfo cName@"rescue block" _ _) -> toDoc cName
   (LeafInfo cName@"when block" _ _) -> toDoc cName
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
@@ -244,6 +241,11 @@ toTermName source term = case unwrap term of
   S.BlockExpression maybeExpr children -> case maybeExpr of
     Just expr -> termNameFromSource expr
     Nothing -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Rescue maybeArgs maybeEx _ -> case (maybeArgs, maybeEx) of
+    (Just args, Just ex) -> toTermName' args <> " => " <> toTermName' ex
+    (Just args, Nothing) -> toTermName' args
+    _ -> ""
+  S.LastException expr -> termNameFromSource expr
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -262,12 +264,14 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
       C.Begin -> "in a" <+> catName c
       C.Else -> "in an" <+> catName c
-      C.Elsif -> "in an" <+> catName c
+      C.Elsif -> "in the" <+> squotes (termName t) <+> catName c
       C.Ensure -> "in an" <+> catName c
-      C.Rescue -> "in an" <+> catName c
-      C.Case -> "in a" <+> catName c
+      C.Rescue -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
+      C.Case -> "in the" <+> squotes (termName t) <+> catName c
       C.When -> "in a" <+> catName c
-      _ -> "in the" <+> catName c
+      _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
     termName = toDoc
@@ -383,6 +387,7 @@ instance HasCategory Category where
     C.Ensure -> "ensure block"
     C.Rescue -> "rescue block"
     C.When -> "when comparison"
+    C.LastException -> "last exception"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

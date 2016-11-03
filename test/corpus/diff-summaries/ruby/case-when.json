@@ -93,7 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' when comparison in a case statement"
+                    "summary": "Deleted the 'bar' when comparison in the 'foo' case statement"
                 }
             ]
         },
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' when comparison in a case statement"
+                    "summary": "Added the 'bar' when comparison in the 'foo' case statement"
                 }
             ]
         },

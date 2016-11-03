@@ -132,6 +132,7 @@ data Category
   | Ensure
   | Rescue
   | When
+  | LastException
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -198,6 +199,7 @@ instance Arbitrary Category where
     , pure Ensure
     , pure Rescue
     , pure When
+    , pure LastException
     , Other <$> arbitrary
     ]
 

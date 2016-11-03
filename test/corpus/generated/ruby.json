@@ -230,6 +230,16 @@
         "replacement": "begin\n  foo\nrescue x\n  bar\nend"
       },
       {
+        "syntax": "rescue-empty",
+        "insert": "begin\n  foo\nrescue\nend",
+        "replacement": "begin\n  foo\nrescue\n  bar\nend"
+      },
+      {
+        "syntax": "rescue-last-ex",
+        "insert": "begin\n  foo\nrescue Error => x\nend",
+        "replacement": "begin\n  foo\nrescue Error => x\n  bar\nend"
+      },
+      {
         "syntax": "case-when",
         "insert": "case foo\nend",
         "replacement": "case foo\nwhen bar\nend"
