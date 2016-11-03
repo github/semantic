@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object"
+                    "summary": "Added the '{ add(a, b) }' object"
                 }
             ]
         },
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object"
+                    "summary": "Added the '{ subtract(a, b) }' object"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object"
+                    "summary": "Added the '{ add(a, b) }' object"
                 }
             ]
         },
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method"
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add(a, b) method"
                 }
             ]
         },
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method"
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract(a, b) method"
                 }
             ]
         },
@@ -179,7 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object"
+                    "summary": "Deleted the '{ subtract(a, b) }' object"
                 },
                 {
                     "span": {
@@ -194,7 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object"
+                    "summary": "Deleted the '{ add(a, b) }' object"
                 },
                 {
                     "span": {
@@ -209,7 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object"
+                    "summary": "Added the '{ subtract(a, b) }' object"
                 }
             ]
         },
@@ -240,7 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object"
+                    "summary": "Deleted the '{ add(a, b) }' object"
                 }
             ]
         },
@@ -271,7 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object"
+                    "summary": "Deleted the '{ subtract(a, b) }' object"
                 }
             ]
         },
