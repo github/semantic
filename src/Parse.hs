@@ -29,7 +29,7 @@ run args@Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
 
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
-  let parsers = parserForFilepath <$> filePaths
+  let parsers = parserWithCost <$> filePaths
   let parsersAndBlobs = zip parsers sourceBlobs
 
   terms <- traverse (\(parser, sourceBlob) -> parser sourceBlob) parsersAndBlobs
@@ -38,9 +38,9 @@ run args@Arguments{..} = do
 
   pure ()
 
--- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
-parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
+-- | Return a parser that decorates with the cost of a term and its children.
+parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
+parserWithCost path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
