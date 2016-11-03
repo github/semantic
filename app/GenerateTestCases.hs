@@ -246,43 +246,26 @@ generateJSON args = do
 -- | Commands represent the various combination of patches (insert, delete, replacement)
 -- | for a given syntax.
 commands :: JSONMetaRepo -> JSONMetaSyntax -> [(JSONMetaSyntax, String, String, String)]
-commands JSONMetaRepo{..} metaSyntax@JSONMetaSyntax{..} =
-  [ (metaSyntax, "insert", commaSeperator, insertCommands)
-  , (metaSyntax, "replacement-insert", commaSeperator, replaceInsertCommands)
-  , (metaSyntax, "delete-insert", commaSeperator, deleteInsertCommands)
-  , (metaSyntax, "replacement", commaSeperator, replacementCommands)
-  , (metaSyntax, "delete-replacement", commaSeperator, deleteReplacementCommands)
-  , (metaSyntax, "delete", commaSeperator, deleteCommands)
-  , (metaSyntax, "delete-rest", spaceSeperator, deleteRestCommands)
-  ]
+commands JSONMetaRepo{..} metaSyntax@JSONMetaSyntax{..} = case template of
+  (Just _) -> [ (metaSyntax, "setup", commaSeperator, fileWriteCommand repoFilePath (withTemplate "") <> commitCommand syntax "setup")
+              , (metaSyntax, "insert", commaSeperator, fileWriteCommand repoFilePath (withTemplate insert) <> commitCommand syntax "insert")
+              , (metaSyntax, "replacement", commaSeperator, fileWriteCommand repoFilePath (withTemplate replacement) <> commitCommand syntax "replacement")
+              , (metaSyntax, "delete-replacement", commaSeperator, fileWriteCommand repoFilePath (withTemplate insert) <> commitCommand syntax "delete replacement")
+              , (metaSyntax, "delete-insert", commaSeperator, fileWriteCommand repoFilePath (withTemplate "") <> commitCommand syntax "delete insert")
+              , (metaSyntax, "teardown", spaceSeperator, removeCommand repoFilePath <> touchCommand repoFilePath <> commitCommand syntax "teardown")
+              ]
+  Nothing -> [ (metaSyntax, "insert", commaSeperator, fileWriteCommand repoFilePath insert <> commitCommand syntax "insert")
+             , (metaSyntax, "replacement-insert", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement + insert + insert")
+             , (metaSyntax, "delete-insert", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [insert, insert, insert]) <> commitCommand syntax "delete + insert")
+             , (metaSyntax, "replacement", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement")
+             , (metaSyntax, "delete-replacement", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [insert, replacement]) <> commitCommand syntax "delete + replacement")
+             , (metaSyntax, "delete", commaSeperator, fileWriteCommand repoFilePath replacement <> commitCommand syntax "delete")
+             , (metaSyntax, "delete-rest", spaceSeperator, removeCommand repoFilePath <> touchCommand repoFilePath <> commitCommand syntax "delete rest")
+             ]
   where commaSeperator = "\n,"
         spaceSeperator = ""
         repoFilePath = syntax <> fileExt
         withTemplate = contentsWithTemplate template
-        insertCommands
-          = fileWriteCommand repoFilePath (withTemplate "")
-         <> commitCommand syntax "setup"
-         <> fileWriteCommand repoFilePath (withTemplate insert)
-         <> commitCommand syntax "insert"
-        replaceInsertCommands
-          = fileWriteCommand repoFilePath (withTemplate (Prologue.intercalate "\n" [replacement, insert, insert]))
-         <> commitCommand syntax "replacement + insert + insert"
-        deleteInsertCommands
-          = fileWriteCommand repoFilePath (withTemplate (Prologue.intercalate "\n" [insert, insert, insert]))
-         <> commitCommand syntax "delete + insert"
-        replacementCommands
-          = fileWriteCommand repoFilePath (withTemplate (Prologue.intercalate "\n" [replacement, insert, insert]))
-         <> commitCommand syntax "replacement"
-        deleteReplacementCommands
-          = fileWriteCommand repoFilePath (withTemplate (Prologue.intercalate "\n" [insert, replacement]))
-         <> commitCommand syntax "delete + replacement"
-        deleteCommands
-          = fileWriteCommand repoFilePath (withTemplate replacement)
-         <> commitCommand syntax "delete"
-        deleteRestCommands
-          = removeCommand repoFilePath
-         <> touchCommand repoFilePath
-         <> commitCommand syntax "delete rest"
         contentsWithTemplate :: Maybe String -> String -> String
         contentsWithTemplate (Just template) contents = DT.unpack $ DT.replace "{0}" (toS contents) (toS template)
         contentsWithTemplate Nothing contents = contents
