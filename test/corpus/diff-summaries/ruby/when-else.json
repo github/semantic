@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-rescue-setup-test",
+    "testCaseDescription": "ruby-when-else-setup-test",
     "expectedResult": {
         "changes": {
-            "rescue.rb": [
+            "when-else.rb": [
                 {
                     "span": {
                         "insert": {
@@ -11,153 +11,153 @@
                                 1
                             ],
                             "end": [
-                                3,
+                                4,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added a begin statement"
+                    "summary": "Added the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "rescue.rb"
+        "when-else.rb"
     ],
-    "sha1": "96b198057dd2d93412c9bc9cba5b76939a345329",
+    "sha1": "4271016dbb96667635e707fced1ae9261e704536",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6e3f9905304cfe8c1c4df7a0e366c08002ea2c10"
+    "sha2": "5876dd3c93cb19b2873a0d264e91c317ac016061"
 }
 ,{
-    "testCaseDescription": "ruby-rescue-insert-test",
+    "testCaseDescription": "ruby-when-else-insert-test",
     "expectedResult": {
         "changes": {
-            "rescue.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' rescue block in a begin statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "rescue.rb"
-    ],
-    "sha1": "6e3f9905304cfe8c1c4df7a0e366c08002ea2c10",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dc632b49848a2e2b3b17f892985c0c2e3e649a0f"
-}
-,{
-    "testCaseDescription": "ruby-rescue-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "rescue.rb": [
+            "when-else.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                3
+                                1
                             ],
                             "end": [
                                 4,
-                                6
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier in the 'x' rescue block"
+                    "summary": "Added an else block in the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "rescue.rb"
+        "when-else.rb"
     ],
-    "sha1": "dc632b49848a2e2b3b17f892985c0c2e3e649a0f",
+    "sha1": "5876dd3c93cb19b2873a0d264e91c317ac016061",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ebf19536e8ca621c5c28bd4e8f1ff1ada05a9701"
+    "sha2": "3912ee731b5531e0e2ce8eab6ea230468a6c3465"
 }
 ,{
-    "testCaseDescription": "ruby-rescue-delete-replacement-test",
+    "testCaseDescription": "ruby-when-else-replacement-test",
     "expectedResult": {
         "changes": {
-            "rescue.rb": [
+            "when-else.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'qoz' identifier in an else block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "sha1": "3912ee731b5531e0e2ce8eab6ea230468a6c3465",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a9c76a9c67839c33512146db9135ebfcfc480468"
+}
+,{
+    "testCaseDescription": "ruby-when-else-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'qoz' identifier in an else block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "when-else.rb"
+    ],
+    "sha1": "a9c76a9c67839c33512146db9135ebfcfc480468",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "da7924e7af2b0534ef00eea9aa224dcea767be19"
+}
+,{
+    "testCaseDescription": "ruby-when-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "when-else.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                3
+                                1
                             ],
                             "end": [
                                 4,
-                                6
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier in the 'x' rescue block"
+                    "summary": "Deleted an else block in the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "rescue.rb"
+        "when-else.rb"
     ],
-    "sha1": "ebf19536e8ca621c5c28bd4e8f1ff1ada05a9701",
+    "sha1": "da7924e7af2b0534ef00eea9aa224dcea767be19",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e75efcb699aa96ae619519b4b8678b33cc5eb5a4"
+    "sha2": "554464d4e89b576a6d7a19f9d901ed1691ccfc75"
 }
 ,{
-    "testCaseDescription": "ruby-rescue-delete-insert-test",
+    "testCaseDescription": "ruby-when-else-teardown-test",
     "expectedResult": {
         "changes": {
-            "rescue.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' rescue block in a begin statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "rescue.rb"
-    ],
-    "sha1": "e75efcb699aa96ae619519b4b8678b33cc5eb5a4",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2aa4b2a6c5cf75817c062542ba314209cd8826ac"
-}
-,{
-    "testCaseDescription": "ruby-rescue-teardown-test",
-    "expectedResult": {
-        "changes": {
-            "rescue.rb": [
+            "when-else.rb": [
                 {
                     "span": {
                         "delete": {
@@ -166,21 +166,21 @@
                                 1
                             ],
                             "end": [
-                                3,
+                                4,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted a begin statement"
+                    "summary": "Deleted the 'foo' case statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "rescue.rb"
+        "when-else.rb"
     ],
-    "sha1": "2aa4b2a6c5cf75817c062542ba314209cd8826ac",
+    "sha1": "554464d4e89b576a6d7a19f9d901ed1691ccfc75",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c4e3bd3c2f9f845c116b7b567b28eaa7a2ac6327"
+    "sha2": "96b198057dd2d93412c9bc9cba5b76939a345329"
 }]

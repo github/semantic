@@ -203,14 +203,10 @@
         "replacement": "ensure\n  bar\n"
       },
       {
-        "syntax": "begin-rescue",
-        "insert": "begin\n  foo\nend",
-        "replacement": "begin\n  foo\nrescue x\n  bar\nend"
-      },
-      {
         "syntax": "rescue",
-        "insert": "begin\n  foo\nrescue x\nend",
-        "replacement": "begin\n  foo\nrescue x\n  bar\nend"
+        "template": "begin\n  foo\n{0}end",
+        "insert": "rescue x\n",
+        "replacement": "rescue x\n  bar\n"
       },
       {
         "syntax": "rescue-empty",
@@ -239,14 +235,10 @@
         "replacement": "when bar\n  baz\n"
       },
       {
-        "syntax": "case-when-else",
-        "insert": "case foo\nwhen bar\n  baz\nend",
-        "replacement": "case foo\nwhen bar\n  baz\nelse\n qoz\nend"
-      },
-      {
         "syntax": "when-else",
-        "insert": "case foo\nwhen bar\n  baz\nelse\nend",
-        "replacement": "case foo\nwhen bar\n  baz\nelse\n qoz\nend"
+        "template": "case foo\nwhen bar\n  baz\n{0}end",
+        "insert": "else\n",
+        "replacement": "else\n  qoz\n"
       }
     ]
   }
