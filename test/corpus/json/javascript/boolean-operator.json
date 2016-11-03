@@ -90,9 +90,16 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "714e5a0dfd44d739d9669ab32c1f32160436e5a2",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index e69de29..7280a98 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -0,0 +1 @@",
+        "+i || j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a47c5c2990f72c9bde5678f2d49625988cc01fb1"
+    "shas": "b0194f4ccae027de9b6fbbc4ceefe070cf51555c..c8ce4905edb0321dfaf25203714eda8d05133dc0"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-insert-test",
@@ -361,9 +368,18 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "a47c5c2990f72c9bde5678f2d49625988cc01fb1",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index 7280a98..fe3f306 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1 +1,3 @@",
+        "+i && j;",
+        "+i || j;",
+        " i || j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f3faa41589c7adf9a27099b5837c7748f8fb9f39"
+    "shas": "c8ce4905edb0321dfaf25203714eda8d05133dc0..018d110adadddb7b94c0c87869f4ef32d9f38bc8"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-insert-test",
@@ -732,9 +748,19 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "f3faa41589c7adf9a27099b5837c7748f8fb9f39",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index fe3f306..273c0ee 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i && j;",
+        "+i || j;",
+        " i || j;",
+        " i || j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d9f0b3ca5a28ba110599c1fb3e50f13959552194"
+    "shas": "018d110adadddb7b94c0c87869f4ef32d9f38bc8..a6577b774ffd0e26986c4e60b951efb7b2680f5c"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-test",
@@ -1103,9 +1129,19 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "d9f0b3ca5a28ba110599c1fb3e50f13959552194",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index 273c0ee..fe3f306 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-i || j;",
+        "+i && j;",
+        " i || j;",
+        " i || j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9736ab252f67c2f14852335eee08c0096ff5231c"
+    "shas": "a6577b774ffd0e26986c4e60b951efb7b2680f5c..742092b6c51172647d7fae976b8b8a5f90842bcc"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-replacement-test",
@@ -1424,9 +1460,19 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "9736ab252f67c2f14852335eee08c0096ff5231c",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index fe3f306..7f4873c 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-i && j;",
+        "-i || j;",
+        " i || j;",
+        "+i && j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "773c0d402eeee97cb1bae0e3b92e409122ec7ca0"
+    "shas": "742092b6c51172647d7fae976b8b8a5f90842bcc..2d12e99c24f6e12742ce6c4456d2ee36b8506d95"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-test",
@@ -1641,9 +1687,17 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "773c0d402eeee97cb1bae0e3b92e409122ec7ca0",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index 7f4873c..c6921d1 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1,2 +1 @@",
+        "-i || j;",
+        " i && j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "65134b28c2f993cadb668adb4633129652739ad5"
+    "shas": "2d12e99c24f6e12742ce6c4456d2ee36b8506d95..c5a063d347caaa73b7d767f02acda08a144928c0"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-rest-test",
@@ -1737,7 +1791,14 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "65134b28c2f993cadb668adb4633129652739ad5",
+    "patch": [
+        "diff --git a/boolean-operator.js b/boolean-operator.js",
+        "index c6921d1..e69de29 100644",
+        "--- a/boolean-operator.js",
+        "+++ b/boolean-operator.js",
+        "@@ -1 +0,0 @@",
+        "-i && j;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0afa7defe7188cc37bb1b58e3f66f45151021f83"
+    "shas": "c5a063d347caaa73b7d767f02acda08a144928c0..94fca5fc215c9c7199b86ef4da0ad543ca630b92"
 }]

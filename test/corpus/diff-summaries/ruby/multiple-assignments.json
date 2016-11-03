@@ -25,9 +25,16 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "65cdd278c64ea23aacd3c8cf11e6f52864fa66ff",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index e69de29..d5c6132 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -0,0 +1 @@",
+        "+x, y, z = 10, 20, 30"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9f2f6fc575ac8807150427ba4da1f8de11e74648"
+    "shas": "ae7f80931d5929403f69e872bbbb5459015f485d..bc54ecf7a9c07f9ee31a53067180aa239bbb16ba"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "9f2f6fc575ac8807150427ba4da1f8de11e74648",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index d5c6132..ffc26fa 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1 +1,3 @@",
+        "+x, y = aVariable, 40",
+        "+x, y, z = 10, 20, 30",
+        " x, y, z = 10, 20, 30"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e6d87164c6073959e327ce3e3552bb0215c65d18"
+    "shas": "bc54ecf7a9c07f9ee31a53067180aa239bbb16ba..40d2d8c5363413c7ca00245da5220a9054c9011c"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
@@ -189,9 +205,19 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "e6d87164c6073959e327ce3e3552bb0215c65d18",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index ffc26fa..7a83199 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x, y = aVariable, 40",
+        "+x, y, z = 10, 20, 30",
+        " x, y, z = 10, 20, 30",
+        " x, y, z = 10, 20, 30"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "75c863e1f261a3fbb80129fd923b041ddf5d36f4"
+    "shas": "40d2d8c5363413c7ca00245da5220a9054c9011c..6495c6ec1bd0b7088c168f9dcd4c56a23d0c0103"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-test",
@@ -313,9 +339,19 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "75c863e1f261a3fbb80129fd923b041ddf5d36f4",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 7a83199..ffc26fa 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x, y, z = 10, 20, 30",
+        "+x, y = aVariable, 40",
+        " x, y, z = 10, 20, 30",
+        " x, y, z = 10, 20, 30"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1b8b525816da68c9b71590d195910c907ec07491"
+    "shas": "6495c6ec1bd0b7088c168f9dcd4c56a23d0c0103..cc6cc8df0bcb3cf5ce51ba23c085f1dbcf5104a0"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
@@ -374,9 +410,19 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "1b8b525816da68c9b71590d195910c907ec07491",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index ffc26fa..64eb96e 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,3 +1,2 @@",
+        "-x, y = aVariable, 40",
+        "-x, y, z = 10, 20, 30",
+        " x, y, z = 10, 20, 30",
+        "+x, y = aVariable, 40"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7b56b3f5cc93525db8296697cf4172342acf9808"
+    "shas": "cc6cc8df0bcb3cf5ce51ba23c085f1dbcf5104a0..8f7f48b7b92739891525739d7b62bd58f98378b9"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-test",
@@ -405,9 +451,17 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "7b56b3f5cc93525db8296697cf4172342acf9808",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 64eb96e..9ddb504 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,2 +1 @@",
+        "-x, y, z = 10, 20, 30",
+        " x, y = aVariable, 40"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "87e60bd80ad17dec9827433189e28c6b26e84d90"
+    "shas": "8f7f48b7b92739891525739d7b62bd58f98378b9..4c51e92f08422ff8e3851dedda68cdd32fa3e0fa"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
@@ -436,7 +490,14 @@
     "filePaths": [
         "multiple-assignments.rb"
     ],
-    "sha1": "87e60bd80ad17dec9827433189e28c6b26e84d90",
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 9ddb504..e69de29 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1 +0,0 @@",
+        "-x, y = aVariable, 40"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "99cb54a96833cce9f6add73f966884f7b735594e"
+    "shas": "4c51e92f08422ff8e3851dedda68cdd32fa3e0fa..cf8094c2727c8d78b8bde198e3e84f9aec793452"
 }]

@@ -7,9 +7,16 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "9e7143591420559db8bb6c8648077d460d371b9f",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index e69de29..7dd15c1 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -0,0 +1 @@",
+        "+# This is a comment"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f046eeeed6eff9186064ab755e813bc89b8cc39c"
+    "shas": "6b7b3f3ff94314a6d7e0047cab6161b417c272bf..a284722762b0dd952426e5dfc01ebba2d2ff1a8f"
 }
 ,{
     "testCaseDescription": "ruby-comment-replacement-insert-test",
@@ -20,9 +27,21 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "f046eeeed6eff9186064ab755e813bc89b8cc39c",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index 7dd15c1..ef7e0e6 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -1 +1,6 @@",
+        "+=begin",
+        "+This is a multiline",
+        "+comment",
+        "+=end",
+        "+# This is a comment",
+        " # This is a comment"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e15daa6b2b08a29755c53ce3c4429f249f6987e3"
+    "shas": "a284722762b0dd952426e5dfc01ebba2d2ff1a8f..2852a24714a1e635ce417d791ad750873ed08ae9"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-insert-test",
@@ -33,9 +52,22 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "e15daa6b2b08a29755c53ce3c4429f249f6987e3",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index ef7e0e6..b2a9858 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -1,6 +1,3 @@",
+        "-=begin",
+        "-This is a multiline",
+        "-comment",
+        "-=end",
+        "+# This is a comment",
+        " # This is a comment",
+        " # This is a comment"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "75a598a45ac4a97d739989a173431c38ebc6ed9f"
+    "shas": "2852a24714a1e635ce417d791ad750873ed08ae9..e4a6fcaedd49358dccd560f68cc14bf24a5d5a80"
 }
 ,{
     "testCaseDescription": "ruby-comment-replacement-test",
@@ -46,9 +78,22 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "75a598a45ac4a97d739989a173431c38ebc6ed9f",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index b2a9858..ef7e0e6 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -1,3 +1,6 @@",
+        "-# This is a comment",
+        "+=begin",
+        "+This is a multiline",
+        "+comment",
+        "+=end",
+        " # This is a comment",
+        " # This is a comment"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7bf58b87b23ef2acbed429beb982a3acf53e83f3"
+    "shas": "e4a6fcaedd49358dccd560f68cc14bf24a5d5a80..5f3f4b6c9a64b6fcd80b85c36106f9128163d930"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-replacement-test",
@@ -59,9 +104,22 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "7bf58b87b23ef2acbed429beb982a3acf53e83f3",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index ef7e0e6..787b019 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -1,6 +1,5 @@",
+        "+# This is a comment",
+        " =begin",
+        " This is a multiline",
+        " comment",
+        " =end",
+        "-# This is a comment",
+        "-# This is a comment"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e46bfe9cc1b0cb70c5fdab5ffb299add7479d6da"
+    "shas": "5f3f4b6c9a64b6fcd80b85c36106f9128163d930..30a93ec4c496f17a7adfdd5bfb918e5202437730"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-test",
@@ -72,9 +130,19 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "e46bfe9cc1b0cb70c5fdab5ffb299add7479d6da",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index 787b019..5bbcda3 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -1,4 +1,3 @@",
+        "-# This is a comment",
+        " =begin",
+        " This is a multiline",
+        " comment"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5983ba2631f2b1fc3b60b7147eb6f315fcfeb7de"
+    "shas": "30a93ec4c496f17a7adfdd5bfb918e5202437730..1b2efe12e0975594889854cda1c03e6cfeff86a9"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-rest-test",
@@ -85,7 +153,17 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "5983ba2631f2b1fc3b60b7147eb6f315fcfeb7de",
+    "patch": [
+        "diff --git a/comment.rb b/comment.rb",
+        "index 5bbcda3..e69de29 100644",
+        "--- a/comment.rb",
+        "+++ b/comment.rb",
+        "@@ -1,4 +0,0 @@",
+        "-=begin",
+        "-This is a multiline",
+        "-comment",
+        "-=end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0957bae761de5bf738359a6690f06c633b38a43d"
+    "shas": "1b2efe12e0975594889854cda1c03e6cfeff86a9..89de1fd8cc6322c451fec05b9e25888a290fb45b"
 }]

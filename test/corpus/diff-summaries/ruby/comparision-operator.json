@@ -40,9 +40,17 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "b5ca633b949a2227913a944093e291dd78724130",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index e69de29..582cb83 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -0,0 +1,2 @@",
+        "+x < y",
+        "+a > b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5c0df13b4e946060b5bb8a3f567e6266765d89ae"
+    "shas": "cba823072c13adb125530eb20fdcce1c84bb71e4..c13eedbea577eba5c66da735a8384de068e9cb12"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-replacement-insert-test",
@@ -116,9 +124,21 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "5c0df13b4e946060b5bb8a3f567e6266765d89ae",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index 582cb83..b96996d 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -1,2 +1,6 @@",
+        "+x <= y",
+        "+a >= b",
+        "+x < y",
+        "+a > b",
+        " x < y",
+        " a > b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "98b281bba1a406ad126b10a93b1f19a6ec904e3d"
+    "shas": "c13eedbea577eba5c66da735a8384de068e9cb12..1175a728e7fe039dad516edeaabf1c98d3c58bf5"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-insert-test",
@@ -129,9 +149,22 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "98b281bba1a406ad126b10a93b1f19a6ec904e3d",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index b96996d..3b7fde7 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -1,5 +1,5 @@",
+        "-x <= y",
+        "-a >= b",
+        "+x < y",
+        "+a > b",
+        " x < y",
+        " a > b",
+        " x < y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "609ac7fdd65830075d5e5020d98a1d0034003e13"
+    "shas": "1175a728e7fe039dad516edeaabf1c98d3c58bf5..fc6a867417b84dfe67655ef3134d5e6eb5569043"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-replacement-test",
@@ -142,9 +175,22 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "609ac7fdd65830075d5e5020d98a1d0034003e13",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index 3b7fde7..b96996d 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -1,5 +1,5 @@",
+        "-x < y",
+        "-a > b",
+        "+x <= y",
+        "+a >= b",
+        " x < y",
+        " a > b",
+        " x < y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4e8293b3761bd1e979438bcbfd0315930b5392a7"
+    "shas": "fc6a867417b84dfe67655ef3134d5e6eb5569043..6e33eea47b9a1409ef2b4e9ae1c69ef787013b99"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-replacement-test",
@@ -188,9 +234,23 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "4e8293b3761bd1e979438bcbfd0315930b5392a7",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index b96996d..1cfa010 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -1,6 +1,4 @@",
+        "-x <= y",
+        "-a >= b",
+        "-x < y",
+        "-a > b",
+        " x < y",
+        " a > b",
+        "+x <= y",
+        "+a >= b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d5eeac3751d6ec5815784b8f52c55a394b27e8a3"
+    "shas": "6e33eea47b9a1409ef2b4e9ae1c69ef787013b99..a1d851f74f03f480e76cef11465d083169de41a5"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-test",
@@ -234,9 +294,19 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "d5eeac3751d6ec5815784b8f52c55a394b27e8a3",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index 1cfa010..71b2892 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -1,4 +1,2 @@",
+        "-x < y",
+        "-a > b",
+        " x <= y",
+        " a >= b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "035c31d7e8d2ea156414abf017c7ddca7296334c"
+    "shas": "a1d851f74f03f480e76cef11465d083169de41a5..409a9b0991350430ff0f606dd617511bf57c3905"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-rest-test",
@@ -280,7 +350,15 @@
     "filePaths": [
         "comparision-operator.rb"
     ],
-    "sha1": "035c31d7e8d2ea156414abf017c7ddca7296334c",
+    "patch": [
+        "diff --git a/comparision-operator.rb b/comparision-operator.rb",
+        "index 71b2892..e69de29 100644",
+        "--- a/comparision-operator.rb",
+        "+++ b/comparision-operator.rb",
+        "@@ -1,2 +0,0 @@",
+        "-x <= y",
+        "-a >= b"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "85eb09d96abcd8b75415cc71358b6753031dd375"
+    "shas": "409a9b0991350430ff0f606dd617511bf57c3905..31802ff35f32594a6c786a0a16272451c84d2bbf"
 }]

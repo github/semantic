@@ -25,9 +25,18 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "637106220ab216a08eb28519ce44928d8e58e145",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index e69de29..81b916c 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -0,0 +1,3 @@",
+        "+class Foo < Super",
+        "+  def test; end",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ff07bf79b05eebef0764a429680b0eebccc58883"
+    "shas": "c6b6465d210afae65e64e64da1f92884d63ad7d9..4a7c2666650b79a751a59f1566d4bf85a6d15f5b"
 }
 ,{
     "testCaseDescription": "ruby-class-replacement-insert-test",
@@ -71,9 +80,24 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "ff07bf79b05eebef0764a429680b0eebccc58883",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index 81b916c..e67922c 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,3 +1,9 @@",
+        "+class Foo",
+        "+  def test; end",
+        "+end",
+        "+class Foo < Super",
+        "+  def test; end",
+        "+end",
+        " class Foo < Super",
+        "   def test; end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4db7f22a3d7477c156b1acd70cc15f8f88dde400"
+    "shas": "4a7c2666650b79a751a59f1566d4bf85a6d15f5b..8d2f76f7fe9816e4cc6a8dd840fe0ede6923bd1e"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-insert-test",
@@ -84,9 +108,20 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "4db7f22a3d7477c156b1acd70cc15f8f88dde400",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index e67922c..c371fd8 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,4 +1,4 @@",
+        "-class Foo",
+        "+class Foo < Super",
+        "   def test; end",
+        " end",
+        " class Foo < Super"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "318aba9031607b1d1d37df4f673bf5d49f9a73a1"
+    "shas": "8d2f76f7fe9816e4cc6a8dd840fe0ede6923bd1e..0b6610d9514245ad667de7a2117d30a38ac6c563"
 }
 ,{
     "testCaseDescription": "ruby-class-replacement-test",
@@ -97,9 +132,20 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "318aba9031607b1d1d37df4f673bf5d49f9a73a1",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index c371fd8..e67922c 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,4 +1,4 @@",
+        "-class Foo < Super",
+        "+class Foo",
+        "   def test; end",
+        " end",
+        " class Foo < Super"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "25664d8665479723ed30e0d5ce8e6712e16a72ea"
+    "shas": "0b6610d9514245ad667de7a2117d30a38ac6c563..650f2504ace9e91709433e8f4e18a168038770ad"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-replacement-test",
@@ -158,9 +204,25 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "25664d8665479723ed30e0d5ce8e6712e16a72ea",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index e67922c..818d26a 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,9 +1,6 @@",
+        "-class Foo",
+        "-  def test; end",
+        "-end",
+        " class Foo < Super",
+        "   def test; end",
+        " end",
+        "-class Foo < Super",
+        "+class Foo",
+        "   def test; end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "25184ebb3d6c360f3fa65f679cc374bee476c62a"
+    "shas": "650f2504ace9e91709433e8f4e18a168038770ad..a4eb5b62dcb95470f072ec3b4fb8c0e132e5f358"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-test",
@@ -189,9 +251,21 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "25184ebb3d6c360f3fa65f679cc374bee476c62a",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index 818d26a..bab2e9f 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,6 +1,3 @@",
+        "-class Foo < Super",
+        "-  def test; end",
+        "-end",
+        " class Foo",
+        "   def test; end",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2031c76ba3543d413bee50ae682ff914a6e697ad"
+    "shas": "a4eb5b62dcb95470f072ec3b4fb8c0e132e5f358..f0cf181a0aa6f3568b4df1fef8955373186bfe8e"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-rest-test",
@@ -220,7 +294,16 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "2031c76ba3543d413bee50ae682ff914a6e697ad",
+    "patch": [
+        "diff --git a/class.rb b/class.rb",
+        "index bab2e9f..e69de29 100644",
+        "--- a/class.rb",
+        "+++ b/class.rb",
+        "@@ -1,3 +0,0 @@",
+        "-class Foo",
+        "-  def test; end",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1b98fc53dd62922900312603c00866cd0981b695"
+    "shas": "f0cf181a0aa6f3568b4df1fef8955373186bfe8e..daa964737173b38b4dd562e5d4370fe48ccba4f6"
 }]

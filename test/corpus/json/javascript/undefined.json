@@ -74,9 +74,16 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "f6fdfae045cfc2c5c89dec2ef98091dac6a57099",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index e69de29..c2ca02c 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -0,0 +1 @@",
+        "+undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e5c3c6eb4098f0c972146d4f52c88bd0e680d2fc"
+    "shas": "61695447b9d6c99d6fbee197c961837045e9237b..4934441f9dfeeaa135562268f75a96859b0348ec"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-insert-test",
@@ -281,9 +288,18 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "e5c3c6eb4098f0c972146d4f52c88bd0e680d2fc",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index c2ca02c..a4352cc 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1 +1,3 @@",
+        "+return undefined;",
+        "+undefined;",
+        " undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "af050e55137515460c064302689707807c89a4f7"
+    "shas": "4934441f9dfeeaa135562268f75a96859b0348ec..bd30c0f337fea623e026c46dd81f07c5bd939c39"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-insert-test",
@@ -560,9 +576,19 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "af050e55137515460c064302689707807c89a4f7",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index a4352cc..52ea257 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,3 +1,3 @@",
+        "-return undefined;",
+        "+undefined;",
+        " undefined;",
+        " undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aa93ed4362103cbbf11ad268abc35f06fcc86f4a"
+    "shas": "bd30c0f337fea623e026c46dd81f07c5bd939c39..8933579c6ec5e19655165fdc6dfc67c2f56c6458"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-test",
@@ -839,9 +865,19 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "aa93ed4362103cbbf11ad268abc35f06fcc86f4a",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index 52ea257..a4352cc 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,3 +1,3 @@",
+        "-undefined;",
+        "+return undefined;",
+        " undefined;",
+        " undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2d35d4ac2c64939d0ae46b684e2b9629e9d3f832"
+    "shas": "8933579c6ec5e19655165fdc6dfc67c2f56c6458..d25d4c09aba8b5c49cadb2dccdc776a9f1fbe009"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-replacement-test",
@@ -1084,9 +1120,19 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "2d35d4ac2c64939d0ae46b684e2b9629e9d3f832",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index a4352cc..a16e747 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,3 +1,2 @@",
+        "-return undefined;",
+        "-undefined;",
+        " undefined;",
+        "+return undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8cea7b06eb430164afcc79b4b925eb59c62fb26a"
+    "shas": "d25d4c09aba8b5c49cadb2dccdc776a9f1fbe009..04a2c6b24a79d6334f7076d6593c15bf9390fc7c"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-test",
@@ -1253,9 +1299,17 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "8cea7b06eb430164afcc79b4b925eb59c62fb26a",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index a16e747..fb505bb 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1,2 +1 @@",
+        "-undefined;",
+        " return undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1f15efe69dffbaec486a0f685719d36fdfa2899e"
+    "shas": "04a2c6b24a79d6334f7076d6593c15bf9390fc7c..8b75a6f10906ce72cbcac5b8460569fc12d1d46a"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-rest-test",
@@ -1333,7 +1387,14 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "1f15efe69dffbaec486a0f685719d36fdfa2899e",
+    "patch": [
+        "diff --git a/undefined.js b/undefined.js",
+        "index fb505bb..e69de29 100644",
+        "--- a/undefined.js",
+        "+++ b/undefined.js",
+        "@@ -1 +0,0 @@",
+        "-return undefined;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20d2c012fbfa3774153c1ec275408bafeecfcca9"
+    "shas": "8b75a6f10906ce72cbcac5b8460569fc12d1d46a..e4ca78655510a1ab2e5ceade62c77bd39b3a9599"
 }]

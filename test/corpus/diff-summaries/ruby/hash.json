@@ -25,9 +25,16 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "625fb3deaae6820d70e1d8cfe393b3d0c19484ff",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index e69de29..925618f 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -0,0 +1 @@",
+        "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "772b3a5b2f946cafcde59cc408bf4fb10403220a"
+    "shas": "d9eddd177d4e2bbaf20ed13f81e033f1702c23e1..5d8570a30f2d2e15b25fc2df1bcac7c86cf32bae"
 }
 ,{
     "testCaseDescription": "ruby-hash-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "772b3a5b2f946cafcde59cc408bf4fb10403220a",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index 925618f..a0c7d41 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1 +1,3 @@",
+        "+{ key1: \"changed value\", key2: 2, key3: true }",
+        "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9236ba7f889e6adeea78ca6d2bf6a9d1484c4de5"
+    "shas": "5d8570a30f2d2e15b25fc2df1bcac7c86cf32bae..db9487694f56632d52be7ce8a1b9f33731340f7b"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-insert-test",
@@ -186,9 +202,19 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "9236ba7f889e6adeea78ca6d2bf6a9d1484c4de5",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index a0c7d41..d4ed2ec 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,3 +1,3 @@",
+        "-{ key1: \"changed value\", key2: 2, key3: true }",
+        "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fb99ecf8de7a77d6af01ac7dafd2608c9b3350c5"
+    "shas": "db9487694f56632d52be7ce8a1b9f33731340f7b..fd752d5909d1670207f363dfff4f31df24b47f37"
 }
 ,{
     "testCaseDescription": "ruby-hash-replacement-test",
@@ -301,9 +327,19 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "fb99ecf8de7a77d6af01ac7dafd2608c9b3350c5",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index d4ed2ec..a0c7d41 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,3 +1,3 @@",
+        "-{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        "+{ key1: \"changed value\", key2: 2, key3: true }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "33fe30a86061a31b6c1d366d58704ccd2dc8d9c9"
+    "shas": "fd752d5909d1670207f363dfff4f31df24b47f37..298d6e908515f98a686669476acb600769e0ceef"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-replacement-test",
@@ -362,9 +398,19 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "33fe30a86061a31b6c1d366d58704ccd2dc8d9c9",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index a0c7d41..4154b7d 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,3 +1,2 @@",
+        "-{ key1: \"changed value\", key2: 2, key3: true }",
+        "-{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        "+{ key1: \"changed value\", key2: 2, key3: true }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "91d2b531eacbc7e98bd55a9f22afc7013d4e7119"
+    "shas": "298d6e908515f98a686669476acb600769e0ceef..98f9ac052173d1e922cd23eac21a9eceb278ba80"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-test",
@@ -393,9 +439,17 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "91d2b531eacbc7e98bd55a9f22afc7013d4e7119",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index 4154b7d..4a0e8d0 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1,2 +1 @@",
+        "-{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        " { key1: \"changed value\", key2: 2, key3: true }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "28a4aaf9ef28a5a41260138f70599d2cbcb12e23"
+    "shas": "98f9ac052173d1e922cd23eac21a9eceb278ba80..a136e7c543c9c0d4a2562fa7543bd8080d991193"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-rest-test",
@@ -424,7 +478,14 @@
     "filePaths": [
         "hash.rb"
     ],
-    "sha1": "28a4aaf9ef28a5a41260138f70599d2cbcb12e23",
+    "patch": [
+        "diff --git a/hash.rb b/hash.rb",
+        "index 4a0e8d0..e69de29 100644",
+        "--- a/hash.rb",
+        "+++ b/hash.rb",
+        "@@ -1 +0,0 @@",
+        "-{ key1: \"changed value\", key2: 2, key3: true }"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0ba58b06e96f1b3ae8331ee4f06e4087a13c29f5"
+    "shas": "a136e7c543c9c0d4a2562fa7543bd8080d991193..b06f33881ef5a8d65535fc5f044cddf24ff1033a"
 }]

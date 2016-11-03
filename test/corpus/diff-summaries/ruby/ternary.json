@@ -25,9 +25,16 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "c3ffed8011708e89709328349892066714996e97",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index e69de29..698a2e2 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -0,0 +1 @@",
+        "+condition ? case1 : case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e2aa333c31548d7b47abc139eea8779a3148f2aa"
+    "shas": "6436c88397ac50ad9fd8cf92b759ac75806d2f73..2a7008cf22ec4e1a78f00e9718714ed1b4fb6902"
 }
 ,{
     "testCaseDescription": "ruby-ternary-replacement-insert-test",
@@ -68,9 +75,18 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "e2aa333c31548d7b47abc139eea8779a3148f2aa",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 698a2e2..38cd95f 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1 +1,3 @@",
+        "+if condition then case 1 else case2",
+        "+condition ? case1 : case2",
+        " condition ? case1 : case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "71869a05d963d2027782232660cbe032a43a963f"
+    "shas": "2a7008cf22ec4e1a78f00e9718714ed1b4fb6902..8270f03e9ee880ab02a580030a6033a75161f2d8"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-insert-test",
@@ -111,9 +127,19 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "71869a05d963d2027782232660cbe032a43a963f",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 38cd95f..411fded 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,3 +1,3 @@",
+        "-if condition then case 1 else case2",
+        "+condition ? case1 : case2",
+        " condition ? case1 : case2",
+        " condition ? case1 : case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "98f4f76d75b5b178b8962c8479483d404e2a5d59"
+    "shas": "8270f03e9ee880ab02a580030a6033a75161f2d8..00587528a4302fbfc5fa97f74052388e32c6efb9"
 }
 ,{
     "testCaseDescription": "ruby-ternary-replacement-test",
@@ -154,9 +180,19 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "98f4f76d75b5b178b8962c8479483d404e2a5d59",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 411fded..38cd95f 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,3 +1,3 @@",
+        "-condition ? case1 : case2",
+        "+if condition then case 1 else case2",
+        " condition ? case1 : case2",
+        " condition ? case1 : case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "369b76639eb5496421b489e95f47304b0a022d58"
+    "shas": "00587528a4302fbfc5fa97f74052388e32c6efb9..0282b16f15fb5382c393c5ade5345ded2d760226"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-replacement-test",
@@ -197,9 +233,19 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "369b76639eb5496421b489e95f47304b0a022d58",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 38cd95f..32b2056 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,3 +1,2 @@",
+        "-if condition then case 1 else case2",
+        "-condition ? case1 : case2",
+        " condition ? case1 : case2",
+        "+if condition then case 1 else case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fe539acd7240395178acb21418efe1c1ae1ffb95"
+    "shas": "0282b16f15fb5382c393c5ade5345ded2d760226..b82d7e261aeefd8745d87015c21b68b152a56a9d"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-test",
@@ -228,9 +274,17 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "fe539acd7240395178acb21418efe1c1ae1ffb95",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index 32b2056..f53e447 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1,2 +1 @@",
+        "-condition ? case1 : case2",
+        " if condition then case 1 else case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e4ee68c328041f87bcd3c08fa24eeeae9d08e173"
+    "shas": "b82d7e261aeefd8745d87015c21b68b152a56a9d..205c5b1241866e1705a0f2cc080fe3da4dd5f80a"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-rest-test",
@@ -259,7 +313,14 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "e4ee68c328041f87bcd3c08fa24eeeae9d08e173",
+    "patch": [
+        "diff --git a/ternary.rb b/ternary.rb",
+        "index f53e447..e69de29 100644",
+        "--- a/ternary.rb",
+        "+++ b/ternary.rb",
+        "@@ -1 +0,0 @@",
+        "-if condition then case 1 else case2"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1d64a73244315b920d5fe90966068c5c81009362"
+    "shas": "205c5b1241866e1705a0f2cc080fe3da4dd5f80a..0afb16ab6d08fb158b2f5029251b71719ef2406e"
 }]

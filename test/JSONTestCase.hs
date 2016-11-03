@@ -22,8 +22,8 @@ data JSONMetaSyntax = JSONMetaSyntax { syntax :: !String
 data JSONTestCase = JSONTestCase { gitDir :: !String
                                  , testCaseDescription :: !String
                                  , filePaths :: ![String]
-                                 , sha1 :: !String
-                                 , sha2 :: !String
+                                 , shas :: !String
+                                 , patch :: ![String]
                                  , expectedResult :: !ExpectedResult
                                  } deriving (Show, Generic, FromJSON)
 

@@ -25,9 +25,16 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "fc80ccb71b0c0f159f05f8232853473f7f64457e",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index e69de29..4203d4b 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -0,0 +1 @@",
+        "+true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1bc0309425daa924ae3ea043487c39b6848c5101"
+    "shas": "bc804312603351b07d0e242d9b3675d646934512..b8a5a66ee0d580e0f5be577ba65a6afe82b8acfe"
 }
 ,{
     "testCaseDescription": "javascript-true-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "1bc0309425daa924ae3ea043487c39b6848c5101",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 4203d4b..65b6323 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1 +1,3 @@",
+        "+return true;",
+        "+true;",
+        " true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4ff3fb89e3bdee3acfa7caea5d67cca2f92a7f25"
+    "shas": "b8a5a66ee0d580e0f5be577ba65a6afe82b8acfe..38f0052081cce419eb03bcd07164a3f756a4d014"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-insert-test",
@@ -117,9 +133,19 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "4ff3fb89e3bdee3acfa7caea5d67cca2f92a7f25",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 65b6323..91e1cfc 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,3 +1,3 @@",
+        "-return true;",
+        "+true;",
+        " true;",
+        " true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c750216e8276e0e09c33035db1b4f84c6b532ea3"
+    "shas": "38f0052081cce419eb03bcd07164a3f756a4d014..514cc9bcf90d8b96eb0f5109b0c84d8136f5e82a"
 }
 ,{
     "testCaseDescription": "javascript-true-replacement-test",
@@ -163,9 +189,19 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "c750216e8276e0e09c33035db1b4f84c6b532ea3",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 91e1cfc..65b6323 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,3 +1,3 @@",
+        "-true;",
+        "+return true;",
+        " true;",
+        " true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a3f9ee0d3aaa5a315031e3f9b6711995f1737c6b"
+    "shas": "514cc9bcf90d8b96eb0f5109b0c84d8136f5e82a..883bffa8136e0f6cc1fc850f8aab8f69ac48699b"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-replacement-test",
@@ -224,9 +260,19 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "a3f9ee0d3aaa5a315031e3f9b6711995f1737c6b",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 65b6323..48a44d1 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,3 +1,2 @@",
+        "-return true;",
+        "-true;",
+        " true;",
+        "+return true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e9e8b1a5a4beb5e33e607dc86b5f45aa694ddf0"
+    "shas": "883bffa8136e0f6cc1fc850f8aab8f69ac48699b..36585335908145fbf9f18eabecb60038b29552f0"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-test",
@@ -255,9 +301,17 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "8e9e8b1a5a4beb5e33e607dc86b5f45aa694ddf0",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index 48a44d1..c1c6922 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1,2 +1 @@",
+        "-true;",
+        " return true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ad3373eca4102be0a57a93239b8feec6863dfcbb"
+    "shas": "36585335908145fbf9f18eabecb60038b29552f0..9d5dc3e57ffd189e1482d577bfc73e78e900d42a"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-rest-test",
@@ -286,7 +340,14 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "ad3373eca4102be0a57a93239b8feec6863dfcbb",
+    "patch": [
+        "diff --git a/true.js b/true.js",
+        "index c1c6922..e69de29 100644",
+        "--- a/true.js",
+        "+++ b/true.js",
+        "@@ -1 +0,0 @@",
+        "-return true;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "04aded71e587d0bada2c50fd567023d9de7f477c"
+    "shas": "9d5dc3e57ffd189e1482d577bfc73e78e900d42a..a56c14e19dec2910d36460e4fca6496da46f6240"
 }]

@@ -25,9 +25,16 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "559546b09a86fffc79e8283d8f7567d491c07e90",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index e69de29..8f6ae64 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -0,0 +1 @@",
+        "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0ac57022cf74cb78426a1df060ce3ac2ff83cd71"
+    "shas": "f6dfeb42af9db740677fd60341ea39da711f7c81..f071d25d12bb0086a285449efbe5cfaeeed8e436"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "0ac57022cf74cb78426a1df060ce3ac2ff83cd71",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index 8f6ae64..b509437 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1 +1,3 @@",
+        "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5bbc894719630d0236a85728f425e98a4ef3487b"
+    "shas": "f071d25d12bb0086a285449efbe5cfaeeed8e436..ba736a07888eb4991323c035f2bf78fe1650ea56"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-insert-test",
@@ -174,9 +190,19 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "5bbc894719630d0236a85728f425e98a4ef3487b",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index b509437..c4f5c91 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,3 +1,3 @@",
+        "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        "+class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7e7e2be0141ca3710f3a774caa03f4704e9d3586"
+    "shas": "ba736a07888eb4991323c035f2bf78fe1650ea56..c99d7b8dc9cff808ef1e6010caa4573ad1694d9b"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-test",
@@ -277,9 +303,19 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "7e7e2be0141ca3710f3a774caa03f4704e9d3586",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index c4f5c91..b509437 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,3 +1,3 @@",
+        "-class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f67a4f59fd14475400023beebe947c59aea5f3ea"
+    "shas": "c99d7b8dc9cff808ef1e6010caa4573ad1694d9b..75a0caa880f62a0706ff723f555a9ec1f0c53c29"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-replacement-test",
@@ -338,9 +374,19 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "f67a4f59fd14475400023beebe947c59aea5f3ea",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index b509437..b1ef404 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,3 +1,2 @@",
+        "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }",
+        "-class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        "+class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ef1f76b5f01fce4b330b99a4ebf3b128c03b7cb1"
+    "shas": "75a0caa880f62a0706ff723f555a9ec1f0c53c29..4231a3b306d145aa37ceb879ef6f8da6221e54b8"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-test",
@@ -369,9 +415,17 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "ef1f76b5f01fce4b330b99a4ebf3b128c03b7cb1",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index b1ef404..2c17f72 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1,2 +1 @@",
+        "-class Foo { static one(a) { return a; }; two(b) { return b; } three(c) { return c; } }",
+        " class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "db58ab719fe45f004df748e0e6248d756f7ad9f3"
+    "shas": "4231a3b306d145aa37ceb879ef6f8da6221e54b8..d5627235989da4028cfcb15c4b1ee2bdc544fd31"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-rest-test",
@@ -400,7 +454,14 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "db58ab719fe45f004df748e0e6248d756f7ad9f3",
+    "patch": [
+        "diff --git a/class.js b/class.js",
+        "index 2c17f72..e69de29 100644",
+        "--- a/class.js",
+        "+++ b/class.js",
+        "@@ -1 +0,0 @@",
+        "-class Foo { static foo(a) { return a; }; bar(b) { return b; } baz(c) { return c; } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9ccab273233837d842e68ec909416aab24ff359a"
+    "shas": "d5627235989da4028cfcb15c4b1ee2bdc544fd31..654a538b26c9b4c8637e6c2e4cd497c93e690310"
 }]

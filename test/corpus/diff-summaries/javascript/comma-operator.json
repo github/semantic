@@ -40,9 +40,16 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "653a2a2b908c1963d4682a6e4b6e89f1aa17b275",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index e69de29..cff019f 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -0,0 +1 @@",
+        "+a = 1, b = 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7d8c6c9fdcb9ab7e9f40ae14efc813ae2b67e19e"
+    "shas": "ec86aaba01801d01aca70fd31403642be1e2d438..b0a5f928a8a4594bb176a56275c43ccab6e2e2a0"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-replacement-insert-test",
@@ -101,9 +108,18 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "7d8c6c9fdcb9ab7e9f40ae14efc813ae2b67e19e",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index cff019f..93ece10 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -1 +1,3 @@",
+        "+c = {d: (3, 4 + 5, 6)};",
+        "+a = 1, b = 2;",
+        " a = 1, b = 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "40847aa7f589fd835e91320d43628d16fd37ef15"
+    "shas": "b0a5f928a8a4594bb176a56275c43ccab6e2e2a0..315b46ccdb9a45c374b4ed1cc51a062d74c13a78"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-insert-test",
@@ -162,9 +178,19 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "40847aa7f589fd835e91320d43628d16fd37ef15",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index 93ece10..f738c2d 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-c = {d: (3, 4 + 5, 6)};",
+        "+a = 1, b = 2;",
+        " a = 1, b = 2;",
+        " a = 1, b = 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b244fddf952c3cadad8f104cc2ee2abbf93dafcf"
+    "shas": "315b46ccdb9a45c374b4ed1cc51a062d74c13a78..30cf69eb0cc5543fe53be82f29cd0e0371e30cd1"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-replacement-test",
@@ -223,9 +249,19 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "b244fddf952c3cadad8f104cc2ee2abbf93dafcf",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index f738c2d..93ece10 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-a = 1, b = 2;",
+        "+c = {d: (3, 4 + 5, 6)};",
+        " a = 1, b = 2;",
+        " a = 1, b = 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f40060278cf7bbaca75632570dbadc10067591bb"
+    "shas": "30cf69eb0cc5543fe53be82f29cd0e0371e30cd1..a454c132f64a253a51cbf1a1455e74fca9343c23"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-replacement-test",
@@ -299,9 +335,19 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "f40060278cf7bbaca75632570dbadc10067591bb",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index 93ece10..297e28d 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-c = {d: (3, 4 + 5, 6)};",
+        "-a = 1, b = 2;",
+        " a = 1, b = 2;",
+        "+c = {d: (3, 4 + 5, 6)};"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "67e74b7145a061c1d8f576792167aab68c6be809"
+    "shas": "a454c132f64a253a51cbf1a1455e74fca9343c23..db24ea61ad00e73c91b0a4b616f333a5eac48f29"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-test",
@@ -345,9 +391,17 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "67e74b7145a061c1d8f576792167aab68c6be809",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index 297e28d..421bc7f 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -1,2 +1 @@",
+        "-a = 1, b = 2;",
+        " c = {d: (3, 4 + 5, 6)};"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "12ce4e2077d01b8c8209ad272f1d0f715d9b0124"
+    "shas": "db24ea61ad00e73c91b0a4b616f333a5eac48f29..4ec8128c2ab11f7bf00c002d0fec6c8601b14c16"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-rest-test",
@@ -376,7 +430,14 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "12ce4e2077d01b8c8209ad272f1d0f715d9b0124",
+    "patch": [
+        "diff --git a/comma-operator.js b/comma-operator.js",
+        "index 421bc7f..e69de29 100644",
+        "--- a/comma-operator.js",
+        "+++ b/comma-operator.js",
+        "@@ -1 +0,0 @@",
+        "-c = {d: (3, 4 + 5, 6)};"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "26df3b54cd036f1ed2bff8a0ca225ad680e23432"
+    "shas": "4ec8128c2ab11f7bf00c002d0fec6c8601b14c16..0ccf8092231ebc8ac92cc60fe614f1681bc03a89"
 }]

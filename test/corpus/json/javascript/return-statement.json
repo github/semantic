@@ -74,9 +74,16 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "c26d48032e032fd0fc1650e48cee5545f6337902",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index e69de29..6315029 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -0,0 +1 @@",
+        "+return 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3eb406b4b30859658f540257356b8372bce7eba7"
+    "shas": "9fdae081cef5395f539eef79836a911574344379..a6519eaebdf537fde59ebe64592c4809e1687d84"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-insert-test",
@@ -273,9 +280,18 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "3eb406b4b30859658f540257356b8372bce7eba7",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 6315029..22dde95 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1 +1,3 @@",
+        "+return;",
+        "+return 5;",
+        " return 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "49f5fa1ef87d8690b07c563ce17f2f5cdedc4ef0"
+    "shas": "a6519eaebdf537fde59ebe64592c4809e1687d84..70590b307748041027a3074e4e8568ae9bbea413"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-insert-test",
@@ -543,9 +559,19 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "49f5fa1ef87d8690b07c563ce17f2f5cdedc4ef0",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 22dde95..522349c 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-return;",
+        "+return 5;",
+        " return 5;",
+        " return 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9ca1e345d582da4d6e8e64c0d1b5025dc601d0c4"
+    "shas": "70590b307748041027a3074e4e8568ae9bbea413..21febb1d7f52af48f7d71d6b063371ae1e7ee66c"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-test",
@@ -813,9 +839,19 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "9ca1e345d582da4d6e8e64c0d1b5025dc601d0c4",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 522349c..22dde95 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-return 5;",
+        "+return;",
+        " return 5;",
+        " return 5;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5f2948710ef315b8bf0ad73d1886d55fa4dc493c"
+    "shas": "21febb1d7f52af48f7d71d6b063371ae1e7ee66c..8b962deb58f1b589be0cdede381164f4c8b02fac"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-replacement-test",
@@ -1042,9 +1078,19 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "5f2948710ef315b8bf0ad73d1886d55fa4dc493c",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 22dde95..4d44d6a 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-return;",
+        "-return 5;",
+        " return 5;",
+        "+return;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6669db5ce9cb1d0414a4bbe0ff6811aa62147fc3"
+    "shas": "8b962deb58f1b589be0cdede381164f4c8b02fac..90bc3b8759268da9a86a1e27674f462916546ca8"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-test",
@@ -1195,9 +1241,17 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "6669db5ce9cb1d0414a4bbe0ff6811aa62147fc3",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index 4d44d6a..f312410 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1,2 +1 @@",
+        "-return 5;",
+        " return;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "86b03316284ecc5e3f92031727aded8ab596a705"
+    "shas": "90bc3b8759268da9a86a1e27674f462916546ca8..e60ebebf754719b6c7025fd60e409ca738c7dec6"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-rest-test",
@@ -1267,7 +1321,14 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "86b03316284ecc5e3f92031727aded8ab596a705",
+    "patch": [
+        "diff --git a/return-statement.js b/return-statement.js",
+        "index f312410..e69de29 100644",
+        "--- a/return-statement.js",
+        "+++ b/return-statement.js",
+        "@@ -1 +0,0 @@",
+        "-return;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7ed50d1404aa1f2b612ab1e1ec31c028d7670964"
+    "shas": "e60ebebf754719b6c7025fd60e409ca738c7dec6..3a0405bd7047ac7693031b2b8fc3060c111cc827"
 }]

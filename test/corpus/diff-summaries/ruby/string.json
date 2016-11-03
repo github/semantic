@@ -40,9 +40,17 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "1da7c8ba79becf9a9b091384779dc9bf9ab0136b",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index e69de29..8d1b50a 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -0,0 +1,2 @@",
+        "+''",
+        "+'foo with \"bar\"'"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d0bcc2781177a044bc6701ab731b9e633878e350"
+    "shas": "b8369fbac8f8f06cad0217c3a15eabeac5427777..11a11ab7004124672ec4c818e59e08ebb38c97f4"
 }
 ,{
     "testCaseDescription": "ruby-string-replacement-insert-test",
@@ -116,9 +124,21 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "d0bcc2781177a044bc6701ab731b9e633878e350",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index 8d1b50a..f1597ee 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -1,2 +1,6 @@",
+        "+\"\"",
+        "+\"bar with 'foo'\"",
+        "+''",
+        "+'foo with \"bar\"'",
+        " ''",
+        " 'foo with \"bar\"'"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3258b4998ff47a27fce961068c99cd79bf6a4242"
+    "shas": "11a11ab7004124672ec4c818e59e08ebb38c97f4..a63f53dea4f14383d50a0fe84cd6877272f380b9"
 }
 ,{
     "testCaseDescription": "ruby-string-delete-insert-test",
@@ -186,9 +206,22 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "3258b4998ff47a27fce961068c99cd79bf6a4242",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index f1597ee..6158c1a 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -1,5 +1,5 @@",
+        "-\"\"",
+        "-\"bar with 'foo'\"",
+        "+''",
+        "+'foo with \"bar\"'",
+        " ''",
+        " 'foo with \"bar\"'",
+        " ''"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c3d587eedf675d92b046d5da16471df538004878"
+    "shas": "a63f53dea4f14383d50a0fe84cd6877272f380b9..afa7ff5e18ca2247c6a7e84158257eb4351df34f"
 }
 ,{
     "testCaseDescription": "ruby-string-replacement-test",
@@ -256,9 +289,22 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "c3d587eedf675d92b046d5da16471df538004878",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index 6158c1a..f1597ee 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -1,5 +1,5 @@",
+        "-''",
+        "-'foo with \"bar\"'",
+        "+\"\"",
+        "+\"bar with 'foo'\"",
+        " ''",
+        " 'foo with \"bar\"'",
+        " ''"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5b2dca9c2599211adec25539453d649b3b0e1826"
+    "shas": "afa7ff5e18ca2247c6a7e84158257eb4351df34f..73ff58ac285589563a17c13d9de17d955a35a887"
 }
 ,{
     "testCaseDescription": "ruby-string-delete-replacement-test",
@@ -362,9 +408,23 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "5b2dca9c2599211adec25539453d649b3b0e1826",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index f1597ee..b8be05c 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -1,6 +1,4 @@",
+        "-\"\"",
+        "-\"bar with 'foo'\"",
+        "-''",
+        "-'foo with \"bar\"'",
+        " ''",
+        " 'foo with \"bar\"'",
+        "+\"\"",
+        "+\"bar with 'foo'\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "03c0576c75db435100dd6b1ba5f905e922beac8f"
+    "shas": "73ff58ac285589563a17c13d9de17d955a35a887..a312f2d3750c26c7c1dfa7f49b89a8fc4c1fe9d5"
 }
 ,{
     "testCaseDescription": "ruby-string-delete-test",
@@ -408,9 +468,19 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "03c0576c75db435100dd6b1ba5f905e922beac8f",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index b8be05c..83e4a68 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -1,4 +1,2 @@",
+        "-''",
+        "-'foo with \"bar\"'",
+        " \"\"",
+        " \"bar with 'foo'\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5d13167acb02fe329fccaaeb6ce960670c82b435"
+    "shas": "a312f2d3750c26c7c1dfa7f49b89a8fc4c1fe9d5..3421e64039af7552b08507b3cb4df99d1fa79025"
 }
 ,{
     "testCaseDescription": "ruby-string-delete-rest-test",
@@ -454,7 +524,15 @@
     "filePaths": [
         "string.rb"
     ],
-    "sha1": "5d13167acb02fe329fccaaeb6ce960670c82b435",
+    "patch": [
+        "diff --git a/string.rb b/string.rb",
+        "index 83e4a68..e69de29 100644",
+        "--- a/string.rb",
+        "+++ b/string.rb",
+        "@@ -1,2 +0,0 @@",
+        "-\"\"",
+        "-\"bar with 'foo'\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "27c8bb9ed1adb160824505aa87bcb49fd2bd0606"
+    "shas": "3421e64039af7552b08507b3cb4df99d1fa79025..25836faa95e159d9e500e475825eb259c2f575c8"
 }]

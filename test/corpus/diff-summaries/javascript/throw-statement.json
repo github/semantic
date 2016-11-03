@@ -25,9 +25,16 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "be60a15b22146780f1f1a090b8550ce29929e830",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index e69de29..e2fcb67 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -0,0 +1 @@",
+        "+throw new Error(\"uh oh\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "06ff6b48e424252bf5f7e1734af6be3939c7160a"
+    "shas": "8e3f45940f773e7849a53fefdaeb52a682a6a488..116eb17be5e023970df37ba38884c86aa4cb9dbd"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "06ff6b48e424252bf5f7e1734af6be3939c7160a",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index e2fcb67..c0020c8 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -1 +1,3 @@",
+        "+throw new Error(\"oooooops\");",
+        "+throw new Error(\"uh oh\");",
+        " throw new Error(\"uh oh\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f1b8b13e67b888546e7f539aa11f39ec0071e984"
+    "shas": "116eb17be5e023970df37ba38884c86aa4cb9dbd..e1a31ba713d3185c274f86dd4e8644740fb7429d"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "f1b8b13e67b888546e7f539aa11f39ec0071e984",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index c0020c8..4644233 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-throw new Error(\"oooooops\");",
+        "+throw new Error(\"uh oh\");",
+        " throw new Error(\"uh oh\");",
+        " throw new Error(\"uh oh\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2547a3a1d8fc60aedb2d5f017318ade862ee3e54"
+    "shas": "e1a31ba713d3185c274f86dd4e8644740fb7429d..dad40ac44ee1763621da95939261c0afc7664ec4"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "2547a3a1d8fc60aedb2d5f017318ade862ee3e54",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index 4644233..c0020c8 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-throw new Error(\"uh oh\");",
+        "+throw new Error(\"oooooops\");",
+        " throw new Error(\"uh oh\");",
+        " throw new Error(\"uh oh\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "23c866826fe1d1f041a445cd747ef16e3174122c"
+    "shas": "dad40ac44ee1763621da95939261c0afc7664ec4..6ead807809e97520b2dce628bc592bfa358dd249"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "23c866826fe1d1f041a445cd747ef16e3174122c",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index c0020c8..a1bbf3e 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-throw new Error(\"oooooops\");",
+        "-throw new Error(\"uh oh\");",
+        " throw new Error(\"uh oh\");",
+        "+throw new Error(\"oooooops\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "70db2c7584e6acae05d2d03b49860dc5db393f62"
+    "shas": "6ead807809e97520b2dce628bc592bfa358dd249..c1804715b17f4c02c529052b13f67eab4f85d127"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "70db2c7584e6acae05d2d03b49860dc5db393f62",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index a1bbf3e..cc3c531 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -1,2 +1 @@",
+        "-throw new Error(\"uh oh\");",
+        " throw new Error(\"oooooops\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b6610e26a2e5418b434ea25e1227b430961113cc"
+    "shas": "c1804715b17f4c02c529052b13f67eab4f85d127..36892466e1b20aa85270c797d4898149a5456dae"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "b6610e26a2e5418b434ea25e1227b430961113cc",
+    "patch": [
+        "diff --git a/throw-statement.js b/throw-statement.js",
+        "index cc3c531..e69de29 100644",
+        "--- a/throw-statement.js",
+        "+++ b/throw-statement.js",
+        "@@ -1 +0,0 @@",
+        "-throw new Error(\"oooooops\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b52b5d119274b849b6f3a5aa770b5677e0f1ea18"
+    "shas": "36892466e1b20aa85270c797d4898149a5456dae..a5583b5ba5ae300bddff029cb144c539a2cb48fd"
 }]

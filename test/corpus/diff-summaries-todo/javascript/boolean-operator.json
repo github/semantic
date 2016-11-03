@@ -9,9 +9,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "c57d91166c3246b8e352252024dc21de6a42f707",
+    "patch": [],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "244097ce5a74d6275f249d5159a6a14696a1eddf"
+    "shas": "c57d91166c3246b8e352252024dc21de6a42f707..244097ce5a74d6275f249d5159a6a14696a1eddf"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-test",
@@ -24,7 +24,7 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "244097ce5a74d6275f249d5159a6a14696a1eddf",
+    "patch": [],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0abfc815d9c5912259cfc25becb398a8f1444d40"
+    "shas": "244097ce5a74d6275f249d5159a6a14696a1eddf..0abfc815d9c5912259cfc25becb398a8f1444d40"
 }]

@@ -160,9 +160,16 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "90fa78ee591c70436d12d9a65e5ab236886874d6",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index e69de29..9826f7c 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -0,0 +1 @@",
+        "+try { f; } catch { g; } finally { h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3d4940b1b8a98f96b29b8a0c445506f3f04289e5"
+    "shas": "3a1f9b51fe7092afcbd5589b8987d6e91e2100a5..04e89cbdebc69c9f36d421f5d0d659f992ea0eb9"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-replacement-insert-test",
@@ -711,9 +718,18 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "3d4940b1b8a98f96b29b8a0c445506f3f04289e5",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 9826f7c..7befc1c 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1 +1,3 @@",
+        "+try { f; } catch { h; } finally { g; };",
+        "+try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8bed493bdd0364531dcdfb9737b769489e5638c2"
+    "shas": "04e89cbdebc69c9f36d421f5d0d659f992ea0eb9..477a60f5691efb5cb5a92bc21fca69d9124043cf"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-insert-test",
@@ -1506,9 +1522,19 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "8bed493bdd0364531dcdfb9737b769489e5638c2",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 7befc1c..94fed9c 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-try { f; } catch { h; } finally { g; };",
+        "+try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1821c2a8e9a1e623ad44b9dee292ecec382ad098"
+    "shas": "477a60f5691efb5cb5a92bc21fca69d9124043cf..b3caa1e2ca9c36a64f26eb1bcb13ae0313670c8b"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-replacement-test",
@@ -2301,9 +2327,19 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "1821c2a8e9a1e623ad44b9dee292ecec382ad098",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 94fed9c..7befc1c 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-try { f; } catch { g; } finally { h; };",
+        "+try { f; } catch { h; } finally { g; };",
+        " try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0bc2116f248643695f7950dc86ec8bb0692b58ab"
+    "shas": "b3caa1e2ca9c36a64f26eb1bcb13ae0313670c8b..2148f052267ba61fe0924e6eb49b33e0767715c9"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-replacement-test",
@@ -2976,9 +3012,19 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "0bc2116f248643695f7950dc86ec8bb0692b58ab",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 7befc1c..8ab70e0 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-try { f; } catch { h; } finally { g; };",
+        "-try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { g; } finally { h; };",
+        "+try { f; } catch { h; } finally { g; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e86c0f496bd69d480fa359a97be75f8c2af38c7e"
+    "shas": "2148f052267ba61fe0924e6eb49b33e0767715c9..d45069cac6de6cc64641b935485492fd1b8ddebd"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-test",
@@ -3403,9 +3449,17 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "e86c0f496bd69d480fa359a97be75f8c2af38c7e",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 8ab70e0..024f88a 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1,2 +1 @@",
+        "-try { f; } catch { g; } finally { h; };",
+        " try { f; } catch { h; } finally { g; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "34d6068089dd6f07368cde629157cf775f081ef1"
+    "shas": "d45069cac6de6cc64641b935485492fd1b8ddebd..b5c850a8cdd8a0342c396c81e695099ab61ef4e0"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-rest-test",
@@ -3569,7 +3623,14 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "34d6068089dd6f07368cde629157cf775f081ef1",
+    "patch": [
+        "diff --git a/try-statement.js b/try-statement.js",
+        "index 024f88a..e69de29 100644",
+        "--- a/try-statement.js",
+        "+++ b/try-statement.js",
+        "@@ -1 +0,0 @@",
+        "-try { f; } catch { h; } finally { g; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "432b804f2c2742a1c3e16957aea653610dc8daeb"
+    "shas": "b5c850a8cdd8a0342c396c81e695099ab61ef4e0..38a4e343f701a84082bcd768e0389e8f827f85af"
 }]

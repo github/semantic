@@ -25,9 +25,22 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "03b2db1cb47a50501b36faf7fc35ebd3347c0a0a",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index e69de29..c4c729f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -0,0 +1,7 @@",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "06f67f854a8c5278a30c80ea8daab16114f0705d"
+    "shas": "6682c19351cfd7077bdb5a7dc6c978bd3b3d3346..ee62612da55444599799a08f4b987a8264f69780"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-insert-test",
@@ -86,9 +99,29 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "06f67f854a8c5278a30c80ea8daab16114f0705d",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index c4c729f..326833f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,3 +1,14 @@",
+        "+if x",
+        "+end",
+        "+if y then",
+        "+end",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        "+end",
+        " if foo",
+        "   bar",
+        " elsif quux"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c2e0eaba62e5fb53f9dd334f0e21b52064b27c6e"
+    "shas": "ee62612da55444599799a08f4b987a8264f69780..4e59ad7bd02cb86d8fd088473cc47e1bfec3eec8"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-insert-test",
@@ -216,9 +249,27 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "c2e0eaba62e5fb53f9dd334f0e21b52064b27c6e",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 326833f..2cbbfda 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,6 +1,9 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        " end",
+        " if foo",
+        "   bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "321cfe0b9283c0b1f35c175e8259043b7f3fbc21"
+    "shas": "4e59ad7bd02cb86d8fd088473cc47e1bfec3eec8..63ab3ee631264cba77129593f4c4e23231704714"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-test",
@@ -346,9 +397,27 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "321cfe0b9283c0b1f35c175e8259043b7f3fbc21",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 2cbbfda..326833f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,9 +1,6 @@",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "+if x",
+        "+end",
+        "+if y then",
+        " end",
+        " if foo",
+        "   bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2eadf498c21757333d25f7c003b41afbe0579757"
+    "shas": "63ab3ee631264cba77129593f4c4e23231704714..7409555c2f77c08b187eb415f7fd9cd0a5f51a60"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-replacement-test",
@@ -377,9 +446,36 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "2eadf498c21757333d25f7c003b41afbe0579757",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 326833f..2927cc0 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,7 +1,3 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "-end",
+        " if foo",
+        "   bar",
+        " elsif quux",
+        "@@ -9,10 +5,7 @@ elsif quux",
+        " else",
+        "   bat",
+        " end",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "+if x",
+        "+end",
+        "+if y then",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "350fc0e2ea2916667a35b82f86f52cdcc479ff18"
+    "shas": "7409555c2f77c08b187eb415f7fd9cd0a5f51a60..7e990bc8b6f9fa0e1494a5e125d7fbf3590d7f98"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-test",
@@ -408,9 +504,25 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "350fc0e2ea2916667a35b82f86f52cdcc479ff18",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 2927cc0..5bfb167 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,10 +1,3 @@",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "-end",
+        " if x",
+        " end",
+        " if y then"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0a4501920cccb75d37d857ed92b235778d943997"
+    "shas": "7e990bc8b6f9fa0e1494a5e125d7fbf3590d7f98..8869c43fdb63d64699a97f25e8f0f5fb8c4cf669"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-rest-test",
@@ -454,7 +566,17 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "0a4501920cccb75d37d857ed92b235778d943997",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 5bfb167..e69de29 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,4 +0,0 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "482d92220765ab9cc71c4a13b264d98554a987b2"
+    "shas": "8869c43fdb63d64699a97f25e8f0f5fb8c4cf669..7c1f947c182cfe31103c45d2a28ea7497bf717e5"
 }]
