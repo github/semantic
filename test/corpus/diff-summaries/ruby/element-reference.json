@@ -55,9 +55,9 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "b22ab90f31f999ae10698ac13fb7826d9c012afd",
+    "sha1": "6bef099d2af7b41f171358e66662163cdf0bc96e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8faa1072f000860b6f9134f201ee67bdf25fb175"
+    "sha2": "8bc26414118839cc62822f791546a858daf7463d"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-replacement-insert-test",
@@ -146,9 +146,9 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "8faa1072f000860b6f9134f201ee67bdf25fb175",
+    "sha1": "8bc26414118839cc62822f791546a858daf7463d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1bf14bd0d1532dc8c6d9605c435d4dfa20e270a9"
+    "sha2": "5bf31b94df885fc6aeef3d941a276275a1b54539"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-insert-test",
@@ -207,7 +207,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the subscript access"
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the foo[:bar] subscript access"
                 },
                 {
                     "span": {
@@ -234,7 +234,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ':\"c\"' symbol with the ':bar' symbol in the subscript access"
+                    "summary": "Replaced the ':\"c\"' symbol with the ':bar' symbol in the foo[:bar] subscript access"
                 },
                 {
                     "span": {
@@ -258,9 +258,9 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "1bf14bd0d1532dc8c6d9605c435d4dfa20e270a9",
+    "sha1": "5bf31b94df885fc6aeef3d941a276275a1b54539",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "cc059ac892929e51191251d0f3e2252968d65314"
+    "sha2": "2772d28a1314eea9589d8248bfaacaac641d78fd"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-replacement-test",
@@ -319,7 +319,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the subscript access"
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the x[:\"c\"] subscript access"
                 },
                 {
                     "span": {
@@ -346,7 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ':bar' symbol with the ':\"c\"' symbol in the subscript access"
+                    "summary": "Replaced the ':bar' symbol with the ':\"c\"' symbol in the x[:\"c\"] subscript access"
                 },
                 {
                     "span": {
@@ -370,9 +370,9 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "cc059ac892929e51191251d0f3e2252968d65314",
+    "sha1": "2772d28a1314eea9589d8248bfaacaac641d78fd",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "27d2733604b6d27e2f31de7267d31917451ecc53"
+    "sha2": "6bd4d2e07d73b6bf4d52cff5ec3990c18e04da38"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-replacement-test",
@@ -491,9 +491,9 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "27d2733604b6d27e2f31de7267d31917451ecc53",
+    "sha1": "6bd4d2e07d73b6bf4d52cff5ec3990c18e04da38",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "868c4831dd01c807b763cea902b90a80a92c0a52"
+    "sha2": "69629c98667b474becb7b596dedd4133cd703449"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-test",
@@ -552,9 +552,9 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "868c4831dd01c807b763cea902b90a80a92c0a52",
+    "sha1": "69629c98667b474becb7b596dedd4133cd703449",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "90e6a62b62a28a4a454b164384143756f66e1662"
+    "sha2": "65dc4b08527a43bdf462865885355973c8154460"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-rest-test",
@@ -598,7 +598,7 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "90e6a62b62a28a4a454b164384143756f66e1662",
+    "sha1": "65dc4b08527a43bdf462865885355973c8154460",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ce1c0def9460d28b4eaef38a52d16af8d0d78a7a"
+    "sha2": "0afd2cfcf489061cc131d9970716bb04bb5cb203"
 }]
