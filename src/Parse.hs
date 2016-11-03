@@ -14,15 +14,13 @@ import Language
 import Language.Markdown
 import Parser
 import Prologue
-import Range
 import Source
-import SourceSpan
 import Syntax
 import System.FilePath
 import Term
-import Term.Instances
 import TreeSitter
 import Text.Parser.TreeSitter.Language
+import Renderer.JSON
 
 run :: Arguments -> IO ()
 run args@Arguments{..} = do
