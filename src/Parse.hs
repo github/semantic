@@ -23,7 +23,7 @@ import Text.Parser.TreeSitter.Language
 import Renderer.JSON()
 
 run :: Arguments -> IO ()
-run args@Arguments{..} = do
+run Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
 
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
