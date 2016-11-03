@@ -3,21 +3,15 @@ module Diffing where
 
 import Prologue hiding (fst, snd)
 import Category
-import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Record
 import qualified Data.Text.IO as TextIO
-import qualified Data.Text.ICU.Detect as Detect
-import qualified Data.Text.ICU.Convert as Convert
 import Data.These
 import Diff
 import Info
 import Interpreter
-import Language
-import Language.Markdown
-import Parse
-import Parser
 import Patch
+import Parser
 import Renderer
 import Renderer.JSON
 import Renderer.Patch
@@ -30,9 +24,6 @@ import System.FilePath
 import qualified System.IO as IO
 import System.Environment (lookupEnv)
 import Term
-import TreeSitter
-import Text.Parser.TreeSitter.Language
-import qualified Data.Text as T
 import Data.Aeson (ToJSON, toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
