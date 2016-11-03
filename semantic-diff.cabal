@@ -35,6 +35,7 @@ library
                      , Language.JavaScript
                      , Language.Markdown
                      , Language.Ruby
+                     , Parse
                      , Parser
                      , Patch
                      , Patch.Arbitrary
