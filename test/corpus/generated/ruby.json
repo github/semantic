@@ -200,24 +200,16 @@
         "replacement": "begin\n  foo()\nelse\n  bar()\nend"
       },
       {
-        "syntax": "if-elsif",
-        "insert": "if bar\n  foo()\nend",
-        "replacement": "if bar\n  foo()\nelsif baz\n  qoz()\nend"
-      },
-      {
+        "template": "if bar\n  foo()\n{0}end",
         "syntax": "elsif",
-        "insert": "if bar\n  foo()\nelsif baz\nend",
-        "replacement": "if bar\n  foo()\nelsif baz\n  qoz()\nend"
+        "insert": "elsif baz\n",
+        "replacement": "elsif baz\n  qoz()\n"
       },
       {
-        "syntax": "begin-ensure",
-        "insert": "begin\n  foo\nend",
-        "replacement": "begin\n  foo\nensure\n  bar\nend"
-      },
-      {
+        "template": "begin\n  foo\n{0}end",
         "syntax": "ensure",
-        "insert": "begin\n  foo\nensure\nend",
-        "replacement": "begin\n  foo\nensure\n  bar\nend"
+        "insert": "ensure\n",
+        "replacement": "ensure\n  bar\n"
       },
       {
         "syntax": "begin-rescue",

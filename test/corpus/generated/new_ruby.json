@@ -5,9 +5,10 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "syntax": "rescue-modifier2",
-        "insert": "foo rescue nil",
-        "replacement": "bar rescue nil"
+        "template": "if bar\n  foo()\n{0}end",
+        "syntax": "elsif",
+        "insert": "elsif baz\n",
+        "replacement": "elsif baz\n  qoz()\n"
       }
     ]
   }

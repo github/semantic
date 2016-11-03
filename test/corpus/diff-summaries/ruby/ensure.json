@@ -1,4 +1,35 @@
 [{
+    "testCaseDescription": "ruby-ensure-setup-test",
+    "expectedResult": {
+        "changes": {
+            "ensure.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ensure.rb"
+    ],
+    "sha1": "07e6140d0f1859cdf2c6c81605638077b0af60da",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a71566e1231c8a9393df823862030546ff0dd48b"
+}
+,{
     "testCaseDescription": "ruby-ensure-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,16 +38,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                3,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                3,
+                                7
                             ]
                         }
                     },
-                    "summary": "Added a begin statement"
+                    "summary": "Added an ensure block in a begin statement"
                 }
             ]
         },
@@ -25,86 +56,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "eb3e192264281bd85982434a84d3936e776a4cb2",
+    "sha1": "a71566e1231c8a9393df823862030546ff0dd48b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1d0f58a4006ba171d29cbdf9fc833edcd9ee3668"
-}
-,{
-    "testCaseDescription": "ruby-ensure-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "ensure.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added a begin statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added a begin statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "ensure.rb"
-    ],
-    "sha1": "1d0f58a4006ba171d29cbdf9fc833edcd9ee3668",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "869b8019aede969ec6757b1ed89babcab2210ef9"
-}
-,{
-    "testCaseDescription": "ruby-ensure-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "ensure.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier in an ensure block"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "ensure.rb"
-    ],
-    "sha1": "869b8019aede969ec6757b1ed89babcab2210ef9",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a820cfd99b963215ee8fc7dbf2d3db2159929d33"
+    "sha2": "555959914f2014aff3ad8ed6e1723bc280068467"
 }
 ,{
     "testCaseDescription": "ruby-ensure-replacement-test",
@@ -133,9 +87,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "a820cfd99b963215ee8fc7dbf2d3db2159929d33",
+    "sha1": "555959914f2014aff3ad8ed6e1723bc280068467",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d992c120c1b21200356cc55868dadeec4eee7e8b"
+    "sha2": "4bbf9dec42ba7b47ed4fad678c865afc0f04afd6"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-replacement-test",
@@ -146,77 +100,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted a begin statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted a begin statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added a begin statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "ensure.rb"
-    ],
-    "sha1": "d992c120c1b21200356cc55868dadeec4eee7e8b",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d1a7e2778ce1960232822a312824df731c34e54d"
-}
-,{
-    "testCaseDescription": "ruby-ensure-delete-test",
-    "expectedResult": {
-        "changes": {
-            "ensure.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
+                                4,
+                                3
                             ],
                             "end": [
                                 4,
-                                4
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted a begin statement"
+                    "summary": "Deleted the 'bar' identifier in an ensure block"
                 }
             ]
         },
@@ -225,12 +118,43 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "d1a7e2778ce1960232822a312824df731c34e54d",
+    "sha1": "4bbf9dec42ba7b47ed4fad678c865afc0f04afd6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e234e9fb239ccdb8f70e2d815c077713a8f9e798"
+    "sha2": "c7ebe35f742d9f193e8621fb93e4a8f9f9af5e05"
 }
 ,{
-    "testCaseDescription": "ruby-ensure-delete-rest-test",
+    "testCaseDescription": "ruby-ensure-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ensure.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an ensure block in a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ensure.rb"
+    ],
+    "sha1": "c7ebe35f742d9f193e8621fb93e4a8f9f9af5e05",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f898d7986546a2dc6be955acd083ebfb7d506bfb"
+}
+,{
+    "testCaseDescription": "ruby-ensure-teardown-test",
     "expectedResult": {
         "changes": {
             "ensure.rb": [
@@ -242,7 +166,7 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 4
                             ]
                         }
@@ -256,7 +180,7 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "e234e9fb239ccdb8f70e2d815c077713a8f9e798",
+    "sha1": "f898d7986546a2dc6be955acd083ebfb7d506bfb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e8bcd0735789378b5732b7b1185c713f8cd29765"
+    "sha2": "83fca8ebbbdbf9494197148765e4f21bd2da46f0"
 }]
