@@ -57,7 +57,7 @@ styleName category = "category-" <> case category of
   TemplateString -> "template_string"
   Regex -> "regex"
   Identifier -> "identifier"
-  Params -> "parameters"
+  C.Params -> "parameters"
   ExpressionStatements -> "expression_statements"
   C.MathAssignment -> "math_assignment"
   C.SubscriptAccess -> "subscript_access"

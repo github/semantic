@@ -1,0 +1,346 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "2b8a209b5182b90d44688005575420851d868f62",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "152400cb111d1381378c9aa80fe7441fdc0b84d2"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "152400cb111d1381378c9aa80fe7441fdc0b84d2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fbb8c869988afa65b0d233d3ea7b9298ed422fa3"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the foo method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier in the foo method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' identifier in the foo method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "fbb8c869988afa65b0d233d3ea7b9298ed422fa3",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fbcfd55e62585d839a93fefcfe4911907e5753fb"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the bar method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier in the bar method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' identifier in the bar method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "fbcfd55e62585d839a93fefcfe4911907e5753fb",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "80b67427ee52635b3f00f9d329e2f8dd36821c8c"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "80b67427ee52635b3f00f9d329e2f8dd36821c8c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3de5e0f1d49ad36843ca4d89e1b54b1077c3c6ef"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "3de5e0f1d49ad36843ca4d89e1b54b1077c3c6ef",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "71bdd986420b21efd04056017ac0f06eb539a699"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration.rb"
+    ],
+    "sha1": "71bdd986420b21efd04056017ac0f06eb539a699",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "25348d220869101b20b073b5f39a60076612326b"
+}]

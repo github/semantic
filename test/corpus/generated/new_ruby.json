@@ -1,0 +1,15 @@
+[
+  {
+    "language": "ruby",
+    "fileExt": ".rb",
+    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
+    "syntaxes": [
+      {
+        "syntax": "method-declaration-params",
+        "template": "def foo{0}\nend",
+        "insert": "(a)",
+        "replacement": "(a, b, c)"
+      }
+    ]
+  }
+]

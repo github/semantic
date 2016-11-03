@@ -228,7 +228,7 @@ toTermName source term = case unwrap term of
   S.Try expr _ _ -> termNameFromSource expr
   S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
-  S.Method identifier _ _ -> toTermName' identifier
+  S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
@@ -249,6 +249,7 @@ toTermName source term = case unwrap term of
     _ -> ""
   S.RescueModifier _ rhs -> termNameFromSource rhs
   S.LastException expr -> termNameFromSource expr
+  S.Params args -> mconcat $ toTermName' <$> args
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -355,7 +356,7 @@ instance HasCategory Category where
     NumberLiteral -> "number"
     Other s -> s
     C.Pair -> "pair"
-    Params -> "params"
+    C.Params -> "params"
     Program -> "top level"
     Regex -> "regex"
     StringLiteral -> "string"

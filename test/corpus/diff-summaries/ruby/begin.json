@@ -1,0 +1,150 @@
+[{
+    "testCaseDescription": "ruby-begin-setup-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "96b7131c6fa55f1ebaa280af12a41a99741fd54b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "030c90377373b9b48cc12118c676fa8a83b3e2b7"
+}
+,{
+    "testCaseDescription": "ruby-begin-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "030c90377373b9b48cc12118c676fa8a83b3e2b7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ef1e4587d09eb124f6e32e40b1403d5055b62dd2"
+}
+,{
+    "testCaseDescription": "ruby-begin-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'puts('hi')' function call in the foo method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "ef1e4587d09eb124f6e32e40b1403d5055b62dd2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ed584aace513a8f89e799c0b90da108e3261e28c"
+}
+,{
+    "testCaseDescription": "ruby-begin-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'puts('hi')' function call in the foo method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "ed584aace513a8f89e799c0b90da108e3261e28c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ad0da4d00535256004bb73da0111e84c828a58d6"
+}
+,{
+    "testCaseDescription": "ruby-begin-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "ad0da4d00535256004bb73da0111e84c828a58d6",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "214074e2e71e4f70e0357eb7eb371a7f7f8be320"
+}
+,{
+    "testCaseDescription": "ruby-begin-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "sha1": "214074e2e71e4f70e0357eb7eb371a7f7f8be320",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "dc248ad29a694f47fbba18a5b1addde1e2f9de7a"
+}]

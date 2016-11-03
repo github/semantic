@@ -1,0 +1,216 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-params-setup-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "sha1": "889c05df9a650c94dd7949b8f72390180ccb0235",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8f592d5202cdb294f41d177b22ae57cda75f5fb2"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier in the foo(a) method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "sha1": "8f592d5202cdb294f41d177b22ae57cda75f5fb2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8e6c85a5cc3b1b45d9c6f807d76202e0b789abb4"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the foo(a, b, c) method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier in the foo(a, b, c) method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "sha1": "8e6c85a5cc3b1b45d9c6f807d76202e0b789abb4",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e01ce7a23ef50f94b90c1326beaa2609a5ebadf0"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the foo(a) method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier in the foo(a) method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "sha1": "e01ce7a23ef50f94b90c1326beaa2609a5ebadf0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "1be244f66a5e4a57e18cdc6cb59b12149011b680"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier in the foo() method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "sha1": "1be244f66a5e4a57e18cdc6cb59b12149011b680",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ea9d6ce956ce8aef4ec177b17069183fcbcf426f"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "sha1": "ea9d6ce956ce8aef4ec177b17069183fcbcf426f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d8cf8ed3178a413a5273cc21f3e29a671546ff84"
+}]

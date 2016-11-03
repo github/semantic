@@ -92,6 +92,8 @@ data Syntax a f
   | RescueModifier f f
   -- | The last exception captured in a rescue block to a local variable (e.g. in Ruby rescue => x).
   | LastException f
+  -- | Parameters in a method/function definition
+  | Params [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

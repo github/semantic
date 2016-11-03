@@ -95,6 +95,11 @@
         "replacement": "if condition then case 1 else case2"
       },
       {
+        "syntax": "method-declaration",
+        "insert": "def foo\nend",
+        "replacement": "def bar(a)\n  baz\nend"
+      },
+      {
         "syntax": "method-invocation",
         "insert": "print\nfoo.bar\nbar",
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)"
@@ -183,6 +188,12 @@
         "syntax": "element-reference",
         "insert": "foo[bar]\nfoo[:bar]\nfoo[bar] = 1",
         "replacement": "x[\"b\"]\nx[:\"c\"]"
+      },
+      {
+        "syntax": "begin",
+        "template": "def foo\n{0}end",
+        "insert": "begin\nend\n",
+        "replacement": "begin\n  puts 'hi'\nend\n"
       },
       {
         "syntax": "else",
