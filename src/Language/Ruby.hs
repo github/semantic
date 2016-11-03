@@ -72,7 +72,6 @@ termConstructor source sourceSpan name range children
     ("rescue_block", _) -> case runCofree <$> children of
       (args@(_ :< S.Args _) : e@(_ :< S.LastException _) : rest) -> S.Rescue (Just (cofree args)) (Just (cofree e)) (cofree <$> rest)
       (args@(_ :< S.Args _) : rest) -> S.Rescue (Just (cofree args)) Nothing (cofree <$> rest)
-      -- (args:rest) -> S.Rescue (Just (cofree args)) Nothing (cofree <$> rest)
       _ -> S.Rescue Nothing Nothing children
     ("return_statement", _ ) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
