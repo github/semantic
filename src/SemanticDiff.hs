@@ -29,7 +29,12 @@ import Development.GitRev
 main :: IO ()
 main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
-  case diffMode of
+  case runMode of
+    Diff -> runDiff args
+    Parse -> Parse.run args
+
+runDiff :: Arguments -> IO ()
+runDiff args@Arguments{..} = case diffMode of
     PathDiff paths -> diffPaths args paths
     CommitDiff -> diffCommits args
 
