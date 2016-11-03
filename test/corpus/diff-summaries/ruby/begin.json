@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' method"
+                    "summary": "Added the 'foo()' method"
                 }
             ]
         },
@@ -25,22 +25,40 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "96b7131c6fa55f1ebaa280af12a41a99741fd54b",
+    "sha1": "03c9f263611a1073e5d99cfe3750c34bfd34ca72",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "030c90377373b9b48cc12118c676fa8a83b3e2b7"
+    "sha2": "71c803a5fcf8ba2ae10f24d37aa2ee026dbd74c6"
 }
 ,{
     "testCaseDescription": "ruby-begin-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement in the foo() method"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "030c90377373b9b48cc12118c676fa8a83b3e2b7",
+    "sha1": "71c803a5fcf8ba2ae10f24d37aa2ee026dbd74c6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ef1e4587d09eb124f6e32e40b1403d5055b62dd2"
+    "sha2": "03ad6520b0ee07f99a2462a3352de193158072a2"
 }
 ,{
     "testCaseDescription": "ruby-begin-replacement-test",
@@ -60,7 +78,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'puts('hi')' function call in the foo method"
+                    "summary": "Added the 'puts('hi')' function call in a begin statement of the 'foo()' method"
                 }
             ]
         },
@@ -69,9 +87,9 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "ef1e4587d09eb124f6e32e40b1403d5055b62dd2",
+    "sha1": "03ad6520b0ee07f99a2462a3352de193158072a2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ed584aace513a8f89e799c0b90da108e3261e28c"
+    "sha2": "3dbbe3b3a1688734d517256a99ebd6e20ce1afd1"
 }
 ,{
     "testCaseDescription": "ruby-begin-delete-replacement-test",
@@ -91,7 +109,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'puts('hi')' function call in the foo method"
+                    "summary": "Deleted the 'puts('hi')' function call in a begin statement of the 'foo()' method"
                 }
             ]
         },
@@ -100,22 +118,40 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "ed584aace513a8f89e799c0b90da108e3261e28c",
+    "sha1": "3dbbe3b3a1688734d517256a99ebd6e20ce1afd1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ad0da4d00535256004bb73da0111e84c828a58d6"
+    "sha2": "00dd270fd0b0c958bc2d00860c2eae8128ad14c7"
 }
 ,{
     "testCaseDescription": "ruby-begin-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement in the foo() method"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "ad0da4d00535256004bb73da0111e84c828a58d6",
+    "sha1": "00dd270fd0b0c958bc2d00860c2eae8128ad14c7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "214074e2e71e4f70e0357eb7eb371a7f7f8be320"
+    "sha2": "f15dcec33c1402a158c0f63486d7c2dd77adc11d"
 }
 ,{
     "testCaseDescription": "ruby-begin-teardown-test",
@@ -135,7 +171,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' method"
+                    "summary": "Deleted the 'foo()' method"
                 }
             ]
         },
@@ -144,7 +180,7 @@
     "filePaths": [
         "begin.rb"
     ],
-    "sha1": "214074e2e71e4f70e0357eb7eb371a7f7f8be320",
+    "sha1": "f15dcec33c1402a158c0f63486d7c2dd77adc11d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dc248ad29a694f47fbba18a5b1addde1e2f9de7a"
+    "sha2": "d17161b34383c7680aadb5b411bc13814e53148d"
 }]

@@ -25,9 +25,9 @@
     "filePaths": [
         "method-declaration-params.rb"
     ],
-    "sha1": "889c05df9a650c94dd7949b8f72390180ccb0235",
+    "sha1": "766401b52ec407563772d729264ef9f2ba4844eb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8f592d5202cdb294f41d177b22ae57cda75f5fb2"
+    "sha2": "304b79bbc3d5a8b3f7b7c6715088b606de26067f"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-insert-test",
@@ -56,9 +56,9 @@
     "filePaths": [
         "method-declaration-params.rb"
     ],
-    "sha1": "8f592d5202cdb294f41d177b22ae57cda75f5fb2",
+    "sha1": "304b79bbc3d5a8b3f7b7c6715088b606de26067f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8e6c85a5cc3b1b45d9c6f807d76202e0b789abb4"
+    "sha2": "49751a5d957c9c8ea80288d2b61f3c51c02bfcc4"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-replacement-test",
@@ -102,9 +102,9 @@
     "filePaths": [
         "method-declaration-params.rb"
     ],
-    "sha1": "8e6c85a5cc3b1b45d9c6f807d76202e0b789abb4",
+    "sha1": "49751a5d957c9c8ea80288d2b61f3c51c02bfcc4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e01ce7a23ef50f94b90c1326beaa2609a5ebadf0"
+    "sha2": "fa12a30f536169727e0f9745d184ce7bf39d45c6"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
@@ -148,9 +148,9 @@
     "filePaths": [
         "method-declaration-params.rb"
     ],
-    "sha1": "e01ce7a23ef50f94b90c1326beaa2609a5ebadf0",
+    "sha1": "fa12a30f536169727e0f9745d184ce7bf39d45c6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1be244f66a5e4a57e18cdc6cb59b12149011b680"
+    "sha2": "deee291907e301199dbdfdeee0549de0158f446c"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
@@ -179,9 +179,9 @@
     "filePaths": [
         "method-declaration-params.rb"
     ],
-    "sha1": "1be244f66a5e4a57e18cdc6cb59b12149011b680",
+    "sha1": "deee291907e301199dbdfdeee0549de0158f446c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ea9d6ce956ce8aef4ec177b17069183fcbcf426f"
+    "sha2": "836bd0055be09693b470ab37e66cbc6506d5282b"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-teardown-test",
@@ -210,7 +210,7 @@
     "filePaths": [
         "method-declaration-params.rb"
     ],
-    "sha1": "ea9d6ce956ce8aef4ec177b17069183fcbcf426f",
+    "sha1": "836bd0055be09693b470ab37e66cbc6506d5282b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d8cf8ed3178a413a5273cc21f3e29a671546ff84"
+    "sha2": "e5721328087e5be744c5b668e305fc99890b37e9"
 }]

@@ -25,9 +25,9 @@
     "filePaths": [
         "rescue.rb"
     ],
-    "sha1": "96b198057dd2d93412c9bc9cba5b76939a345329",
+    "sha1": "b5bc784487b6cdf785d63aa3a7ecf97e75882c99",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6e3f9905304cfe8c1c4df7a0e366c08002ea2c10"
+    "sha2": "82e90ce3498e87c2d854475d5c1c1b21cd191618"
 }
 ,{
     "testCaseDescription": "ruby-rescue-insert-test",
@@ -56,9 +56,9 @@
     "filePaths": [
         "rescue.rb"
     ],
-    "sha1": "6e3f9905304cfe8c1c4df7a0e366c08002ea2c10",
+    "sha1": "82e90ce3498e87c2d854475d5c1c1b21cd191618",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dc632b49848a2e2b3b17f892985c0c2e3e649a0f"
+    "sha2": "03f78525a02c1b7bb7797309ddce0ba3b1662ea9"
 }
 ,{
     "testCaseDescription": "ruby-rescue-replacement-test",
@@ -87,9 +87,9 @@
     "filePaths": [
         "rescue.rb"
     ],
-    "sha1": "dc632b49848a2e2b3b17f892985c0c2e3e649a0f",
+    "sha1": "03f78525a02c1b7bb7797309ddce0ba3b1662ea9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ebf19536e8ca621c5c28bd4e8f1ff1ada05a9701"
+    "sha2": "43810879bd8d4998a4dc2f583443caf903c87298"
 }
 ,{
     "testCaseDescription": "ruby-rescue-delete-replacement-test",
@@ -118,9 +118,9 @@
     "filePaths": [
         "rescue.rb"
     ],
-    "sha1": "ebf19536e8ca621c5c28bd4e8f1ff1ada05a9701",
+    "sha1": "43810879bd8d4998a4dc2f583443caf903c87298",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e75efcb699aa96ae619519b4b8678b33cc5eb5a4"
+    "sha2": "a5a67780e74729a1dfdd2b0c74505fcad8a32b81"
 }
 ,{
     "testCaseDescription": "ruby-rescue-delete-insert-test",
@@ -149,9 +149,9 @@
     "filePaths": [
         "rescue.rb"
     ],
-    "sha1": "e75efcb699aa96ae619519b4b8678b33cc5eb5a4",
+    "sha1": "a5a67780e74729a1dfdd2b0c74505fcad8a32b81",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2aa4b2a6c5cf75817c062542ba314209cd8826ac"
+    "sha2": "e4ea804331b999a3cf5bf690c604194ff538ddc5"
 }
 ,{
     "testCaseDescription": "ruby-rescue-teardown-test",
@@ -180,7 +180,7 @@
     "filePaths": [
         "rescue.rb"
     ],
-    "sha1": "2aa4b2a6c5cf75817c062542ba314209cd8826ac",
+    "sha1": "e4ea804331b999a3cf5bf690c604194ff538ddc5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c4e3bd3c2f9f845c116b7b567b28eaa7a2ac6327"
+    "sha2": "9e50ecb353fbd3ccce70bbe595d2be9f3a15002a"
 }]

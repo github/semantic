@@ -25,9 +25,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "07e6140d0f1859cdf2c6c81605638077b0af60da",
+    "sha1": "141ffb684fc9a6254fc51dec118d0a7626dc5cf1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a71566e1231c8a9393df823862030546ff0dd48b"
+    "sha2": "8bad468d53bd6c32d15a51179e935968a960e147"
 }
 ,{
     "testCaseDescription": "ruby-ensure-insert-test",
@@ -56,9 +56,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "a71566e1231c8a9393df823862030546ff0dd48b",
+    "sha1": "8bad468d53bd6c32d15a51179e935968a960e147",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "555959914f2014aff3ad8ed6e1723bc280068467"
+    "sha2": "c72c59b2ce6fabc05b4b5a470931b6ffefaf1fea"
 }
 ,{
     "testCaseDescription": "ruby-ensure-replacement-test",
@@ -87,9 +87,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "555959914f2014aff3ad8ed6e1723bc280068467",
+    "sha1": "c72c59b2ce6fabc05b4b5a470931b6ffefaf1fea",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4bbf9dec42ba7b47ed4fad678c865afc0f04afd6"
+    "sha2": "a5341bb19b676eb4e5d9eedb719f1229775a0568"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-replacement-test",
@@ -118,9 +118,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "4bbf9dec42ba7b47ed4fad678c865afc0f04afd6",
+    "sha1": "a5341bb19b676eb4e5d9eedb719f1229775a0568",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c7ebe35f742d9f193e8621fb93e4a8f9f9af5e05"
+    "sha2": "950565bd986bcf48a582580f8eacb49e268001e5"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-insert-test",
@@ -149,9 +149,9 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "c7ebe35f742d9f193e8621fb93e4a8f9f9af5e05",
+    "sha1": "950565bd986bcf48a582580f8eacb49e268001e5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f898d7986546a2dc6be955acd083ebfb7d506bfb"
+    "sha2": "3bf1b2d209a8db9e529c98f65e2730736128af78"
 }
 ,{
     "testCaseDescription": "ruby-ensure-teardown-test",
@@ -180,7 +180,7 @@
     "filePaths": [
         "ensure.rb"
     ],
-    "sha1": "f898d7986546a2dc6be955acd083ebfb7d506bfb",
+    "sha1": "3bf1b2d209a8db9e529c98f65e2730736128af78",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "83fca8ebbbdbf9494197148765e4f21bd2da46f0"
+    "sha2": "b5bc784487b6cdf785d63aa3a7ecf97e75882c99"
 }]

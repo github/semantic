@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' method"
+                    "summary": "Added the 'foo()' method"
                 }
             ]
         },
@@ -25,9 +25,9 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "2b8a209b5182b90d44688005575420851d868f62",
+    "sha1": "a7db41da2ebcffeeb1a4b238af369ec33aa7f2ba",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "152400cb111d1381378c9aa80fe7441fdc0b84d2"
+    "sha2": "7a5e353d691ec72bc829af6eb407417c392d88fa"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-replacement-insert-test",
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' method"
+                    "summary": "Added the 'bar(a)' method"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' method"
+                    "summary": "Added the 'foo()' method"
                 }
             ]
         },
@@ -71,9 +71,9 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "152400cb111d1381378c9aa80fe7441fdc0b84d2",
+    "sha1": "7a5e353d691ec72bc829af6eb407417c392d88fa",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fbb8c869988afa65b0d233d3ea7b9298ed422fa3"
+    "sha2": "eff04fde3bc068fe823aaa4bf127b013a994666a"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-delete-insert-test",
@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the foo method"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the foo() method"
                 },
                 {
                     "span": {
@@ -120,7 +120,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier in the foo method"
+                    "summary": "Deleted the 'a' identifier in the foo() method"
                 },
                 {
                     "span": {
@@ -135,7 +135,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' identifier in the foo method"
+                    "summary": "Deleted the 'baz' identifier in the foo() method"
                 }
             ]
         },
@@ -144,9 +144,9 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "fbb8c869988afa65b0d233d3ea7b9298ed422fa3",
+    "sha1": "eff04fde3bc068fe823aaa4bf127b013a994666a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fbcfd55e62585d839a93fefcfe4911907e5753fb"
+    "sha2": "7a53968c73c274cc1611dd871e8b270a7897588c"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-replacement-test",
@@ -178,7 +178,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the bar method"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the bar(a) method"
                 },
                 {
                     "span": {
@@ -193,7 +193,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier in the bar method"
+                    "summary": "Added the 'a' identifier in the bar(a) method"
                 },
                 {
                     "span": {
@@ -208,7 +208,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' identifier in the bar method"
+                    "summary": "Added the 'baz' identifier in the bar(a) method"
                 }
             ]
         },
@@ -217,9 +217,9 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "fbcfd55e62585d839a93fefcfe4911907e5753fb",
+    "sha1": "7a53968c73c274cc1611dd871e8b270a7897588c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "80b67427ee52635b3f00f9d329e2f8dd36821c8c"
+    "sha2": "ab39a5ab297037073662c44b2217383a8b8eb04f"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-delete-replacement-test",
@@ -239,7 +239,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' method"
+                    "summary": "Deleted the 'bar(a)' method"
                 },
                 {
                     "span": {
@@ -254,7 +254,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' method"
+                    "summary": "Deleted the 'foo()' method"
                 },
                 {
                     "span": {
@@ -269,7 +269,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' method"
+                    "summary": "Added the 'bar(a)' method"
                 }
             ]
         },
@@ -278,9 +278,9 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "80b67427ee52635b3f00f9d329e2f8dd36821c8c",
+    "sha1": "ab39a5ab297037073662c44b2217383a8b8eb04f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3de5e0f1d49ad36843ca4d89e1b54b1077c3c6ef"
+    "sha2": "da26bfb5f97a97761c6c9c527d6e7ca7233b93d9"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-delete-test",
@@ -300,7 +300,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' method"
+                    "summary": "Deleted the 'foo()' method"
                 }
             ]
         },
@@ -309,9 +309,9 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "3de5e0f1d49ad36843ca4d89e1b54b1077c3c6ef",
+    "sha1": "da26bfb5f97a97761c6c9c527d6e7ca7233b93d9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "71bdd986420b21efd04056017ac0f06eb539a699"
+    "sha2": "7090baeedd9343e356ba412c0fe0bcb583d11406"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-delete-rest-test",
@@ -331,7 +331,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' method"
+                    "summary": "Deleted the 'bar(a)' method"
                 }
             ]
         },
@@ -340,7 +340,7 @@
     "filePaths": [
         "method-declaration.rb"
     ],
-    "sha1": "71bdd986420b21efd04056017ac0f06eb539a699",
+    "sha1": "7090baeedd9343e356ba412c0fe0bcb583d11406",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "25348d220869101b20b073b5f39a60076612326b"
+    "sha2": "766401b52ec407563772d729264ef9f2ba4844eb"
 }]

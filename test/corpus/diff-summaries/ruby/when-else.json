@@ -25,9 +25,9 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "4271016dbb96667635e707fced1ae9261e704536",
+    "sha1": "5513d900ce05598c0cfb38566161b2de611b46f9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5876dd3c93cb19b2873a0d264e91c317ac016061"
+    "sha2": "5f4c5f1e6fa59f26495d1de8d8e808158ea4ae1e"
 }
 ,{
     "testCaseDescription": "ruby-when-else-insert-test",
@@ -56,9 +56,9 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "5876dd3c93cb19b2873a0d264e91c317ac016061",
+    "sha1": "5f4c5f1e6fa59f26495d1de8d8e808158ea4ae1e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3912ee731b5531e0e2ce8eab6ea230468a6c3465"
+    "sha2": "e78645da3ee2ba6c9e07ffd6b473f8103a5b95d3"
 }
 ,{
     "testCaseDescription": "ruby-when-else-replacement-test",
@@ -87,9 +87,9 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "3912ee731b5531e0e2ce8eab6ea230468a6c3465",
+    "sha1": "e78645da3ee2ba6c9e07ffd6b473f8103a5b95d3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a9c76a9c67839c33512146db9135ebfcfc480468"
+    "sha2": "4f0e16a79a4a5b3e37e8f9a2789a53a4530e4524"
 }
 ,{
     "testCaseDescription": "ruby-when-else-delete-replacement-test",
@@ -118,9 +118,9 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "a9c76a9c67839c33512146db9135ebfcfc480468",
+    "sha1": "4f0e16a79a4a5b3e37e8f9a2789a53a4530e4524",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "da7924e7af2b0534ef00eea9aa224dcea767be19"
+    "sha2": "8e52dcd19263f5aeb2a9acf69cfcf375a7190db3"
 }
 ,{
     "testCaseDescription": "ruby-when-else-delete-insert-test",
@@ -149,9 +149,9 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "da7924e7af2b0534ef00eea9aa224dcea767be19",
+    "sha1": "8e52dcd19263f5aeb2a9acf69cfcf375a7190db3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "554464d4e89b576a6d7a19f9d901ed1691ccfc75"
+    "sha2": "ced6c32ff092198cd659755ca7e39557181e50dd"
 }
 ,{
     "testCaseDescription": "ruby-when-else-teardown-test",
@@ -180,7 +180,7 @@
     "filePaths": [
         "when-else.rb"
     ],
-    "sha1": "554464d4e89b576a6d7a19f9d901ed1691ccfc75",
+    "sha1": "ced6c32ff092198cd659755ca7e39557181e50dd",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "96b198057dd2d93412c9bc9cba5b76939a345329"
+    "sha2": "ac7d38e4ecbfcf7f44e03c5127d837da112419e8"
 }]

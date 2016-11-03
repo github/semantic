@@ -100,6 +100,12 @@
         "replacement": "def bar(a)\n  baz\nend"
       },
       {
+        "syntax": "method-declaration-params",
+        "template": "def foo{0}\nend",
+        "insert": "(a)",
+        "replacement": "(a, b, c)"
+      },
+      {
         "syntax": "method-invocation",
         "insert": "print\nfoo.bar\nbar",
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)"

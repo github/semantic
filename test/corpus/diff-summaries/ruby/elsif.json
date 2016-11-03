@@ -25,9 +25,9 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "83fca8ebbbdbf9494197148765e4f21bd2da46f0",
+    "sha1": "94ca7b95dd13dc6bb6bd514c8a7a081042e1ff4c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d86011611e0415521179b53d9cb20fb3cdf8fafa"
+    "sha2": "c235c7ae6f69d4d9cf2441cbe539c59aa754ffb2"
 }
 ,{
     "testCaseDescription": "ruby-elsif-insert-test",
@@ -56,9 +56,9 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "d86011611e0415521179b53d9cb20fb3cdf8fafa",
+    "sha1": "c235c7ae6f69d4d9cf2441cbe539c59aa754ffb2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4a763ccdd1f90aaaf080fc3a18023a2f204af612"
+    "sha2": "074fc552f8f99d5ee0ee0cd775275e7314a1d0c9"
 }
 ,{
     "testCaseDescription": "ruby-elsif-replacement-test",
@@ -87,9 +87,9 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "4a763ccdd1f90aaaf080fc3a18023a2f204af612",
+    "sha1": "074fc552f8f99d5ee0ee0cd775275e7314a1d0c9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e708e14098bc8a374bb3c7d9db04ae530391c427"
+    "sha2": "40957312978a663c403790b436bca9638e089afe"
 }
 ,{
     "testCaseDescription": "ruby-elsif-delete-replacement-test",
@@ -118,9 +118,9 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "e708e14098bc8a374bb3c7d9db04ae530391c427",
+    "sha1": "40957312978a663c403790b436bca9638e089afe",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fa18382ac60432ae0a486be91b01afd0f6aaa75c"
+    "sha2": "e0a27b711317613600c72ab35a8118fe45d0c610"
 }
 ,{
     "testCaseDescription": "ruby-elsif-delete-insert-test",
@@ -149,9 +149,9 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "fa18382ac60432ae0a486be91b01afd0f6aaa75c",
+    "sha1": "e0a27b711317613600c72ab35a8118fe45d0c610",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0187a64c75ce1a0c68c8ef6f086b0cd6b2fc1147"
+    "sha2": "f750d245cd81332a5f2294a4007a8641f48e65c7"
 }
 ,{
     "testCaseDescription": "ruby-elsif-teardown-test",
@@ -180,7 +180,7 @@
     "filePaths": [
         "elsif.rb"
     ],
-    "sha1": "0187a64c75ce1a0c68c8ef6f086b0cd6b2fc1147",
+    "sha1": "f750d245cd81332a5f2294a4007a8641f48e65c7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "185f388c63b93f9018e84d711803adf1636308ae"
+    "sha2": "141ffb684fc9a6254fc51dec118d0a7626dc5cf1"
 }]
