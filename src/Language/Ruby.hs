@@ -73,6 +73,8 @@ termConstructor source sourceSpan name range children
       (args@(_ :< S.Args _) : e@(_ :< S.LastException _) : rest) -> S.Rescue (Just (cofree args)) (Just (cofree e)) (cofree <$> rest)
       (args@(_ :< S.Args _) : rest) -> S.Rescue (Just (cofree args)) Nothing (cofree <$> rest)
       _ -> S.Rescue Nothing Nothing children
+    ("rescue_modifier", [lhs, rhs] ) -> S.RescueModifier lhs rhs
+    ("rescue_modifier", _ ) -> S.Error children
     ("return_statement", _ ) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
     ("unless_modifier", _ ) -> S.Error children
@@ -148,6 +150,7 @@ categoryForRubyName = \case
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
   "rescue_block" -> Rescue
+  "rescue_modifier" -> RescueModifier
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "string" -> StringLiteral

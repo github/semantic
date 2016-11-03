@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-rescue-modifier2-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "7e0ebe98de8bf5ee5e7ce55fcb2094c482cb7b7f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cd16d47d649a4293498963fa39ab45b48ec70c23"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier2-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue nil' modifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "cd16d47d649a4293498963fa39ab45b48ec70c23",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "00696e572d69a88e4fcb2e69399458f9bdd3f53a"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier2-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "00696e572d69a88e4fcb2e69399458f9bdd3f53a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "03c0aa5215d4723f4ac7354eff3d1995a7d8548c"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier2-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "03c0aa5215d4723f4ac7354eff3d1995a7d8548c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "fe6fceb0e275a75cc0e5db4d1972e3446094b960"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier2-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue nil' modifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue nil' modifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "fe6fceb0e275a75cc0e5db4d1972e3446094b960",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e8a2fe4b6228a8b52635301f8055244f16536565"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier2-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "e8a2fe4b6228a8b52635301f8055244f16536565",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c6fd6f46b12e65ad9f69b10d4989d9bc7033347a"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier2-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier2.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier2.rb"
+    ],
+    "sha1": "c6fd6f46b12e65ad9f69b10d4989d9bc7033347a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "11ad4e0860b7b48bdcb45da7f1f47a0ed2170060"
+}]

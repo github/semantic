@@ -131,6 +131,7 @@ data Category
   | Elsif
   | Ensure
   | Rescue
+  | RescueModifier
   | When
   | LastException
   deriving (Eq, Generic, Ord, Show)
@@ -198,6 +199,7 @@ instance Arbitrary Category where
     , pure Elsif
     , pure Ensure
     , pure Rescue
+    , pure RescueModifier
     , pure When
     , pure LastException
     , Other <$> arbitrary

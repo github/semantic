@@ -1,0 +1,14 @@
+[
+  {
+    "language": "ruby",
+    "fileExt": ".rb",
+    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
+    "syntaxes": [
+      {
+        "syntax": "rescue-modifier2",
+        "insert": "foo rescue nil",
+        "replacement": "bar rescue nil"
+      }
+    ]
+  }
+]

@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-rescue-modifier-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "59a9759ed2f863210fba0ebe543cfdb7a02c7342",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "badca3f03550951b38703f5995f62ee8d0a1da48"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue false' modifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "badca3f03550951b38703f5995f62ee8d0a1da48",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7fb9b2faedcaece1faacc6ac6d26fd2d721dd98f"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'rescue false' modifier with the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "7fb9b2faedcaece1faacc6ac6d26fd2d721dd98f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "9cd8a1a8c08d02c996e065ff343a7a14842e4c1d"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'rescue nil' modifier with the 'rescue false' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "9cd8a1a8c08d02c996e065ff343a7a14842e4c1d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "53210ef19442457d281b7345e2adf35b65c6b0b0"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue false' modifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue nil' modifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'rescue false' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "53210ef19442457d281b7345e2adf35b65c6b0b0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "91395bedfccd9c9d793f1c32f423c40f689bef8b"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue nil' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "91395bedfccd9c9d793f1c32f423c40f689bef8b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6fbf1592a69bf9faa4a2efe3a40e5c5653448b2e"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'rescue false' modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "sha1": "6fbf1592a69bf9faa4a2efe3a40e5c5653448b2e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "546403a4d56edb42ee8fecb780f372200d5e906e"
+}]

@@ -240,6 +240,16 @@
         "replacement": "begin\n  foo\nrescue Error => x\n  bar\nend"
       },
       {
+        "syntax": "rescue-modifier",
+        "insert": "foo rescue nil",
+        "replacement": "foo rescue false"
+      },
+      {
+        "syntax": "rescue-modifier2",
+        "insert": "foo rescue nil",
+        "replacement": "bar rescue nil"
+      },
+      {
         "syntax": "case-when",
         "insert": "case foo\nend",
         "replacement": "case foo\nwhen bar\nend"

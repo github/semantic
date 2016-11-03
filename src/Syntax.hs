@@ -87,6 +87,8 @@ data Syntax a f
   | BlockExpression (Maybe f) [f]
   -- | A rescue block: maybe Args to rescue, maybe a local var for the last exception, and a list of expressions.
   | Rescue (Maybe f) (Maybe f) [f]
+  -- | A rescue modifier has a left and right expression (e.g. foo rescue nil).
+  | RescueModifier f f
   | LastException f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
