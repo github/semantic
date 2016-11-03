@@ -25,9 +25,16 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "1a9472e94c365639f5f2b5c519a06c2daf17c630",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index e69de29..8bd95e0 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -0,0 +1 @@",
+        "+someFunction(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aea81a7aab8e43746db84c917498d022cad8f88b"
+    "shas": "5ef42771e35b5af39f3befe137fedf40f174a5c7..00b36bff0934786a0071eff76e45c17c464e432a"
 }
 ,{
     "testCaseDescription": "javascript-function-call-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "aea81a7aab8e43746db84c917498d022cad8f88b",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index 8bd95e0..6bb4cf3 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -1 +1,3 @@",
+        "+someFunction(arg1, \"arg3\");",
+        "+someFunction(arg1, \"arg2\");",
+        " someFunction(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a665ddd2de9f0b3f6cb01dac3885746472685a02"
+    "shas": "00b36bff0934786a0071eff76e45c17c464e432a..520cba16d2faea8fd35a81086ea0a0b2405bf082"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "a665ddd2de9f0b3f6cb01dac3885746472685a02",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index 6bb4cf3..b38c232 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -1,3 +1,3 @@",
+        "-someFunction(arg1, \"arg3\");",
+        "+someFunction(arg1, \"arg2\");",
+        " someFunction(arg1, \"arg2\");",
+        " someFunction(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3c91447c23d8af65a9d5b3fdad3d2223dc9c9b8c"
+    "shas": "520cba16d2faea8fd35a81086ea0a0b2405bf082..8f84b861874020df6e144f16bbccb5221b1543e4"
 }
 ,{
     "testCaseDescription": "javascript-function-call-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "3c91447c23d8af65a9d5b3fdad3d2223dc9c9b8c",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index b38c232..6bb4cf3 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -1,3 +1,3 @@",
+        "-someFunction(arg1, \"arg2\");",
+        "+someFunction(arg1, \"arg3\");",
+        " someFunction(arg1, \"arg2\");",
+        " someFunction(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "92454603aeea12b9db63daaf4ff448a3ad866fc6"
+    "shas": "8f84b861874020df6e144f16bbccb5221b1543e4..718e8939aaef9685a140e371b050e8933450a215"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "92454603aeea12b9db63daaf4ff448a3ad866fc6",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index 6bb4cf3..3e15c6a 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -1,3 +1,2 @@",
+        "-someFunction(arg1, \"arg3\");",
+        "-someFunction(arg1, \"arg2\");",
+        " someFunction(arg1, \"arg2\");",
+        "+someFunction(arg1, \"arg3\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b5ba13c145b484c83750280711b5a8dbf9339b2a"
+    "shas": "718e8939aaef9685a140e371b050e8933450a215..35112398ed93567a624e79597194400f3a6ba5ed"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "b5ba13c145b484c83750280711b5a8dbf9339b2a",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index 3e15c6a..1add64b 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -1,2 +1 @@",
+        "-someFunction(arg1, \"arg2\");",
+        " someFunction(arg1, \"arg3\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "200d34900ee17186bda5fbf861a3960c8e0053e4"
+    "shas": "35112398ed93567a624e79597194400f3a6ba5ed..2928901cff45e08e275b3c7cc5559704326f2974"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "200d34900ee17186bda5fbf861a3960c8e0053e4",
+    "patch": [
+        "diff --git a/function-call.js b/function-call.js",
+        "index 1add64b..e69de29 100644",
+        "--- a/function-call.js",
+        "+++ b/function-call.js",
+        "@@ -1 +0,0 @@",
+        "-someFunction(arg1, \"arg3\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3a19dee8da1e0544c2cf975d850a6ce707912b35"
+    "shas": "2928901cff45e08e275b3c7cc5559704326f2974..f8662860eb083b9e95b5cc1c706a7872a4779532"
 }]

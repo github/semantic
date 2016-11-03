@@ -180,14 +180,16 @@ runGenerateCommitAndTestCase opts JSONMetaRepo{..} testCaseFilePath (JSONMetaSyn
   _ <- executeCommand (repoPath language) command
   afterSha <- executeCommand (repoPath language) getLastCommitShaCommand
 
+  patch <- executeCommand (repoPath language) (gitDiffCommand beforeSha afterSha)
+
   expectedResult' <- runExpectedResult (repoPath language) beforeSha afterSha (syntax <> fileExt) opts
 
   let jsonTestCase = encodePretty JSONTestCase {
     gitDir = extractGitDir (repoPath language),
     testCaseDescription = language <> "-" <> syntax <> "-" <> description <> "-" <> "test",
     filePaths = [syntax <> fileExt],
-    sha1 = beforeSha,
-    sha2 = afterSha,
+    shas = beforeSha <> ".." <> afterSha,
+    patch = lines patch,
     expectedResult = expectedResult'
     }
 
@@ -314,6 +316,9 @@ addSubmoduleCommand repoUrl repoPath = "git submodule add " <> repoUrl <> " " <>
 
 getLastCommitShaCommand :: String
 getLastCommitShaCommand = "git log --pretty=format:\"%H\" -n 1;"
+
+gitDiffCommand :: String -> String -> String
+gitDiffCommand sha1 sha2 = "git diff " <> sha1 <> ".." <> sha2 <> ";"
 
 checkoutMasterCommand :: String
 checkoutMasterCommand = "git checkout master;"

@@ -25,9 +25,16 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "cf3bb492593b241390a7cfd11dbdbd3d251a4177",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index e69de29..7150d6e 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -0,0 +1 @@",
+        "+x += 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5e3008d3df1c58d4ffb6fc9245ba0c50d5ad50e5"
+    "shas": "5da04c6d20aa6fdedbc205bf855829ccd10687f3..5ec631f6610cf3cc1f773396df8e13b4b814129c"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "5e3008d3df1c58d4ffb6fc9245ba0c50d5ad50e5",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 7150d6e..0bf97e7 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1 +1,3 @@",
+        "+x += 2;",
+        "+x += 1;",
+        " x += 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8437fbfaf6631316f57d0d1c1a72f2e3922f393d"
+    "shas": "5ec631f6610cf3cc1f773396df8e13b4b814129c..b0a185f38a22e6745bb368f017c102214337c4cb"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "8437fbfaf6631316f57d0d1c1a72f2e3922f393d",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 0bf97e7..ad04937 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x += 2;",
+        "+x += 1;",
+        " x += 1;",
+        " x += 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b40e39c6b8bb1409ba0d98c4479e37d7467f7ee6"
+    "shas": "b0a185f38a22e6745bb368f017c102214337c4cb..38cc878f5583067ae28923541b036488434aff2b"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "b40e39c6b8bb1409ba0d98c4479e37d7467f7ee6",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index ad04937..0bf97e7 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x += 1;",
+        "+x += 2;",
+        " x += 1;",
+        " x += 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "392a9f0d59a7bf5d3b18769cd84c20687b82ac4a"
+    "shas": "38cc878f5583067ae28923541b036488434aff2b..156edc8d14ab30f0157138c24b7694cec8a4bb67"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "392a9f0d59a7bf5d3b18769cd84c20687b82ac4a",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 0bf97e7..7127545 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-x += 2;",
+        "-x += 1;",
+        " x += 1;",
+        "+x += 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b6960087a76266fca12fa88acfce88a499a43397"
+    "shas": "156edc8d14ab30f0157138c24b7694cec8a4bb67..185343b45e80feb8176e8a5a0ee4ec9bbe0fb637"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "b6960087a76266fca12fa88acfce88a499a43397",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 7127545..94d1472 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1,2 +1 @@",
+        "-x += 1;",
+        " x += 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "04d6487122e380aaa06d6fceb345e3a36f0e749a"
+    "shas": "185343b45e80feb8176e8a5a0ee4ec9bbe0fb637..8ff3bab42e216d76eeba9d8c9c04f66c9c99eb7d"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "04d6487122e380aaa06d6fceb345e3a36f0e749a",
+    "patch": [
+        "diff --git a/math-assignment-operator.js b/math-assignment-operator.js",
+        "index 94d1472..e69de29 100644",
+        "--- a/math-assignment-operator.js",
+        "+++ b/math-assignment-operator.js",
+        "@@ -1 +0,0 @@",
+        "-x += 2;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d42f86b317b470d5207108107a9710b5a66b7693"
+    "shas": "8ff3bab42e216d76eeba9d8c9c04f66c9c99eb7d..1c2dbb18fb6fc930b3d0e6bb31a559a853be5c63"
 }]

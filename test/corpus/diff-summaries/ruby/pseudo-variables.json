@@ -55,9 +55,19 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "ce3778a99ea788f6ff75371e985c61c1a240cf13",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index e69de29..2be92bc 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -0,0 +1,4 @@",
+        "+nil",
+        "+self",
+        "+false",
+        "+true"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "733f12cf3bffe56c4c06348db5254dc45f24c4ac"
+    "shas": "cf8094c2727c8d78b8bde198e3e84f9aec793452..016d97436328e681d1384144498401a5eea7e926"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-replacement-insert-test",
@@ -161,9 +171,26 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "733f12cf3bffe56c4c06348db5254dc45f24c4ac",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index 2be92bc..e5837f2 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -1,3 +1,11 @@",
+        "+self",
+        "+NIL",
+        "+TRUE",
+        "+FALSE",
+        "+nil",
+        "+self",
+        "+false",
+        "+true",
+        " nil",
+        " self",
+        " false"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a05d3f95aec10f667adf4b0c4e1cdd8bd606e377"
+    "shas": "016d97436328e681d1384144498401a5eea7e926..2325801a5bbb1f636164f3518178b05acad1a0b9"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-insert-test",
@@ -261,9 +288,25 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "a05d3f95aec10f667adf4b0c4e1cdd8bd606e377",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index e5837f2..e3f5814 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -1,7 +1,7 @@",
+        "+nil",
+        " self",
+        "-NIL",
+        "-TRUE",
+        "-FALSE",
+        "+false",
+        "+true",
+        " nil",
+        " self",
+        " false"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "18b9418c8995dcee39f6daae644bc82170913dda"
+    "shas": "2325801a5bbb1f636164f3518178b05acad1a0b9..9d7e3199c45afae865f7be1f7fae815ebeb0560f"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-replacement-test",
@@ -361,9 +404,25 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "18b9418c8995dcee39f6daae644bc82170913dda",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index e3f5814..e5837f2 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -1,7 +1,7 @@",
+        "-nil",
+        " self",
+        "-false",
+        "-true",
+        "+NIL",
+        "+TRUE",
+        "+FALSE",
+        " nil",
+        " self",
+        " false"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "21335e57824052719d0a357137bc271a3806012b"
+    "shas": "9d7e3199c45afae865f7be1f7fae815ebeb0560f..9d876bae792ede12f28c65d517b343f2057ccf60"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-replacement-test",
@@ -512,9 +571,30 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "21335e57824052719d0a357137bc271a3806012b",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index e5837f2..8873ea5 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -1,12 +1,8 @@",
+        "-self",
+        "-NIL",
+        "-TRUE",
+        "-FALSE",
+        " nil",
+        " self",
+        " false",
+        " true",
+        "-nil",
+        " self",
+        "-false",
+        "-true",
+        "+NIL",
+        "+TRUE",
+        "+FALSE"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "657002ff458fa50b32477904d9b48ef106b3a45e"
+    "shas": "9d876bae792ede12f28c65d517b343f2057ccf60..125d36cc56c5f613a0f721ee87836c5a288396b3"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-test",
@@ -573,9 +653,22 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "657002ff458fa50b32477904d9b48ef106b3a45e",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index 8873ea5..30bb4d2 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -1,7 +1,3 @@",
+        "-nil",
+        "-self",
+        "-false",
+        "-true",
+        " self",
+        " NIL",
+        " TRUE"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "91d164b57939d4fcff85c1889c113feb71f90f13"
+    "shas": "125d36cc56c5f613a0f721ee87836c5a288396b3..42ded21b0d945b12c425db637520bdab3def2e3c"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-rest-test",
@@ -634,7 +727,17 @@
     "filePaths": [
         "pseudo-variables.rb"
     ],
-    "sha1": "91d164b57939d4fcff85c1889c113feb71f90f13",
+    "patch": [
+        "diff --git a/pseudo-variables.rb b/pseudo-variables.rb",
+        "index 30bb4d2..e69de29 100644",
+        "--- a/pseudo-variables.rb",
+        "+++ b/pseudo-variables.rb",
+        "@@ -1,4 +0,0 @@",
+        "-self",
+        "-NIL",
+        "-TRUE",
+        "-FALSE"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4cf0b1c84b725b7ecea2d0e2524d4aa83e9aa9f0"
+    "shas": "42ded21b0d945b12c425db637520bdab3def2e3c..9bbbfdb669130a637e82cce8a4a7203d0b7b10f1"
 }]

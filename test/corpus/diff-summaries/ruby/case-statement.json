@@ -25,9 +25,18 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "9b332f981a2fa42849e4ddc48afca9424480312d",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index e69de29..92a40ca 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -0,0 +1,3 @@",
+        "+case foo",
+        "+when bar",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "91f8cf75d9c34e5b1275898ae984a110f3b6381b"
+    "shas": "f50f57fa7d2de425445fedef30c77220e45b7581..95e873431be4e491f77c229edfacba17ccf03f14"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-replacement-insert-test",
@@ -71,9 +80,25 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "91f8cf75d9c34e5b1275898ae984a110f3b6381b",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index 92a40ca..1b4c2db 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -1,3 +1,10 @@",
+        " case foo",
+        " when bar",
+        "+else",
+        "+end",
+        "+case foo",
+        "+when bar",
+        "+end",
+        "+case foo",
+        "+when bar",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d7029d7b9e07992515a23b2410f68aa645c7ac04"
+    "shas": "95e873431be4e491f77c229edfacba17ccf03f14..05c438e440ea28edaedac7f2593723a51b8c7be6"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-insert-test",
@@ -102,9 +127,21 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "d7029d7b9e07992515a23b2410f68aa645c7ac04",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index 1b4c2db..c90d080 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -1,6 +1,5 @@",
+        " case foo",
+        " when bar",
+        "-else",
+        " end",
+        " case foo",
+        " when bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6b2a37829199cf77bcbd27c3b0051cc0ea42e419"
+    "shas": "05c438e440ea28edaedac7f2593723a51b8c7be6..c53041521920675802643185c637188b9dd77b17"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-replacement-test",
@@ -133,9 +170,21 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "6b2a37829199cf77bcbd27c3b0051cc0ea42e419",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index c90d080..1b4c2db 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -1,5 +1,6 @@",
+        " case foo",
+        " when bar",
+        "+else",
+        " end",
+        " case foo",
+        " when bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6e0d7c355b6c2c3d21ea2c6ba4603039e4a80f38"
+    "shas": "c53041521920675802643185c637188b9dd77b17..df4b9759732e4e8afbb5b297e0514cf10c9363da"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-replacement-test",
@@ -194,9 +243,26 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "6e0d7c355b6c2c3d21ea2c6ba4603039e4a80f38",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index 1b4c2db..7ccfe26 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -1,10 +1,7 @@",
+        " case foo",
+        " when bar",
+        "-else",
+        "-end",
+        "-case foo",
+        "-when bar",
+        " end",
+        " case foo",
+        " when bar",
+        "+else",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "62110252f65a05ba2d9acf0d52d78e00afecef6c"
+    "shas": "df4b9759732e4e8afbb5b297e0514cf10c9363da..77252438ee0aedaa5b2f57206554fb5eb746cf14"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-test",
@@ -225,9 +291,22 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "62110252f65a05ba2d9acf0d52d78e00afecef6c",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index 7ccfe26..9df8788 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -1,7 +1,4 @@",
+        " case foo",
+        " when bar",
+        "-end",
+        "-case foo",
+        "-when bar",
+        " else",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6abb2ef55c040d5c19e14573d227d3ad04f387c0"
+    "shas": "77252438ee0aedaa5b2f57206554fb5eb746cf14..d3459860b95e0e898b24e3ab4159c00e1b48d922"
 }
 ,{
     "testCaseDescription": "ruby-case-statement-delete-rest-test",
@@ -256,7 +335,17 @@
     "filePaths": [
         "case-statement.rb"
     ],
-    "sha1": "6abb2ef55c040d5c19e14573d227d3ad04f387c0",
+    "patch": [
+        "diff --git a/case-statement.rb b/case-statement.rb",
+        "index 9df8788..e69de29 100644",
+        "--- a/case-statement.rb",
+        "+++ b/case-statement.rb",
+        "@@ -1,4 +0,0 @@",
+        "-case foo",
+        "-when bar",
+        "-else",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "637106220ab216a08eb28519ce44928d8e58e145"
+    "shas": "d3459860b95e0e898b24e3ab4159c00e1b48d922..c6b6465d210afae65e64e64da1f92884d63ad7d9"
 }]

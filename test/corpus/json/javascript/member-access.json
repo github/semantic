@@ -90,9 +90,16 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "a816d0383b93d78bf467c1afad387fafe01c3111",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index e69de29..3c837c9 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -0,0 +1 @@",
+        "+x.someProperty;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "07ce317c24188e7c5b3a30bf4e85ecae2a80ca87"
+    "shas": "6bb7b92e6660b4bea6500b17891e6215571694a1..a7e9f12709231169ce940b7b5adddb8b700c4740"
 }
 ,{
     "testCaseDescription": "javascript-member-access-replacement-insert-test",
@@ -361,9 +368,18 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "07ce317c24188e7c5b3a30bf4e85ecae2a80ca87",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 3c837c9..858131a 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1 +1,3 @@",
+        "+x.someOtherProperty",
+        "+x.someProperty;",
+        " x.someProperty;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a8f66d16ff50e27be46da0c438cf697f0bb21347"
+    "shas": "a7e9f12709231169ce940b7b5adddb8b700c4740..8a2a90b5c78a4271528ba0098926b1309345cd81"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-insert-test",
@@ -734,9 +750,19 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "a8f66d16ff50e27be46da0c438cf697f0bb21347",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 858131a..5ed8a8d 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,3 +1,3 @@",
+        "-x.someOtherProperty",
+        "+x.someProperty;",
+        " x.someProperty;",
+        " x.someProperty;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "60817f8e436ec95656c3a073de32ae6ad339f8b8"
+    "shas": "8a2a90b5c78a4271528ba0098926b1309345cd81..b3e91ac2bb642a9f673811cf0f81464baa0d5107"
 }
 ,{
     "testCaseDescription": "javascript-member-access-replacement-test",
@@ -1107,9 +1133,19 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "60817f8e436ec95656c3a073de32ae6ad339f8b8",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 5ed8a8d..858131a 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,3 +1,3 @@",
+        "-x.someProperty;",
+        "+x.someOtherProperty",
+        " x.someProperty;",
+        " x.someProperty;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0404cbe6cc21a5386f60b28539ef9fe05643b170"
+    "shas": "b3e91ac2bb642a9f673811cf0f81464baa0d5107..a840fc931f382340c5556c4189d2d1794ccc11dd"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-replacement-test",
@@ -1432,9 +1468,19 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "0404cbe6cc21a5386f60b28539ef9fe05643b170",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 858131a..81f5f46 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,3 +1,2 @@",
+        "-x.someOtherProperty",
+        "-x.someProperty;",
+        " x.someProperty;",
+        "+x.someOtherProperty"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6371c8367e8925538f32c7cd4bb3d5dbfd67fb0e"
+    "shas": "a840fc931f382340c5556c4189d2d1794ccc11dd..162904a6f6d643b66a5f4b844ba2e228b7dc6c5e"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-test",
@@ -1649,9 +1695,17 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "6371c8367e8925538f32c7cd4bb3d5dbfd67fb0e",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 81f5f46..8329c77 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1,2 +1 @@",
+        "-x.someProperty;",
+        " x.someOtherProperty"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6a53a985f2fece8768d4b40e67c3e7d37f49a3d5"
+    "shas": "162904a6f6d643b66a5f4b844ba2e228b7dc6c5e..66de6fe8153911bdce9e1e49b303c1e0fa6f3df9"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-rest-test",
@@ -1745,7 +1799,14 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "6a53a985f2fece8768d4b40e67c3e7d37f49a3d5",
+    "patch": [
+        "diff --git a/member-access.js b/member-access.js",
+        "index 8329c77..e69de29 100644",
+        "--- a/member-access.js",
+        "+++ b/member-access.js",
+        "@@ -1 +0,0 @@",
+        "-x.someOtherProperty"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "287b6fa60bf503572cbcddbf84c46e81f3f4008c"
+    "shas": "66de6fe8153911bdce9e1e49b303c1e0fa6f3df9..75ba258ab370ff0efecb47f5f6a2f6a9968e9b8d"
 }]

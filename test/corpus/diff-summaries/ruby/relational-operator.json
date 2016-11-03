@@ -55,9 +55,18 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "ef97729fc1ce67c8c748ea440decb29ce2e8fb6e",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index e69de29..e2290b2 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -0,0 +1,3 @@",
+        "+x == y",
+        "+x != y",
+        "+x === y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "724a9cb614befd72789dcd62cf7b0a9985dd9b23"
+    "shas": "cdfe07e3ce652a0ca3282e6fb45641f687c90cc9..0bba6ffb4d95d7dd1b2872244c9c31b5b34fbdac"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-replacement-insert-test",
@@ -161,9 +170,24 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "724a9cb614befd72789dcd62cf7b0a9985dd9b23",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index e2290b2..d547ce5 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -1,3 +1,9 @@",
+        "+x <=> y",
+        "+x =~ y",
+        "+x =! y",
+        "+x == y",
+        "+x != y",
+        "+x === y",
+        " x == y",
+        " x != y",
+        " x === y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "57d4171a58d3565183f75619b4c044aa0e80c5c2"
+    "shas": "0bba6ffb4d95d7dd1b2872244c9c31b5b34fbdac..77c774a9480278848fb13a6ac6eff069d3ce3f7a"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-insert-test",
@@ -207,9 +231,24 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "57d4171a58d3565183f75619b4c044aa0e80c5c2",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index d547ce5..5849f29 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -1,6 +1,6 @@",
+        "-x <=> y",
+        "-x =~ y",
+        "-x =! y",
+        "+x == y",
+        "+x != y",
+        "+x === y",
+        " x == y",
+        " x != y",
+        " x === y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "abfa3a152c9057cf2373a440079e39757782e9bb"
+    "shas": "77c774a9480278848fb13a6ac6eff069d3ce3f7a..757c4f6c07f644472ce4d32787e205c4dd432102"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-replacement-test",
@@ -253,9 +292,24 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "abfa3a152c9057cf2373a440079e39757782e9bb",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index 5849f29..d547ce5 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -1,6 +1,6 @@",
+        "-x == y",
+        "-x != y",
+        "-x === y",
+        "+x <=> y",
+        "+x =~ y",
+        "+x =! y",
+        " x == y",
+        " x != y",
+        " x === y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "92a1884a99d461f88a20c7ba0be8c3b850ce82cd"
+    "shas": "757c4f6c07f644472ce4d32787e205c4dd432102..58da43ffe05d8e1c27ac3ffa6f5c68c1adcf5c2f"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-replacement-test",
@@ -344,9 +398,27 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "92a1884a99d461f88a20c7ba0be8c3b850ce82cd",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index d547ce5..ac1eb5d 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -1,9 +1,6 @@",
+        "-x <=> y",
+        "-x =~ y",
+        "-x =! y",
+        "-x == y",
+        "-x != y",
+        "-x === y",
+        " x == y",
+        " x != y",
+        " x === y",
+        "+x <=> y",
+        "+x =~ y",
+        "+x =! y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e4851a23d5aa5cbe144dff6b48cb6c33c51fd7e1"
+    "shas": "58da43ffe05d8e1c27ac3ffa6f5c68c1adcf5c2f..0ccab35bff7e3735ea5dac1dbe90fbffb726c02a"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-test",
@@ -405,9 +477,21 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "e4851a23d5aa5cbe144dff6b48cb6c33c51fd7e1",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index ac1eb5d..8180103 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -1,6 +1,3 @@",
+        "-x == y",
+        "-x != y",
+        "-x === y",
+        " x <=> y",
+        " x =~ y",
+        " x =! y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3ace56632c61e59046865dee72b13029a9a1b0b2"
+    "shas": "0ccab35bff7e3735ea5dac1dbe90fbffb726c02a..ca44eeb6bfea2261001f3d3b1abce770ad988b62"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-rest-test",
@@ -466,7 +550,16 @@
     "filePaths": [
         "relational-operator.rb"
     ],
-    "sha1": "3ace56632c61e59046865dee72b13029a9a1b0b2",
+    "patch": [
+        "diff --git a/relational-operator.rb b/relational-operator.rb",
+        "index 8180103..e69de29 100644",
+        "--- a/relational-operator.rb",
+        "+++ b/relational-operator.rb",
+        "@@ -1,3 +0,0 @@",
+        "-x <=> y",
+        "-x =~ y",
+        "-x =! y"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b5ca633b949a2227913a944093e291dd78724130"
+    "shas": "ca44eeb6bfea2261001f3d3b1abce770ad988b62..cba823072c13adb125530eb20fdcce1c84bb71e4"
 }]

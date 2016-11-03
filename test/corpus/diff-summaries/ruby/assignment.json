@@ -25,9 +25,16 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "c1011bb99d1909091258a822b4b1cffd554404e2",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index e69de29..3aea0c5 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -0,0 +1 @@",
+        "+x = 0"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e41b3065504363a0301c9b303287647996485eb0"
+    "shas": "57f86efa1b5bea006e86c9d582280c3e622cb4ea..f08d8aa1003ac043ff916cefeb4df511fb41e099"
 }
 ,{
     "testCaseDescription": "ruby-assignment-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "e41b3065504363a0301c9b303287647996485eb0",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index 3aea0c5..80ff640 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -1 +1,3 @@",
+        "+x = 1",
+        "+x = 0",
+        " x = 0"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8f67f0dddc276771748784c1c867ba26ef19cda7"
+    "shas": "f08d8aa1003ac043ff916cefeb4df511fb41e099..9a88d58eb0721119c25aac22df3d741c50794e27"
 }
 ,{
     "testCaseDescription": "ruby-assignment-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "8f67f0dddc276771748784c1c867ba26ef19cda7",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index 80ff640..e9580bc 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x = 1",
+        "+x = 0",
+        " x = 0",
+        " x = 0"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "68f0d646d1b49e7e5b49f56b3af54223fb47c85a"
+    "shas": "9a88d58eb0721119c25aac22df3d741c50794e27..d1ff964100006298196b1858b33596356679b74b"
 }
 ,{
     "testCaseDescription": "ruby-assignment-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "68f0d646d1b49e7e5b49f56b3af54223fb47c85a",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index e9580bc..80ff640 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x = 0",
+        "+x = 1",
+        " x = 0",
+        " x = 0"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "26627cf899d8f7bc331270249d6a9333e048ac19"
+    "shas": "d1ff964100006298196b1858b33596356679b74b..a6e5ae47e403bc29de6460c50ace19d1eef00aa8"
 }
 ,{
     "testCaseDescription": "ruby-assignment-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "26627cf899d8f7bc331270249d6a9333e048ac19",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index 80ff640..2465cb3 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -1,3 +1,2 @@",
+        "-x = 1",
+        "-x = 0",
+        " x = 0",
+        "+x = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b4bd50ed246f8e68c1a7f3e24e78ceb4e65c96f6"
+    "shas": "a6e5ae47e403bc29de6460c50ace19d1eef00aa8..14a96448f85cbe57c7e0ddf95454aba657c6931b"
 }
 ,{
     "testCaseDescription": "ruby-assignment-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "b4bd50ed246f8e68c1a7f3e24e78ceb4e65c96f6",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index 2465cb3..7d4290a 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -1,2 +1 @@",
+        "-x = 0",
+        " x = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9fe03a3aec3859d5b48075e09fb5024bfd82c375"
+    "shas": "14a96448f85cbe57c7e0ddf95454aba657c6931b..541105badde89f9f61723eb06d211d4c45ec0138"
 }
 ,{
     "testCaseDescription": "ruby-assignment-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "assignment.rb"
     ],
-    "sha1": "9fe03a3aec3859d5b48075e09fb5024bfd82c375",
+    "patch": [
+        "diff --git a/assignment.rb b/assignment.rb",
+        "index 7d4290a..e69de29 100644",
+        "--- a/assignment.rb",
+        "+++ b/assignment.rb",
+        "@@ -1 +0,0 @@",
+        "-x = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9e7143591420559db8bb6c8648077d460d371b9f"
+    "shas": "541105badde89f9f61723eb06d211d4c45ec0138..6b7b3f3ff94314a6d7e0047cab6161b417c272bf"
 }]

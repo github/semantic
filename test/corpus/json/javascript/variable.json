@@ -74,9 +74,16 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "fc9b2f0c3bbc1743da1d9f7c05b00dce579743dc",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index e69de29..1cf4ad0 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -0,0 +1 @@",
+        "+theVar;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "743e919f5e47aee15e99fb1253761ba85c11fe6a"
+    "shas": "3accaff544c4d4e390ec737b8c076a43e5d56563..49c032f849f019e32d810e49774f40a58f567df8"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-insert-test",
@@ -281,9 +288,18 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "743e919f5e47aee15e99fb1253761ba85c11fe6a",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index 1cf4ad0..888855a 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -1 +1,3 @@",
+        "+theVar2",
+        "+theVar;",
+        " theVar;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d2080f5440eb73d2825438502db8980c8cbd1df9"
+    "shas": "49c032f849f019e32d810e49774f40a58f567df8..ae375a014a72082ea44bed596598c1e12a348025"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-insert-test",
@@ -558,9 +574,19 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "d2080f5440eb73d2825438502db8980c8cbd1df9",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index 888855a..60e041c 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -1,3 +1,3 @@",
+        "-theVar2",
+        "+theVar;",
+        " theVar;",
+        " theVar;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "70aea979cee3ebc094d51abb4e173eb1d1af4050"
+    "shas": "ae375a014a72082ea44bed596598c1e12a348025..c5b76769a302fcd3a48d68f455a991c01d58a0c5"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-test",
@@ -835,9 +861,19 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "70aea979cee3ebc094d51abb4e173eb1d1af4050",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index 60e041c..888855a 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -1,3 +1,3 @@",
+        "-theVar;",
+        "+theVar2",
+        " theVar;",
+        " theVar;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "643423b4dc71e15d75b80071f756f608998cdf58"
+    "shas": "c5b76769a302fcd3a48d68f455a991c01d58a0c5..99fc27128f2bcedf21b589afe5d355c8f01b1673"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-replacement-test",
@@ -1080,9 +1116,19 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "643423b4dc71e15d75b80071f756f608998cdf58",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index 888855a..fbc7b28 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -1,3 +1,2 @@",
+        "-theVar2",
+        "-theVar;",
+        " theVar;",
+        "+theVar2"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e53e6db231bb1f8459397a9fd843c106e4d71856"
+    "shas": "99fc27128f2bcedf21b589afe5d355c8f01b1673..1ec955cdacef1045e39f487523b6b11245f31137"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-test",
@@ -1249,9 +1295,17 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "e53e6db231bb1f8459397a9fd843c106e4d71856",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index fbc7b28..7276d95 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -1,2 +1 @@",
+        "-theVar;",
+        " theVar2"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "61bf73809ef6736679d7c9424501710dc1bdadad"
+    "shas": "1ec955cdacef1045e39f487523b6b11245f31137..b64e131430cad9f2e1b958fe3ee4cd577de5381b"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-rest-test",
@@ -1329,7 +1383,14 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "61bf73809ef6736679d7c9424501710dc1bdadad",
+    "patch": [
+        "diff --git a/variable.js b/variable.js",
+        "index 7276d95..e69de29 100644",
+        "--- a/variable.js",
+        "+++ b/variable.js",
+        "@@ -1 +0,0 @@",
+        "-theVar2"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "81080589255cbb551f9a84c4691635b5fd543c2e"
+    "shas": "b64e131430cad9f2e1b958fe3ee4cd577de5381b..1b8151602239d34159506d5d6e55de712e8c0d10"
 }]

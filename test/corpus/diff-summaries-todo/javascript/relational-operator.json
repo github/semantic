@@ -9,9 +9,9 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "f79a619c0277b82bb45cb1510847b78ba44ea31b",
+    "patch": [],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1fc7441b1fb64b171cf7892e3ce25bc55e25d754"
+    "shas": "f79a619c0277b82bb45cb1510847b78ba44ea31b..1fc7441b1fb64b171cf7892e3ce25bc55e25d754"
 }
 ,{
     "testCaseDescription": "javascript-relational-operator-replacement-test",
@@ -24,7 +24,7 @@
     "filePaths": [
         "relational-operator.js"
     ],
-    "sha1": "1fc7441b1fb64b171cf7892e3ce25bc55e25d754",
+    "patch": [],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e1d768da1e35b8066276dc5b5f9653442345948d"
+    "shas": "1fc7441b1fb64b171cf7892e3ce25bc55e25d754..e1d768da1e35b8066276dc5b5f9653442345948d"
 }]

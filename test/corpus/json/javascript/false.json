@@ -74,9 +74,16 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "2969c3538fa44b0b9930417f37b669ad53801cd1",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index e69de29..8a63946 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -0,0 +1 @@",
+        "+false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "095c3902a688889958d23a03d630c67d22698541"
+    "shas": "163b832af7eb86fe2d319810d137565e70a924f4..534e91d885497e33f825d5c9e7e90ef4986e83b6"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-insert-test",
@@ -281,9 +288,18 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "095c3902a688889958d23a03d630c67d22698541",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index 8a63946..86574b1 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -1 +1,3 @@",
+        "+return false;",
+        "+false;",
+        " false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b58497ea325bb4126bcb61842f0625cce094c3b3"
+    "shas": "534e91d885497e33f825d5c9e7e90ef4986e83b6..f57bd598b66633b00684cbdb1b4d9ee81148d197"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-insert-test",
@@ -560,9 +576,19 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "b58497ea325bb4126bcb61842f0625cce094c3b3",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index 86574b1..7bae7c5 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -1,3 +1,3 @@",
+        "-return false;",
+        "+false;",
+        " false;",
+        " false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c8576e58f77b78a88ef4a2c7c5e4359988262dcb"
+    "shas": "f57bd598b66633b00684cbdb1b4d9ee81148d197..09585d310062f9fe315c2a400c69cb13cf67675a"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-test",
@@ -839,9 +865,19 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "c8576e58f77b78a88ef4a2c7c5e4359988262dcb",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index 7bae7c5..86574b1 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -1,3 +1,3 @@",
+        "-false;",
+        "+return false;",
+        " false;",
+        " false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6097785f86a891c394346a254baa66d68379a6e9"
+    "shas": "09585d310062f9fe315c2a400c69cb13cf67675a..ed00e5f614db396d4d52c2bacefb89580ad7fbba"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-replacement-test",
@@ -1084,9 +1120,19 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "6097785f86a891c394346a254baa66d68379a6e9",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index 86574b1..85b5be9 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -1,3 +1,2 @@",
+        "-return false;",
+        "-false;",
+        " false;",
+        "+return false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e00f9f0164fc3e41fe973b3c0ea6b24d43a22eca"
+    "shas": "ed00e5f614db396d4d52c2bacefb89580ad7fbba..d8c0287cc65dc125d283d6aa0e6cd32a3d5e1e31"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-test",
@@ -1253,9 +1299,17 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "e00f9f0164fc3e41fe973b3c0ea6b24d43a22eca",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index 85b5be9..1f328b3 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -1,2 +1 @@",
+        "-false;",
+        " return false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2e5600ef22e895d75944c1b0b428703529387b3f"
+    "shas": "d8c0287cc65dc125d283d6aa0e6cd32a3d5e1e31..cd36fb39c2618d389cd4fd7511eded4aa0bdccf2"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-rest-test",
@@ -1333,7 +1387,14 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "2e5600ef22e895d75944c1b0b428703529387b3f",
+    "patch": [
+        "diff --git a/false.js b/false.js",
+        "index 1f328b3..e69de29 100644",
+        "--- a/false.js",
+        "+++ b/false.js",
+        "@@ -1 +0,0 @@",
+        "-return false;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2f777027985687b45cb77235606c630008823245"
+    "shas": "cd36fb39c2618d389cd4fd7511eded4aa0bdccf2..025ac2dcb7ae8e622fb5a7f0508e2ec9e15604f8"
 }]

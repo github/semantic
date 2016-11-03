@@ -2,6 +2,7 @@ module IntegrationFormatSpec where
 
 import Arguments
 import Data.Aeson
+import Data.List.Split
 import Control.Exception
 import qualified Data.ByteString.Lazy as DL
 import JSONTestCase
@@ -21,10 +22,11 @@ catchException = handle errorHandler
 
 assertDiffSummary :: JSONTestCase -> Format -> (Either String ExpectedResult -> Either String ExpectedResult -> Expectation) -> Expectation
 assertDiffSummary JSONTestCase {..} format matcher = do
-  diffs <- fetchDiffs $ args gitDir sha1 sha2 filePaths format
+  diffs <- fetchDiffs $ args gitDir (Prelude.head shas') (Prelude.last shas') filePaths format
   result <- catchException . pure . pure . concatOutputs $ diffs
   let actual = eitherDecode . DL.fromStrict . encodeUtf8 . fromJust . listToMaybe $ result
   matcher actual (Right expectedResult)
+  where shas' = splitOn ".." shas
 
 runTestsIn :: [FilePath] -> Format -> (Either String ExpectedResult -> Either String ExpectedResult -> Expectation) -> SpecWith ()
 runTestsIn filePaths format matcher = do
