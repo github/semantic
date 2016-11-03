@@ -134,4 +134,5 @@ syntaxToTermField syntax = case syntax of
   S.Rescue args ex expressions -> [ "args" .= args ] <> [ "ex" .= ex ] <> childrenFields expressions
   S.RescueModifier lhs rhs -> [ "lhs" .= lhs ] <> [ "rhs" .= rhs ]
   S.LastException e -> [ "ex" .= e ]
+  S.Params c -> childrenFields c
   where childrenFields c = [ "children" .= c ]
