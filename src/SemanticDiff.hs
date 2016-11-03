@@ -25,6 +25,7 @@ import qualified Source
 import qualified Control.Concurrent.Async.Pool as Async
 import GHC.Conc (numCapabilities)
 import Development.GitRev
+import Parse
 
 main :: IO ()
 main = do
