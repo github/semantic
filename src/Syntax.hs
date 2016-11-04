@@ -88,8 +88,6 @@ data Syntax a f
   | BlockExpression (Maybe f) [f]
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
   | Rescue [f] [f]
-  -- | Parameters in a method/function definition
-  | Params [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

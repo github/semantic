@@ -132,5 +132,4 @@ syntaxToTermField syntax = case syntax of
   S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
   S.BlockExpression condition expressions -> [ "condition" .= condition ] <> childrenFields expressions
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
-  S.Params c -> childrenFields c
   where childrenFields c = [ "children" .= c ]

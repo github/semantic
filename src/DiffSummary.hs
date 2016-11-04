@@ -244,7 +244,6 @@ toTermName source term = case unwrap term of
     Just expr -> termNameFromSource expr
     Nothing -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
-  S.Params args -> mconcat $ toTermName' <$> args
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)

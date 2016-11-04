@@ -43,7 +43,6 @@ termConstructor source sourceSpan name range children
     ("conditional_assignment", _ ) -> S.Error children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
-    ("formal_parameters", _) -> S.Params children
     ("function_call", _) -> case runCofree <$> children of
       [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
       [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
@@ -63,11 +62,9 @@ termConstructor source sourceSpan name range children
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("member_access", _ ) -> S.Error children
-    ("method_declaration", _) -> case runCofree <$> children of
-      [ identifier, params@(_ :< S.Params _) ] -> S.Method (cofree identifier) (toList params) []
-      [ identifier ] -> S.Method (cofree identifier) [] []
-      ( identifier : params@(_ :< S.Params _ ) : exprs) -> S.Method (cofree identifier) (toList params) (cofree <$> exprs)
-      ( identifier : exprs ) -> S.Method (cofree identifier) [] (cofree <$> exprs)
+    ("method_declaration", _) -> case children of
+      identifier : params : body | category (extract params) == Params -> S.Method identifier (toList (unwrap params)) body
+      identifier : body -> S.Method identifier [] body
       _ -> S.Error children
     ("module_declaration", identifier : body ) -> S.Module identifier body
     ("module_declaration", _ ) -> S.Error children
