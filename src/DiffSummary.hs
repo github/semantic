@@ -55,7 +55,6 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Export{} -> Identifiable
           S.BlockExpression{} -> Identifiable
           S.Rescue{} -> Identifiable
-          S.RescueModifier{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -163,7 +162,6 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo cName@"else block" _ _) -> toDoc cName
   (LeafInfo cName@"ensure block" _ _) -> toDoc cName
   (LeafInfo cName@"when block" _ _) -> toDoc cName
-  (LeafInfo "rescue modifier" termName _) -> squotes ("rescue" <+> toDoc termName) <+> "modifier"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
@@ -243,12 +241,7 @@ toTermName source term = case unwrap term of
   S.BlockExpression maybeExpr children -> case maybeExpr of
     Just expr -> termNameFromSource expr
     Nothing -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
-  S.Rescue maybeArgs maybeEx _ -> case (maybeArgs, maybeEx) of
-    (Just args, Just ex) -> toTermName' args <> " => " <> toTermName' ex
-    (Just args, Nothing) -> toTermName' args
-    _ -> ""
-  S.RescueModifier _ rhs -> termNameFromSource rhs
-  S.LastException expr -> termNameFromSource expr
+  S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Params args -> mconcat $ toTermName' <$> args
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))

@@ -59,8 +59,6 @@ termConstructor source sourceSpan name range children
     ("element_reference", _ ) -> S.Error children
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
     ("for_statement", _ ) -> S.Error children
-    ("last_exception", [ ex ]) -> S.LastException ex
-    ("last_exception", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
@@ -73,11 +71,15 @@ termConstructor source sourceSpan name range children
       _ -> S.Error children
     ("module_declaration", identifier : body ) -> S.Module identifier body
     ("module_declaration", _ ) -> S.Error children
-    ("rescue_block", _) -> case runCofree <$> children of
-      (args@(_ :< S.Args _) : e@(_ :< S.LastException _) : rest) -> S.Rescue (Just (cofree args)) (Just (cofree e)) (cofree <$> rest)
-      (args@(_ :< S.Args _) : rest) -> S.Rescue (Just (cofree args)) Nothing (cofree <$> rest)
-      _ -> S.Rescue Nothing Nothing children
-    ("rescue_modifier", [lhs, rhs] ) -> S.RescueModifier lhs rhs
+    ("rescue_block", _) -> case children of
+      args : lastException : rest |
+        category (extract args) == Args,
+        category (extract lastException) == LastException ->
+          S.Rescue (toList (unwrap args) <> [lastException]) rest
+      lastException : rest | category (extract lastException) == LastException -> S.Rescue [lastException] rest
+      args : body | category (extract args) == Args -> S.Rescue (toList (unwrap args)) body
+      body -> S.Rescue [] body
+    ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
     ("return_statement", _ ) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]

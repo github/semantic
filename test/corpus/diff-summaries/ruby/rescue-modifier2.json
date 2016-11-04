@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'rescue nil' modifier"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6c195e290e7613379817885b55119b8158a86bb2..ccbc5b1238c33590f2f2d8de25cc77a39a322352"
+    "shas": "89be77a7b4f5ee9670276a33a97a6aa3941c9cfb..55cdbc8c69ef00db47f231d904f083eb28f50160"
 }
 ,{
     "testCaseDescription": "ruby-rescue-modifier2-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'rescue nil' modifier"
+                    "summary": "Added the 'bar' rescue modifier"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'rescue nil' modifier"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ccbc5b1238c33590f2f2d8de25cc77a39a322352..bdc004cefba4d7a9462c07a1cc2344b6d436acf4"
+    "shas": "55cdbc8c69ef00db47f231d904f083eb28f50160..198f5f3b96b3f405c1ff2081a511fac17edc7c91"
 }
 ,{
     "testCaseDescription": "ruby-rescue-modifier2-delete-insert-test",
@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'rescue nil' modifier"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'rescue foo' modifier"
                 }
             ]
         },
@@ -142,7 +142,7 @@
         " foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bdc004cefba4d7a9462c07a1cc2344b6d436acf4..0b22cb5a465965c27dd9044b9d89a55caf5ee42b"
+    "shas": "198f5f3b96b3f405c1ff2081a511fac17edc7c91..1e6f032a4125e945220103becbd30842264ab52e"
 }
 ,{
     "testCaseDescription": "ruby-rescue-modifier2-replacement-test",
@@ -174,7 +174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'rescue nil' modifier"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'rescue bar' modifier"
                 }
             ]
         },
@@ -195,7 +195,7 @@
         " foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0b22cb5a465965c27dd9044b9d89a55caf5ee42b..b18711120acd0a77e1687a8f1e5ff4044e1ff54c"
+    "shas": "1e6f032a4125e945220103becbd30842264ab52e..a666824e8c4d5b66c6d27e6a0246b63a3042b7a0"
 }
 ,{
     "testCaseDescription": "ruby-rescue-modifier2-delete-replacement-test",
@@ -215,7 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'rescue nil' modifier"
+                    "summary": "Deleted the 'bar' rescue modifier"
                 },
                 {
                     "span": {
@@ -230,7 +230,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'rescue nil' modifier"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 },
                 {
                     "span": {
@@ -245,7 +245,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'rescue nil' modifier"
+                    "summary": "Added the 'bar' rescue modifier"
                 }
             ]
         },
@@ -266,7 +266,7 @@
         "+bar rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b18711120acd0a77e1687a8f1e5ff4044e1ff54c..dd5754f0a62ca3ebc8b724e37745873953c7493a"
+    "shas": "a666824e8c4d5b66c6d27e6a0246b63a3042b7a0..14d5975cd55f2b7d27ce40f3491786b5644c10a6"
 }
 ,{
     "testCaseDescription": "ruby-rescue-modifier2-delete-test",
@@ -286,7 +286,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'rescue nil' modifier"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 }
             ]
         },
@@ -305,7 +305,7 @@
         " bar rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "dd5754f0a62ca3ebc8b724e37745873953c7493a..1e5ba2921990ac256abe41be03b236a701541d9d"
+    "shas": "14d5975cd55f2b7d27ce40f3491786b5644c10a6..0446bcdbd6fc1e4f75ecdd984d9428c2d82e4c2a"
 }
 ,{
     "testCaseDescription": "ruby-rescue-modifier2-delete-rest-test",
@@ -325,7 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'rescue nil' modifier"
+                    "summary": "Deleted the 'bar' rescue modifier"
                 }
             ]
         },
@@ -343,5 +343,5 @@
         "-bar rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1e5ba2921990ac256abe41be03b236a701541d9d..dc9d24ac927d2ba1f4d7331d5edcf9888c6bfbdf"
+    "shas": "0446bcdbd6fc1e4f75ecdd984d9428c2d82e4c2a..375e457b7d8886bdbdb8b3e131a0c001d20ac41c"
 }]

@@ -131,8 +131,6 @@ syntaxToTermField syntax = case syntax of
   S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
   S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
   S.BlockExpression condition expressions -> [ "condition" .= condition ] <> childrenFields expressions
-  S.Rescue args ex expressions -> [ "args" .= args ] <> [ "ex" .= ex ] <> childrenFields expressions
-  S.RescueModifier lhs rhs -> [ "lhs" .= lhs ] <> [ "rhs" .= rhs ]
-  S.LastException e -> [ "ex" .= e ]
+  S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
   S.Params c -> childrenFields c
   where childrenFields c = [ "children" .= c ]
