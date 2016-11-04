@@ -1,0 +1,353 @@
+[{
+    "testCaseDescription": "ruby-method-calls-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.foo()' method call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index e69de29..5831d31 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -0,0 +1 @@",
+        "+x.foo()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "17903b081197a8af07c0566effcb951a5c2b4e92..e934fefb49abf087c33e1240f8f6dd8750461981"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.foo()' method call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 5831d31..ce891a7 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1 +1,3 @@",
+        "+bar()",
+        "+x.foo()",
+        " x.foo()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e934fefb49abf087c33e1240f8f6dd8750461981..aa456894a021e11601d5c5545633e8f9391038a9"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.foo()' method call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index ce891a7..472abf1 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1,3 +1,3 @@",
+        "-bar()",
+        "+x.foo()",
+        " x.foo()",
+        " x.foo()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "aa456894a021e11601d5c5545633e8f9391038a9..526f90542e5291bf410c4f56e69c47282675bd1c"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.foo()' method call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 472abf1..ce891a7 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x.foo()",
+        "+bar()",
+        " x.foo()",
+        " x.foo()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "526f90542e5291bf410c4f56e69c47282675bd1c..7c5ce020e41d5b01f7ea9f88acf3386f426e01e6"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.foo()' method call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index ce891a7..6c5bbe0 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1,3 +1,2 @@",
+        "-bar()",
+        "-x.foo()",
+        " x.foo()",
+        "+bar()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "7c5ce020e41d5b01f7ea9f88acf3386f426e01e6..ee7be1e9e40189aa48d053b3891b9f9ad093db4e"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.foo()' method call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 6c5bbe0..4be2e26 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1,2 +1 @@",
+        "-x.foo()",
+        " bar()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ee7be1e9e40189aa48d053b3891b9f9ad093db4e..beafe8aef216cb2b54edb534e94edb3fd5138052"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 4be2e26..e69de29 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1 +0,0 @@",
+        "-bar()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "beafe8aef216cb2b54edb534e94edb3fd5138052..eb51a430951de620d64e6e92df9603e953708321"
+}]

@@ -5,9 +5,9 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "syntax": "module",
-        "insert": "module Foo\nend",
-        "replacement": "module Foo\n  def bar\nend\nend"
+        "syntax": "method-calls",
+        "insert": "x.foo()",
+        "replacement": "bar()"
       }
     ]
   }

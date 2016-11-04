@@ -43,12 +43,10 @@ termConstructor source sourceSpan name range children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
     ("function_call", _) -> case children of
-      [ member, args ] |
-        category (extract member) == MemberAccess,
-        category (extract args) == Args -> case toList (unwrap member) of
-          [target, method] -> S.MethodCall target method (toList (unwrap args))
-          _ -> S.Error children
-      [ function, args ] | category (extract args) == Args -> S.FunctionCall function (toList (unwrap args))
+      member : args | category (extract member) == MemberAccess -> case toList (unwrap member) of
+        [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
+        _ -> S.Error children
+      function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
     ("hash", _) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
@@ -107,7 +105,9 @@ termConstructor source sourceSpan name range children
   where
     withDefaultInfo syntax = do
       sourceSpan' <- sourceSpan
-      pure $! cofree ((range .: categoryForRubyName name .: sourceSpan' .: RNil) :< syntax)
+      pure $! case syntax of
+        S.MethodCall{} -> cofree ((range .:  MethodCall .: sourceSpan' .: RNil) :< syntax)
+        _ -> cofree ((range .: categoryForRubyName name .: sourceSpan' .: RNil) :< syntax)
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case

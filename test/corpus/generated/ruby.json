@@ -111,6 +111,11 @@
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)"
       },
       {
+        "syntax": "method-calls",
+        "insert": "x.foo()",
+        "replacement": "bar()"
+      },
+      {
         "syntax": "class",
         "insert": "class Foo < Super\n  def test; end\nend",
         "replacement": "class Foo\n  def test; end\nend"

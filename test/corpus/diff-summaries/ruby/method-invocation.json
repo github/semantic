@@ -101,7 +101,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo.bar()' function call"
+                    "summary": "Added the 'foo.bar()' method call"
                 },
                 {
                     "span": {
@@ -283,7 +283,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo.bar()' function call"
+                    "summary": "Deleted the 'foo.bar()' method call"
                 },
                 {
                     "span": {
@@ -375,7 +375,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo.bar()' function call"
+                    "summary": "Added the 'foo.bar()' method call"
                 },
                 {
                     "span": {
@@ -665,7 +665,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo.bar()' function call"
+                    "summary": "Deleted the 'foo.bar()' method call"
                 },
                 {
                     "span": {
