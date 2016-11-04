@@ -31,7 +31,6 @@ termConstructor
 termConstructor source sourceSpan name range children
   | name == "ERROR" = withDefaultInfo (S.Error children)
   | otherwise = withDefaultInfo $ case (name, children) of
-    ("argument_list", _) -> S.Args children
     ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
@@ -43,11 +42,13 @@ termConstructor source sourceSpan name range children
     ("conditional_assignment", _ ) -> S.Error children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
-    ("function_call", _) -> case runCofree <$> children of
-      [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
-      [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
-      [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
-      (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
+    ("function_call", _) -> case children of
+      [ member, args ] |
+        category (extract member) == MemberAccess,
+        category (extract args) == Args -> case toList (unwrap member) of
+          [target, method] -> S.MethodCall target method (toList (unwrap args))
+          _ -> S.Error children
+      [ function, args ] | category (extract args) == Args -> S.FunctionCall function (toList (unwrap args))
       _ -> S.Error children
     ("hash", _) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
