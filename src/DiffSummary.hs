@@ -55,7 +55,10 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
           S.Ternary{} -> Identifiable
+          S.If{} -> Identifiable
           S.BlockExpression{} -> Identifiable
+          S.Switch{} -> Identifiable
+          S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
           _ -> Unidentifiable
 
@@ -206,7 +209,7 @@ toTermName source term = case unwrap term of
   S.VarDecl decl -> toTermName' decl
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
-  S.Case expr _ -> toTermName' expr
+  S.Case expr _ -> termNameFromSource expr
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
@@ -267,7 +270,9 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
         "" -> "in a" <+> catName c
         _ -> "in the" <+> squotes (termName t) <+> catName c
       C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
+      C.If -> "in the" <+> squotes (termName t) <+> catName c
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
+      C.Switch -> "in the" <+> squotes (termName t) <+> catName c
       C.When -> "in a" <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c

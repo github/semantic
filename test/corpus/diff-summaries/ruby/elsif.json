@@ -56,7 +56,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' elsif block"
+                    "summary": "Added the 'baz' elsif block in the 'bar' if statement"
                 }
             ]
         },
@@ -181,7 +181,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' elsif block"
+                    "summary": "Deleted the 'baz' elsif block in the 'bar' if statement"
                 }
             ]
         },

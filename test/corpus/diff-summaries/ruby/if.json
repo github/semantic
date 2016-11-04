@@ -153,7 +153,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'foo' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -168,7 +168,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier"
+                    "summary": "Added the 'bar' identifier in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -183,7 +183,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'quux' elsif block"
+                    "summary": "Added the 'quux' elsif block in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -198,7 +198,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an else block"
+                    "summary": "Added an else block in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -274,7 +274,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'x' identifier"
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -289,7 +289,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted the 'bar' identifier in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -304,7 +304,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'quux' elsif block"
+                    "summary": "Deleted the 'quux' elsif block in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -319,7 +319,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an else block"
+                    "summary": "Deleted an else block in the 'x' if statement"
                 },
                 {
                     "span": {

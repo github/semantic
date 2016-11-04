@@ -18,9 +18,6 @@ functions = [ "lambda_literal", "lambda_expression" ]
 blocks :: [Text]
 blocks = [ "begin_statement", "else_block", "ensure_block" ]
 
-conditionalBlocks :: [Text]
-conditionalBlocks = [ "elsif_block", "case_statement", "when_block" ]
-
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -34,6 +31,10 @@ termConstructor source sourceSpan name range children
     ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
+    ("case_statement", expr : body ) -> S.Switch expr body
+    ("case_statement", _ ) -> S.Error children
+    ("when_block", condition : body ) -> S.Case condition body
+    ("when_block", _ ) -> S.Error children
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class_declaration", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
     ("class_declaration", _ ) -> S.Error children
@@ -51,8 +52,10 @@ termConstructor source sourceSpan name range children
     ("hash", _) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_modifier", _ ) -> S.Error children
-    ("if_statement", expr : rest ) -> S.If expr rest
+    ("if_statement", condition : body ) -> S.If condition body
     ("if_statement", _ ) -> S.Error children
+    ("elsif_block", condition : body ) -> S.If condition body
+    ("elsif_block", _ ) -> S.Error children
     ("element_reference", [ base, element ]) -> S.SubscriptAccess base element
     ("element_reference", _ ) -> S.Error children
     ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
@@ -92,9 +95,6 @@ termConstructor source sourceSpan name range children
     ("while_statement", _ ) -> S.Error children
     ("yield", _) -> S.Yield (listToMaybe children)
     _ | name `elem` blocks -> S.BlockExpression Nothing children
-    _ | name `elem` conditionalBlocks -> case children of
-      ( condition : rest ) -> S.BlockExpression (Just condition) rest
-      _ -> S.Error children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]

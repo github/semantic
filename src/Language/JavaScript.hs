@@ -54,7 +54,7 @@ termConstructor source sourceSpan name range children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
     ("switch_statement", expr : rest) -> S.Switch expr rest
     ("switch_statement", _ ) -> S.Error children
-    ("case", [ expr, body ]) -> S.Case expr body
+    ("case", [ expr, body ]) -> S.Case expr [body]
     ("case", _ ) -> S.Error children
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
