@@ -47,12 +47,14 @@ identifiable term = isIdentifiable (unwrap term) term
           S.MathAssignment{} -> Identifiable
           S.VarAssignment{} -> Identifiable
           S.SubscriptAccess{} -> Identifiable
+          S.Module{} -> Identifiable
           S.Class{} -> Identifiable
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
           S.DoWhile{} -> Identifiable
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
+          S.Ternary{} -> Identifiable
           S.BlockExpression{} -> Identifiable
           S.Rescue{} -> Identifiable
           _ -> Unidentifiable
@@ -263,6 +265,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Else -> "in an" <+> catName c
       C.Elsif -> "in the" <+> squotes (termName t) <+> catName c
       C.Method -> "in the" <+> squotes (termName t) <+> catName c
+      C.Ternary -> "in the" <+> squotes (termName t) <+> catName c
       C.Ensure -> "in an" <+> catName c
       C.Rescue -> case t of
         "" -> "in a" <+> catName c

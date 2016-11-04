@@ -91,8 +91,8 @@
       },
       {
         "syntax": "ternary",
-        "insert": "condition ? case1 : case2",
-        "replacement": "if condition then case 1 else case2"
+        "insert": "foo ? case1 : case2",
+        "replacement": "bar ? a : b"
       },
       {
         "syntax": "method-declaration",
@@ -117,8 +117,8 @@
       },
       {
         "syntax": "module",
-        "insert": "module Foo\n  class Bar\n    def self.test; end\nend\nend",
-        "replacement": "class Bar::Foo\nend"
+        "insert": "module Foo\nend",
+        "replacement": "module Foo\n  def bar\nend\nend"
       },
       {
         "syntax": "return",

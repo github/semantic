@@ -5,10 +5,9 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "syntax": "method-declaration-params",
-        "template": "def foo{0}\nend",
-        "insert": "(a)",
-        "replacement": "(a, b, c)"
+        "syntax": "module",
+        "insert": "module Foo\nend",
+        "replacement": "module Foo\n  def bar\nend\nend"
       }
     ]
   }
