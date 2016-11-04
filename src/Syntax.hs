@@ -81,8 +81,8 @@ data Syntax a f
   | Until { untilExpr :: f, untilBody :: [f] }
   -- | An unless statement with an expression and maybe more expression clauses.
   | Unless f [f]
-  -- | A block expression might have a conditional expression and always has a list of expressions (e.g. begin, else, ensure in Ruby).
-  | BlockExpression (Maybe f) [f]
+  -- | A block expression has a list of expressions (e.g. begin, else, ensure in Ruby).
+  | BlockExpression [f]
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
   | Rescue [f] [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)

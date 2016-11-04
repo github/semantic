@@ -94,7 +94,7 @@ termConstructor source sourceSpan name range children
     ("while_statement", expr : rest ) -> S.While expr rest
     ("while_statement", _ ) -> S.Error children
     ("yield", _) -> S.Yield (listToMaybe children)
-    _ | name `elem` blocks -> S.BlockExpression Nothing children
+    _ | name `elem` blocks -> S.BlockExpression children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
