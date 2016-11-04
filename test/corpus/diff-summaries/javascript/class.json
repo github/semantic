@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'one' identifier in the one(a) method of the 'Foo' class"
+                    "summary": "Replaced the 'foo' identifier with the 'one' identifier in the 'one(a)' method of the 'Foo' class"
                 },
                 {
                     "span": {
@@ -234,7 +234,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'foo' identifier in the foo(a) method of the 'Foo' class"
+                    "summary": "Replaced the 'one' identifier with the 'foo' identifier in the 'foo(a)' method of the 'Foo' class"
                 },
                 {
                     "span": {

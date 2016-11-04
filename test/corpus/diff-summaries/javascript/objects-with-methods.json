@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add(a, b) method"
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the 'add(a, b)' method"
                 }
             ]
         },
@@ -174,7 +174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract(a, b) method"
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the 'subtract(a, b)' method"
                 }
             ]
         },

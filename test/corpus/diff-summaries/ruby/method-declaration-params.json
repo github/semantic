@@ -55,7 +55,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier in the foo(a) method"
+                    "summary": "Added the 'a' identifier in the 'foo(a)' method"
                 }
             ]
         },
@@ -95,7 +95,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier in the foo(a, b, c) method"
+                    "summary": "Added the 'b' identifier in the 'foo(a, b, c)' method"
                 },
                 {
                     "span": {
@@ -110,7 +110,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier in the foo(a, b, c) method"
+                    "summary": "Added the 'c' identifier in the 'foo(a, b, c)' method"
                 }
             ]
         },
@@ -150,7 +150,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier in the foo(a) method"
+                    "summary": "Deleted the 'b' identifier in the 'foo(a)' method"
                 },
                 {
                     "span": {
@@ -165,7 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier in the foo(a) method"
+                    "summary": "Deleted the 'c' identifier in the 'foo(a)' method"
                 }
             ]
         },
@@ -205,7 +205,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier in the foo() method"
+                    "summary": "Deleted the 'a' identifier in the 'foo()' method"
                 }
             ]
         },

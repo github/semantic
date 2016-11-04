@@ -126,7 +126,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the foo() method"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'foo()' method"
                 },
                 {
                     "span": {
@@ -141,7 +141,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier in the foo() method"
+                    "summary": "Deleted the 'a' identifier in the 'foo()' method"
                 },
                 {
                     "span": {
@@ -156,7 +156,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' identifier in the foo() method"
+                    "summary": "Deleted the 'baz' identifier in the 'foo()' method"
                 }
             ]
         },
@@ -211,7 +211,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the bar(a) method"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'bar(a)' method"
                 },
                 {
                     "span": {
@@ -226,7 +226,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier in the bar(a) method"
+                    "summary": "Added the 'a' identifier in the 'bar(a)' method"
                 },
                 {
                     "span": {
@@ -241,7 +241,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' identifier in the bar(a) method"
+                    "summary": "Added the 'baz' identifier in the 'bar(a)' method"
                 }
             ]
         },

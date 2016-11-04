@@ -55,7 +55,7 @@
                             ]
                         }
                     },
-                    "summary": "Added a begin statement in the foo() method"
+                    "summary": "Added a begin statement in the 'foo()' method"
                 }
             ]
         },
@@ -180,7 +180,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted a begin statement in the foo() method"
+                    "summary": "Deleted a begin statement in the 'foo()' method"
                 }
             ]
         },
