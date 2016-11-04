@@ -100,7 +100,6 @@ syntaxToTermField syntax = case syntax of
   S.MathAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
-  S.Args c -> childrenFields c
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.VarDecl declaration -> [ "declaration" .= declaration ]
   S.VarAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]

@@ -204,9 +204,6 @@ toTermName source term = case unwrap term of
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
   S.VarAssignment varId _ -> toTermName' varId
   S.VarDecl decl -> toTermName' decl
-  -- TODO: We should remove Args from Syntax since I don't think we should ever
-  -- evaluate Args as a single toTermName Text - joshvera
-  S.Args args -> mconcat $ toTermName' <$> args
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> toTermName' expr

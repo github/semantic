@@ -41,15 +41,16 @@ termConstructor source sourceSpan name range children
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
     ("comma_op", _ ) -> S.Error children
-    ("function_call", _) -> case runCofree <$> children of
-      [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
-      [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
-      [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
-      (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
+    ("function_call", _) -> case children of
+      [ member, args ] |
+        category (extract member) == MemberAccess,
+        category (extract args) == Args -> case toList (unwrap member) of
+          [target, method] -> S.MethodCall target method (toList (unwrap args))
+          _ -> S.Error children
+      [ function, args ] | category (extract args) == Args -> S.FunctionCall function (toList (unwrap args))
       _ -> S.Error children
     ("ternary", condition : cases) -> S.Ternary condition cases
     ("ternary", _ ) -> S.Error children
-    ("arguments", _) -> S.Args children
     ("var_assignment", [ x, y ]) -> S.VarAssignment x y
     ("var_assignment", _ ) -> S.Error children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
