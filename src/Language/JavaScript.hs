@@ -42,12 +42,10 @@ termConstructor source sourceSpan name range children
       _ -> S.Indexed children
     ("comma_op", _ ) -> S.Error children
     ("function_call", _) -> case children of
-      [ member, args ] |
-        category (extract member) == MemberAccess,
-        category (extract args) == Args -> case toList (unwrap member) of
-          [target, method] -> S.MethodCall target method (toList (unwrap args))
-          _ -> S.Error children
-      [ function, args ] | category (extract args) == Args -> S.FunctionCall function (toList (unwrap args))
+      member : args | category (extract member) == MemberAccess -> case toList (unwrap member) of
+        [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
+        _ -> S.Error children
+      function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
     ("ternary", condition : cases) -> S.Ternary condition cases
     ("ternary", _ ) -> S.Error children
