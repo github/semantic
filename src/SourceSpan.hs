@@ -28,8 +28,8 @@ data SourcePos = SourcePos
   } deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 displaySourcePos :: SourcePos -> Text
-displaySourcePos sp =
-  "line " <> show (line sp) <> ", column " <> show (column sp)
+displaySourcePos SourcePos{..} =
+  "line " <> show line <> ", column " <> show column
 
 instance A.ToJSON SourcePos where
   toJSON SourcePos{..} =
