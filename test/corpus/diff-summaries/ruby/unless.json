@@ -149,7 +149,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'foo' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the foo unless statement"
                 },
                 {
                     "span": {
@@ -164,7 +164,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier"
+                    "summary": "Added the 'bar' identifier in the foo unless statement"
                 },
                 {
                     "span": {
@@ -179,7 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bat' identifier"
+                    "summary": "Added the 'bat' identifier in the foo unless statement"
                 },
                 {
                     "span": {
@@ -253,7 +253,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'x' identifier"
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the x unless statement"
                 },
                 {
                     "span": {
@@ -268,7 +268,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted the 'bar' identifier in the x unless statement"
                 },
                 {
                     "span": {
@@ -283,7 +283,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bat' identifier"
+                    "summary": "Deleted the 'bat' identifier in the x unless statement"
                 },
                 {
                     "span": {

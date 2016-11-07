@@ -25,6 +25,16 @@ termConstructor
   -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children
   | name == "ERROR" = withDefaultInfo (S.Error children)
+  | name == "unless_modifier" = case children of
+    [ lhs, rhs ] -> do
+      condition <- withDefaultInfo (S.Negate rhs)
+      withDefaultInfo $ S.If condition [lhs]
+    _ -> withDefaultInfo $ S.Error children
+  | name == "unless_statement" = case children of
+    ( expr : rest ) -> do
+      condition <- withDefaultInfo (S.Negate expr)
+      withDefaultInfo $ S.If condition rest
+    _ -> withDefaultInfo $ S.Error children
   | otherwise = withDefaultInfo $ case (name, children) of
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
@@ -75,7 +85,7 @@ termConstructor source sourceSpan name range children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("member_access", _ ) -> S.Error children
     ("method_declaration", _ ) -> case children of
-      identifier : params : body | category (extract params) == Params -> S.Method identifier (toList (unwrap params)) body
+      identifier : params : body | Params <- category (extract params) -> S.Method identifier (toList (unwrap params)) body
       identifier : body -> S.Method identifier [] body
       _ -> S.Error children
     ("module_declaration", identifier : body ) -> S.Module identifier body
@@ -90,9 +100,6 @@ termConstructor source sourceSpan name range children
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
     ("return_statement", _ ) -> S.Return (listToMaybe children)
-    ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
-    ("unless_modifier", _ ) -> S.Error children
-    ("unless_statement", expr : rest ) -> S.Unless expr rest
     ("unless_statement", _ ) -> S.Error children
     ("until_modifier", [ lhs, condition ]) -> S.Until condition [lhs]
     ("until_modifier", _ ) -> S.Error children

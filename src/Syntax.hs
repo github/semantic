@@ -80,8 +80,8 @@ data Syntax a f
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield (Maybe f)
   | Until { untilExpr :: f, untilBody :: [f] }
-  -- | An unless statement with an expression and maybe more expression clauses.
-  | Unless f [f]
+  -- | A negation has a single expression.
+  | Negate f
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
   | Rescue [f] [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)

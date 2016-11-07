@@ -128,6 +128,6 @@ syntaxToTermField syntax = case syntax of
   S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
-  S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
+  S.Negate expr -> [ "negate" .= expr ]
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
   where childrenFields c = [ "children" .= c ]

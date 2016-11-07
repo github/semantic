@@ -219,7 +219,9 @@ toTermName source term = case unwrap term of
   S.Return expr -> maybe "empty" toTermName' expr
   S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
-  S.If expr _ -> termNameFromSource expr
+  S.If expr _ -> case unwrap expr of
+    (S.Negate condition) -> termNameFromSource condition
+    _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
@@ -239,7 +241,7 @@ toTermName source term = case unwrap term of
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   S.ConditionalAssignment id _ -> toTermName' id
   S.Until expr _ -> toTermName' expr
-  S.Unless expr _ -> termNameFromSource expr
+  S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
