@@ -27,22 +27,22 @@ termConstructor source sourceSpan name range children
   | name == "ERROR" = withDefaultInfo (S.Error children)
   | name == "unless_modifier" = case children of
     [ lhs, rhs ] -> do
-      condition <- withDefaultInfo (S.Negate rhs)
+      condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
       withDefaultInfo $ S.If condition [lhs]
     _ -> withDefaultInfo $ S.Error children
   | name == "unless_statement" = case children of
     ( expr : rest ) -> do
-      condition <- withDefaultInfo (S.Negate expr)
+      condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.If condition rest
     _ -> withDefaultInfo $ S.Error children
   | name == "until_modifier" = case children of
     [ lhs, rhs ] -> do
-      condition <- withDefaultInfo (S.Negate rhs)
+      condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
       withDefaultInfo $ S.While condition [lhs]
     _ -> withDefaultInfo $ S.Error children
   | name == "until_statement" = case children of
     ( expr : rest ) -> do
-      condition <- withDefaultInfo (S.Negate expr)
+      condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
   | otherwise = withDefaultInfo $ case (name, children) of
@@ -123,11 +123,13 @@ termConstructor source sourceSpan name range children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
-    withDefaultInfo syntax = do
+    withRecord record syntax = pure $! cofree (record :< syntax)
+    withCategory category syntax = do
       sourceSpan' <- sourceSpan
-      pure $! case syntax of
-        S.MethodCall{} -> cofree ((range .:  MethodCall .: sourceSpan' .: RNil) :< syntax)
-        _ -> cofree ((range .: categoryForRubyName name .: sourceSpan' .: RNil) :< syntax)
+      pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)
+    withDefaultInfo syntax = case syntax of
+      S.MethodCall{} -> withCategory MethodCall syntax
+      _ -> withCategory (categoryForRubyName name) syntax
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case

@@ -134,6 +134,7 @@ data Category
   | RescueModifier
   | When
   | RescuedException
+  | Negate
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -202,6 +203,7 @@ instance Arbitrary Category where
     , pure RescueModifier
     , pure When
     , pure RescuedException
+    , pure Negate
     , Other <$> arbitrary
     ]
 

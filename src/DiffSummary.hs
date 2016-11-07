@@ -392,6 +392,7 @@ instance HasCategory Category where
     C.RescueModifier -> "rescue modifier"
     C.When -> "when comparison"
     C.RescuedException -> "last exception"
+    C.Negate -> "negate"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
