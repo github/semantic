@@ -36,7 +36,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "291c23618b5574de7402f710d7feba58b0edbcc2..f52d02d0007fbcf6d4447578ae0f085e5c995bef"
+    "shas": "f6f1229dfdaa0bf7f5b33425764b3b4423e6e28c..b10ccba8ad4f11f74e74fe5eca3b97e5a604aff2"
 }
 ,{
     "testCaseDescription": "ruby-ensure-insert-test",
@@ -77,7 +77,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f52d02d0007fbcf6d4447578ae0f085e5c995bef..999a581cd8dc26f89cd2145133271109ef2504f3"
+    "shas": "b10ccba8ad4f11f74e74fe5eca3b97e5a604aff2..fa5e430655c2dcff9f8c706046b6c5a230172103"
 }
 ,{
     "testCaseDescription": "ruby-ensure-replacement-test",
@@ -86,18 +86,30 @@
             "ensure.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'bar' identifier in an ensure block"
+                    "summary": "Replaced an ensure block with an 'bar' identifier in a begin statement"
                 }
             ]
         },
@@ -119,7 +131,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "999a581cd8dc26f89cd2145133271109ef2504f3..fad947ef36d88b7e323747c024af8904eceedede"
+    "shas": "fa5e430655c2dcff9f8c706046b6c5a230172103..5eb9ced9edc1f64762468d4378055a3c44c7688c"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-replacement-test",
@@ -128,18 +140,30 @@
             "ensure.rb": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'bar' identifier in an ensure block"
+                    "summary": "Replaced the 'bar' identifier with the ensure block in a begin statement"
                 }
             ]
         },
@@ -161,7 +185,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "fad947ef36d88b7e323747c024af8904eceedede..5bb953c9575b80ac5bc457ceed86b67092944a8c"
+    "shas": "5eb9ced9edc1f64762468d4378055a3c44c7688c..a8e6dd4fff6bf1580be14213e216207ed53cf059"
 }
 ,{
     "testCaseDescription": "ruby-ensure-delete-insert-test",
@@ -202,7 +226,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5bb953c9575b80ac5bc457ceed86b67092944a8c..9e3babd9f3ba565f0d1d9ab6e24a2de63adefb87"
+    "shas": "a8e6dd4fff6bf1580be14213e216207ed53cf059..324595aac765613b219d4e80d627e6eb186cec57"
 }
 ,{
     "testCaseDescription": "ruby-ensure-teardown-test",
@@ -242,5 +266,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9e3babd9f3ba565f0d1d9ab6e24a2de63adefb87..7d242e1a703020b3d44a44dfca02698401fd5888"
+    "shas": "324595aac765613b219d4e80d627e6eb186cec57..5df8bfbe172193e6124da27f457fa6fb19547593"
 }]

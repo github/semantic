@@ -37,7 +37,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c723ad6d1865bc31b8b6d554c0768635937c0ab3..283ae1e6221f0617fd5ec6d20db443579bfa869b"
+    "shas": "4bf7d0bf7a5f56e68acbec672e139df1702a7f37..5b4964a35255ff016d9da31b9cb8bf36778aa043"
 }
 ,{
     "testCaseDescription": "ruby-when-else-insert-test",
@@ -79,7 +79,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "283ae1e6221f0617fd5ec6d20db443579bfa869b..639f5d0d1b1e4ae8a3f7aa870c4edaa8de2e1658"
+    "shas": "5b4964a35255ff016d9da31b9cb8bf36778aa043..bc90856b69058e9fbce171c0c94504ce05b21a75"
 }
 ,{
     "testCaseDescription": "ruby-when-else-replacement-test",
@@ -88,18 +88,30 @@
             "when-else.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'qoz' identifier in an else block"
+                    "summary": "Replaced an else block with an 'qoz' identifier in the 'foo' case statement"
                 }
             ]
         },
@@ -121,7 +133,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "639f5d0d1b1e4ae8a3f7aa870c4edaa8de2e1658..60681cda49b81c0c9372b049209a373135f2da77"
+    "shas": "bc90856b69058e9fbce171c0c94504ce05b21a75..44f9ec6f04b1705e4fcc65bd704593c6945d7f77"
 }
 ,{
     "testCaseDescription": "ruby-when-else-delete-replacement-test",
@@ -130,18 +142,30 @@
             "when-else.rb": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'qoz' identifier in an else block"
+                    "summary": "Replaced the 'qoz' identifier with the else block in the 'foo' case statement"
                 }
             ]
         },
@@ -163,7 +187,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "60681cda49b81c0c9372b049209a373135f2da77..13946aba199ec4be3a9a7d11815fd5dd987c3c3b"
+    "shas": "44f9ec6f04b1705e4fcc65bd704593c6945d7f77..c1b522289f7864ca47e536478df06830c958061d"
 }
 ,{
     "testCaseDescription": "ruby-when-else-delete-insert-test",
@@ -205,7 +229,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "13946aba199ec4be3a9a7d11815fd5dd987c3c3b..53011c7928dc7a14a2e1aa5605dd08cd4ad34de5"
+    "shas": "c1b522289f7864ca47e536478df06830c958061d..c3668122d9d5da3171cf5e831a48ee3f42cdb19e"
 }
 ,{
     "testCaseDescription": "ruby-when-else-teardown-test",
@@ -246,5 +270,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "53011c7928dc7a14a2e1aa5605dd08cd4ad34de5..dbbf1ed8a8cafe556ea468af463f118f3ca0f4ba"
+    "shas": "c3668122d9d5da3171cf5e831a48ee3f42cdb19e..51729c359e350d71395532126c23bfed960f2373"
 }]

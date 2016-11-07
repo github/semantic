@@ -36,7 +36,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cc81318f97e858789ab75eb6e9c4a9ef9a96807c..33bc769c08469883737fe1140d2144dc561d0d81"
+    "shas": "4fed48f0abf8058f93dbb4c7361358c434c9bb6d..e1fa35de3fc02773c68ea68b126d5a42843cff03"
 }
 ,{
     "testCaseDescription": "ruby-else-insert-test",
@@ -77,7 +77,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "33bc769c08469883737fe1140d2144dc561d0d81..96b6809efbb8797d78b2b81d56d17340c9035538"
+    "shas": "e1fa35de3fc02773c68ea68b126d5a42843cff03..37109135d5e8872de06650f214f53d5782718911"
 }
 ,{
     "testCaseDescription": "ruby-else-replacement-test",
@@ -86,18 +86,30 @@
             "else.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'bar()' function call in an else block"
+                    "summary": "Replaced an else block with an 'bar()' function call in a begin statement"
                 }
             ]
         },
@@ -119,7 +131,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "96b6809efbb8797d78b2b81d56d17340c9035538..e57a5478d9f5f42241e37c822610bf478930673f"
+    "shas": "37109135d5e8872de06650f214f53d5782718911..e9f5d111cea4eb38ef60719ace819f23d38d2c7b"
 }
 ,{
     "testCaseDescription": "ruby-else-delete-replacement-test",
@@ -128,18 +140,30 @@
             "else.rb": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'bar()' function call in an else block"
+                    "summary": "Replaced the 'bar()' function call with the else block in a begin statement"
                 }
             ]
         },
@@ -161,7 +185,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e57a5478d9f5f42241e37c822610bf478930673f..876365e1b571b6c9641bf92e5baca7662e0ebc4f"
+    "shas": "e9f5d111cea4eb38ef60719ace819f23d38d2c7b..343ff65611626b914e8d8a3e97c6159ef40e1262"
 }
 ,{
     "testCaseDescription": "ruby-else-delete-insert-test",
@@ -202,7 +226,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "876365e1b571b6c9641bf92e5baca7662e0ebc4f..3067849e0a352190b4d636187878720d8d6e6b17"
+    "shas": "343ff65611626b914e8d8a3e97c6159ef40e1262..d849d51a7355131232dbf59bd5b3d20fa660b059"
 }
 ,{
     "testCaseDescription": "ruby-else-teardown-test",
@@ -242,5 +266,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3067849e0a352190b4d636187878720d8d6e6b17..d571b61c3d53f568ed84cc6dad1c76cea2abe08d"
+    "shas": "d849d51a7355131232dbf59bd5b3d20fa660b059..f6f1229dfdaa0bf7f5b33425764b3b4423e6e28c"
 }]

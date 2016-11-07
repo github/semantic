@@ -69,13 +69,14 @@ termConstructor source sourceSpan name range children
     ("throw_statment", _ ) -> S.Error children
     ("new_expression", [ expr ]) -> S.Constructor expr
     ("new_expression", _ ) -> S.Error children
-    ("try_statement", [ body ]) -> S.Try body Nothing Nothing
-    ("try_statement", [ body, catch ]) | Catch <- category (extract catch) -> S.Try body (Just catch) Nothing
-    ("try_statement", [ body, finally ]) | Finally <- category (extract finally) -> S.Try body Nothing (Just finally)
-    ("try_statement", [ body, catch, finally ])
-      | Catch <- category (extract catch)
-      , Finally <- category (extract finally) -> S.Try body (Just catch) (Just finally)
-    ("try_statement", _ ) -> S.Error children
+    ("try_statement", _) -> case children of
+      [ body ] -> S.Try [body] [] Nothing Nothing
+      [ body, catch ] | Catch <- category (extract catch) -> S.Try [body] [catch] Nothing Nothing
+      [ body, finally ] | Finally <- category (extract finally) -> S.Try [body] [] Nothing (Just finally)
+      [ body, catch, finally ]
+        | Catch <- category (extract catch)
+        , Finally <- category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
+      _ -> S.Error children
     ("array", _) -> S.Array children
     ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))

@@ -117,7 +117,7 @@ syntaxToTermField syntax = case syntax of
   S.Return expression -> [ "expression" .= expression ]
   S.Throw c -> [ "expression" .= c ]
   S.Constructor expression -> [ "expression" .= expression ]
-  S.Try body catchExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "finallyExpression" .= finallyExpression ]
+  S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
   S.Array c -> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier parameters definitions -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
@@ -129,6 +129,5 @@ syntaxToTermField syntax = case syntax of
   S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
   S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
-  S.BlockExpression expressions -> childrenFields expressions
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
   where childrenFields c = [ "children" .= c ]

@@ -56,7 +56,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Export{} -> Identifiable
           S.Ternary{} -> Identifiable
           S.If{} -> Identifiable
-          S.BlockExpression{} -> Identifiable
+          S.Try{} -> Identifiable
           S.Switch{} -> Identifiable
           S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
@@ -225,7 +225,7 @@ toTermName source term = case unwrap term of
   S.DoWhile _ expr -> toTermName' expr
   S.Throw expr -> termNameFromSource expr
   S.Constructor expr -> toTermName' expr
-  S.Try expr _ _ -> termNameFromSource expr
+  S.Try clauses _ _ _ -> termNameFromChildren term clauses
   S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
@@ -240,7 +240,6 @@ toTermName source term = case unwrap term of
   S.ConditionalAssignment id _ -> toTermName' id
   S.Until expr _ -> toTermName' expr
   S.Unless expr _ -> termNameFromSource expr
-  S.BlockExpression clauses -> termNameFromChildren term clauses
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))

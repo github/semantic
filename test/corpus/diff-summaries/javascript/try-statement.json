@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'g' identifier"
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the { f; } try statement"
                 },
                 {
                     "span": {
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'h' identifier"
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the { f; } try statement"
                 }
             ]
         },
@@ -201,7 +201,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'h' identifier"
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the { f; } try statement"
                 },
                 {
                     "span": {
@@ -228,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'g' identifier"
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the { f; } try statement"
                 }
             ]
         },

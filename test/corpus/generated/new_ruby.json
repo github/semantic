@@ -5,9 +5,21 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "syntax": "method-calls",
-        "insert": "x.foo()",
-        "replacement": "bar()"
+        "syntax": "if",
+        "insert": "if foo\n  bar\nelsif quux\n  baz\nelse\n  bat\nend",
+        "replacement": "if x\nend\nif y then\nend"
+      },
+      {
+        "syntax": "else",
+        "template": "begin\n  foo()\n{0}end",
+        "insert": "else\n",
+        "replacement": "else\n  bar()\n"
+      },
+      {
+        "syntax": "ensure",
+        "template": "begin\n  foo\n{0}end",
+        "insert": "ensure\n",
+        "replacement": "ensure\n  bar\n"
       }
     ]
   }

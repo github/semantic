@@ -40,7 +40,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9a18b4c80b2e7e2bdca5da3ea6388d1cb4727f8f..09e135965f850e6105dc12cbc31fbd33680c95cd"
+    "shas": "51729c359e350d71395532126c23bfed960f2373..eb8e4745aa2692c20519254d7b8d27b3a2c07cac"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-insert-test",
@@ -121,7 +121,7 @@
         " elsif quux"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "09e135965f850e6105dc12cbc31fbd33680c95cd..7a39278a9e93352f00f7dfa6362470078b3c27c9"
+    "shas": "eb8e4745aa2692c20519254d7b8d27b3a2c07cac..a0d707f1e50df11d0aa4d3407dfcf79fad65acc6"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-insert-test",
@@ -189,16 +189,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
-                                1
+                                6,
+                                3
                             ],
                             "end": [
-                                7,
-                                1
+                                6,
+                                6
                             ]
                         }
                     },
-                    "summary": "Added an else block in the 'foo' if statement"
+                    "summary": "Added the 'bat' identifier in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -242,7 +242,7 @@
         "   bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7a39278a9e93352f00f7dfa6362470078b3c27c9..cbf9441cd701880ffb2ae337601fdef3fd69de61"
+    "shas": "a0d707f1e50df11d0aa4d3407dfcf79fad65acc6..b9ef26ef27b3cf5ad0e522a145ede60f9b4f3dc2"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-test",
@@ -310,16 +310,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                1
+                                6,
+                                3
                             ],
                             "end": [
-                                7,
-                                1
+                                6,
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted an else block in the 'x' if statement"
+                    "summary": "Deleted the 'bat' identifier in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -363,7 +363,7 @@
         "   bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cbf9441cd701880ffb2ae337601fdef3fd69de61..9af355b039a2d55b9201d78ff8f99773fb085b5b"
+    "shas": "b9ef26ef27b3cf5ad0e522a145ede60f9b4f3dc2..af72ae7656106dce11ffcbd6c2a31e9a756b0342"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-replacement-test",
@@ -421,7 +421,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9af355b039a2d55b9201d78ff8f99773fb085b5b..0b742b0999af15895c1470c7f6dbafde5168f693"
+    "shas": "af72ae7656106dce11ffcbd6c2a31e9a756b0342..2aef901d538d790e42fec0a2a6b1522d8b4fce9e"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-test",
@@ -468,7 +468,7 @@
         " if y then"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0b742b0999af15895c1470c7f6dbafde5168f693..8c45366900e95149ad6489d3f46b949c8159f5bd"
+    "shas": "2aef901d538d790e42fec0a2a6b1522d8b4fce9e..bd1fd56e20054df058e8bc8d3e2dd0d523ecce08"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-rest-test",
@@ -524,5 +524,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8c45366900e95149ad6489d3f46b949c8159f5bd..8faf69d7a7d6454f74fea1b6ecf0dae989609b0c"
+    "shas": "bd1fd56e20054df058e8bc8d3e2dd0d523ecce08..4fed48f0abf8058f93dbb4c7361358c434c9bb6d"
 }]
