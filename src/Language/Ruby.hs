@@ -73,9 +73,9 @@ termConstructor source sourceSpan name range children
     ("rescue_block", _) -> case children of
       args : lastException : rest |
         category (extract args) == Args,
-        category (extract lastException) == LastException ->
+        category (extract lastException) == RescuedException ->
           S.Rescue (toList (unwrap args) <> [lastException]) rest
-      lastException : rest | category (extract lastException) == LastException -> S.Rescue [lastException] rest
+      lastException : rest | category (extract lastException) == RescuedException -> S.Rescue [lastException] rest
       args : body | category (extract args) == Args -> S.Rescue (toList (unwrap args)) body
       body -> S.Rescue [] body
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
@@ -143,7 +143,7 @@ categoryForRubyName = \case
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
-  "last_exception" -> LastException
+  "rescued_exception" -> RescuedException
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method

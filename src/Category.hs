@@ -133,7 +133,7 @@ data Category
   | Rescue
   | RescueModifier
   | When
-  | LastException
+  | RescuedException
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -201,7 +201,7 @@ instance Arbitrary Category where
     , pure Rescue
     , pure RescueModifier
     , pure When
-    , pure LastException
+    , pure RescuedException
     , Other <$> arbitrary
     ]
 

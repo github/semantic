@@ -96,7 +96,7 @@ styleName category = "category-" <> case category of
   C.Rescue -> "rescue_block"
   C.RescueModifier -> "rescue_modifier"
   C.When -> "when_block"
-  C.LastException -> "last_exception"
+  C.RescuedException -> "last_exception"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

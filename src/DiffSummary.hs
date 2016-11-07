@@ -389,7 +389,7 @@ instance HasCategory Category where
     C.Rescue -> "rescue block"
     C.RescueModifier -> "rescue modifier"
     C.When -> "when comparison"
-    C.LastException -> "last exception"
+    C.RescuedException -> "last exception"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
