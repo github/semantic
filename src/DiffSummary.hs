@@ -223,7 +223,9 @@ toTermName source term = case unwrap term of
     (S.Negate condition) -> termNameFromSource condition
     _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
-  S.While expr _ -> toTermName' expr
+  S.While expr _ -> case unwrap expr of
+    (S.Negate condition) -> termNameFromSource condition
+    _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
   S.Throw expr -> termNameFromSource expr
   S.Constructor expr -> toTermName' expr
@@ -240,7 +242,6 @@ toTermName source term = case unwrap term of
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   S.ConditionalAssignment id _ -> toTermName' id
-  S.Until expr _ -> toTermName' expr
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   where toTermName' = toTermName source

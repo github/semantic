@@ -35,6 +35,16 @@ termConstructor source sourceSpan name range children
       condition <- withDefaultInfo (S.Negate expr)
       withDefaultInfo $ S.If condition rest
     _ -> withDefaultInfo $ S.Error children
+  | name == "until_modifier" = case children of
+    [ lhs, rhs ] -> do
+      condition <- withDefaultInfo (S.Negate rhs)
+      withDefaultInfo $ S.While condition [lhs]
+    _ -> withDefaultInfo $ S.Error children
+  | name == "until_statement" = case children of
+    ( expr : rest ) -> do
+      condition <- withDefaultInfo (S.Negate expr)
+      withDefaultInfo $ S.While condition rest
+    _ -> withDefaultInfo $ S.Error children
   | otherwise = withDefaultInfo $ case (name, children) of
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
@@ -100,11 +110,6 @@ termConstructor source sourceSpan name range children
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
     ("return_statement", _ ) -> S.Return (listToMaybe children)
-    ("unless_statement", _ ) -> S.Error children
-    ("until_modifier", [ lhs, condition ]) -> S.Until condition [lhs]
-    ("until_modifier", _ ) -> S.Error children
-    ("until_statement", expr : rest ) -> S.Until expr rest
-    ("until_statement", _ ) -> S.Error children
     ("while_modifier", [ lhs, condition ]) -> S.While condition [lhs]
     ("while_modifier", _ ) -> S.Error children
     ("while_statement", expr : rest ) -> S.While expr rest

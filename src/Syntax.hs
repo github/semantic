@@ -79,8 +79,7 @@ data Syntax a f
   -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield (Maybe f)
-  | Until { untilExpr :: f, untilBody :: [f] }
-  -- | A negation has a single expression.
+  -- | A negation of a single expression.
   | Negate f
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
   | Rescue [f] [f]

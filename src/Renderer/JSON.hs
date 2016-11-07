@@ -127,7 +127,6 @@ syntaxToTermField syntax = case syntax of
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
-  S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
   S.Negate expr -> [ "negate" .= expr ]
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
   where childrenFields c = [ "children" .= c ]
