@@ -5,21 +5,9 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "syntax": "if",
-        "insert": "if foo\n  bar\nelsif quux\n  baz\nelse\n  bat\nend",
-        "replacement": "if x\nend\nif y then\nend"
-      },
-      {
-        "syntax": "else",
-        "template": "begin\n  foo()\n{0}end",
-        "insert": "else\n",
-        "replacement": "else\n  bar()\n"
-      },
-      {
-        "syntax": "ensure",
-        "template": "begin\n  foo\n{0}end",
-        "insert": "ensure\n",
-        "replacement": "ensure\n  bar\n"
+        "syntax": "module",
+        "insert": "module Foo\nend",
+        "replacement": "module Foo\n  def bar\n  end\nend"
       }
     ]
   }

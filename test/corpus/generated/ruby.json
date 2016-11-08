@@ -123,7 +123,7 @@
       {
         "syntax": "module",
         "insert": "module Foo\nend",
-        "replacement": "module Foo\n  def bar\nend\nend"
+        "replacement": "module Foo\n  def bar\n  end\nend"
       },
       {
         "syntax": "return",
