@@ -99,7 +99,9 @@ styleName category = "category-" <> case category of
   C.RescuedException -> "last_exception"
   C.RescueArgs -> "rescue_args"
   C.Negate -> "negate"
-  C.ArgumentPair -> "pair"
+  C.ArgumentPair -> "argument_pair"
+  C.KeywordParam -> "keyword_param"
+  C.PositionalParam -> "positional_param"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
