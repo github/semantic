@@ -33,7 +33,7 @@ run Arguments{..} = do
   let parsers = parserWithSource <$> filePaths
   let parsersAndBlobs = zip parsers sourceBlobs
 
-  terms <- traverse (\(parser, sourceBlob) -> parser sourceBlob) parsersAndBlobs
+  terms <- traverse (uncurry folder) parsersAndBlobs
 
   putStrLn $ encodePretty terms
 
