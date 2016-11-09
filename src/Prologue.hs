@@ -3,7 +3,7 @@ module Prologue
 , lookup
 , (&&&)
 , (***)
-, hylo, cata, para
+, hylo, cata, para, ana
 , module Data.Hashable
 , last
 ) where
@@ -17,6 +17,6 @@ import Control.Comonad as X
 
 import Control.Arrow ((&&&), (***))
 
-import Data.Functor.Foldable (hylo, cata, para)
+import Data.Functor.Foldable (hylo, cata, para, ana)
 
 import Data.Hashable
