@@ -49,7 +49,6 @@ termConstructor source sourceSpan name range children
     ("argument_pair", [ k, v ] ) -> S.Pair k v
     ("argument_pair", _ ) -> S.Error children
     ("keyword_parameter", [ k, v ] ) -> S.Pair k v
-    -- ("keyword_parameter", [ k ] ) -> S.Fixed [k]
     ("positional_parameter", [ k, v ] ) -> S.Pair k v
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
