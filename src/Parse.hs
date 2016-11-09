@@ -35,7 +35,7 @@ run Arguments{..} = do
 
   terms <- traverse (uncurry folder) parsersAndBlobs
 
-  putStrLn $ encodePretty terms
+  traverse_ (\ (parseJSON :< annotation) -> putStrLn . encodePretty $ parseJSON) (runCofree <$> terms)
 
   pure ()
   where
