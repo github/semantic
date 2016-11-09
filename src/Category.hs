@@ -137,6 +137,8 @@ data Category
   | When
   | Negate
   | ArgumentPair
+  | KeywordParam
+  | PositionalParam
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -208,6 +210,8 @@ instance Arbitrary Category where
     , pure When
     , pure Negate
     , pure ArgumentPair
+    , pure KeywordParam
+    , pure PositionalParam
     , Other <$> arbitrary
     ]
 

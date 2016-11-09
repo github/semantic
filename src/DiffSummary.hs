@@ -394,6 +394,8 @@ instance HasCategory Category where
     C.RescueArgs -> "arguments"
     C.Negate -> "negate"
     C.ArgumentPair -> "argument"
+    C.KeywordParam -> "parameter"
+    C.PositionalParam -> "parameter"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

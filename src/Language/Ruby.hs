@@ -48,6 +48,9 @@ termConstructor source sourceSpan name range children
   | otherwise = withDefaultInfo $ case (name, children) of
     ("argument_pair", [ k, v ] ) -> S.Pair k v
     ("argument_pair", _ ) -> S.Error children
+    ("keyword_parameter", [ k, v ] ) -> S.Pair k v
+    -- ("keyword_parameter", [ k ] ) -> S.Fixed [k]
+    ("positional_parameter", [ k, v ] ) -> S.Pair k v
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
@@ -168,12 +171,14 @@ categoryForRubyName = \case
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
+  "keyword_parameter" -> KeywordParam
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method
   "module_declaration"  -> Module
   "nil" -> Identifier
   "or" -> BooleanOperator
+  "positional_parameter" -> PositionalParam
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.

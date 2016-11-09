@@ -52,7 +52,7 @@
         "+x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f99339c141252271935202cb6c4b96a5076cf574..98a5ec1c60abaf1b78a8b0e337b95a0f962b25ac"
+    "shas": "3bb1c281d994cc6dc7ae3b4123ecfe7bc4e9a4ad..0e189b7286042eac7f4dc2d734ee25d7df782697"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
@@ -68,21 +68,6 @@
                             ],
                             "end": [
                                 1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
                                 2
                             ]
                         }
@@ -116,12 +101,12 @@
                                 2
                             ],
                             "end": [
-                                2,
-                                21
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the ', y, z = 10, 20, 30' at line 2, column 2 - line 2, column 21"
+                    "summary": "Added the ', y, z = 10, 20, 30\nx' at line 2, column 2 - line 3, column 2"
                 }
             ]
         }
@@ -140,7 +125,7 @@
         " x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "98a5ec1c60abaf1b78a8b0e337b95a0f962b25ac..c48c21b17b29aa5e6bd49b027c9b43a9e8de8555"
+    "shas": "0e189b7286042eac7f4dc2d734ee25d7df782697..d067041f230f898d7c96eb355fe81f2d3773d2c6"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
@@ -149,34 +134,115 @@
             "multiple-assignments.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    2
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    2
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21 with the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21"
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' last exception"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added '20'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added '30'"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
+                }
+            ]
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -193,7 +259,7 @@
         " x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c48c21b17b29aa5e6bd49b027c9b43a9e8de8555..980e039b8ec804ddd8dbddc853077d19dbf9120a"
+    "shas": "d067041f230f898d7c96eb355fe81f2d3773d2c6..5de1631198435982d9a0a84c46169d5d6d7ea075"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-test",
@@ -202,34 +268,115 @@
             "multiple-assignments.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    2
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    2
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21 with the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' last exception"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                7
+                            ],
+                            "end": [
+                                3,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                15
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '20'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                19
+                            ],
+                            "end": [
+                                3,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '30'"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
+                }
+            ]
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -246,7 +393,7 @@
         " x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "980e039b8ec804ddd8dbddc853077d19dbf9120a..859efa4bd7103d88fddb33e725029b020f6194ac"
+    "shas": "5de1631198435982d9a0a84c46169d5d6d7ea075..341e71598187b95dcc7b15484bae6f11e7bf2be1"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
@@ -332,30 +479,12 @@
         "+x, y = aVariable, 40"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "859efa4bd7103d88fddb33e725029b020f6194ac..0db7d6e491af2074c50a647bd3fde1732a13e8a1"
+    "shas": "341e71598187b95dcc7b15484bae6f11e7bf2be1..a6593c018a9df2378f861b9c1ad3b9177bfa829b"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-test",
     "expectedResult": {
-        "changes": {
-            "multiple-assignments.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {
             "multiple-assignments.rb": [
                 {
@@ -366,12 +495,12 @@
                                 2
                             ],
                             "end": [
-                                1,
-                                21
+                                2,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21"
+                    "summary": "Deleted the ', y, z = 10, 20, 30\nx' at line 1, column 2 - line 2, column 2"
                 }
             ]
         }
@@ -389,7 +518,7 @@
         " x, y = aVariable, 40"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0db7d6e491af2074c50a647bd3fde1732a13e8a1..c6eec07b5b8f35169a6c9fec9bf0ec78776a1dc7"
+    "shas": "a6593c018a9df2378f861b9c1ad3b9177bfa829b..062f58537be463677c5fdb1f2bdb348c6b5dc35b"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
@@ -445,5 +574,5 @@
         "-x, y = aVariable, 40"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c6eec07b5b8f35169a6c9fec9bf0ec78776a1dc7..118c643eafd1e37132a89af409f899e58621d0e4"
+    "shas": "062f58537be463677c5fdb1f2bdb348c6b5dc35b..8fdba55b3908d99741224cef85bcd7bef5dfcf2f"
 }]
