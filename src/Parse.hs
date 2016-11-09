@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators, DeriveAnyClass #-}
 module Parse where
 
