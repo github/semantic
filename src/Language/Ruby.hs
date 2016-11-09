@@ -102,10 +102,10 @@ termConstructor source sourceSpan name range children
     ("module_declaration", _ ) -> S.Error children
     ("rescue_block", _ ) -> case children of
       args : lastException : rest
-        | Args <- category (extract args)
+        | RescueArgs <- category (extract args)
         , RescuedException <- category (extract lastException) -> S.Rescue (toList (unwrap args) <> [lastException]) rest
       lastException : rest | RescuedException <- category (extract lastException) -> S.Rescue [lastException] rest
-      args : body | Args <- category (extract args) -> S.Rescue (toList (unwrap args)) body
+      args : body | RescueArgs <- category (extract args) -> S.Rescue (toList (unwrap args)) body
       body -> S.Rescue [] body
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
@@ -165,7 +165,6 @@ categoryForRubyName = \case
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
-  "rescued_exception" -> RescuedException
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method
@@ -175,8 +174,10 @@ categoryForRubyName = \case
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
+  "rescue_arguments" -> RescueArgs
   "rescue_block" -> Rescue
   "rescue_modifier" -> RescueModifier
+  "rescued_exception" -> RescuedException
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "string" -> StringLiteral
