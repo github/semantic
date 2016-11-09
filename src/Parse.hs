@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators, DeriveAnyClass #-}
 module Parse where
 
 import Arguments
@@ -21,6 +22,8 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import Renderer.JSON()
+
+data ParseJSON f a = ParseJSON { category :: Text, range :: Range, syntax :: Syntax f a, sourceText :: SourceText } deriving (Show, Generic, ToJSON, Functor)
 
 run :: Arguments -> IO ()
 run Arguments{..} = do
