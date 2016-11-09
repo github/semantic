@@ -116,6 +116,16 @@
         "replacement": "bar()"
       },
       {
+        "syntax": "method-calls-keyword-args",
+        "insert": "foo(bar: true)",
+        "replacement": "foo(bar: true, baz: 1)"
+      },
+      {
+        "syntax": "method-calls-hash-args",
+        "insert": "foo(:bar => true)",
+        "replacement": "foo(:bar => true, :baz => 1)"
+      },
+      {
         "syntax": "class",
         "insert": "class Foo < Super\n  def test; end\nend",
         "replacement": "class Foo\n  def test; end\nend"

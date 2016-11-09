@@ -136,6 +136,7 @@ data Category
   | RescueArgs
   | When
   | Negate
+  | ArgumentPair
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -206,6 +207,7 @@ instance Arbitrary Category where
     , pure RescueArgs
     , pure When
     , pure Negate
+    , pure ArgumentPair
     , Other <$> arbitrary
     ]
 

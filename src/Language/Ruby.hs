@@ -46,6 +46,8 @@ termConstructor source sourceSpan name range children
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
   | otherwise = withDefaultInfo $ case (name, children) of
+    ("argument_pair", [ k, v ] ) -> S.Pair k v
+    ("argument_pair", _ ) -> S.Error children
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
@@ -135,6 +137,7 @@ categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "and" -> BooleanOperator
   "argument_list" -> Args
+  "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
   "begin_statement" -> Begin

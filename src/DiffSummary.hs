@@ -13,7 +13,7 @@ import Syntax as S
 import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
-import Data.Text as Text (intercalate)
+import Data.Text as Text (intercalate, replace)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
@@ -60,6 +60,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Switch{} -> Identifiable
           S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
+          S.Pair{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -215,7 +216,9 @@ toTermName source term = case unwrap term of
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
-  S.Pair a _ -> toTermName' a <> ": …"
+  S.Pair k v -> Text.replace ":" "" (toTermName' k) <> ": " <> case identifiable v of
+    Identifiable v -> toTermName' v
+    Unidentifiable _ -> "…"
   S.Return expr -> maybe "empty" toTermName' expr
   S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
@@ -390,6 +393,7 @@ instance HasCategory Category where
     C.RescuedException -> "last exception"
     C.RescueArgs -> "arguments"
     C.Negate -> "negate"
+    C.ArgumentPair -> "argument"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

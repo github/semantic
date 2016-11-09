@@ -1,0 +1,323 @@
+[{
+    "testCaseDescription": "ruby-method-calls-hash-args-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index e69de29..32f81aa 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -0,0 +1 @@",
+        "+foo(:bar => true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0b8859a7463c7f7199a43896da33717a33adb581..7a3b7b95e6772f9bbf12b2652d9e6b0543bbc3a9"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-hash-args-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true, baz: 1)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index 32f81aa..0028a70 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -1 +1,3 @@",
+        "+foo(:bar => true, :baz => 1)",
+        "+foo(:bar => true)",
+        " foo(:bar => true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "7a3b7b95e6772f9bbf12b2652d9e6b0543bbc3a9..320658998fd4ee2f996c588145b11f7e5dd7cadc"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-hash-args-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                19
+                            ],
+                            "end": [
+                                1,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz: 1' argument in the foo(bar: true) function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index 0028a70..67cb62b 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo(:bar => true, :baz => 1)",
+        "+foo(:bar => true)",
+        " foo(:bar => true)",
+        " foo(:bar => true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "320658998fd4ee2f996c588145b11f7e5dd7cadc..da4df9f65cee9943106807788bf7af9beccc0188"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-hash-args-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                19
+                            ],
+                            "end": [
+                                1,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz: 1' argument in the foo(bar: true, baz: 1) function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index 67cb62b..0028a70 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo(:bar => true)",
+        "+foo(:bar => true, :baz => 1)",
+        " foo(:bar => true)",
+        " foo(:bar => true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "da4df9f65cee9943106807788bf7af9beccc0188..77b4ab53916c053c65b82af83196dfa72e09381d"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-hash-args-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true, baz: 1)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true, baz: 1)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index 0028a70..402c698 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -1,3 +1,2 @@",
+        "-foo(:bar => true, :baz => 1)",
+        "-foo(:bar => true)",
+        " foo(:bar => true)",
+        "+foo(:bar => true, :baz => 1)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "77b4ab53916c053c65b82af83196dfa72e09381d..ee4cd57d64dd1364a7c327c041537d4cbfe6dd41"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-hash-args-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index 402c698..3a6326e 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -1,2 +1 @@",
+        "-foo(:bar => true)",
+        " foo(:bar => true, :baz => 1)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ee4cd57d64dd1364a7c327c041537d4cbfe6dd41..52b0d3ce05c4cac541b0a92675582e76547e1c37"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-hash-args-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-hash-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true, baz: 1)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-hash-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-hash-args.rb b/method-calls-hash-args.rb",
+        "index 3a6326e..e69de29 100644",
+        "--- a/method-calls-hash-args.rb",
+        "+++ b/method-calls-hash-args.rb",
+        "@@ -1 +0,0 @@",
+        "-foo(:bar => true, :baz => 1)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "52b0d3ce05c4cac541b0a92675582e76547e1c37..3ab5bd23eb0228069d84c0fedf7b60c8fe25a1a5"
+}]

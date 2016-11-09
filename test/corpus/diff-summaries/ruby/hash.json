@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
+                    "summary": "Added the '{ key1: \"value\", key2: 1, \"key3\": false, \"symbol_key\": 10 }' object"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bcd6d0b339d47a3a232e595d43db61acf2bfae04..1618b6749dab1997b0e6606829f8594c205b0616"
+    "shas": "3ab5bd23eb0228069d84c0fedf7b60c8fe25a1a5..2725364055a76cb39a0dd62e89da329407697355"
 }
 ,{
     "testCaseDescription": "ruby-hash-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ key1: …, key2: …, key3: … }' object"
+                    "summary": "Added the '{ key1: \"changed value\", key2: 2, key3: true }' object"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
+                    "summary": "Added the '{ key1: \"value\", key2: 1, \"key3\": false, \"symbol_key\": 10 }' object"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1618b6749dab1997b0e6606829f8594c205b0616..06de914a4e27ab3c14240b993c16ca75ea2a9f74"
+    "shas": "2725364055a76cb39a0dd62e89da329407697355..3cdcf4f5414db06a235ff22ab130e46399db60ff"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-insert-test",
@@ -109,7 +109,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the ':key1: …' pair"
+                    "summary": "Added the 'key1: \"value\"' pair"
                 },
                 {
                     "span": {
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the ':key2: …' pair"
+                    "summary": "Added the 'key2: 1' pair"
                 },
                 {
                     "span": {
@@ -151,7 +151,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'key1: …' pair with the '\"key3\": …' pair"
+                    "summary": "Replaced the 'key1: \"changed value\"' pair with the '\"key3\": false' pair"
                 },
                 {
                     "span": {
@@ -178,7 +178,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'key2: …' pair with the ':\"symbol_key\": …' pair"
+                    "summary": "Replaced the 'key2: 2' pair with the '\"symbol_key\": 10' pair"
                 },
                 {
                     "span": {
@@ -193,7 +193,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'key3: …' pair"
+                    "summary": "Deleted the 'key3: true' pair"
                 }
             ]
         },
@@ -214,7 +214,7 @@
         " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "06de914a4e27ab3c14240b993c16ca75ea2a9f74..9b4b4ff04981427a62802545d093e8536fe6b273"
+    "shas": "3cdcf4f5414db06a235ff22ab130e46399db60ff..c3c9183829fa5977de2e57dbd42866f196e2e9c4"
 }
 ,{
     "testCaseDescription": "ruby-hash-replacement-test",
@@ -234,7 +234,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'key1: …' pair"
+                    "summary": "Added the 'key1: \"changed value\"' pair"
                 },
                 {
                     "span": {
@@ -261,7 +261,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ':key1: …' pair with the 'key2: …' pair"
+                    "summary": "Replaced the 'key1: \"value\"' pair with the 'key2: 2' pair"
                 },
                 {
                     "span": {
@@ -288,7 +288,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ':key2: …' pair with the 'key3: …' pair"
+                    "summary": "Replaced the 'key2: 1' pair with the 'key3: true' pair"
                 },
                 {
                     "span": {
@@ -303,7 +303,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key3\": …' pair"
+                    "summary": "Deleted the '\"key3\": false' pair"
                 },
                 {
                     "span": {
@@ -318,7 +318,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the ':\"symbol_key\": …' pair"
+                    "summary": "Deleted the '\"symbol_key\": 10' pair"
                 }
             ]
         },
@@ -339,7 +339,7 @@
         " { :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9b4b4ff04981427a62802545d093e8536fe6b273..35db7ac0f6000c8534941e46f08790624d929444"
+    "shas": "c3c9183829fa5977de2e57dbd42866f196e2e9c4..6f2c0e21634bddce82208f340fbc5b1b78009286"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-replacement-test",
@@ -359,7 +359,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ key1: …, key2: …, key3: … }' object"
+                    "summary": "Deleted the '{ key1: \"changed value\", key2: 2, key3: true }' object"
                 },
                 {
                     "span": {
@@ -374,7 +374,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
+                    "summary": "Deleted the '{ key1: \"value\", key2: 1, \"key3\": false, \"symbol_key\": 10 }' object"
                 },
                 {
                     "span": {
@@ -389,7 +389,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ key1: …, key2: …, key3: … }' object"
+                    "summary": "Added the '{ key1: \"changed value\", key2: 2, key3: true }' object"
                 }
             ]
         },
@@ -410,7 +410,7 @@
         "+{ key1: \"changed value\", key2: 2, key3: true }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "35db7ac0f6000c8534941e46f08790624d929444..673381f3ce87fd2d1102e55ce01a719ac28ad4b1"
+    "shas": "6f2c0e21634bddce82208f340fbc5b1b78009286..fbf98e25d8a46216e6cbcc4790ae9c6686749305"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-test",
@@ -430,7 +430,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
+                    "summary": "Deleted the '{ key1: \"value\", key2: 1, \"key3\": false, \"symbol_key\": 10 }' object"
                 }
             ]
         },
@@ -449,7 +449,7 @@
         " { key1: \"changed value\", key2: 2, key3: true }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "673381f3ce87fd2d1102e55ce01a719ac28ad4b1..cba8ccf48ee9899a1c5ad781289fe52f129f48d4"
+    "shas": "fbf98e25d8a46216e6cbcc4790ae9c6686749305..45bf18b1fa79cac61d38eb6f72bf309ecbff4f78"
 }
 ,{
     "testCaseDescription": "ruby-hash-delete-rest-test",
@@ -469,7 +469,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ key1: …, key2: …, key3: … }' object"
+                    "summary": "Deleted the '{ key1: \"changed value\", key2: 2, key3: true }' object"
                 }
             ]
         },
@@ -487,5 +487,5 @@
         "-{ key1: \"changed value\", key2: 2, key3: true }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cba8ccf48ee9899a1c5ad781289fe52f129f48d4..5b279526f66afb77b2588f5173ce44d7cc693f97"
+    "shas": "45bf18b1fa79cac61d38eb6f72bf309ecbff4f78..9ca1ce3253edee0894880354e9af62697893ddf8"
 }]
