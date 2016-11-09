@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-percent-array-insert-test",
+    "testCaseDescription": "ruby-method-calls-insert-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "method-calls.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,35 +12,35 @@
                             ],
                             "end": [
                                 1,
-                                12
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the '%w(one two)' array"
+                    "summary": "Added the 'x.foo()' method call"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "method-calls.rb"
     ],
     "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index e69de29..f2bc7a3 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index e69de29..5831d31 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
         "@@ -0,0 +1 @@",
-        "+%w(one two)"
+        "+x.foo()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "79b196cace027a076f4ba235171fd4f409bdaba9..60bbbb2dee1ceb124b3a5732a1f3ee63ec515497"
+    "shas": "17903b081197a8af07c0566effcb951a5c2b4e92..e934fefb49abf087c33e1240f8f6dd8750461981"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-replacement-insert-test",
+    "testCaseDescription": "ruby-method-calls-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "method-calls.rb": [
                 {
                     "span": {
                         "insert": {
@@ -50,11 +50,11 @@
                             ],
                             "end": [
                                 1,
-                                19
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the '%W(one #{b} three)' array"
+                    "summary": "Added the 'bar()' function call"
                 },
                 {
                     "span": {
@@ -65,119 +65,52 @@
                             ],
                             "end": [
                                 2,
-                                12
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the '%w(one two)' array"
+                    "summary": "Added the 'x.foo()' method call"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "method-calls.rb"
     ],
     "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index f2bc7a3..a706392 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 5831d31..ce891a7 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
         "@@ -1 +1,3 @@",
-        "+%W(one #{b} three)",
-        "+%w(one two)",
-        " %w(one two)"
+        "+bar()",
+        "+x.foo()",
+        " x.foo()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "60bbbb2dee1ceb124b3a5732a1f3ee63ec515497..7331cd0d8952471a92cddf2c85b3a8a3ce74846d"
+    "shas": "e934fefb49abf087c33e1240f8f6dd8750461981..aa456894a021e11601d5c5545633e8f9391038a9"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-insert-test",
+    "testCaseDescription": "ruby-method-calls-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                10
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "percent-array.rb"
-    ],
-    "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index a706392..339b21e 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
-        "@@ -1,3 +1,3 @@",
-        "-%W(one #{b} three)",
-        "+%w(one two)",
-        " %w(one two)",
-        " %w(one two)"
-    ],
-    "gitDir": "test/corpus/repos/ruby",
-    "shas": "7331cd0d8952471a92cddf2c85b3a8a3ce74846d..0a03996c67d51dc60959a36d35bb2bb781eff19b"
-}
-,{
-    "testCaseDescription": "ruby-percent-array-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "percent-array.rb": [
+            "method-calls.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                10
+                                1
                             ],
                             "end": [
                                 1,
-                                11
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "percent-array.rb"
-    ],
-    "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index 339b21e..a706392 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
-        "@@ -1,3 +1,3 @@",
-        "-%w(one two)",
-        "+%W(one #{b} three)",
-        " %w(one two)",
-        " %w(one two)"
-    ],
-    "gitDir": "test/corpus/repos/ruby",
-    "shas": "0a03996c67d51dc60959a36d35bb2bb781eff19b..864617da3f66a3b16b6ab2c7c63a0a449669fc01"
-}
-,{
-    "testCaseDescription": "ruby-percent-array-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "percent-array.rb": [
+                    "summary": "Added the 'x.foo()' method call"
+                },
                 {
                     "span": {
                         "delete": {
@@ -187,11 +120,108 @@
                             ],
                             "end": [
                                 1,
-                                19
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the '%W(one #{b} three)' array"
+                    "summary": "Deleted the 'bar()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index ce891a7..472abf1 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1,3 +1,3 @@",
+        "-bar()",
+        "+x.foo()",
+        " x.foo()",
+        " x.foo()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "aa456894a021e11601d5c5545633e8f9391038a9..526f90542e5291bf410c4f56e69c47282675bd1c"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.foo()' method call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 472abf1..ce891a7 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x.foo()",
+        "+bar()",
+        " x.foo()",
+        " x.foo()"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "526f90542e5291bf410c4f56e69c47282675bd1c..7c5ce020e41d5b01f7ea9f88acf3386f426e01e6"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar()' function call"
                 },
                 {
                     "span": {
@@ -202,11 +232,11 @@
                             ],
                             "end": [
                                 2,
-                                12
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the '%w(one two)' array"
+                    "summary": "Deleted the 'x.foo()' method call"
                 },
                 {
                     "span": {
@@ -217,38 +247,38 @@
                             ],
                             "end": [
                                 2,
-                                19
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the '%W(one #{b} three)' array"
+                    "summary": "Added the 'bar()' function call"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "method-calls.rb"
     ],
     "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index a706392..1e3e29b 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index ce891a7..6c5bbe0 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
         "@@ -1,3 +1,2 @@",
-        "-%W(one #{b} three)",
-        "-%w(one two)",
-        " %w(one two)",
-        "+%W(one #{b} three)"
+        "-bar()",
+        "-x.foo()",
+        " x.foo()",
+        "+bar()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "864617da3f66a3b16b6ab2c7c63a0a449669fc01..0bee45a0f42e71f1162b4150b0647cf13a05b8f8"
+    "shas": "7c5ce020e41d5b01f7ea9f88acf3386f426e01e6..ee7be1e9e40189aa48d053b3891b9f9ad093db4e"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-test",
+    "testCaseDescription": "ruby-method-calls-delete-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "method-calls.rb": [
                 {
                     "span": {
                         "delete": {
@@ -258,36 +288,36 @@
                             ],
                             "end": [
                                 1,
-                                12
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the '%w(one two)' array"
+                    "summary": "Deleted the 'x.foo()' method call"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "method-calls.rb"
     ],
     "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index 1e3e29b..54153c4 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 6c5bbe0..4be2e26 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
         "@@ -1,2 +1 @@",
-        "-%w(one two)",
-        " %W(one #{b} three)"
+        "-x.foo()",
+        " bar()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0bee45a0f42e71f1162b4150b0647cf13a05b8f8..4a8ac79d914f73b9e92da2948689badc6676ca31"
+    "shas": "ee7be1e9e40189aa48d053b3891b9f9ad093db4e..beafe8aef216cb2b54edb534e94edb3fd5138052"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-rest-test",
+    "testCaseDescription": "ruby-method-calls-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "method-calls.rb": [
                 {
                     "span": {
                         "delete": {
@@ -297,27 +327,27 @@
                             ],
                             "end": [
                                 1,
-                                19
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the '%W(one #{b} three)' array"
+                    "summary": "Deleted the 'bar()' function call"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "method-calls.rb"
     ],
     "patch": [
-        "diff --git a/percent-array.rb b/percent-array.rb",
-        "index 54153c4..e69de29 100644",
-        "--- a/percent-array.rb",
-        "+++ b/percent-array.rb",
+        "diff --git a/method-calls.rb b/method-calls.rb",
+        "index 4be2e26..e69de29 100644",
+        "--- a/method-calls.rb",
+        "+++ b/method-calls.rb",
         "@@ -1 +0,0 @@",
-        "-%W(one #{b} three)"
+        "-bar()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4a8ac79d914f73b9e92da2948689badc6676ca31..39e3abbd0e3332afc2314759fdd350cba39b8e28"
+    "shas": "beafe8aef216cb2b54edb534e94edb3fd5138052..eb51a430951de620d64e6e92df9603e953708321"
 }]

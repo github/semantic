@@ -12,15 +12,33 @@
                             ],
                             "end": [
                                 1,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                }
+            ]
+        },
+        "errors": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Added the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -34,7 +52,7 @@
         "+x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ae7f80931d5929403f69e872bbbb5459015f485d..bc54ecf7a9c07f9ee31a53067180aa239bbb16ba"
+    "shas": "f99339c141252271935202cb6c4b96a5076cf574..98a5ec1c60abaf1b78a8b0e337b95a0f962b25ac"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
@@ -50,11 +68,11 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, 40)' function call"
+                    "summary": "Added the 'x' identifier"
                 },
                 {
                     "span": {
@@ -65,15 +83,48 @@
                             ],
                             "end": [
                                 2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                }
+            ]
+        },
+        "errors": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Added the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the ', y, z = 10, 20, 30' at line 2, column 2 - line 2, column 21"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -89,28 +140,13 @@
         " x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bc54ecf7a9c07f9ee31a53067180aa239bbb16ba..40d2d8c5363413c7ca00245da5220a9054c9011c"
+    "shas": "98a5ec1c60abaf1b78a8b0e337b95a0f962b25ac..c48c21b17b29aa5e6bd49b027c9b43a9e8de8555"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
     "expectedResult": {
         "changes": {
             "multiple-assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier in the x(…, y, z, 20, 30) function call"
-                },
                 {
                     "span": {
                         "replace": [
@@ -121,55 +157,13 @@
                                 ],
                                 "end": [
                                     1,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ', y = aVariable' at line 1, column 2 - line 1, column 17 with the 'z' assignment in the x(…, y, z, 20, 30) function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added '20' in the x(…, y, z, 20, 30) function call"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
                                     21
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    19
+                                    2
                                 ],
                                 "end": [
                                     1,
@@ -178,29 +172,11 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '40' with '30' in the x(…, y, z, 20, 30) function call"
+                    "summary": "Replaced the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21 with the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21"
                 }
             ]
         },
-        "errors": {
-            "multiple-assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the ',' at line 1, column 2 - line 1, column 3 in the x(…, y, z, 20, 30) function call"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -217,7 +193,7 @@
         " x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "40d2d8c5363413c7ca00245da5220a9054c9011c..6495c6ec1bd0b7088c168f9dcd4c56a23d0c0103"
+    "shas": "c48c21b17b29aa5e6bd49b027c9b43a9e8de8555..980e039b8ec804ddd8dbddc853077d19dbf9120a"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-test",
@@ -226,115 +202,34 @@
             "multiple-assignments.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    2
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    2
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added '40' in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                7
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z' assignment in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '20' in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '30' in the x(…, 40) function call"
+                    "summary": "Replaced the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21 with the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
                 }
             ]
         },
-        "errors": {
-            "multiple-assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the ', y = aVariable' at line 1, column 2 - line 1, column 17 in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ',' at line 1, column 2 - line 1, column 3 in the x(…, 40) function call"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -351,7 +246,7 @@
         " x, y, z = 10, 20, 30"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6495c6ec1bd0b7088c168f9dcd4c56a23d0c0103..cc6cc8df0bcb3cf5ce51ba23c085f1dbcf5104a0"
+    "shas": "980e039b8ec804ddd8dbddc853077d19dbf9120a..859efa4bd7103d88fddb33e725029b020f6194ac"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
@@ -367,45 +262,60 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, 40)' function call"
+                    "summary": "Deleted the 'x' identifier"
                 },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ', y, z = 10, 20, 30' at line 3, column 2 - line 3, column 21 with the ', y = aVariable, 40' at line 2, column 2 - line 2, column 21"
+                }
+            ]
+        },
+        "errors": {
+            "multiple-assignments.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
-                                1
+                                1,
+                                2
                             ],
                             "end": [
-                                2,
+                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, y, z, 20, 30)' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x(…, 40)' function call"
+                    "summary": "Deleted the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -422,7 +332,7 @@
         "+x, y = aVariable, 40"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cc6cc8df0bcb3cf5ce51ba23c085f1dbcf5104a0..8f7f48b7b92739891525739d7b62bd58f98378b9"
+    "shas": "859efa4bd7103d88fddb33e725029b020f6194ac..0db7d6e491af2074c50a647bd3fde1732a13e8a1"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-test",
@@ -438,15 +348,33 @@
                             ],
                             "end": [
                                 1,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                }
+            ]
+        },
+        "errors": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Deleted the ', y, z = 10, 20, 30' at line 1, column 2 - line 1, column 21"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -461,7 +389,7 @@
         " x, y = aVariable, 40"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8f7f48b7b92739891525739d7b62bd58f98378b9..4c51e92f08422ff8e3851dedda68cdd32fa3e0fa"
+    "shas": "0db7d6e491af2074c50a647bd3fde1732a13e8a1..c6eec07b5b8f35169a6c9fec9bf0ec78776a1dc7"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
@@ -477,15 +405,33 @@
                             ],
                             "end": [
                                 1,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                }
+            ]
+        },
+        "errors": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, 40)' function call"
+                    "summary": "Deleted the ', y = aVariable, 40' at line 1, column 2 - line 1, column 21"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "multiple-assignments.rb"
@@ -499,5 +445,5 @@
         "-x, y = aVariable, 40"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4c51e92f08422ff8e3851dedda68cdd32fa3e0fa..cf8094c2727c8d78b8bde198e3e84f9aec793452"
+    "shas": "c6eec07b5b8f35169a6c9fec9bf0ec78776a1dc7..118c643eafd1e37132a89af409f899e58621d0e4"
 }]

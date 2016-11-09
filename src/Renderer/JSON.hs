@@ -100,7 +100,6 @@ syntaxToTermField syntax = case syntax of
   S.MathAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
-  S.Args c -> childrenFields c
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.VarDecl declaration -> [ "declaration" .= declaration ]
   S.VarAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
@@ -118,7 +117,7 @@ syntaxToTermField syntax = case syntax of
   S.Return expression -> [ "expression" .= expression ]
   S.Throw c -> [ "expression" .= c ]
   S.Constructor expression -> [ "expression" .= expression ]
-  S.Try body catchExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "finallyExpression" .= finallyExpression ]
+  S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
   S.Array c -> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier parameters definitions -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
@@ -128,6 +127,6 @@ syntaxToTermField syntax = case syntax of
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
-  S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
-  S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
+  S.Negate expr -> [ "negate" .= expr ]
+  S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
   where childrenFields c = [ "children" .= c ]

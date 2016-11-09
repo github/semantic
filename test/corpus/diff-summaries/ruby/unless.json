@@ -38,7 +38,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7c1f947c182cfe31103c45d2a28ea7497bf717e5..3c9d69a4042eb4b84cab2a598c910eb876a8ae59"
+    "shas": "eb51a430951de620d64e6e92df9603e953708321..3305c9604e19f1adb5acc1ac48128f02ba8824b5"
 }
 ,{
     "testCaseDescription": "ruby-unless-replacement-insert-test",
@@ -117,7 +117,7 @@
         " else"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3c9d69a4042eb4b84cab2a598c910eb876a8ae59..cd98efcd9f4096dc47e2467be6425452a824252d"
+    "shas": "3305c9604e19f1adb5acc1ac48128f02ba8824b5..b375e5596a5e365eafe9b0d2bec7778f71f80a59"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-insert-test",
@@ -149,34 +149,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'foo' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the foo unless statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    2,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    3
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the '\n' expression statements with the 'bar' identifier"
+                    "summary": "Added the 'bar' identifier in the foo unless statement"
                 },
                 {
                     "span": {
@@ -191,7 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bat' identifier"
+                    "summary": "Added the 'bat' identifier in the foo unless statement"
                 },
                 {
                     "span": {
@@ -233,7 +221,7 @@
         "   bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cd98efcd9f4096dc47e2467be6425452a824252d..9a1353fb91d63700a0e0528c3d5ccef2954185ce"
+    "shas": "b375e5596a5e365eafe9b0d2bec7778f71f80a59..f8fdadec2dc18f26cceabd013cc59cfc925f261d"
 }
 ,{
     "testCaseDescription": "ruby-unless-replacement-test",
@@ -265,34 +253,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'x' identifier"
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the x unless statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    3
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    2,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'bar' identifier with the '\n' expression statements"
+                    "summary": "Deleted the 'bar' identifier in the x unless statement"
                 },
                 {
                     "span": {
@@ -307,7 +283,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bat' identifier"
+                    "summary": "Deleted the 'bat' identifier in the x unless statement"
                 },
                 {
                     "span": {
@@ -349,7 +325,7 @@
         "   bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9a1353fb91d63700a0e0528c3d5ccef2954185ce..e613fb7f1b5c6cbe6b8f41f26dc806c92fcf0d77"
+    "shas": "f8fdadec2dc18f26cceabd013cc59cfc925f261d..ed0a3d5a27a0fef38499b6b79183b9afe9898a0e"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-replacement-test",
@@ -403,7 +379,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e613fb7f1b5c6cbe6b8f41f26dc806c92fcf0d77..e4263e28bfc3438ae1a48317f896cfb8e8463dc8"
+    "shas": "ed0a3d5a27a0fef38499b6b79183b9afe9898a0e..0a0941c08b3a3f65dbcbf32e375689ae3c541b42"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-test",
@@ -448,7 +424,7 @@
         " unless y then"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e4263e28bfc3438ae1a48317f896cfb8e8463dc8..67401c39d445a713e51e77073aa74b43e8dc3739"
+    "shas": "0a0941c08b3a3f65dbcbf32e375689ae3c541b42..95eeab305a4bd6687a1e532bc9be0965422ba737"
 }
 ,{
     "testCaseDescription": "ruby-unless-delete-rest-test",
@@ -504,5 +480,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "67401c39d445a713e51e77073aa74b43e8dc3739..b0aa009ffe6cf99d971f753dfaa18e634d15e00b"
+    "shas": "95eeab305a4bd6687a1e532bc9be0965422ba737..4bf7d0bf7a5f56e68acbec672e139df1702a7f37"
 }]

@@ -47,12 +47,19 @@ identifiable term = isIdentifiable (unwrap term) term
           S.MathAssignment{} -> Identifiable
           S.VarAssignment{} -> Identifiable
           S.SubscriptAccess{} -> Identifiable
+          S.Module{} -> Identifiable
           S.Class{} -> Identifiable
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
           S.DoWhile{} -> Identifiable
           S.Import{} -> Identifiable
           S.Export{} -> Identifiable
+          S.Ternary{} -> Identifiable
+          S.If{} -> Identifiable
+          S.Try{} -> Identifiable
+          S.Switch{} -> Identifiable
+          S.Case{} -> Identifiable
+          S.Rescue{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -139,6 +146,10 @@ determiner :: DiffInfo -> Doc
 determiner (LeafInfo "number" _ _) = ""
 determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
+determiner (LeafInfo "begin statement" _ _) = "a"
+determiner (LeafInfo "else block" _ _) = "an"
+determiner (LeafInfo "ensure block" _ _) = "an"
+determiner (LeafInfo "when block" _ _) = "a"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
@@ -152,6 +163,10 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "integer" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
+  (LeafInfo cName@"begin statement" _ _) -> toDoc cName
+  (LeafInfo cName@"else block" _ _) -> toDoc cName
+  (LeafInfo cName@"ensure block" _ _) -> toDoc cName
+  (LeafInfo cName@"when block" _ _) -> toDoc cName
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
@@ -192,12 +207,9 @@ toTermName source term = case unwrap term of
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
   S.VarAssignment varId _ -> toTermName' varId
   S.VarDecl decl -> toTermName' decl
-  -- TODO: We should remove Args from Syntax since I don't think we should ever
-  -- evaluate Args as a single toTermName Text - joshvera
-  S.Args args -> mconcat $ toTermName' <$> args
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
-  S.Case expr _ -> toTermName' expr
+  S.Case expr _ -> termNameFromSource expr
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
@@ -213,10 +225,10 @@ toTermName source term = case unwrap term of
   S.DoWhile _ expr -> toTermName' expr
   S.Throw expr -> termNameFromSource expr
   S.Constructor expr -> toTermName' expr
-  S.Try expr _ _ -> termNameFromSource expr
+  S.Try clauses _ _ _ -> termNameFromChildren term clauses
   S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
-  S.Method identifier _ _ -> toTermName' identifier
+  S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
@@ -226,8 +238,8 @@ toTermName source term = case unwrap term of
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   S.ConditionalAssignment id _ -> toTermName' id
-  S.Until expr _ -> toTermName' expr
-  S.Unless expr _ -> termNameFromSource expr
+  S.Negate expr -> toTermName' expr
+  S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -244,6 +256,20 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
   where
     identifiableDoc (c, t) = case c of
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
+      C.Begin -> "in a" <+> catName c
+      C.Else -> "in an" <+> catName c
+      C.Elsif -> "in the" <+> squotes (termName t) <+> catName c
+      C.Method -> "in the" <+> squotes (termName t) <+> catName c
+      C.Ternary -> "in the" <+> squotes (termName t) <+> catName c
+      C.Ensure -> "in an" <+> catName c
+      C.Rescue -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
+      C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
+      C.If -> "in the" <+> squotes (termName t) <+> catName c
+      C.Case -> "in the" <+> squotes (termName t) <+> catName c
+      C.Switch -> "in the" <+> squotes (termName t) <+> catName c
+      C.When -> "in a" <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
@@ -324,7 +350,7 @@ instance HasCategory Category where
     NumberLiteral -> "number"
     Other s -> s
     C.Pair -> "pair"
-    Params -> "params"
+    C.Params -> "params"
     Program -> "top level"
     Regex -> "regex"
     StringLiteral -> "string"
@@ -354,6 +380,15 @@ instance HasCategory Category where
     C.Yield -> "yield statement"
     C.Until -> "until statement"
     C.Unless -> "unless statement"
+    C.Begin -> "begin statement"
+    C.Else -> "else block"
+    C.Elsif -> "elsif block"
+    C.Ensure -> "ensure block"
+    C.Rescue -> "rescue block"
+    C.RescueModifier -> "rescue modifier"
+    C.When -> "when comparison"
+    C.RescuedException -> "last exception"
+    C.Negate -> "negate"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

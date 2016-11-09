@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'one' identifier in the one method of the 'Foo' class"
+                    "summary": "Replaced the 'foo' identifier with the 'one' identifier in the 'one(a)' method of the 'Foo' class"
                 },
                 {
                     "span": {
@@ -136,7 +136,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' method in the Foo class"
+                    "summary": "Added the 'two(b)' method in the Foo class"
                 },
                 {
                     "span": {
@@ -151,7 +151,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'three' method in the Foo class"
+                    "summary": "Added the 'three(c)' method in the Foo class"
                 },
                 {
                     "span": {
@@ -166,7 +166,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' method in the Foo class"
+                    "summary": "Deleted the 'bar(b)' method in the Foo class"
                 },
                 {
                     "span": {
@@ -181,7 +181,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' method in the Foo class"
+                    "summary": "Deleted the 'baz(c)' method in the Foo class"
                 }
             ]
         },
@@ -234,7 +234,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'foo' identifier in the foo method of the 'Foo' class"
+                    "summary": "Replaced the 'one' identifier with the 'foo' identifier in the 'foo(a)' method of the 'Foo' class"
                 },
                 {
                     "span": {
@@ -249,7 +249,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' method in the Foo class"
+                    "summary": "Added the 'bar(b)' method in the Foo class"
                 },
                 {
                     "span": {
@@ -264,7 +264,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' method in the Foo class"
+                    "summary": "Added the 'baz(c)' method in the Foo class"
                 },
                 {
                     "span": {
@@ -279,7 +279,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' method in the Foo class"
+                    "summary": "Deleted the 'two(b)' method in the Foo class"
                 },
                 {
                     "span": {
@@ -294,7 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'three' method in the Foo class"
+                    "summary": "Deleted the 'three(c)' method in the Foo class"
                 }
             ]
         },

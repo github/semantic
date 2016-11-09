@@ -91,8 +91,19 @@
       },
       {
         "syntax": "ternary",
-        "insert": "condition ? case1 : case2",
-        "replacement": "if condition then case 1 else case2"
+        "insert": "foo ? case1 : case2",
+        "replacement": "bar ? a : b"
+      },
+      {
+        "syntax": "method-declaration",
+        "insert": "def foo\nend",
+        "replacement": "def bar(a)\n  baz\nend"
+      },
+      {
+        "syntax": "method-declaration-params",
+        "template": "def foo{0}\nend",
+        "insert": "(a)",
+        "replacement": "(a, b, c)"
       },
       {
         "syntax": "method-invocation",
@@ -100,9 +111,9 @@
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)"
       },
       {
-        "syntax": "case-statement",
-        "insert": "case foo\nwhen bar\nend",
-        "replacement": "case foo\nwhen bar\nelse\nend"
+        "syntax": "method-calls",
+        "insert": "x.foo()",
+        "replacement": "bar()"
       },
       {
         "syntax": "class",
@@ -111,8 +122,8 @@
       },
       {
         "syntax": "module",
-        "insert": "module Foo\n  class Bar\n    def self.test; end\nend\nend",
-        "replacement": "class Bar::Foo\nend"
+        "insert": "module Foo\nend",
+        "replacement": "module Foo\n  def bar\n  end\nend"
       },
       {
         "syntax": "return",
@@ -188,6 +199,68 @@
         "syntax": "element-reference",
         "insert": "foo[bar]\nfoo[:bar]\nfoo[bar] = 1",
         "replacement": "x[\"b\"]\nx[:\"c\"]"
+      },
+      {
+        "syntax": "begin",
+        "template": "def foo\n{0}end",
+        "insert": "begin\nend\n",
+        "replacement": "begin\n  puts 'hi'\nend\n"
+      },
+      {
+        "syntax": "else",
+        "template": "begin\n  foo()\n{0}end",
+        "insert": "else\n",
+        "replacement": "else\n  bar()\n"
+      },
+      {
+        "syntax": "elsif",
+        "template": "if bar\n  foo()\n{0}end",
+        "insert": "elsif baz\n",
+        "replacement": "elsif baz\n  qoz()\n"
+      },
+      {
+        "syntax": "ensure",
+        "template": "begin\n  foo\n{0}end",
+        "insert": "ensure\n",
+        "replacement": "ensure\n  bar\n"
+      },
+      {
+        "syntax": "rescue",
+        "template": "begin\n  foo\n{0}end",
+        "insert": "rescue x\n",
+        "replacement": "rescue x\n  bar\n"
+      },
+      {
+        "syntax": "rescue-empty",
+        "insert": "begin\n  foo\nrescue\nend",
+        "replacement": "begin\n  foo\nrescue\n  bar\nend"
+      },
+      {
+        "syntax": "rescue-last-ex",
+        "insert": "begin\n  foo\nrescue Error => x\nend",
+        "replacement": "begin\n  foo\nrescue Error => x\n  bar\nend"
+      },
+      {
+        "syntax": "rescue-modifier",
+        "insert": "foo rescue nil",
+        "replacement": "foo rescue false"
+      },
+      {
+        "syntax": "rescue-modifier2",
+        "insert": "foo rescue nil",
+        "replacement": "bar rescue nil"
+      },
+      {
+        "syntax": "when",
+        "template": "case foo\n{0}end",
+        "insert": "when bar\n",
+        "replacement": "when bar\n  baz\n"
+      },
+      {
+        "syntax": "when-else",
+        "template": "case foo\nwhen bar\n  baz\n{0}end",
+        "insert": "else\n",
+        "replacement": "else\n  qoz\n"
       }
     ]
   }

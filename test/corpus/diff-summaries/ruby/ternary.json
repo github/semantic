@@ -12,11 +12,11 @@
                             ],
                             "end": [
                                 1,
-                                26
+                                20
                             ]
                         }
                     },
-                    "summary": "Added the 'condition' ternary expression"
+                    "summary": "Added the 'foo' ternary expression"
                 }
             ]
         },
@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index e69de29..698a2e2 100644",
+        "index e69de29..cc46e6d 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -0,0 +1 @@",
-        "+condition ? case1 : case2"
+        "+foo ? case1 : case2"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6436c88397ac50ad9fd8cf92b759ac75806d2f73..2a7008cf22ec4e1a78f00e9718714ed1b4fb6902"
+    "shas": "97f870df43868da61ab367aca7fcbfdf8a77aa00..e1f849d81b2f0565744fbf4f45a7cf54b924eae8"
 }
 ,{
     "testCaseDescription": "ruby-ternary-replacement-insert-test",
@@ -43,30 +43,33 @@
             "ternary.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'condition' ternary expression with the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1"
+                    "summary": "Added the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' ternary expression"
                 }
             ]
         },
@@ -77,16 +80,16 @@
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index 698a2e2..38cd95f 100644",
+        "index cc46e6d..44ee69e 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -1 +1,3 @@",
-        "+if condition then case 1 else case2",
-        "+condition ? case1 : case2",
-        " condition ? case1 : case2"
+        "+bar ? a : b",
+        "+foo ? case1 : case2",
+        " foo ? case1 : case2"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2a7008cf22ec4e1a78f00e9718714ed1b4fb6902..8270f03e9ee880ab02a580030a6033a75161f2d8"
+    "shas": "e1f849d81b2f0565744fbf4f45a7cf54b924eae8..15476ef40fd0d4fd9c8ae6157dc6039fbc450716"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-insert-test",
@@ -102,8 +105,8 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
-                                    1
+                                    1,
+                                    4
                                 ]
                             },
                             {
@@ -113,12 +116,66 @@
                                 ],
                                 "end": [
                                     1,
-                                    26
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1 with the 'condition' ternary expression"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'foo' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'case1' identifier in the 'foo' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'case2' identifier in the 'foo' ternary expression"
                 }
             ]
         },
@@ -129,17 +186,17 @@
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index 38cd95f..411fded 100644",
+        "index 44ee69e..86614c8 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -1,3 +1,3 @@",
-        "-if condition then case 1 else case2",
-        "+condition ? case1 : case2",
-        " condition ? case1 : case2",
-        " condition ? case1 : case2"
+        "-bar ? a : b",
+        "+foo ? case1 : case2",
+        " foo ? case1 : case2",
+        " foo ? case1 : case2"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8270f03e9ee880ab02a580030a6033a75161f2d8..00587528a4302fbfc5fa97f74052388e32c6efb9"
+    "shas": "15476ef40fd0d4fd9c8ae6157dc6039fbc450716..0f6207e02eb77f9f87e4a2b7256e0a80f978adc8"
 }
 ,{
     "testCaseDescription": "ruby-ternary-replacement-test",
@@ -156,7 +213,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    26
+                                    4
                                 ]
                             },
                             {
@@ -165,13 +222,67 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
-                                    1
+                                    1,
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'condition' ternary expression with the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'case1' identifier with the 'a' identifier in the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'case2' identifier with the 'b' identifier in the 'bar' ternary expression"
                 }
             ]
         },
@@ -182,17 +293,17 @@
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index 411fded..38cd95f 100644",
+        "index 86614c8..44ee69e 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -1,3 +1,3 @@",
-        "-condition ? case1 : case2",
-        "+if condition then case 1 else case2",
-        " condition ? case1 : case2",
-        " condition ? case1 : case2"
+        "-foo ? case1 : case2",
+        "+bar ? a : b",
+        " foo ? case1 : case2",
+        " foo ? case1 : case2"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "00587528a4302fbfc5fa97f74052388e32c6efb9..0282b16f15fb5382c393c5ade5345ded2d760226"
+    "shas": "0f6207e02eb77f9f87e4a2b7256e0a80f978adc8..1eb7b010282784002c1064e2433e57457e048cbb"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-replacement-test",
@@ -201,30 +312,48 @@
             "ternary.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    26
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1 with the 'condition' ternary expression"
+                    "summary": "Deleted the 'bar' ternary expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' ternary expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' ternary expression"
                 }
             ]
         },
@@ -235,17 +364,17 @@
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index 38cd95f..32b2056 100644",
+        "index 44ee69e..1ce4e51 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -1,3 +1,2 @@",
-        "-if condition then case 1 else case2",
-        "-condition ? case1 : case2",
-        " condition ? case1 : case2",
-        "+if condition then case 1 else case2"
+        "-bar ? a : b",
+        "-foo ? case1 : case2",
+        " foo ? case1 : case2",
+        "+bar ? a : b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0282b16f15fb5382c393c5ade5345ded2d760226..b82d7e261aeefd8745d87015c21b68b152a56a9d"
+    "shas": "1eb7b010282784002c1064e2433e57457e048cbb..16fba8824d7b308daeae80ae16375ff007846b9b"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-test",
@@ -261,11 +390,11 @@
                             ],
                             "end": [
                                 1,
-                                26
+                                20
                             ]
                         }
                     },
-                    "summary": "Deleted the 'condition' ternary expression"
+                    "summary": "Deleted the 'foo' ternary expression"
                 }
             ]
         },
@@ -276,21 +405,20 @@
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index 32b2056..f53e447 100644",
+        "index 1ce4e51..7f42328 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -1,2 +1 @@",
-        "-condition ? case1 : case2",
-        " if condition then case 1 else case2"
+        "-foo ? case1 : case2",
+        " bar ? a : b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b82d7e261aeefd8745d87015c21b68b152a56a9d..205c5b1241866e1705a0f2cc080fe3da4dd5f80a"
+    "shas": "16fba8824d7b308daeae80ae16375ff007846b9b..0783eee8d94a9d7a8f7d590f0a9716617e145336"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-rest-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "ternary.rb": [
                 {
                     "span": {
@@ -300,27 +428,28 @@
                                 1
                             ],
                             "end": [
-                                2,
-                                1
+                                1,
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'if condition then case 1 else case2\n' at line 1, column 1 - line 2, column 1"
+                    "summary": "Deleted the 'bar' ternary expression"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "ternary.rb"
     ],
     "patch": [
         "diff --git a/ternary.rb b/ternary.rb",
-        "index f53e447..e69de29 100644",
+        "index 7f42328..e69de29 100644",
         "--- a/ternary.rb",
         "+++ b/ternary.rb",
         "@@ -1 +0,0 @@",
-        "-if condition then case 1 else case2"
+        "-bar ? a : b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "205c5b1241866e1705a0f2cc080fe3da4dd5f80a..0afb16ab6d08fb158b2f5029251b71719ef2406e"
+    "shas": "0783eee8d94a9d7a8f7d590f0a9716617e145336..ec2870c9e829ba9514a3fc196f778f73f25ff514"
 }]

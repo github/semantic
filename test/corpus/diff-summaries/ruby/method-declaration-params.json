@@ -1,0 +1,268 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-params-setup-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-params.rb b/method-declaration-params.rb",
+        "index e69de29..ff7bbbe 100644",
+        "--- a/method-declaration-params.rb",
+        "+++ b/method-declaration-params.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f82bf4ad6ff1fbd5a9259bd1eacc5a0f4f859641..0197e7f75970a0d4fb4ac2094b70667322cd28f7"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier in the 'foo(a)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-params.rb b/method-declaration-params.rb",
+        "index ff7bbbe..47fdd58 100644",
+        "--- a/method-declaration-params.rb",
+        "+++ b/method-declaration-params.rb",
+        "@@ -1,2 +1,2 @@",
+        "-def foo",
+        "+def foo(a)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0197e7f75970a0d4fb4ac2094b70667322cd28f7..552d3174c07720ca6e22d4d10793d77b8cbd8272"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the 'foo(a, b, c)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier in the 'foo(a, b, c)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-params.rb b/method-declaration-params.rb",
+        "index 47fdd58..b9f1ab5 100644",
+        "--- a/method-declaration-params.rb",
+        "+++ b/method-declaration-params.rb",
+        "@@ -1,2 +1,2 @@",
+        "-def foo(a)",
+        "+def foo(a, b, c)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "552d3174c07720ca6e22d4d10793d77b8cbd8272..d1de60658c07241f71d613af600c1182ae93d5ee"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the 'foo(a)' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier in the 'foo(a)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-params.rb b/method-declaration-params.rb",
+        "index b9f1ab5..47fdd58 100644",
+        "--- a/method-declaration-params.rb",
+        "+++ b/method-declaration-params.rb",
+        "@@ -1,2 +1,2 @@",
+        "-def foo(a, b, c)",
+        "+def foo(a)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d1de60658c07241f71d613af600c1182ae93d5ee..9dbfbeb8ecb62a12415834b6b4d6acb2c25248e1"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier in the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-params.rb b/method-declaration-params.rb",
+        "index 47fdd58..ff7bbbe 100644",
+        "--- a/method-declaration-params.rb",
+        "+++ b/method-declaration-params.rb",
+        "@@ -1,2 +1,2 @@",
+        "-def foo(a)",
+        "+def foo",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9dbfbeb8ecb62a12415834b6b4d6acb2c25248e1..104d7b89ddba1700c8472a8622398479e4b75428"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-params-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-params.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-params.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-params.rb b/method-declaration-params.rb",
+        "index ff7bbbe..e69de29 100644",
+        "--- a/method-declaration-params.rb",
+        "+++ b/method-declaration-params.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "104d7b89ddba1700c8472a8622398479e4b75428..38847e533e9d63b067fd46b4e3bf8e4bcd68f0db"
+}]

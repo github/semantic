@@ -36,9 +36,6 @@ data Syntax a f
   -- | A method call consisting of its target, the method name, and the parameters passed to the method.
   -- | e.g. in Javascript console.log('hello') represents a method call.
   | MethodCall { targetId :: f, methodId :: f, methodParams :: [f] }
-  -- | The list of arguments to a method call.
-  -- | TODO: It might be worth removing this and using Fixed instead.
-  | Args [f]
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
@@ -49,7 +46,7 @@ data Syntax a f
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
   | Switch { switchExpr :: f, cases :: [f] }
-  | Case { caseExpr :: f, caseStatements :: f }
+  | Case { caseExpr :: f, caseStatements :: [f] }
   | Object { keyValues :: [f] }
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
@@ -65,7 +62,8 @@ data Syntax a f
   | Return (Maybe f)
   | Throw f
   | Constructor f
-  | Try f (Maybe f) (Maybe f)
+  -- | TODO: Is it a problem that in Ruby, this pattern can work for method def too?
+  | Try { tryBegin :: [f], catchRescue :: [f], beginElse :: Maybe f, finallyEnsure :: Maybe f }
   -- | An array literal with list of children.
   | Array [f]
   -- | A class with an identifier, superclass, and a list of definitions.
@@ -81,9 +79,10 @@ data Syntax a f
   -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield (Maybe f)
-  | Until { untilExpr :: f, untilBody :: [f] }
-  -- | An unless statement with an expression and maybe more expression clauses.
-  | Unless f [f]
+  -- | A negation of a single expression.
+  | Negate f
+  -- | A rescue block has a list of arguments to rescue and a list of expressions.
+  | Rescue [f] [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

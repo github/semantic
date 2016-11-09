@@ -41,21 +41,20 @@ termConstructor source sourceSpan name range children
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
     ("comma_op", _ ) -> S.Error children
-    ("function_call", _) -> case runCofree <$> children of
-      [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
-      [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
-      [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
-      (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
+    ("function_call", _) -> case children of
+      member : args | category (extract member) == MemberAccess -> case toList (unwrap member) of
+        [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
+        _ -> S.Error children
+      function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
     ("ternary", condition : cases) -> S.Ternary condition cases
     ("ternary", _ ) -> S.Error children
-    ("arguments", _) -> S.Args children
     ("var_assignment", [ x, y ]) -> S.VarAssignment x y
     ("var_assignment", _ ) -> S.Error children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
     ("switch_statement", expr : rest) -> S.Switch expr rest
     ("switch_statement", _ ) -> S.Error children
-    ("case", [ expr, body ]) -> S.Case expr body
+    ("case", [ expr, body ]) -> S.Case expr [body]
     ("case", _ ) -> S.Error children
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
@@ -70,13 +69,14 @@ termConstructor source sourceSpan name range children
     ("throw_statment", _ ) -> S.Error children
     ("new_expression", [ expr ]) -> S.Constructor expr
     ("new_expression", _ ) -> S.Error children
-    ("try_statement", [ body ]) -> S.Try body Nothing Nothing
-    ("try_statement", [ body, catch ]) | Catch <- category (extract catch) -> S.Try body (Just catch) Nothing
-    ("try_statement", [ body, finally ]) | Finally <- category (extract finally) -> S.Try body Nothing (Just finally)
-    ("try_statement", [ body, catch, finally ])
-      | Catch <- category (extract catch)
-      , Finally <- category (extract finally) -> S.Try body (Just catch) (Just finally)
-    ("try_statement", _ ) -> S.Error children
+    ("try_statement", _) -> case children of
+      [ body ] -> S.Try [body] [] Nothing Nothing
+      [ body, catch ] | Catch <- category (extract catch) -> S.Try [body] [catch] Nothing Nothing
+      [ body, finally ] | Finally <- category (extract finally) -> S.Try [body] [] Nothing (Just finally)
+      [ body, catch, finally ]
+        | Catch <- category (extract catch)
+        , Finally <- category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
+      _ -> S.Error children
     ("array", _) -> S.Array children
     ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))

@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-module-insert-test",
+    "testCaseDescription": "ruby-rescue-last-ex-insert-test",
     "expectedResult": {
         "changes": {
-            "module.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "insert": {
@@ -11,37 +11,39 @@
                                 1
                             ],
                             "end": [
-                                2,
+                                4,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'Foo' module"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "module.rb"
+        "rescue-last-ex.rb"
     ],
     "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index e69de29..85026ed 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -0,0 +1,2 @@",
-        "+module Foo",
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index e69de29..a5dbb28 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -0,0 +1,4 @@",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5df8bfbe172193e6124da27f457fa6fb19547593..9e3d30cbf214e01bac2e8ced270032fc40117c33"
+    "shas": "e805bb575511867c24e67d81ccae909f2668e660..57fbaa6c0752b39141df6d2229a40d52ab46eec2"
 }
 ,{
-    "testCaseDescription": "ruby-module-replacement-insert-test",
+    "testCaseDescription": "ruby-rescue-last-ex-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "module.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "insert": {
@@ -50,12 +52,180 @@
                                 1
                             ],
                             "end": [
-                                4,
+                                5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'Foo' module"
+                    "summary": "Added a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index a5dbb28..9c0bf85 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,4 +1,13 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "57fbaa6c0752b39141df6d2229a40d52ab46eec2..1abc809f7c5f4bce8b655282c1a89c80acdb4719"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in the 'Error, x' rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 9c0bf85..e6fe0ab 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,7 +1,6 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1abc809f7c5f4bce8b655282c1a89c80acdb4719..4d3835c45aaafa64cf2ea5d23c0e0a7ca25f50ba"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in the 'Error, x' rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index e6fe0ab..9c0bf85 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,6 +1,7 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "4d3835c45aaafa64cf2ea5d23c0e0a7ca25f50ba..1a1c77e9e42914a1ec12b746fa9bfaf045f39be6"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
                 },
                 {
                     "span": {
@@ -65,129 +235,49 @@
                                 1
                             ],
                             "end": [
-                                6,
+                                9,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'Foo' module"
+                    "summary": "Added a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "module.rb"
+        "rescue-last-ex.rb"
     ],
     "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index 85026ed..351dcd2 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -1,2 +1,8 @@",
-        " module Foo",
-        "+  def bar",
-        "+  end",
-        "+end",
-        "+module Foo",
-        "+end",
-        "+module Foo",
-        " end"
-    ],
-    "gitDir": "test/corpus/repos/ruby",
-    "shas": "9e3d30cbf214e01bac2e8ced270032fc40117c33..070a30dadbd08713621ade900398489f3d5d8d35"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar()' method in the Foo module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index 351dcd2..5900129 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -1,6 +1,4 @@",
-        " module Foo",
-        "-  def bar",
-        "-  end",
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 9c0bf85..23c7c1b 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,13 +1,9 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-  bar",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
         " end",
-        " module Foo",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "070a30dadbd08713621ade900398489f3d5d8d35..164b8f9d4149fc6c28f330d764d68e2529ddfe7e"
+    "shas": "1a1c77e9e42914a1ec12b746fa9bfaf045f39be6..fba897776dd4e1be1f36e4a3685fcdb77e2fdd77"
 }
 ,{
-    "testCaseDescription": "ruby-module-replacement-test",
+    "testCaseDescription": "ruby-rescue-last-ex-delete-test",
     "expectedResult": {
         "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar()' method in the Foo module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index 5900129..351dcd2 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -1,4 +1,6 @@",
-        " module Foo",
-        "+  def bar",
-        "+  end",
-        " end",
-        " module Foo",
-        " end"
-    ],
-    "gitDir": "test/corpus/repos/ruby",
-    "shas": "164b8f9d4149fc6c28f330d764d68e2529ddfe7e..6790c446e68c1186b5bc0256bcb13ea4f8f98dbc"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "delete": {
@@ -201,146 +291,73 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Foo' module"
-                },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 23c7c1b..c247b6d 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,9 +1,5 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        "   bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "fba897776dd4e1be1f36e4a3685fcdb77e2fdd77..c605c98f25261242ec2e73cc56004de8524dea2e"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
                                 5,
-                                1
-                            ],
-                            "end": [
-                                6,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Foo' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Foo' module"
+                    "summary": "Deleted a begin statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "module.rb"
+        "rescue-last-ex.rb"
     ],
     "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index 351dcd2..66871d0 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -1,8 +1,6 @@",
-        " module Foo",
-        "-  def bar",
-        "-  end",
-        "-end",
-        "-module Foo",
-        " end",
-        " module Foo",
-        "+  def bar",
-        "+  end",
-        " end"
-    ],
-    "gitDir": "test/corpus/repos/ruby",
-    "shas": "6790c446e68c1186b5bc0256bcb13ea4f8f98dbc..ec4ecafdea519cb0020ed5599ff939570d0f854b"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Foo' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index 66871d0..56f77bb 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -1,6 +1,4 @@",
-        " module Foo",
-        "-end",
-        "-module Foo",
-        "   def bar",
-        "   end",
-        " end"
-    ],
-    "gitDir": "test/corpus/repos/ruby",
-    "shas": "ec4ecafdea519cb0020ed5599ff939570d0f854b..57a8fb4e465c80ab42466968a539a77bf8880f5a"
-}
-,{
-    "testCaseDescription": "ruby-module-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "module.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Foo' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "module.rb"
-    ],
-    "patch": [
-        "diff --git a/module.rb b/module.rb",
-        "index 56f77bb..e69de29 100644",
-        "--- a/module.rb",
-        "+++ b/module.rb",
-        "@@ -1,4 +0,0 @@",
-        "-module Foo",
-        "-  def bar",
-        "-  end",
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index c247b6d..e69de29 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,5 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        "-  bar",
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "57a8fb4e465c80ab42466968a539a77bf8880f5a..1713f7f3e2aa6a1e643842fde9382ce098c08363"
+    "shas": "c605c98f25261242ec2e73cc56004de8524dea2e..875face60282636c8ba6fbd9db4a50c6b8b38fd2"
 }]

@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-subshell-insert-test",
+    "testCaseDescription": "ruby-rescue-modifier-insert-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,35 +12,35 @@
                             ],
                             "end": [
                                 1,
-                                9
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the `ls -la` subshell command"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index e69de29..169f84d 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index e69de29..b0cea1a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -0,0 +1 @@",
-        "+`ls -la`"
+        "+foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f8cc3489b25f8d1857452648c25c51084dbdbdb9..522071b01d711758caecf86fae864d7a5e5e190c"
+    "shas": "dbbf1ed8a8cafe556ea468af463f118f3ca0f4ba..ee8d8559b436b4434abf6fb62e720fd2b2e25e67"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-replacement-insert-test",
+    "testCaseDescription": "ruby-rescue-modifier-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "insert": {
@@ -50,11 +50,11 @@
                             ],
                             "end": [
                                 1,
-                                13
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the `git status` subshell command"
+                    "summary": "Added the 'foo' rescue modifier"
                 },
                 {
                     "span": {
@@ -65,37 +65,37 @@
                             ],
                             "end": [
                                 2,
-                                9
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the `ls -la` subshell command"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index 169f84d..4b279f6 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index b0cea1a..79b1f6a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -1 +1,3 @@",
-        "+`git status`",
-        "+`ls -la`",
-        " `ls -la`"
+        "+foo rescue false",
+        "+foo rescue nil",
+        " foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "522071b01d711758caecf86fae864d7a5e5e190c..8339afa687e64dabdb372ff0b27bb39f832a1d02"
+    "shas": "ee8d8559b436b4434abf6fb62e720fd2b2e25e67..f757d66e78f7d4e6497ce72a70017e34180e6ed7"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-insert-test",
+    "testCaseDescription": "ruby-rescue-modifier-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "replace": [
@@ -106,7 +106,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    13
+                                    17
                                 ]
                             },
                             {
@@ -116,39 +116,39 @@
                                 ],
                                 "end": [
                                     1,
-                                    9
+                                    15
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the `git status` subshell command with the `ls -la` subshell command"
+                    "summary": "Replaced the 'foo' rescue modifier with the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index 4b279f6..6781ff3 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index 79b1f6a..f59c8c2 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -1,3 +1,3 @@",
-        "-`git status`",
-        "+`ls -la`",
-        " `ls -la`",
-        " `ls -la`"
+        "-foo rescue false",
+        "+foo rescue nil",
+        " foo rescue nil",
+        " foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8339afa687e64dabdb372ff0b27bb39f832a1d02..c719966658d8f95beafc1b182efd507251268a5b"
+    "shas": "f757d66e78f7d4e6497ce72a70017e34180e6ed7..48cf3c8ae9539479ada31649b7907f45750d3587"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-replacement-test",
+    "testCaseDescription": "ruby-rescue-modifier-replacement-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "replace": [
@@ -159,7 +159,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    9
+                                    15
                                 ]
                             },
                             {
@@ -169,39 +169,39 @@
                                 ],
                                 "end": [
                                     1,
-                                    13
+                                    17
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the `ls -la` subshell command with the `git status` subshell command"
+                    "summary": "Replaced the 'foo' rescue modifier with the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index 6781ff3..4b279f6 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index f59c8c2..79b1f6a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -1,3 +1,3 @@",
-        "-`ls -la`",
-        "+`git status`",
-        " `ls -la`",
-        " `ls -la`"
+        "-foo rescue nil",
+        "+foo rescue false",
+        " foo rescue nil",
+        " foo rescue nil"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c719966658d8f95beafc1b182efd507251268a5b..611fa19dd10019ef47b3d7477c12855fe89177f2"
+    "shas": "48cf3c8ae9539479ada31649b7907f45750d3587..e27305bea14543e812e35efdfad8e15916b44bce"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-replacement-test",
+    "testCaseDescription": "ruby-rescue-modifier-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "delete": {
@@ -211,11 +211,11 @@
                             ],
                             "end": [
                                 1,
-                                13
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the `git status` subshell command"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 },
                 {
                     "span": {
@@ -226,11 +226,11 @@
                             ],
                             "end": [
                                 2,
-                                9
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the `ls -la` subshell command"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 },
                 {
                     "span": {
@@ -241,38 +241,38 @@
                             ],
                             "end": [
                                 2,
-                                13
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the `git status` subshell command"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index 4b279f6..c695b4c 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index 79b1f6a..509bcea 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -1,3 +1,2 @@",
-        "-`git status`",
-        "-`ls -la`",
-        " `ls -la`",
-        "+`git status`"
+        "-foo rescue false",
+        "-foo rescue nil",
+        " foo rescue nil",
+        "+foo rescue false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "611fa19dd10019ef47b3d7477c12855fe89177f2..8d03313c9be4bcd64a2a6a3c4047c5497a00686b"
+    "shas": "e27305bea14543e812e35efdfad8e15916b44bce..8448399194931991c532e1431d5bb57feec7e9d2"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-test",
+    "testCaseDescription": "ruby-rescue-modifier-delete-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "delete": {
@@ -282,36 +282,36 @@
                             ],
                             "end": [
                                 1,
-                                9
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the `ls -la` subshell command"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index c695b4c..acb0008 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index 509bcea..c36274a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -1,2 +1 @@",
-        "-`ls -la`",
-        " `git status`"
+        "-foo rescue nil",
+        " foo rescue false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8d03313c9be4bcd64a2a6a3c4047c5497a00686b..1b0cba06f36513f77bdbf325e75c866ed1311775"
+    "shas": "8448399194931991c532e1431d5bb57feec7e9d2..0aa3073a2d457a147b4ce034ab0576694ff7ed6d"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-rest-test",
+    "testCaseDescription": "ruby-rescue-modifier-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "rescue-modifier.rb": [
                 {
                     "span": {
                         "delete": {
@@ -321,27 +321,27 @@
                             ],
                             "end": [
                                 1,
-                                13
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the `git status` subshell command"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "rescue-modifier.rb"
     ],
     "patch": [
-        "diff --git a/subshell.rb b/subshell.rb",
-        "index acb0008..e69de29 100644",
-        "--- a/subshell.rb",
-        "+++ b/subshell.rb",
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index c36274a..e69de29 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
         "@@ -1 +0,0 @@",
-        "-`git status`"
+        "-foo rescue false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1b0cba06f36513f77bdbf325e75c866ed1311775..bcd6d0b339d47a3a232e595d43db61acf2bfae04"
+    "shas": "0aa3073a2d457a147b4ce034ab0576694ff7ed6d..89be77a7b4f5ee9670276a33a97a6aa3941c9cfb"
 }]

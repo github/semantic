@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1'"
+                    "summary": "Replaced '2' with '1' in the '1' switch statement"
                 },
                 {
                     "span": {
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1'"
+                    "summary": "Replaced '2' with '1' in the '2' case statement"
                 }
             ]
         },
@@ -201,7 +201,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2'"
+                    "summary": "Replaced '1' with '2' in the '2' switch statement"
                 },
                 {
                     "span": {
@@ -228,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2'"
+                    "summary": "Replaced '1' with '2' in the '2' case statement"
                 }
             ]
         },
