@@ -74,7 +74,7 @@ termConstructor source sourceSpan name range children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
     ("function_call", _ ) -> case children of
-      member : args | category (extract member) == MemberAccess -> case toList (unwrap member) of
+      member : args | MemberAccess <- category (extract member) -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
         _ -> S.Error children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
