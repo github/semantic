@@ -1,8 +1,10 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Category where
 
 import Prologue
 import Test.QuickCheck hiding (Args)
+import Data.Text (pack)
 import Data.Text.Arbitrary()
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -131,6 +133,9 @@ data Category
 -- Instances
 
 instance Hashable Category
+
+instance (StringConv Category Text) where
+  strConv _ = pack . show
 
 instance Arbitrary Category where
   arbitrary = oneof [
