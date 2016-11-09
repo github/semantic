@@ -38,6 +38,18 @@ run Arguments{..} = do
   putStrLn $ encodePretty terms
 
   pure ()
+  where
+    folder parser sourceBlob = do
+      term <- parser sourceBlob
+      pure $ (ana coalgebra :: (HasField fields Range, HasField fields Category, HasField fields SourceText) => Cofree (Syntax f) (Record fields) -> Cofree (ParseJSON f) (Record fields)) term
+      where
+        coalgebra term =
+          case runCofree term of
+            (annotation :< syntax) -> annotation :< ParseJSON category' range' syntax sourceText'
+              where
+                category' = toS $ Info.category annotation
+                range' = characterRange annotation
+                sourceText' = Info.sourceText annotation
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
