@@ -119,7 +119,12 @@
         "syntax": "method-declaration-param-default",
         "insert": "def foo()\nend",
         "replacement": "def foo(name = nil)\nend"
-      }
+      },
+      {
+        "syntax": "method-declaration-unnamed-param",
+        "insert": "def foo(name)\nend",
+        "replacement": "def foo(name, **)\nend"
+      },
       {
         "syntax": "method-invocation",
         "insert": "print\nfoo.bar\nbar",
