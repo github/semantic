@@ -49,7 +49,11 @@ termConstructor source sourceSpan name range children
     ("argument_pair", [ k, v ] ) -> S.Pair k v
     ("argument_pair", _ ) -> S.Error children
     ("keyword_parameter", [ k, v ] ) -> S.Pair k v
+    -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g.:
+    --    def foo(name:); end
+    -- Let it fall through to generate an Indexed syntax.
     ("optional_parameter", [ k, v ] ) -> S.Pair k v
+    ("optional_parameter", _ ) -> S.Error children
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
