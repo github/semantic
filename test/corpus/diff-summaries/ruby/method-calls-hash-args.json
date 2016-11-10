@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo(bar: true)' function call"
+                    "summary": "Added the 'foo(:bar => true)' function call"
                 }
             ]
         },
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo(bar: true, baz: 1)' function call"
+                    "summary": "Added the 'foo(:bar => true, :baz => 1)' function call"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo(bar: true)' function call"
+                    "summary": "Added the 'foo(:bar => true)' function call"
                 }
             ]
         },
@@ -109,7 +109,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz: 1' argument in the foo(bar: true) function call"
+                    "summary": "Deleted the ':baz => 1' argument in the foo(:bar => true) function call"
                 }
             ]
         },
@@ -150,7 +150,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz: 1' argument in the foo(bar: true, baz: 1) function call"
+                    "summary": "Added the ':baz => 1' argument in the foo(:bar => true, :baz => 1) function call"
                 }
             ]
         },
@@ -191,7 +191,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo(bar: true, baz: 1)' function call"
+                    "summary": "Deleted the 'foo(:bar => true, :baz => 1)' function call"
                 },
                 {
                     "span": {
@@ -206,7 +206,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo(bar: true)' function call"
+                    "summary": "Deleted the 'foo(:bar => true)' function call"
                 },
                 {
                     "span": {
@@ -221,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo(bar: true, baz: 1)' function call"
+                    "summary": "Added the 'foo(:bar => true, :baz => 1)' function call"
                 }
             ]
         },
@@ -262,7 +262,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo(bar: true)' function call"
+                    "summary": "Deleted the 'foo(:bar => true)' function call"
                 }
             ]
         },
@@ -301,7 +301,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo(bar: true, baz: 1)' function call"
+                    "summary": "Deleted the 'foo(:bar => true, :baz => 1)' function call"
                 }
             ]
         },

@@ -13,7 +13,8 @@ import Syntax as S
 import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
-import Data.Text as Text (intercalate, replace)
+import Data.Text (intercalate)
+import qualified Data.Text as Text (head)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
@@ -216,9 +217,7 @@ toTermName source term = case unwrap term of
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
-  S.Pair k v -> Text.replace ":" "" (toTermName' k) <> ": " <> case identifiable v of
-    Identifiable v -> toTermName' v
-    Unidentifiable _ -> "…"
+  S.Pair k v -> toKeyName k <> toArgName v
   S.Return expr -> maybe "empty" toTermName' expr
   S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
@@ -253,6 +252,9 @@ toTermName source term = case unwrap term of
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
+        toKeyName key = case toTermName' key of
+          n | Text.head n == ':' -> n <> " => "
+          n -> n <> ": "
 
 parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
 parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
