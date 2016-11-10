@@ -101,7 +101,10 @@ styleName category = "category-" <> case category of
   C.Negate -> "negate"
   C.ArgumentPair -> "argument_pair"
   C.KeywordParam -> "keyword_param"
-  C.PositionalParam -> "positional_param"
+  C.OptionalParameter -> "optional_param"
+  C.SplatParameter -> "splat_param"
+  C.HashSplatParameter -> "hash_splat_param"
+  C.BlockParameter -> "block_param"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

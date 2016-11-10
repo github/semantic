@@ -395,7 +395,10 @@ instance HasCategory Category where
     C.Negate -> "negate"
     C.ArgumentPair -> "argument"
     C.KeywordParam -> "parameter"
-    C.PositionalParam -> "parameter"
+    C.OptionalParameter -> "parameter"
+    C.SplatParameter -> "parameter"
+    C.HashSplatParameter -> "parameter"
+    C.BlockParameter -> "parameter"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

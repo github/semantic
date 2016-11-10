@@ -49,7 +49,7 @@ termConstructor source sourceSpan name range children
     ("argument_pair", [ k, v ] ) -> S.Pair k v
     ("argument_pair", _ ) -> S.Error children
     ("keyword_parameter", [ k, v ] ) -> S.Pair k v
-    ("positional_parameter", [ k, v ] ) -> S.Pair k v
+    ("optional_parameter", [ k, v ] ) -> S.Pair k v
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
@@ -145,6 +145,7 @@ categoryForRubyName = \case
   "begin_statement" -> Begin
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
   "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
+  "block_parameter" -> BlockParameter
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
   "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
@@ -164,6 +165,7 @@ categoryForRubyName = \case
   "formal_parameters" -> Params
   "function_call" -> FunctionCall
   "function" -> Function
+  "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
   "if_modifier" -> If
@@ -176,8 +178,8 @@ categoryForRubyName = \case
   "method_declaration" -> Method
   "module_declaration"  -> Module
   "nil" -> Identifier
+  "optional_parameter" -> OptionalParameter
   "or" -> BooleanOperator
-  "positional_parameter" -> PositionalParam
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
@@ -187,6 +189,7 @@ categoryForRubyName = \case
   "rescued_exception" -> RescuedException
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
+  "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral

@@ -138,7 +138,10 @@ data Category
   | Negate
   | ArgumentPair
   | KeywordParam
-  | PositionalParam
+  | OptionalParameter
+  | SplatParameter
+  | HashSplatParameter
+  | BlockParameter
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -211,7 +214,10 @@ instance Arbitrary Category where
     , pure Negate
     , pure ArgumentPair
     , pure KeywordParam
-    , pure PositionalParam
+    , pure OptionalParameter
+    , pure SplatParameter
+    , pure HashSplatParameter
+    , pure BlockParameter
     , Other <$> arbitrary
     ]
 
