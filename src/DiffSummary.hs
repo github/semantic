@@ -396,7 +396,7 @@ instance HasCategory Category where
     C.RescueArgs -> "arguments"
     C.Negate -> "negate"
     C.ArgumentPair -> "argument"
-    C.KeywordParam -> "parameter"
+    C.KeywordParameter -> "parameter"
     C.OptionalParameter -> "parameter"
     C.SplatParameter -> "parameter"
     C.HashSplatParameter -> "parameter"

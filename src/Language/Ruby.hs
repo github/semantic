@@ -176,7 +176,7 @@ categoryForRubyName = \case
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
-  "keyword_parameter" -> KeywordParam
+  "keyword_parameter" -> KeywordParameter
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method

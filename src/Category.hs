@@ -137,7 +137,7 @@ data Category
   | When
   | Negate
   | ArgumentPair
-  | KeywordParam
+  | KeywordParameter
   | OptionalParameter
   | SplatParameter
   | HashSplatParameter
@@ -213,7 +213,7 @@ instance Arbitrary Category where
     , pure When
     , pure Negate
     , pure ArgumentPair
-    , pure KeywordParam
+    , pure KeywordParameter
     , pure OptionalParameter
     , pure SplatParameter
     , pure HashSplatParameter

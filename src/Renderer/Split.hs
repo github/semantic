@@ -100,7 +100,7 @@ styleName category = "category-" <> case category of
   C.RescueArgs -> "rescue_args"
   C.Negate -> "negate"
   C.ArgumentPair -> "argument_pair"
-  C.KeywordParam -> "keyword_param"
+  C.KeywordParameter -> "keyword_param"
   C.OptionalParameter -> "optional_param"
   C.SplatParameter -> "splat_param"
   C.HashSplatParameter -> "hash_splat_param"
