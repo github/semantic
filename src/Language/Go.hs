@@ -39,7 +39,8 @@ termConstructor source sourceSpan name range children = case (name, children) of
     (clauses, cases) -> do
       clauses' <- withDefaultInfo $ S.Indexed clauses
       withDefaultInfo $ S.Switch clauses' cases
-    where isCaseClause = (== Other "expression_case_clause") . category . extract
+    where isCaseClause = (== Case) . category . extract
+
 
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
@@ -133,5 +134,6 @@ categoryForGoName = \case
   "if_statement" -> If
   "for_statement" -> For
   "expression_switch_statement" -> Switch
+  "expression_case_clause" -> Case
   s -> Other (toS s)
 
