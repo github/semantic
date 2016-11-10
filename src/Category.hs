@@ -136,11 +136,17 @@ data Category
   | RescueArgs
   | When
   | Negate
+  -- | An argument pair, e.g. foo(run: true) or foo(:run => true) in Ruby.
   | ArgumentPair
+  -- | A keyword parameter, e.g. def foo(name:) or def foo(name:false) in Ruby.
   | KeywordParameter
+  -- | An optional/default parameter, e.g. def foo(name = nil) in Ruby.
   | OptionalParameter
+  -- | A splat parameter, e.g. def foo(*array) in Ruby.
   | SplatParameter
+  -- | A hash splat parameter, e.g. def foo(**option) in Ruby.
   | HashSplatParameter
+  -- | A block parameter, e.g. def foo(&block) in Ruby.
   | BlockParameter
   deriving (Eq, Generic, Ord, Show)
 
