@@ -37,9 +37,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "d0afc2e652c5efeb2093ef6281ada2d7f415f1da",
+    "sha1": "150f53c8cfb31186993a9588c913d8bcad3cef1d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "de0de48205cea09a3cd728c13bf3b1391ed4537b"
+    "sha2": "21ac6fd6aef52591595b45a382ab3fbf4e5da753"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-insert-test",
@@ -51,585 +51,150 @@
                         "insert": {
                             "start": [
                                 3,
-                                6
+                                2
                             ],
                             "end": [
-                                3,
-                                8
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the ';;' for_clause"
+                    "summary": "Added the 'for ;; {\na()\ngoto loop\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                7,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                5
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                16
-                            ],
-                            "end": [
-                                7,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
+                    "summary": "Added the 'x := range y' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 11,
-                                5
-                            ],
-                            "end": [
-                                11,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
                                 1
                             ],
                             "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                7
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                11
-                            ],
-                            "end": [
-                                15,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '10'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                15
-                            ],
-                            "end": [
-                                15,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                20,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                14,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                20,
-                                3
-                            ],
-                            "end": [
-                                20,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                21,
+                                15,
                                 1
                             ],
                             "end": [
-                                21,
-                                6
+                                18,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'break' break_statement"
+                    "summary": "Added the 'i < 10; i++' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                24,
+                                19,
                                 1
                             ],
                             "end": [
-                                24,
-                                4
+                                22,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
+                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                25,
-                                6
+                                23,
+                                2
                             ],
                             "end": [
-                                25,
-                                10
+                                26,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'loop' identifier"
+                    "summary": "Added the 'for {\na()\ngoto loop\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 27,
-                                5
-                            ],
-                            "end": [
-                                27,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                27,
-                                13
-                            ],
-                            "end": [
-                                27,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                27,
-                                17
-                            ],
-                            "end": [
-                                27,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the '5'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                27,
-                                20
-                            ],
-                            "end": [
-                                27,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                28,
                                 1
                             ],
                             "end": [
-                                28,
-                                4
+                                30,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                29,
-                                7
-                            ],
-                            "end": [
-                                29,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 31,
-                                7
-                            ],
-                            "end": [
-                                31,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                31,
-                                11
-                            ],
-                            "end": [
-                                31,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '10'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                31,
-                                15
-                            ],
-                            "end": [
-                                31,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                32,
                                 1
                             ],
                             "end": [
-                                32,
-                                4
+                                34,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                33,
-                                10
-                            ],
-                            "end": [
-                                33,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop2' identifier"
+                    "summary": "Added the 'i < 10; i++' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 35,
-                                5
-                            ],
-                            "end": [
-                                35,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                36,
                                 1
                             ],
                             "end": [
-                                36,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                37,
-                                1
-                            ],
-                            "end": [
-                                37,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                39,
-                                5
-                            ],
-                            "end": [
-                                39,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                39,
-                                16
-                            ],
-                            "end": [
-                                39,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                40,
-                                1
-                            ],
-                            "end": [
-                                40,
+                                38,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                40,
-                                3
-                            ],
-                            "end": [
-                                40,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                41,
+                                39,
                                 1
                             ],
                             "end": [
-                                41,
-                                6
+                                42,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'break' break_statement"
+                    "summary": "Added the 'x := range y' for statement"
                 }
             ]
         },
@@ -638,9 +203,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "de0de48205cea09a3cd728c13bf3b1391ed4537b",
+    "sha1": "21ac6fd6aef52591595b45a382ab3fbf4e5da753",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2d167136f44fb7266a3f337fdb5c0f30f1c6a74f"
+    "sha2": "e399c20d6dcbdd06e621ba91c2524985229c3f42"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -649,228 +214,48 @@
             "for-statements.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ';;' for_clause"
-                },
-                {
-                    "span": {
                         "insert": {
                             "start": [
                                 7,
-                                5
-                            ],
-                            "end": [
-                                7,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                13
-                            ],
-                            "end": [
-                                7,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                17
-                            ],
-                            "end": [
-                                7,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the '5'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                20
-                            ],
-                            "end": [
-                                7,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
                                 1
                             ],
                             "end": [
-                                8,
-                                4
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 11,
-                                7
-                            ],
-                            "end": [
-                                11,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                11
-                            ],
-                            "end": [
-                                11,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '10'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                15
-                            ],
-                            "end": [
-                                11,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
                                 1
                             ],
                             "end": [
-                                12,
-                                4
+                                14,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop2' identifier"
+                    "summary": "Added the 'i < 10; i++' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 15,
-                                5
-                            ],
-                            "end": [
-                                15,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
                                 1
                             ],
                             "end": [
-                                16,
-                                4
+                                18,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'continue' continue_statement"
+                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement"
                 },
                 {
                     "span": {
@@ -931,165 +316,45 @@
                         "delete": {
                             "start": [
                                 11,
-                                5
-                            ],
-                            "end": [
-                                11,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
                                 1
                             ],
                             "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                7
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                11
-                            ],
-                            "end": [
-                                15,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '10'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                15
-                            ],
-                            "end": [
-                                15,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                20,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                14,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue loop2\n}' for statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                20,
-                                3
-                            ],
-                            "end": [
-                                20,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                21,
+                                15,
                                 1
                             ],
                             "end": [
-                                21,
-                                6
+                                18,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'break' break_statement"
+                    "summary": "Deleted the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for  {\na(x)\nbreak\n}' for statement"
                 }
             ]
         },
@@ -1098,9 +363,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "2d167136f44fb7266a3f337fdb5c0f30f1c6a74f",
+    "sha1": "e399c20d6dcbdd06e621ba91c2524985229c3f42",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4d46be416e5b8ea9e3b3e161fbf73b18c4323e8f"
+    "sha2": "da9601af0446030e832c0f250e004c135eb5f47e"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -1111,526 +376,121 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 7,
-                                5
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                16
-                            ],
-                            "end": [
-                                7,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
                                 1
                             ],
                             "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                5
-                            ],
-                            "end": [
-                                11,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                7
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                11
-                            ],
-                            "end": [
-                                15,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '10'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                15
-                            ],
-                            "end": [
-                                15,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                20,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                10,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'x := range y' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                20,
-                                3
-                            ],
-                            "end": [
-                                20,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                21,
+                                11,
                                 1
                             ],
                             "end": [
-                                21,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'break' break_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                5
-                            ],
-                            "end": [
-                                7,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                13
-                            ],
-                            "end": [
-                                7,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                17
-                            ],
-                            "end": [
-                                7,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                20
-                            ],
-                            "end": [
-                                7,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                7
-                            ],
-                            "end": [
-                                11,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                11
-                            ],
-                            "end": [
-                                11,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '10'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                15
-                            ],
-                            "end": [
-                                11,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                5
-                            ],
-                            "end": [
-                                15,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                19,
-                                5
-                            ],
-                            "end": [
-                                19,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                19,
-                                16
-                            ],
-                            "end": [
-                                19,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                20,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                14,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                20,
-                                3
-                            ],
-                            "end": [
-                                20,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                21,
+                                15,
                                 1
                             ],
                             "end": [
-                                21,
-                                6
+                                18,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'break' break_statement"
+                    "summary": "Added the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x := range y' for statement"
                 }
             ]
         },
@@ -1639,9 +499,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "4d46be416e5b8ea9e3b3e161fbf73b18c4323e8f",
+    "sha1": "da9601af0446030e832c0f250e004c135eb5f47e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e31be408062bab3ff17ac0bf4985c227f2df2672"
+    "sha2": "eb6fc97aa06a82c1a8c4e7706eb9e5aae065179e"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -1653,855 +513,195 @@
                         "delete": {
                             "start": [
                                 3,
-                                6
+                                2
                             ],
                             "end": [
-                                3,
-                                8
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the ';;' for_clause"
+                    "summary": "Deleted the 'for ;; {\na()\ngoto loop\n}' for statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                7,
                                 1
                             ],
                             "end": [
-                                4,
-                                4
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                5
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                16
-                            ],
-                            "end": [
-                                7,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
+                    "summary": "Deleted the 'x := range y' for statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 11,
-                                5
-                            ],
-                            "end": [
-                                11,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
                                 1
                             ],
                             "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                7
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                11
-                            ],
-                            "end": [
-                                15,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '10'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                15
-                            ],
-                            "end": [
-                                15,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                20,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                14,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue loop2\n}' for statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                20,
-                                3
-                            ],
-                            "end": [
-                                20,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                21,
+                                15,
                                 1
                             ],
                             "end": [
-                                21,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'break' break_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                24,
-                                1
-                            ],
-                            "end": [
-                                24,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                25,
-                                6
-                            ],
-                            "end": [
-                                25,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                27,
-                                5
-                            ],
-                            "end": [
-                                27,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                27,
-                                13
-                            ],
-                            "end": [
-                                27,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                27,
-                                17
-                            ],
-                            "end": [
-                                27,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                27,
-                                20
-                            ],
-                            "end": [
-                                27,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                28,
-                                1
-                            ],
-                            "end": [
-                                28,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                29,
-                                7
-                            ],
-                            "end": [
-                                29,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                31,
-                                7
-                            ],
-                            "end": [
-                                31,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                31,
-                                11
-                            ],
-                            "end": [
-                                31,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '10'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                31,
-                                15
-                            ],
-                            "end": [
-                                31,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                32,
-                                1
-                            ],
-                            "end": [
-                                32,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                33,
-                                10
-                            ],
-                            "end": [
-                                33,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                35,
-                                5
-                            ],
-                            "end": [
-                                35,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                36,
-                                1
-                            ],
-                            "end": [
-                                36,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                37,
-                                1
-                            ],
-                            "end": [
-                                37,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                39,
-                                5
-                            ],
-                            "end": [
-                                39,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                39,
-                                16
-                            ],
-                            "end": [
-                                39,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                40,
-                                1
-                            ],
-                            "end": [
-                                40,
+                                18,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'i < 10; i++' for statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                40,
-                                3
-                            ],
-                            "end": [
-                                40,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                41,
+                                19,
                                 1
                             ],
                             "end": [
-                                41,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'break' break_statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                23,
-                                6
-                            ],
-                            "end": [
-                                23,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                24,
-                                1
-                            ],
-                            "end": [
-                                24,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                25,
-                                6
-                            ],
-                            "end": [
-                                25,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                27,
-                                5
-                            ],
-                            "end": [
-                                27,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                27,
-                                16
-                            ],
-                            "end": [
-                                27,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                28,
-                                1
-                            ],
-                            "end": [
-                                28,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                29,
-                                7
-                            ],
-                            "end": [
-                                29,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                31,
-                                5
-                            ],
-                            "end": [
-                                31,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                32,
-                                1
-                            ],
-                            "end": [
-                                32,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                33,
-                                10
-                            ],
-                            "end": [
-                                33,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                35,
-                                7
-                            ],
-                            "end": [
-                                35,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                35,
-                                11
-                            ],
-                            "end": [
-                                35,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '10'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                35,
-                                15
-                            ],
-                            "end": [
-                                35,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                36,
-                                1
-                            ],
-                            "end": [
-                                36,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                37,
-                                1
-                            ],
-                            "end": [
-                                37,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                40,
-                                1
-                            ],
-                            "end": [
-                                40,
+                                22,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Deleted the 'for  {\na(x)\nbreak\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                40,
-                                3
-                            ],
-                            "end": [
-                                40,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                41,
+                                27,
                                 1
                             ],
                             "end": [
-                                41,
-                                6
+                                30,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'break' break_statement"
+                    "summary": "Added the 'x := range y' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                31,
+                                1
+                            ],
+                            "end": [
+                                34,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                35,
+                                1
+                            ],
+                            "end": [
+                                38,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                39,
+                                1
+                            ],
+                            "end": [
+                                42,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                47,
+                                1
+                            ],
+                            "end": [
+                                50,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                51,
+                                1
+                            ],
+                            "end": [
+                                54,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                55,
+                                1
+                            ],
+                            "end": [
+                                58,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                59,
+                                1
+                            ],
+                            "end": [
+                                62,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x := range y' for statement"
                 }
             ]
         },
@@ -2510,9 +710,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "e31be408062bab3ff17ac0bf4985c227f2df2672",
+    "sha1": "eb6fc97aa06a82c1a8c4e7706eb9e5aae065179e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "73847c6782b8bfb1daa9128c8e1f25549dd29989"
+    "sha2": "7b11abfad6e1feb091a1e4ef17ac950317e10f3d"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-test",
@@ -2523,316 +723,76 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                1
+                                3,
+                                2
                             ],
                             "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                5
-                            ],
-                            "end": [
-                                7,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                13
-                            ],
-                            "end": [
-                                7,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                17
-                            ],
-                            "end": [
-                                7,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                20
-                            ],
-                            "end": [
-                                7,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                7
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                7
-                            ],
-                            "end": [
-                                11,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                11
-                            ],
-                            "end": [
-                                11,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '10'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                15
-                            ],
-                            "end": [
-                                11,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                10
-                            ],
-                            "end": [
-                                13,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'loop2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                5
-                            ],
-                            "end": [
-                                15,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ';;' for_clause"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                1
-                            ],
-                            "end": [
-                                17,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'continue' continue_statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                19,
-                                5
-                            ],
-                            "end": [
-                                19,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                19,
-                                16
-                            ],
-                            "end": [
-                                19,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                20,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'for {\na()\ngoto loop\n}' for statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                20,
-                                3
-                            ],
-                            "end": [
-                                20,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                21,
+                                7,
                                 1
                             ],
                             "end": [
-                                21,
-                                6
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'break' break_statement"
+                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x := range y' for statement"
                 }
             ]
         },
@@ -2841,9 +801,9 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "73847c6782b8bfb1daa9128c8e1f25549dd29989",
+    "sha1": "7b11abfad6e1feb091a1e4ef17ac950317e10f3d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "fe83468e5531230cfacc263981381f019f45306f"
+    "sha2": "e610b3e454426cc74c7e50dea1796a8bc38028c3"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-rest-test",
@@ -2884,7 +844,7 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "fe83468e5531230cfacc263981381f019f45306f",
+    "sha1": "e610b3e454426cc74c7e50dea1796a8bc38028c3",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "398072c98a5f8da23fd30fd7fae16e0ae97276c2"
+    "sha2": "e16450a4f5054f826123def384b72eb4946a4544"
 }]

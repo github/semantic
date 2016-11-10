@@ -26,6 +26,15 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("import_declaration", imports) -> toImports imports
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
+  ("for_statement", children) ->
+    withDefaultInfo $ case children of
+      [body] | category (extract body) == Other "block" ->
+        S.For [] (toList $ unwrap body)
+      [forClause, body] | category (extract forClause) == Other "for_clause" ->
+        S.For (toList $ unwrap forClause) (toList $ unwrap body)
+      [rangeClause, body] | category (extract rangeClause) == Other "range_clause" ->
+        S.For (toList $ unwrap rangeClause) (toList $ unwrap body)
+      other -> S.Error other
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -116,5 +125,6 @@ categoryForGoName = \case
   "source_file" -> Module
   "const_declaration" -> VarDecl
   "if_statement" -> If
+  "for_statement" -> For
   s -> Other (toS s)
 
