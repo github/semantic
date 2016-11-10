@@ -25,9 +25,16 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "0f2f0f6f7ae9bb6ee07a66ff1021c512e7ff727a",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index e69de29..08d2bf5 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -0,0 +1 @@",
+        "+typeof x;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ab63e3750b2f4626e4ffc50908102e9f02920950"
+    "shas": "38dbecd6735244d4c2c50c6608e64fd7df72b900..408a6dcf89d854252ec12de52f008a2a88793ade"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "ab63e3750b2f4626e4ffc50908102e9f02920950",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index 08d2bf5..8b9c2f4 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -1 +1,3 @@",
+        "+x instanceof String;",
+        "+typeof x;",
+        " typeof x;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "800baf212ebe5767adc73a88b842034f247998a9"
+    "shas": "408a6dcf89d854252ec12de52f008a2a88793ade..50475853b794903dd58705a2648d465fa42db1c1"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-insert-test",
@@ -102,9 +118,19 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "800baf212ebe5767adc73a88b842034f247998a9",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index 8b9c2f4..6a5be18 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-x instanceof String;",
+        "+typeof x;",
+        " typeof x;",
+        " typeof x;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4e9b73c3d185e4b21436c8d3ff6487be0cdb7178"
+    "shas": "50475853b794903dd58705a2648d465fa42db1c1..033d2812882757f8235cbbc27a1059188d125636"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-test",
@@ -133,9 +159,19 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "4e9b73c3d185e4b21436c8d3ff6487be0cdb7178",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index 6a5be18..8b9c2f4 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -1,3 +1,3 @@",
+        "-typeof x;",
+        "+x instanceof String;",
+        " typeof x;",
+        " typeof x;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d92be6360746626cd309c6918c44ba101125e1f1"
+    "shas": "033d2812882757f8235cbbc27a1059188d125636..a6dcc28c9ae5225546c6829efd0ff16e42357fa3"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-replacement-test",
@@ -194,9 +230,19 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "d92be6360746626cd309c6918c44ba101125e1f1",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index 8b9c2f4..d438f9f 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -1,3 +1,2 @@",
+        "-x instanceof String;",
+        "-typeof x;",
+        " typeof x;",
+        "+x instanceof String;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f9a253ac2748f9207579c7b5939635362743c03c"
+    "shas": "a6dcc28c9ae5225546c6829efd0ff16e42357fa3..bb1b06901faca6abda996edbee1901289e63abde"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-test",
@@ -225,9 +271,17 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "f9a253ac2748f9207579c7b5939635362743c03c",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index d438f9f..0bf5275 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -1,2 +1 @@",
+        "-typeof x;",
+        " x instanceof String;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9074037314693fe2bfe8b91f4ae169843ad0c159"
+    "shas": "bb1b06901faca6abda996edbee1901289e63abde..bc73ac8dfd8a42fc942bd8dac8012ef2e3a217da"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-rest-test",
@@ -256,7 +310,14 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "9074037314693fe2bfe8b91f4ae169843ad0c159",
+    "patch": [
+        "diff --git a/type-operator.js b/type-operator.js",
+        "index 0bf5275..e69de29 100644",
+        "--- a/type-operator.js",
+        "+++ b/type-operator.js",
+        "@@ -1 +0,0 @@",
+        "-x instanceof String;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "979a03e21696fd6d2f5ef3c8c8e7473810cfc7c9"
+    "shas": "bc73ac8dfd8a42fc942bd8dac8012ef2e3a217da..b5645de0a9c0002d8f44d302c200dd88ff113f52"
 }]

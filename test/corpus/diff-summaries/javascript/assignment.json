@@ -25,9 +25,16 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "f5dfc0945ffae36e0f9784dcfeb8472344055afc",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index e69de29..6882fe5 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -0,0 +1 @@",
+        "+x = 0;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6fc2b9a8bdab5a87aeb8214b88ddafb278098394"
+    "shas": "10c888c0caabf36cb211a96640afbe435dfad3fb..6a5eb86577a86881fdd53c3db17dd589617b887e"
 }
 ,{
     "testCaseDescription": "javascript-assignment-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "6fc2b9a8bdab5a87aeb8214b88ddafb278098394",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 6882fe5..fb4cba4 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1 +1,3 @@",
+        "+x = 1;",
+        "+x = 0;",
+        " x = 0;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "45ee00517df6dd2f5c12523b82f4ae9c361cbbab"
+    "shas": "6a5eb86577a86881fdd53c3db17dd589617b887e..79ca8610276bd0cc32d257702e20ec268187f1b6"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "45ee00517df6dd2f5c12523b82f4ae9c361cbbab",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index fb4cba4..42e16c6 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,3 +1,3 @@",
+        "-x = 1;",
+        "+x = 0;",
+        " x = 0;",
+        " x = 0;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c68a9ee4c0811ebc8bc6a97087ad578bda055575"
+    "shas": "79ca8610276bd0cc32d257702e20ec268187f1b6..c3da25392def8e82aaf0179cdd8cc51849d805c8"
 }
 ,{
     "testCaseDescription": "javascript-assignment-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "c68a9ee4c0811ebc8bc6a97087ad578bda055575",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 42e16c6..fb4cba4 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,3 +1,3 @@",
+        "-x = 0;",
+        "+x = 1;",
+        " x = 0;",
+        " x = 0;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aa18ede37e29b97d5478771c02f899c26ed29ec8"
+    "shas": "c3da25392def8e82aaf0179cdd8cc51849d805c8..be4979757f9464e59b4b7fb7dbdce17f4f362029"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "aa18ede37e29b97d5478771c02f899c26ed29ec8",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index fb4cba4..11fe15d 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,3 +1,2 @@",
+        "-x = 1;",
+        "-x = 0;",
+        " x = 0;",
+        "+x = 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e34fae4bc40de3527a8af142718f5034b8c89464"
+    "shas": "be4979757f9464e59b4b7fb7dbdce17f4f362029..592d4d9a24fe20282bbaa1cf66bbe20959d47ae5"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "e34fae4bc40de3527a8af142718f5034b8c89464",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 11fe15d..198b8f8 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1,2 +1 @@",
+        "-x = 0;",
+        " x = 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "844f1b80889b328b7de377506a20fd1e07722c3c"
+    "shas": "592d4d9a24fe20282bbaa1cf66bbe20959d47ae5..f0b77709f5be6c1d671a943d73b8fbb12344762e"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "844f1b80889b328b7de377506a20fd1e07722c3c",
+    "patch": [
+        "diff --git a/assignment.js b/assignment.js",
+        "index 198b8f8..e69de29 100644",
+        "--- a/assignment.js",
+        "+++ b/assignment.js",
+        "@@ -1 +0,0 @@",
+        "-x = 1;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "45a5360969a82ef1602c4fd2629a242bd75a1edf"
+    "shas": "f0b77709f5be6c1d671a943d73b8fbb12344762e..83f3153b76f49e077237997c965dc6f3c3a159bc"
 }]

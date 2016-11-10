@@ -847,9 +847,26 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "22db42187b94dca9b3ba3ce80361c21a8b48b777",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index e69de29..dcd9320 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -0,0 +1,11 @@",
+        "+export { name1, name2, name3, nameN };",
+        "+export { variable1 as name1, variable2 as name2, nameN };",
+        "+export let name1, name2, nameN;",
+        "+export let name1 = value1, name2 = value2, name3, nameN;",
+        "+export default namedFunction;",
+        "+export default function () { };",
+        "+export default function name1() { };",
+        "+export { name1 as default };",
+        "+export * from 'foo';",
+        "+export { name1, name2, nameN } from 'foo';",
+        "+export { import1 as name1, import2 as name2, nameN } from 'bar';"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "69fafd1cab17e5f7d23b70e090674ca58927dfe6"
+    "shas": "0bb74af8eede739c6d9a6b79a13e61263d3c52e6..3d34a0f856d545b0a728805cb18bb843d66b31ef"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -4106,9 +4123,40 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "69fafd1cab17e5f7d23b70e090674ca58927dfe6",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index dcd9320..c8b53ff 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,3 +1,25 @@",
+        "+export { name4, name5, name6, nameZ };",
+        "+export { variable2 as name2, variable3 as name3, nameY };",
+        "+export let name3, name4, nameT;",
+        "+export let name2 = value2, name3 = value3, name4, nameO;",
+        "+export default otherNamedFunction;",
+        "+export default function newName1() {};",
+        "+export default function () {};",
+        "+export { name2 as statement };",
+        "+export * from 'baz';",
+        "+export { name7, name8, nameP } from 'buzz';",
+        "+export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        "+export { name1, name2, name3, nameN };",
+        "+export { variable1 as name1, variable2 as name2, nameN };",
+        "+export let name1, name2, nameN;",
+        "+export let name1 = value1, name2 = value2, name3, nameN;",
+        "+export default namedFunction;",
+        "+export default function () { };",
+        "+export default function name1() { };",
+        "+export { name1 as default };",
+        "+export * from 'foo';",
+        "+export { name1, name2, nameN } from 'foo';",
+        "+export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7fa303ae2482bd012db32fc154762310dad6990"
+    "shas": "3d34a0f856d545b0a728805cb18bb843d66b31ef..14555cd2f315cd841f9d581c0dda879f1f3d2dd7"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -8961,9 +9009,40 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "b7fa303ae2482bd012db32fc154762310dad6990",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index c8b53ff..ad3f21a 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,14 +1,14 @@",
+        "-export { name4, name5, name6, nameZ };",
+        "-export { variable2 as name2, variable3 as name3, nameY };",
+        "-export let name3, name4, nameT;",
+        "-export let name2 = value2, name3 = value3, name4, nameO;",
+        "-export default otherNamedFunction;",
+        "-export default function newName1() {};",
+        "-export default function () {};",
+        "-export { name2 as statement };",
+        "-export * from 'baz';",
+        "-export { name7, name8, nameP } from 'buzz';",
+        "-export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        "+export { name1, name2, name3, nameN };",
+        "+export { variable1 as name1, variable2 as name2, nameN };",
+        "+export let name1, name2, nameN;",
+        "+export let name1 = value1, name2 = value2, name3, nameN;",
+        "+export default namedFunction;",
+        "+export default function () { };",
+        "+export default function name1() { };",
+        "+export { name1 as default };",
+        "+export * from 'foo';",
+        "+export { name1, name2, nameN } from 'foo';",
+        "+export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fc212964303910e919462077da89963cdb1be98d"
+    "shas": "14555cd2f315cd841f9d581c0dda879f1f3d2dd7..db45ffdca40149b2a8ab65cef948169930779ced"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -13802,9 +13881,40 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "fc212964303910e919462077da89963cdb1be98d",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index ad3f21a..c8b53ff 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,14 +1,14 @@",
+        "-export { name1, name2, name3, nameN };",
+        "-export { variable1 as name1, variable2 as name2, nameN };",
+        "-export let name1, name2, nameN;",
+        "-export let name1 = value1, name2 = value2, name3, nameN;",
+        "-export default namedFunction;",
+        "-export default function () { };",
+        "-export default function name1() { };",
+        "-export { name1 as default };",
+        "-export * from 'foo';",
+        "-export { name1, name2, nameN } from 'foo';",
+        "-export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        "+export { name4, name5, name6, nameZ };",
+        "+export { variable2 as name2, variable3 as name3, nameY };",
+        "+export let name3, name4, nameT;",
+        "+export let name2 = value2, name3 = value3, name4, nameO;",
+        "+export default otherNamedFunction;",
+        "+export default function newName1() {};",
+        "+export default function () {};",
+        "+export { name2 as statement };",
+        "+export * from 'baz';",
+        "+export { name7, name8, nameP } from 'buzz';",
+        "+export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1b524fb912fc311ad4e96593ecfdb594e148f97d"
+    "shas": "db45ffdca40149b2a8ab65cef948169930779ced..a7d8a8c67df112242870b85873789fcd84c93dc4"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -17872,9 +17982,55 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "1b524fb912fc311ad4e96593ecfdb594e148f97d",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index c8b53ff..281c672 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,25 +1,3 @@",
+        "-export { name4, name5, name6, nameZ };",
+        "-export { variable2 as name2, variable3 as name3, nameY };",
+        "-export let name3, name4, nameT;",
+        "-export let name2 = value2, name3 = value3, name4, nameO;",
+        "-export default otherNamedFunction;",
+        "-export default function newName1() {};",
+        "-export default function () {};",
+        "-export { name2 as statement };",
+        "-export * from 'baz';",
+        "-export { name7, name8, nameP } from 'buzz';",
+        "-export { import6 as name6, import7 as name7, nameB } from 'fizz';",
+        "-export { name1, name2, name3, nameN };",
+        "-export { variable1 as name1, variable2 as name2, nameN };",
+        "-export let name1, name2, nameN;",
+        "-export let name1 = value1, name2 = value2, name3, nameN;",
+        "-export default namedFunction;",
+        "-export default function () { };",
+        "-export default function name1() { };",
+        "-export { name1 as default };",
+        "-export * from 'foo';",
+        "-export { name1, name2, nameN } from 'foo';",
+        "-export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name1, name2, name3, nameN };",
+        " export { variable1 as name1, variable2 as name2, nameN };",
+        " export let name1, name2, nameN;",
+        "@@ -31,3 +9,14 @@ export { name1 as default };",
+        " export * from 'foo';",
+        " export { name1, name2, nameN } from 'foo';",
+        " export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        "+export { name4, name5, name6, nameZ };",
+        "+export { variable2 as name2, variable3 as name3, nameY };",
+        "+export let name3, name4, nameT;",
+        "+export let name2 = value2, name3 = value3, name4, nameO;",
+        "+export default otherNamedFunction;",
+        "+export default function newName1() {};",
+        "+export default function () {};",
+        "+export { name2 as statement };",
+        "+export * from 'baz';",
+        "+export { name7, name8, nameP } from 'buzz';",
+        "+export { import6 as name6, import7 as name7, nameB } from 'fizz';"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3032a50afea32bd74ade9b5ddec65057e73841b4"
+    "shas": "a7d8a8c67df112242870b85873789fcd84c93dc4..33d58d61e860aaf9d71c3a00aff457cf8c5e7d15"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -20320,9 +20476,29 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "3032a50afea32bd74ade9b5ddec65057e73841b4",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index 281c672..e105ba7 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,14 +1,3 @@",
+        "-export { name1, name2, name3, nameN };",
+        "-export { variable1 as name1, variable2 as name2, nameN };",
+        "-export let name1, name2, nameN;",
+        "-export let name1 = value1, name2 = value2, name3, nameN;",
+        "-export default namedFunction;",
+        "-export default function () { };",
+        "-export default function name1() { };",
+        "-export { name1 as default };",
+        "-export * from 'foo';",
+        "-export { name1, name2, nameN } from 'foo';",
+        "-export { import1 as name1, import2 as name2, nameN } from 'bar';",
+        " export { name4, name5, name6, nameZ };",
+        " export { variable2 as name2, variable3 as name3, nameY };",
+        " export let name3, name4, nameT;"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d76dce2c810aa0215d1bdb63be6fa2a59e65f5dd"
+    "shas": "33d58d61e860aaf9d71c3a00aff457cf8c5e7d15..52b3a9b592646247d5884c136733a12cb2971479"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -21173,7 +21349,24 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "d76dce2c810aa0215d1bdb63be6fa2a59e65f5dd",
+    "patch": [
+        "diff --git a/export.js b/export.js",
+        "index e105ba7..e69de29 100644",
+        "--- a/export.js",
+        "+++ b/export.js",
+        "@@ -1,11 +0,0 @@",
+        "-export { name4, name5, name6, nameZ };",
+        "-export { variable2 as name2, variable3 as name3, nameY };",
+        "-export let name3, name4, nameT;",
+        "-export let name2 = value2, name3 = value3, name4, nameO;",
+        "-export default otherNamedFunction;",
+        "-export default function newName1() {};",
+        "-export default function () {};",
+        "-export { name2 as statement };",
+        "-export * from 'baz';",
+        "-export { name7, name8, nameP } from 'buzz';",
+        "-export { import6 as name6, import7 as name7, nameB } from 'fizz';"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9b877906e9b09b14f277f4c3058dfc04eca3d222"
+    "shas": "52b3a9b592646247d5884c136733a12cb2971479..5dede241573c8e353a4d8c662194e8e3b750e01a"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -40,9 +40,19 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "6a5c5e925499fc0ac05bc20d3440592bebc89ea5",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index e69de29..aca2d55 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -0,0 +1,4 @@",
+        "+const (",
+        "+a = 01i",
+        "+b = 1.e+100i",
+        "+)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "04ef00437176d8193e549a700e3b19929002cc76"
+    "shas": "6761a7543f7002279b3e1d53f388c0b6408e11ac..70a8f336ad4cf76dbf55d755ee3b4ff94b77dc5b"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-insert-test",
@@ -53,11 +63,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -68,11 +78,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -83,11 +93,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -98,11 +108,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -116,9 +126,27 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "04ef00437176d8193e549a700e3b19929002cc76",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index aca2d55..6983988 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,4 +1,12 @@",
+        " const (",
+        "+a = 02i",
+        "+b = 1.e+103i",
+        "+)",
+        "+const (",
+        "+a = 01i",
+        "+b = 1.e+100i",
+        "+)",
+        "+const (",
+        " a = 01i",
+        " b = 1.e+100i",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "60b55b83363314517314e8c074c54c9244ac20ad"
+    "shas": "70a8f336ad4cf76dbf55d755ee3b4ff94b77dc5b..7003c23d83606920ba4dbc36a6fa8aa3fb23d254"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-insert-test",
@@ -130,54 +158,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the a variable of the 'main' module"
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the a variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     5
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     5
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the b variable of the 'main' module"
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the b variable"
                 }
             ]
         },
@@ -186,9 +214,23 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "60b55b83363314517314e8c074c54c9244ac20ad",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 6983988..a7e36a5 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,6 +1,6 @@",
+        " const (",
+        "-a = 02i",
+        "-b = 1.e+103i",
+        "+a = 01i",
+        "+b = 1.e+100i",
+        " )",
+        " const (",
+        " a = 01i"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "95e686a3b779e865259de5a05c7284342ec9efe5"
+    "shas": "7003c23d83606920ba4dbc36a6fa8aa3fb23d254..9c8a6f328131e0ab48ab9cccdf3a8a0ab164e527"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-test",
@@ -200,54 +242,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the a variable of the 'main' module"
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the a variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     5
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     5
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the b variable of the 'main' module"
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the b variable"
                 }
             ]
         },
@@ -256,9 +298,23 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "95e686a3b779e865259de5a05c7284342ec9efe5",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index a7e36a5..6983988 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,6 +1,6 @@",
+        " const (",
+        "-a = 01i",
+        "-b = 1.e+100i",
+        "+a = 02i",
+        "+b = 1.e+103i",
+        " )",
+        " const (",
+        " a = 01i"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "498a8733d663fcea7130e75224198910ad23d497"
+    "shas": "9c8a6f328131e0ab48ab9cccdf3a8a0ab164e527..06c027b6920c1d1e7f4b44cd6527798c933581c4"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
@@ -269,11 +325,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -284,11 +340,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -299,11 +355,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -314,11 +370,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -329,11 +385,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -344,11 +400,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -362,9 +418,29 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "498a8733d663fcea7130e75224198910ad23d497",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 6983988..02cff8d 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,12 +1,8 @@",
+        " const (",
+        "-a = 02i",
+        "-b = 1.e+103i",
+        "-)",
+        "-const (",
+        " a = 01i",
+        " b = 1.e+100i",
+        " )",
+        " const (",
+        "-a = 01i",
+        "-b = 1.e+100i",
+        "+a = 02i",
+        "+b = 1.e+103i",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d11becbeaabdb5e5e1eb9efb0db1b3439bc42139"
+    "shas": "06c027b6920c1d1e7f4b44cd6527798c933581c4..b6de01e92b11ca25862dcd7d798b72f9a01aa1c4"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-test",
@@ -375,11 +451,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -390,11 +466,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -408,9 +484,23 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "d11becbeaabdb5e5e1eb9efb0db1b3439bc42139",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 02cff8d..6d8ec55 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,8 +1,4 @@",
+        " const (",
+        "-a = 01i",
+        "-b = 1.e+100i",
+        "-)",
+        "-const (",
+        " a = 02i",
+        " b = 1.e+103i",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0afc23ae41d67a623887428c19698f2051e71d09"
+    "shas": "b6de01e92b11ca25862dcd7d798b72f9a01aa1c4..8af14aaa12876d71baf9d1580b9de3a0b4769e2a"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-rest-test",
@@ -421,11 +511,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -436,11 +526,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -454,7 +544,17 @@
     "filePaths": [
         "imaginary-literals.go"
     ],
-    "sha1": "0afc23ae41d67a623887428c19698f2051e71d09",
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 6d8ec55..e69de29 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,4 +0,0 @@",
+        "-const (",
+        "-a = 02i",
+        "-b = 1.e+103i",
+        "-)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "46503417695204e939923a09702395449f526a66"
+    "shas": "8af14aaa12876d71baf9d1580b9de3a0b4769e2a..3f18376b34b25deb3740a62df8c40ad667cfef4a"
 }]

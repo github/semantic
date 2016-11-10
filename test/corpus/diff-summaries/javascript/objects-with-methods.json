@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object"
+                    "summary": "Added the '{ add(a, b) }' object"
                 }
             ]
         },
@@ -25,9 +25,16 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "8662f58f1d7ce21fddcefecae990742a5d1398dc",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index e69de29..7421e18 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -0,0 +1 @@",
+        "+{ add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b591df548ffb5ef563a30246d6492b39fb69a564"
+    "shas": "e66b1b20abc596d2b560eaa80f1749c79816f9ff..d3b8c609f29da1978a60c14da5d0ca5dfc565eff"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
@@ -47,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object"
+                    "summary": "Added the '{ subtract(a, b) }' object"
                 },
                 {
                     "span": {
@@ -62,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object"
+                    "summary": "Added the '{ add(a, b) }' object"
                 }
             ]
         },
@@ -71,9 +78,18 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "b591df548ffb5ef563a30246d6492b39fb69a564",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 7421e18..59eb3a3 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1 +1,3 @@",
+        "+{ subtract(a, b) { return a - b; } };",
+        "+{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ee23a64bc6c8edd4994205c77bf77a35bcb40493"
+    "shas": "d3b8c609f29da1978a60c14da5d0ca5dfc565eff..71f9fe548526a54588efe8ccf43fb16946dde439"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
@@ -105,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method"
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the 'add(a, b)' method"
                 }
             ]
         },
@@ -114,9 +130,19 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "ee23a64bc6c8edd4994205c77bf77a35bcb40493",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 59eb3a3..05689b1 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ subtract(a, b) { return a - b; } };",
+        "+{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5afe59e01be0dfa586cf09188b26b97960e84b71"
+    "shas": "71f9fe548526a54588efe8ccf43fb16946dde439..3651aee8e277793117960f9223391b0cfdb1f814"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-test",
@@ -148,7 +174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method"
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the 'subtract(a, b)' method"
                 }
             ]
         },
@@ -157,9 +183,19 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "5afe59e01be0dfa586cf09188b26b97960e84b71",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 05689b1..59eb3a3 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ add(a, b) { return a + b; } };",
+        "+{ subtract(a, b) { return a - b; } };",
+        " { add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3723264ddcbd5d252f20a04e13f2813874ea7a75"
+    "shas": "3651aee8e277793117960f9223391b0cfdb1f814..af0586db52b5b97c1c819ee5e107835fa2299249"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
@@ -179,7 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object"
+                    "summary": "Deleted the '{ subtract(a, b) }' object"
                 },
                 {
                     "span": {
@@ -194,7 +230,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object"
+                    "summary": "Deleted the '{ add(a, b) }' object"
                 },
                 {
                     "span": {
@@ -209,7 +245,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object"
+                    "summary": "Added the '{ subtract(a, b) }' object"
                 }
             ]
         },
@@ -218,9 +254,19 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "3723264ddcbd5d252f20a04e13f2813874ea7a75",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 59eb3a3..29d3998 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,3 +1,2 @@",
+        "-{ subtract(a, b) { return a - b; } };",
+        "-{ add(a, b) { return a + b; } };",
+        " { add(a, b) { return a + b; } };",
+        "+{ subtract(a, b) { return a - b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f2e3bfb506337dbb81c078e49bfca3c4d72abefa"
+    "shas": "af0586db52b5b97c1c819ee5e107835fa2299249..a1ef0cba5455912ff148f7bf8afbc74061d8de10"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-test",
@@ -240,7 +286,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object"
+                    "summary": "Deleted the '{ add(a, b) }' object"
                 }
             ]
         },
@@ -249,9 +295,17 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "f2e3bfb506337dbb81c078e49bfca3c4d72abefa",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 29d3998..80ad7f0 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1,2 +1 @@",
+        "-{ add(a, b) { return a + b; } };",
+        " { subtract(a, b) { return a - b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "59aab91326ae0dbd9332b64ea11a42f940b4437f"
+    "shas": "a1ef0cba5455912ff148f7bf8afbc74061d8de10..896cd9fdc71791d876ea5108de8b34631f284c5a"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
@@ -271,7 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object"
+                    "summary": "Deleted the '{ subtract(a, b) }' object"
                 }
             ]
         },
@@ -280,7 +334,14 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "59aab91326ae0dbd9332b64ea11a42f940b4437f",
+    "patch": [
+        "diff --git a/objects-with-methods.js b/objects-with-methods.js",
+        "index 80ad7f0..e69de29 100644",
+        "--- a/objects-with-methods.js",
+        "+++ b/objects-with-methods.js",
+        "@@ -1 +0,0 @@",
+        "-{ subtract(a, b) { return a - b; } };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ee6b3d5d274912c071eadd10cb5bea9b96b30cb8"
+    "shas": "896cd9fdc71791d876ea5108de8b34631f284c5a..c1ec2fd690eae01418882f3dbba8b6a5c0c3c2eb"
 }]

@@ -5,86 +5,13 @@
             "increment-decrement-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "increment-decrement-statements.go"
-    ],
-    "sha1": "353e531a55c6c3d0540570c523e799df46615898",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "05731f26c98d3d4cf93557f3f95192d6d97e8be5"
-}
-,{
-    "testCaseDescription": "go-increment-decrement-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "increment-decrement-statements.go": [
-                {
-                    "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
+                                1,
                                 2
                             ]
                         }
@@ -95,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                2,
                                 1
                             ],
                             "end": [
-                                6,
+                                2,
                                 2
                             ]
                         }
@@ -113,9 +40,105 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "05731f26c98d3d4cf93557f3f95192d6d97e8be5",
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index e69de29..c118f41 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -0,0 +1,2 @@",
+        "+i++",
+        "+j--"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9c9be572b7c83e36de9a5997c7987815168a6a23"
+    "shas": "acf23921d6e89772dac98a78ba280e58c2429050..74900cd980876ca3be4654c097b3ee3475d51726"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index c118f41..d617bc4 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,2 +1,6 @@",
+        "+foo++",
+        "+x++",
+        "+i++",
+        "+j--",
+        " i++",
+        " j--"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "74900cd980876ca3be4654c097b3ee3475d51726..141a025429562d95737cea6257998bb5f91afdc4"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
@@ -127,21 +150,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -153,11 +176,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -168,11 +191,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -186,9 +209,22 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "9c9be572b7c83e36de9a5997c7987815168a6a23",
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index d617bc4..15214d0 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,5 +1,5 @@",
+        "-foo++",
+        "-x++",
+        "+i++",
+        "+j--",
+        " i++",
+        " j--",
+        " i++"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c1ef5fffc731c318afb45049a81983a54f1ad6bd"
+    "shas": "141a025429562d95737cea6257998bb5f91afdc4..8f96737bbb510f71457b32de6ff88f244261ca3a"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-replacement-test",
@@ -200,21 +236,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             }
@@ -226,11 +262,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -241,11 +277,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -259,9 +295,22 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "c1ef5fffc731c318afb45049a81983a54f1ad6bd",
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 15214d0..d617bc4 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,5 +1,5 @@",
+        "-i++",
+        "-j--",
+        "+foo++",
+        "+x++",
+        " i++",
+        " j--",
+        " i++"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "494d53aa2b6983358c04d03252664e33375e204f"
+    "shas": "8f96737bbb510f71457b32de6ff88f244261ca3a..4189214ea59e379b3c40a1a079666495490968cc"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
@@ -272,11 +321,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 4
                             ]
                         }
@@ -287,11 +336,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -302,11 +351,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -317,11 +366,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -332,11 +381,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 4
                             ]
                         }
@@ -347,11 +396,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -365,9 +414,23 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "494d53aa2b6983358c04d03252664e33375e204f",
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index d617bc4..640bbf1 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,6 +1,4 @@",
+        "-foo++",
+        "-x++",
+        "-i++",
+        "-j--",
+        " i++",
+        " j--",
+        "+foo++",
+        "+x++"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a8f0122076dddd7b2ccc818bb7b6e6e7f819cacc"
+    "shas": "4189214ea59e379b3c40a1a079666495490968cc..b01ab200bee6790fce1710c34aeb967595509f86"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-test",
@@ -378,11 +441,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 2
                             ]
                         }
@@ -393,11 +456,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -411,9 +474,19 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "a8f0122076dddd7b2ccc818bb7b6e6e7f819cacc",
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 640bbf1..b7c351d 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,4 +1,2 @@",
+        "-i++",
+        "-j--",
+        " foo++",
+        " x++"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ccc0273dc372b40fe71baf328c23abc7f1aaa558"
+    "shas": "b01ab200bee6790fce1710c34aeb967595509f86..c7abe86b7eb9259ab0b8cd859b857938aaacd550"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-rest-test",
@@ -422,30 +495,33 @@
             "increment-decrement-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
                 }
             ]
         },
@@ -454,7 +530,15 @@
     "filePaths": [
         "increment-decrement-statements.go"
     ],
-    "sha1": "ccc0273dc372b40fe71baf328c23abc7f1aaa558",
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index b7c351d..e69de29 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,2 +0,0 @@",
+        "-foo++",
+        "-x++"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "07104070f6fbb41df4ca2bfb623637db5ce223eb"
+    "shas": "c7abe86b7eb9259ab0b8cd859b857938aaacd550..8b892c06025823500a32131e0005fe5ea0511bd9"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 19
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 20
                             ],
                             "end": [
-                                3,
+                                1,
                                 25
                             ]
                         }
@@ -55,9 +55,16 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "c818cf5bb28cfc9175040ba099cef324698884d8",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index e69de29..c86220d 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -0,0 +1 @@",
+        "+type m1 map[string]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2257e7dbe31053042cec06248d42a1043db10de2"
+    "shas": "ce33c1bfeb0cbfdd024d65479c25db256cdd12cc..a17295fbbf8618c6b504245e2b94381ba745ef76"
 }
 ,{
     "testCaseDescription": "go-map-types-replacement-insert-test",
@@ -68,11 +75,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -83,11 +90,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 16
                             ]
                         }
@@ -98,11 +105,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 17
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -113,11 +120,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -128,11 +135,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -143,11 +150,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 20
                             ],
                             "end": [
-                                4,
+                                2,
                                 25
                             ]
                         }
@@ -161,9 +168,18 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "2257e7dbe31053042cec06248d42a1043db10de2",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index c86220d..9cc2e8b 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -1 +1,3 @@",
+        "+type m1 map[int]error",
+        "+type m1 map[string]error",
+        " type m1 map[string]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "39b66e714f2dd4d4adca6f13fc122f514509e56d"
+    "shas": "a17295fbbf8618c6b504245e2b94381ba745ef76..e911ec9c095a334531d6f7a12da732a3ab64cd9b"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-insert-test",
@@ -175,21 +191,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     19
                                 ]
                             }
@@ -204,9 +220,19 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "39b66e714f2dd4d4adca6f13fc122f514509e56d",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index 9cc2e8b..ee1d5a0 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type m1 map[int]error",
+        "+type m1 map[string]error",
+        " type m1 map[string]error",
+        " type m1 map[string]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cce534462eee7e892f598bbb11eae8ddadb8621e"
+    "shas": "e911ec9c095a334531d6f7a12da732a3ab64cd9b..f78f0d563d0a83f7d64cf5b28c854727be528d05"
 }
 ,{
     "testCaseDescription": "go-map-types-replacement-test",
@@ -218,21 +244,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     19
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     16
                                 ]
                             }
@@ -247,9 +273,19 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "cce534462eee7e892f598bbb11eae8ddadb8621e",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index ee1d5a0..9cc2e8b 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type m1 map[string]error",
+        "+type m1 map[int]error",
+        " type m1 map[string]error",
+        " type m1 map[string]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "916b37b7fbb2e41bd54ebb1507daeddef36ebd7b"
+    "shas": "f78f0d563d0a83f7d64cf5b28c854727be528d05..f0967ba8a8380ad4160e1d9c45c1a967f4912ce4"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-replacement-test",
@@ -260,11 +296,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -275,11 +311,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 16
                             ]
                         }
@@ -290,11 +326,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 17
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -305,11 +341,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -320,11 +356,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -335,11 +371,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 20
                             ],
                             "end": [
-                                4,
+                                2,
                                 25
                             ]
                         }
@@ -350,11 +386,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -365,11 +401,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -380,11 +416,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 17
                             ],
                             "end": [
-                                4,
+                                2,
                                 22
                             ]
                         }
@@ -398,9 +434,19 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "916b37b7fbb2e41bd54ebb1507daeddef36ebd7b",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index 9cc2e8b..a863ca9 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -1,3 +1,2 @@",
+        "-type m1 map[int]error",
+        "-type m1 map[string]error",
+        " type m1 map[string]error",
+        "+type m1 map[int]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f4ba0647de9d38eba60c257751ae648536d10e6d"
+    "shas": "f0967ba8a8380ad4160e1d9c45c1a967f4912ce4..d48a47fe4d8dd097f68ae843d389105250536d40"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-test",
@@ -411,11 +457,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -426,11 +472,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 19
                             ]
                         }
@@ -441,11 +487,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 20
                             ],
                             "end": [
-                                3,
+                                1,
                                 25
                             ]
                         }
@@ -459,9 +505,17 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "f4ba0647de9d38eba60c257751ae648536d10e6d",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index a863ca9..d7e6949 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -1,2 +1 @@",
+        "-type m1 map[string]error",
+        " type m1 map[int]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e8f2c34064e5df9bad4f99414bd81001fea14ab7"
+    "shas": "d48a47fe4d8dd097f68ae843d389105250536d40..56a30334ee9cb89bdae517650927f99c594ec54d"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-rest-test",
@@ -472,11 +526,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -487,11 +541,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 16
                             ]
                         }
@@ -502,11 +556,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 17
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -520,7 +574,14 @@
     "filePaths": [
         "map-types.go"
     ],
-    "sha1": "e8f2c34064e5df9bad4f99414bd81001fea14ab7",
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index d7e6949..e69de29 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -1 +0,0 @@",
+        "-type m1 map[int]error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e8c412e8ad778a23678aa9734a72ddbb4d0a3f3e"
+    "shas": "56a30334ee9cb89bdae517650927f99c594ec54d..25efc557c3b81f94924fc76ce4196db1fd75e9cc"
 }]

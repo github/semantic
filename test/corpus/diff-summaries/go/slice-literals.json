@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 26
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -55,9 +55,21 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "e727d68d5530b584f126dc2c23f5dafc2ed9f862",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index e69de29..9b1eb7a 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -0,0 +1,6 @@",
+        "+const s1 = []string{}",
+        "+const s2 = []string{\"hi\"}",
+        "+const s3 = []string{",
+        "+\"hi\",",
+        "+ \"hello\",",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7d1dc33757ba083fa8c0a4ee6420a19ba409a632"
+    "shas": "9e795da07ee62f0a45cb22c279f0ac4a7f3d43d7..7e5f16141af567d499956917afac82cf54db902b"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-insert-test",
@@ -68,11 +80,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 27
                             ]
                         }
@@ -83,11 +95,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 29
                             ]
                         }
@@ -98,11 +110,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -113,11 +125,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 22
                             ]
                         }
@@ -128,11 +140,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 26
                             ]
                         }
@@ -143,11 +155,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -161,9 +173,30 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "7d1dc33757ba083fa8c0a4ee6420a19ba409a632",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index 9b1eb7a..4555163 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -1,3 +1,15 @@",
+        "+const s1 = []string{\"sup\"}",
+        "+const s2 = []string{\"hello\"}",
+        "+const s3 = []string{",
+        "+\"bar\",",
+        "+ \"baz\",",
+        "+}",
+        "+const s1 = []string{}",
+        "+const s2 = []string{\"hi\"}",
+        "+const s3 = []string{",
+        "+\"hi\",",
+        "+ \"hello\",",
+        "+}",
+        " const s1 = []string{}",
+        " const s2 = []string{\"hi\"}",
+        " const s3 = []string{"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2777faca7f750c059198d05cdeb7506db55f5b44"
+    "shas": "7e5f16141af567d499956917afac82cf54db902b..430df208c0280d2df11bed2f3f13ef4d0b0ad9fc"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
@@ -175,108 +208,108 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     26
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     20
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"sup\" string with the '{}' literal_value in the s1 variable of the 'main' module"
+                    "summary": "Replaced the \"sup\" string with the '{}' literal_value in the s1 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     21
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     28
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     21
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     25
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the s2 variable of the 'main' module"
+                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the s2 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the s3 variable of the 'main' module"
+                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the s3 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    7,
+                                    5,
                                     2
                                 ],
                                 "end": [
-                                    7,
+                                    5,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    7,
+                                    5,
                                     2
                                 ],
                                 "end": [
-                                    7,
+                                    5,
                                     9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the s3 variable of the 'main' module"
+                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the s3 variable"
                 }
             ]
         },
@@ -285,9 +318,27 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "2777faca7f750c059198d05cdeb7506db55f5b44",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index 4555163..39a2067 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -1,8 +1,8 @@",
+        "-const s1 = []string{\"sup\"}",
+        "-const s2 = []string{\"hello\"}",
+        "+const s1 = []string{}",
+        "+const s2 = []string{\"hi\"}",
+        " const s3 = []string{",
+        "-\"bar\",",
+        "- \"baz\",",
+        "+\"hi\",",
+        "+ \"hello\",",
+        " }",
+        " const s1 = []string{}",
+        " const s2 = []string{\"hi\"}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6c12749cd08a72bbdef593a7c7a81b9d863afb10"
+    "shas": "430df208c0280d2df11bed2f3f13ef4d0b0ad9fc..6d5b83fd5bcf434b3dc818de211b89abee2d6cf4"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
@@ -299,108 +350,108 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     20
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     26
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the '{}' literal_value with the \"sup\" string in the s1 variable of the 'main' module"
+                    "summary": "Replaced the '{}' literal_value with the \"sup\" string in the s1 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     21
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     25
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     21
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     28
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the s2 variable of the 'main' module"
+                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the s2 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the s3 variable of the 'main' module"
+                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the s3 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    7,
+                                    5,
                                     2
                                 ],
                                 "end": [
-                                    7,
+                                    5,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    7,
+                                    5,
                                     2
                                 ],
                                 "end": [
-                                    7,
+                                    5,
                                     7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the s3 variable of the 'main' module"
+                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the s3 variable"
                 }
             ]
         },
@@ -409,9 +460,27 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "6c12749cd08a72bbdef593a7c7a81b9d863afb10",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index 39a2067..4555163 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -1,8 +1,8 @@",
+        "-const s1 = []string{}",
+        "-const s2 = []string{\"hi\"}",
+        "+const s1 = []string{\"sup\"}",
+        "+const s2 = []string{\"hello\"}",
+        " const s3 = []string{",
+        "-\"hi\",",
+        "- \"hello\",",
+        "+\"bar\",",
+        "+ \"baz\",",
+        " }",
+        " const s1 = []string{}",
+        " const s2 = []string{\"hi\"}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "988fbb38958d9dc24e4e35b23bccdad8442f4a94"
+    "shas": "6d5b83fd5bcf434b3dc818de211b89abee2d6cf4..9a675a67b7a1a6c55dcd56919a18b1cef6a4ebd2"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
@@ -422,11 +491,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 27
                             ]
                         }
@@ -437,11 +506,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 29
                             ]
                         }
@@ -452,11 +521,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -467,11 +536,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 22
                             ]
                         }
@@ -482,11 +551,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 26
                             ]
                         }
@@ -497,11 +566,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -512,11 +581,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 27
                             ]
                         }
@@ -527,11 +596,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 29
                             ]
                         }
@@ -542,11 +611,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -560,9 +629,37 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "988fbb38958d9dc24e4e35b23bccdad8442f4a94",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index 4555163..d3fb29c 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -1,18 +1,12 @@",
+        "-const s1 = []string{\"sup\"}",
+        "-const s2 = []string{\"hello\"}",
+        "-const s3 = []string{",
+        "-\"bar\",",
+        "- \"baz\",",
+        "-}",
+        " const s1 = []string{}",
+        " const s2 = []string{\"hi\"}",
+        " const s3 = []string{",
+        " \"hi\",",
+        "  \"hello\",",
+        " }",
+        "-const s1 = []string{}",
+        "-const s2 = []string{\"hi\"}",
+        "+const s1 = []string{\"sup\"}",
+        "+const s2 = []string{\"hello\"}",
+        " const s3 = []string{",
+        "-\"hi\",",
+        "- \"hello\",",
+        "+\"bar\",",
+        "+ \"baz\",",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e138f6bad52e3a5eb9669b55644cf0f6b78a4959"
+    "shas": "9a675a67b7a1a6c55dcd56919a18b1cef6a4ebd2..0be08b31a19a03e3ab9ce42f685dac31c88fcf21"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-test",
@@ -573,11 +670,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -588,11 +685,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 26
                             ]
                         }
@@ -603,11 +700,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -621,9 +718,24 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "e138f6bad52e3a5eb9669b55644cf0f6b78a4959",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index d3fb29c..e3fd378 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -1,9 +1,3 @@",
+        "-const s1 = []string{}",
+        "-const s2 = []string{\"hi\"}",
+        "-const s3 = []string{",
+        "-\"hi\",",
+        "- \"hello\",",
+        "-}",
+        " const s1 = []string{\"sup\"}",
+        " const s2 = []string{\"hello\"}",
+        " const s3 = []string{"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7cc41f942596210a56b0d38f340cbbff25e64125"
+    "shas": "0be08b31a19a03e3ab9ce42f685dac31c88fcf21..3aa336f26d89c944f5f2d3ce3382a451a2e9ab9c"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-rest-test",
@@ -634,11 +746,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 27
                             ]
                         }
@@ -649,11 +761,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 29
                             ]
                         }
@@ -664,11 +776,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -682,7 +794,19 @@
     "filePaths": [
         "slice-literals.go"
     ],
-    "sha1": "7cc41f942596210a56b0d38f340cbbff25e64125",
+    "patch": [
+        "diff --git a/slice-literals.go b/slice-literals.go",
+        "index e3fd378..e69de29 100644",
+        "--- a/slice-literals.go",
+        "+++ b/slice-literals.go",
+        "@@ -1,6 +0,0 @@",
+        "-const s1 = []string{\"sup\"}",
+        "-const s2 = []string{\"hello\"}",
+        "-const s3 = []string{",
+        "-\"bar\",",
+        "- \"baz\",",
+        "-}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ac21f9d0ee6f7ef2a5a607b08fe2b95f3a6470c8"
+    "shas": "3aa336f26d89c944f5f2d3ce3382a451a2e9ab9c..5b7d43722e8258820bec8f43f32d77913026fbd1"
 }]

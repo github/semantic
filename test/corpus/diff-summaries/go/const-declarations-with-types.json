@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 19
                             ]
                         }
@@ -25,9 +25,16 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "c21d0b27e7c59d7774df63523503c3bc468e4b03",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index e69de29..da3bfc4 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -0,0 +1 @@",
+        "+const zero int = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "037b01f87e93e196246e7510a572960226d334c2"
+    "shas": "7c6671fbbc34d7ffd6c48ceafe5d7cb701952070..583d971ed03f04fe46711e9e2954e1fd8967ed9f"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-replacement-insert-test",
@@ -38,11 +45,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -53,11 +60,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -68,11 +75,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -86,9 +93,18 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "037b01f87e93e196246e7510a572960226d334c2",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index da3bfc4..86f010e 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1 +1,3 @@",
+        "+const one, two uiint64 = 1, 2",
+        "+const zero int = 0",
+        " const zero int = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6361df62903f4e062984bdc670ce10de3dde2f40"
+    "shas": "583d971ed03f04fe46711e9e2954e1fd8967ed9f..6524d42fc14ef16ee8b4182d5ca6aa3b40c0ef22"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-insert-test",
@@ -100,64 +116,64 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero variable of the 'main' module"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     26
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     27
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     18
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     19
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the zero variable of the 'main' module"
+                    "summary": "Replaced '1' with '0' in the zero variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -171,9 +187,19 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "6361df62903f4e062984bdc670ce10de3dde2f40",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index 86f010e..049ca7f 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-const one, two uiint64 = 1, 2",
+        "+const zero int = 0",
+        " const zero int = 0",
+        " const zero int = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a15739d174f2a8ca5ca6e7c06384933ef0c70f97"
+    "shas": "6524d42fc14ef16ee8b4182d5ca6aa3b40c0ef22..0ed9143e58bc31164f36886a75e832881432cc87"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-replacement-test",
@@ -185,64 +211,64 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one variable of the 'main' module"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     18
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     19
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     26
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     27
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the one variable of the 'main' module"
+                    "summary": "Replaced '0' with '1' in the one variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -256,9 +282,19 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "a15739d174f2a8ca5ca6e7c06384933ef0c70f97",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index 049ca7f..86f010e 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-const zero int = 0",
+        "+const one, two uiint64 = 1, 2",
+        " const zero int = 0",
+        " const zero int = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8458f0603f7f4fc15b6252185d5e735a91c8e2a0"
+    "shas": "0ed9143e58bc31164f36886a75e832881432cc87..d9db413fa87de51e109abeb31a69d648fc8414c2"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-replacement-test",
@@ -269,11 +305,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -284,11 +320,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -299,11 +335,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -314,11 +350,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -329,11 +365,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -347,9 +383,19 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "8458f0603f7f4fc15b6252185d5e735a91c8e2a0",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index 86f010e..f035105 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1,3 +1,2 @@",
+        "-const one, two uiint64 = 1, 2",
+        "-const zero int = 0",
+        " const zero int = 0",
+        "+const one, two uiint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6ceaa758df5e705335778d863e4a000325a7188f"
+    "shas": "d9db413fa87de51e109abeb31a69d648fc8414c2..5810cba229beabf124f6fbf9f8839bf6516cbfec"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-test",
@@ -360,11 +406,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 19
                             ]
                         }
@@ -378,9 +424,17 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "6ceaa758df5e705335778d863e4a000325a7188f",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index f035105..716746a 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1,2 +1 @@",
+        "-const zero int = 0",
+        " const one, two uiint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "205fd6749a22e393f4c96d72095a7347b473d3d7"
+    "shas": "5810cba229beabf124f6fbf9f8839bf6516cbfec..6f46e936e458f9355d6a374e25288b94989076d6"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-rest-test",
@@ -391,11 +445,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -406,11 +460,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 30
                             ]
                         }
@@ -424,7 +478,14 @@
     "filePaths": [
         "const-declarations-with-types.go"
     ],
-    "sha1": "205fd6749a22e393f4c96d72095a7347b473d3d7",
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index 716746a..e69de29 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1 +0,0 @@",
+        "-const one, two uiint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "45b551f3f778995db1cbc9c4f64fc2a76995f41e"
+    "shas": "6f46e936e458f9355d6a374e25288b94989076d6..95f53bbe92bd5841e140af869c4f35cb74379028"
 }]

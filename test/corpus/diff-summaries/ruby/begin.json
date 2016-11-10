@@ -1,0 +1,244 @@
+[{
+    "testCaseDescription": "ruby-begin-setup-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index e69de29..ff7bbbe 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "72e1f4912f54a936266422abbb53a9c2fc864992..d9be702e11b41377baa2f5fb3ccd4e3cf3dd81e4"
+}
+,{
+    "testCaseDescription": "ruby-begin-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement in the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index ff7bbbe..7b4a3be 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,2 +1,4 @@",
+        " def foo",
+        "+begin",
+        "+end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d9be702e11b41377baa2f5fb3ccd4e3cf3dd81e4..1f7c992ecbf8dc5434ec7da2bc396e814e91adc9"
+}
+,{
+    "testCaseDescription": "ruby-begin-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'puts('hi')' function call in a begin statement of the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index 7b4a3be..7879e55 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,4 +1,5 @@",
+        " def foo",
+        " begin",
+        "+  puts 'hi'",
+        " end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1f7c992ecbf8dc5434ec7da2bc396e814e91adc9..a72bbedc16a6b300edf51b665ebaf90e62662ab8"
+}
+,{
+    "testCaseDescription": "ruby-begin-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'puts('hi')' function call in a begin statement of the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index 7879e55..7b4a3be 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,5 +1,4 @@",
+        " def foo",
+        " begin",
+        "-  puts 'hi'",
+        " end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "a72bbedc16a6b300edf51b665ebaf90e62662ab8..4ba57f34c39daab00f1b9fc48f1e162ced2e9a44"
+}
+,{
+    "testCaseDescription": "ruby-begin-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement in the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index 7b4a3be..ff7bbbe 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,4 +1,2 @@",
+        " def foo",
+        "-begin",
+        "-end",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "4ba57f34c39daab00f1b9fc48f1e162ced2e9a44..9995f52897de0441895de23887b80cd4c9b7ea75"
+}
+,{
+    "testCaseDescription": "ruby-begin-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "begin.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "begin.rb"
+    ],
+    "patch": [
+        "diff --git a/begin.rb b/begin.rb",
+        "index ff7bbbe..e69de29 100644",
+        "--- a/begin.rb",
+        "+++ b/begin.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9995f52897de0441895de23887b80cd4c9b7ea75..cc81318f97e858789ab75eb6e9c4a9ef9a96807c"
+}]

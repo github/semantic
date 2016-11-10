@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -40,9 +40,16 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "c960fcc65ac55182c76b10f2b295a3cc10166860",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index e69de29..99b7041 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -0,0 +1 @@",
+        "+a, b := 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1a783799a30336dc4b9798aef977bb2a4ad30d5d"
+    "shas": "294f5cc0ef0e25ecf0309fd41ae6cd4b376ab627..7ec7132712c0483a2acf6807c9e0b400580acf30"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-insert-test",
@@ -51,30 +58,63 @@
             "short-var-declarations.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
                 }
             ]
         },
@@ -83,9 +123,18 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "1a783799a30336dc4b9798aef977bb2a4ad30d5d",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 99b7041..220aab8 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1 +1,3 @@",
+        "+x, y := 3, 4",
+        "+a, b := 1, 2",
+        " a, b := 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "950d07065887bd080775b0257f250b3b53f35d53"
+    "shas": "7ec7132712c0483a2acf6807c9e0b400580acf30..d55246a1bf4a17fe28258dccf542d3a6ebaf922a"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -97,21 +146,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -124,21 +173,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
@@ -151,21 +200,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -178,21 +227,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     12
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     12
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     13
                                 ]
                             }
@@ -207,9 +256,19 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "950d07065887bd080775b0257f250b3b53f35d53",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 220aab8..96ba966 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1,3 +1,3 @@",
+        "-x, y := 3, 4",
+        "+a, b := 1, 2",
+        " a, b := 1, 2",
+        " a, b := 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2e165e3a8349e288cf5df008c91215a6d1e0eea1"
+    "shas": "d55246a1bf4a17fe28258dccf542d3a6ebaf922a..8984549fa93dd35873e2ee52afc2af3f04791d1c"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -221,21 +280,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -248,21 +307,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
@@ -275,21 +334,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -302,21 +361,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     12
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     12
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     13
                                 ]
                             }
@@ -331,9 +390,19 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "2e165e3a8349e288cf5df008c91215a6d1e0eea1",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 96ba966..220aab8 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1,3 +1,3 @@",
+        "-a, b := 1, 2",
+        "+x, y := 3, 4",
+        " a, b := 1, 2",
+        " a, b := 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f824e878031e2b1d44d93528ba9c60b4cef6083d"
+    "shas": "8984549fa93dd35873e2ee52afc2af3f04791d1c..dd109e24c6a2d3b52a0e1579fa93be09e86bfbbb"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -344,11 +413,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -359,11 +428,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -374,11 +443,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -389,11 +458,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -404,11 +473,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -419,11 +488,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -437,9 +506,19 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "f824e878031e2b1d44d93528ba9c60b4cef6083d",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 220aab8..53cb4ed 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1,3 +1,2 @@",
+        "-x, y := 3, 4",
+        "-a, b := 1, 2",
+        " a, b := 1, 2",
+        "+x, y := 3, 4"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "32c2030e4597ceafbb01ff6e3d6189c4c0c1df4d"
+    "shas": "dd109e24c6a2d3b52a0e1579fa93be09e86bfbbb..068c4c6e6ce030231dcd6b1f5ae3d282a4f6ba47"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-test",
@@ -448,30 +527,33 @@
             "short-var-declarations.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
                 }
             ]
         },
@@ -480,9 +562,17 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "32c2030e4597ceafbb01ff6e3d6189c4c0c1df4d",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 53cb4ed..9209ec7 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1,2 +1 @@",
+        "-a, b := 1, 2",
+        " x, y := 3, 4"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "86e943ef7847ca3016b391c44cb7fdee78d9d927"
+    "shas": "068c4c6e6ce030231dcd6b1f5ae3d282a4f6ba47..5a9292f0154404769494bed8797a68db3bf662ad"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-rest-test",
@@ -493,11 +583,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -508,11 +598,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -526,7 +616,14 @@
     "filePaths": [
         "short-var-declarations.go"
     ],
-    "sha1": "86e943ef7847ca3016b391c44cb7fdee78d9d927",
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 9209ec7..e69de29 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1 +0,0 @@",
+        "-x, y := 3, 4"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b553e5d63655ec620ade647a1f3551dfa59d2277"
+    "shas": "5a9292f0154404769494bed8797a68db3bf662ad..aa129cc05ef2a77358a80e1404c396003e3738af"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 17
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 27
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 27
                             ]
                         }
@@ -55,9 +55,17 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "560d069610442142d3191d7af8ea8e1a2ebfb6ca",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index e69de29..7fa0f78 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -0,0 +1,2 @@",
+        "+var zero int = 0",
+        "+var one, two uint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d2c92ac70f8e73adf099bc0e290820d6eb845995"
+    "shas": "e8cad3a47721767f585896752477a07578a6ae45..5b28fe9002c6b7f4d200b92c3c4bed53f4c52999"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-insert-test",
@@ -68,11 +76,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -83,11 +91,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 2
                             ],
                             "end": [
-                                4,
+                                2,
                                 24
                             ]
                         }
@@ -98,11 +106,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 2
                             ],
                             "end": [
-                                4,
+                                2,
                                 24
                             ]
                         }
@@ -113,11 +121,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 17
                             ]
                         }
@@ -128,11 +136,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 27
                             ]
                         }
@@ -143,11 +151,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 27
                             ]
                         }
@@ -161,9 +169,21 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "d2c92ac70f8e73adf099bc0e290820d6eb845995",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index 7fa0f78..bf0a293 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -1,2 +1,6 @@",
+        "+var a int = 0",
+        "+ var b, c uint64 = 1, 2",
+        "+var zero int = 0",
+        "+var one, two uint64 = 1, 2",
+        " var zero int = 0",
+        " var one, two uint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "152f26eaa12a8990773283c45ad83d581f49f6ac"
+    "shas": "5b28fe9002c6b7f4d200b92c3c4bed53f4c52999..9a2b636002071173ed229f3479690cdcb6340b2b"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -175,81 +195,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     9
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the two variable of the 'main' module"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the two variable"
                 }
             ]
         },
@@ -258,9 +278,22 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "152f26eaa12a8990773283c45ad83d581f49f6ac",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index bf0a293..cba22b9 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -1,5 +1,5 @@",
+        "-var a int = 0",
+        "- var b, c uint64 = 1, 2",
+        "+var zero int = 0",
+        "+var one, two uint64 = 1, 2",
+        " var zero int = 0",
+        " var one, two uint64 = 1, 2",
+        " var zero int = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9c15c981626ece122958d534391d1cd11500823f"
+    "shas": "9a2b636002071173ed229f3479690cdcb6340b2b..2e8341b5c732a5cee90db221775545f69821fa61"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -272,81 +305,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable of the 'main' module"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     9
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     10
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the c variable of the 'main' module"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the c variable"
                 }
             ]
         },
@@ -355,9 +388,22 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "9c15c981626ece122958d534391d1cd11500823f",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index cba22b9..bf0a293 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -1,5 +1,5 @@",
+        "-var zero int = 0",
+        "-var one, two uint64 = 1, 2",
+        "+var a int = 0",
+        "+ var b, c uint64 = 1, 2",
+        " var zero int = 0",
+        " var one, two uint64 = 1, 2",
+        " var zero int = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cefe840a6a8540095390d13aa58ea3124dbda0fc"
+    "shas": "2e8341b5c732a5cee90db221775545f69821fa61..324bbd99a82f7bd7b4d6015f3b6d344f39fb1b25"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -368,11 +414,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -383,11 +429,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 2
                             ],
                             "end": [
-                                4,
+                                2,
                                 24
                             ]
                         }
@@ -398,11 +444,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 2
                             ],
                             "end": [
-                                4,
+                                2,
                                 24
                             ]
                         }
@@ -413,11 +459,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 17
                             ]
                         }
@@ -428,11 +474,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 27
                             ]
                         }
@@ -443,11 +489,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 27
                             ]
                         }
@@ -458,11 +504,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 14
                             ]
                         }
@@ -473,11 +519,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 24
                             ]
                         }
@@ -488,11 +534,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 24
                             ]
                         }
@@ -506,9 +552,23 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "cefe840a6a8540095390d13aa58ea3124dbda0fc",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index bf0a293..bd11fef 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -1,6 +1,4 @@",
+        "-var a int = 0",
+        "- var b, c uint64 = 1, 2",
+        "-var zero int = 0",
+        "-var one, two uint64 = 1, 2",
+        " var zero int = 0",
+        " var one, two uint64 = 1, 2",
+        "+var a int = 0",
+        "+ var b, c uint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7611c6e70f70c76bb7d56d3996937b80c11e0ab4"
+    "shas": "324bbd99a82f7bd7b4d6015f3b6d344f39fb1b25..6864d4222bcdf5c352c42623d77a94fc8aa74a5b"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-test",
@@ -519,11 +579,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 17
                             ]
                         }
@@ -534,11 +594,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 27
                             ]
                         }
@@ -549,11 +609,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 27
                             ]
                         }
@@ -567,9 +627,19 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "7611c6e70f70c76bb7d56d3996937b80c11e0ab4",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index bd11fef..6e0b7e7 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -1,4 +1,2 @@",
+        "-var zero int = 0",
+        "-var one, two uint64 = 1, 2",
+        " var a int = 0",
+        "  var b, c uint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "94b59191a5053d07a4fd33841213f6ee78ee13bf"
+    "shas": "6864d4222bcdf5c352c42623d77a94fc8aa74a5b..61b82a1db7b24aa0535c03fd7f41164e89045d27"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-rest-test",
@@ -580,11 +650,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -595,11 +665,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 2
                             ],
                             "end": [
-                                4,
+                                2,
                                 24
                             ]
                         }
@@ -610,11 +680,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 2
                             ],
                             "end": [
-                                4,
+                                2,
                                 24
                             ]
                         }
@@ -628,7 +698,15 @@
     "filePaths": [
         "var-declarations-with-types.go"
     ],
-    "sha1": "94b59191a5053d07a4fd33841213f6ee78ee13bf",
+    "patch": [
+        "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
+        "index 6e0b7e7..e69de29 100644",
+        "--- a/var-declarations-with-types.go",
+        "+++ b/var-declarations-with-types.go",
+        "@@ -1,2 +0,0 @@",
+        "-var a int = 0",
+        "- var b, c uint64 = 1, 2"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "70ce013ae911ea6eada76f2e5739baddcd04613f"
+    "shas": "61b82a1db7b24aa0535c03fd7f41164e89045d27..a2b3bd32a19f7f76f1536197e193b8699b844991"
 }]

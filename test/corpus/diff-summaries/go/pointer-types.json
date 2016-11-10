@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 3
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 5
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 3
                             ]
                         }
@@ -52,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -70,9 +70,19 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "e8c412e8ad778a23678aa9734a72ddbb4d0a3f3e",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index e69de29..05b4659 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -0,0 +1,4 @@",
+        "+type (",
+        "+p1 *string",
+        "+p2 **p1",
+        "+)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2609295792db8611d8b08bbee5435b5864a2f212"
+    "shas": "25efc557c3b81f94924fc76ce4196db1fd75e9cc..7d8cd7f79e26327a145c2e37f193db0f0aa1b49b"
 }
 ,{
     "testCaseDescription": "go-pointer-types-replacement-insert-test",
@@ -83,11 +93,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 3
                             ]
                         }
@@ -98,11 +108,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 5
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -113,11 +123,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 3
                             ]
                         }
@@ -128,11 +138,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -143,11 +153,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 3
                             ]
                         }
@@ -158,11 +168,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 5
                             ],
                             "end": [
-                                8,
+                                6,
                                 11
                             ]
                         }
@@ -173,11 +183,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 3
                             ]
                         }
@@ -188,11 +198,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 6
                             ],
                             "end": [
-                                9,
+                                7,
                                 8
                             ]
                         }
@@ -206,9 +216,27 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "2609295792db8611d8b08bbee5435b5864a2f212",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 05b4659..95e685d 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,4 +1,12 @@",
+        " type (",
+        "+p1 *int",
+        "+p2 **p3",
+        "+)",
+        "+type (",
+        "+p1 *string",
+        "+p2 **p1",
+        "+)",
+        "+type (",
+        " p1 *string",
+        " p2 **p1",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d99e6ee28aef12a358f5c2aaa3e6875731d28485"
+    "shas": "7d8cd7f79e26327a145c2e37f193db0f0aa1b49b..19578c62cd7513a2390877a56b02993533e6eb4c"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-insert-test",
@@ -220,21 +248,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     11
                                 ]
                             }
@@ -247,21 +275,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
@@ -276,9 +304,23 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "d99e6ee28aef12a358f5c2aaa3e6875731d28485",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 95e685d..74ff673 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,6 +1,6 @@",
+        " type (",
+        "-p1 *int",
+        "-p2 **p3",
+        "+p1 *string",
+        "+p2 **p1",
+        " )",
+        " type (",
+        " p1 *string"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a837d19f0f9758240991ed6012164f15f7fd7711"
+    "shas": "19578c62cd7513a2390877a56b02993533e6eb4c..201e8300e6cc9127cf35b7f6cd44857ac967709b"
 }
 ,{
     "testCaseDescription": "go-pointer-types-replacement-test",
@@ -290,21 +332,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
@@ -317,21 +359,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
@@ -346,9 +388,23 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "a837d19f0f9758240991ed6012164f15f7fd7711",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 74ff673..95e685d 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,6 +1,6 @@",
+        " type (",
+        "-p1 *string",
+        "-p2 **p1",
+        "+p1 *int",
+        "+p2 **p3",
+        " )",
+        " type (",
+        " p1 *string"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a1e6dddea2e8e7a0581e8c7886365eb4bd84ffe5"
+    "shas": "201e8300e6cc9127cf35b7f6cd44857ac967709b..9ba75e4b5fa06381da78759652306dc43d764bc1"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-replacement-test",
@@ -359,11 +415,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 3
                             ]
                         }
@@ -374,11 +430,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 5
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -389,11 +445,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 3
                             ]
                         }
@@ -404,11 +460,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -419,11 +475,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 3
                             ]
                         }
@@ -434,11 +490,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 5
                             ],
                             "end": [
-                                8,
+                                6,
                                 11
                             ]
                         }
@@ -449,11 +505,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 3
                             ]
                         }
@@ -464,11 +520,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 6
                             ],
                             "end": [
-                                9,
+                                7,
                                 8
                             ]
                         }
@@ -479,11 +535,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 3
                             ]
                         }
@@ -494,11 +550,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 5
                             ],
                             "end": [
-                                8,
+                                6,
                                 8
                             ]
                         }
@@ -509,11 +565,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 3
                             ]
                         }
@@ -524,11 +580,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 6
                             ],
                             "end": [
-                                9,
+                                7,
                                 8
                             ]
                         }
@@ -542,9 +598,29 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "a1e6dddea2e8e7a0581e8c7886365eb4bd84ffe5",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 95e685d..4556eeb 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,12 +1,8 @@",
+        " type (",
+        "-p1 *int",
+        "-p2 **p3",
+        "-)",
+        "-type (",
+        " p1 *string",
+        " p2 **p1",
+        " )",
+        " type (",
+        "-p1 *string",
+        "-p2 **p1",
+        "+p1 *int",
+        "+p2 **p3",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "390441dc9a8726ab3ff62efe6e9da7915745fc6f"
+    "shas": "9ba75e4b5fa06381da78759652306dc43d764bc1..31542ede38bd2367c39c2a2c74a8b5663de97b56"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-test",
@@ -555,11 +631,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 3
                             ]
                         }
@@ -570,11 +646,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 5
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -585,11 +661,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 3
                             ]
                         }
@@ -600,11 +676,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -618,9 +694,23 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "390441dc9a8726ab3ff62efe6e9da7915745fc6f",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 4556eeb..5d13f48 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,8 +1,4 @@",
+        " type (",
+        "-p1 *string",
+        "-p2 **p1",
+        "-)",
+        "-type (",
+        " p1 *int",
+        " p2 **p3",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e75361609b9f93258981f716b33bdec73f2777ae"
+    "shas": "31542ede38bd2367c39c2a2c74a8b5663de97b56..0d8c55cd851c0e65a5ba9d03a2bba90ee6301ade"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-rest-test",
@@ -631,11 +721,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 3
                             ]
                         }
@@ -646,11 +736,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 5
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -661,11 +751,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 3
                             ]
                         }
@@ -676,11 +766,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -694,7 +784,17 @@
     "filePaths": [
         "pointer-types.go"
     ],
-    "sha1": "e75361609b9f93258981f716b33bdec73f2777ae",
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index 5d13f48..e69de29 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -1,4 +0,0 @@",
+        "-type (",
+        "-p1 *int",
+        "-p2 **p3",
+        "-)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9b11035ae1a210fb170ae96625f8e899d4d25b2f"
+    "shas": "0d8c55cd851c0e65a5ba9d03a2bba90ee6301ade..bf799eac39c8188d30ac10bed1218975e6ad803c"
 }]

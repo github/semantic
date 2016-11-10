@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "javascript-objects-with-methods-insert-test",
+    "testCaseDescription": "ruby-rescue-modifier2-insert-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,35 @@
                             ],
                             "end": [
                                 1,
-                                32
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "a70334394db6019d12e7b0784152b7931be8a143",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a0fd17b1857723ef6273a44f907cda57e37974ac"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index e69de29..b0cea1a 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -0,0 +1 @@",
+        "+foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "89be77a7b4f5ee9670276a33a97a6aa3941c9cfb..55cdbc8c69ef00db47f231d904f083eb28f50160"
 }
 ,{
-    "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
+    "testCaseDescription": "ruby-rescue-modifier2-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +50,11 @@
                             ],
                             "end": [
                                 1,
-                                37
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object"
+                    "summary": "Added the 'bar' rescue modifier"
                 },
                 {
                     "span": {
@@ -58,114 +65,143 @@
                             ],
                             "end": [
                                 2,
-                                32
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object"
+                    "summary": "Added the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "a0fd17b1857723ef6273a44f907cda57e37974ac",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ee9e102b7b70e841506c83d6775a06fbef86cc90"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index b0cea1a..595bf2e 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -1 +1,3 @@",
+        "+bar rescue nil",
+        "+foo rescue nil",
+        " foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "55cdbc8c69ef00db47f231d904f083eb28f50160..198f5f3b96b3f405c1ff2081a511fac17edc7c91"
 }
 ,{
-    "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
+    "testCaseDescription": "ruby-rescue-modifier2-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    3
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    11
+                                    4
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    3
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the 'rescue foo' modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "ee9e102b7b70e841506c83d6775a06fbef86cc90",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cdc665ab83bdfbe48d09516419efbc8293eceb28"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index 595bf2e..f59c8c2 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -1,3 +1,3 @@",
+        "-bar rescue nil",
+        "+foo rescue nil",
+        " foo rescue nil",
+        " foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "198f5f3b96b3f405c1ff2081a511fac17edc7c91..1e6f032a4125e945220103becbd30842264ab52e"
 }
 ,{
-    "testCaseDescription": "javascript-objects-with-methods-replacement-test",
+    "testCaseDescription": "ruby-rescue-modifier2-replacement-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    3
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    4
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    3
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    11
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the 'rescue bar' modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "cdc665ab83bdfbe48d09516419efbc8293eceb28",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "29c25335a64f0afd24c97afe81528d18081986f6"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index f59c8c2..595bf2e 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo rescue nil",
+        "+bar rescue nil",
+        " foo rescue nil",
+        " foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1e6f032a4125e945220103becbd30842264ab52e..a666824e8c4d5b66c6d27e6a0246b63a3042b7a0"
 }
 ,{
-    "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
+    "testCaseDescription": "ruby-rescue-modifier2-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "delete": {
@@ -175,11 +211,11 @@
                             ],
                             "end": [
                                 1,
-                                37
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object"
+                    "summary": "Deleted the 'bar' rescue modifier"
                 },
                 {
                     "span": {
@@ -190,11 +226,11 @@
                             ],
                             "end": [
                                 2,
-                                32
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 },
                 {
                     "span": {
@@ -205,28 +241,38 @@
                             ],
                             "end": [
                                 2,
-                                37
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object"
+                    "summary": "Added the 'bar' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "29c25335a64f0afd24c97afe81528d18081986f6",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4dcf79e103e6c92f8c96a1774535237b7b162817"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index 595bf2e..0d0f274 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -1,3 +1,2 @@",
+        "-bar rescue nil",
+        "-foo rescue nil",
+        " foo rescue nil",
+        "+bar rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "a666824e8c4d5b66c6d27e6a0246b63a3042b7a0..14d5975cd55f2b7d27ce40f3491786b5644c10a6"
 }
 ,{
-    "testCaseDescription": "javascript-objects-with-methods-delete-test",
+    "testCaseDescription": "ruby-rescue-modifier2-delete-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "delete": {
@@ -236,28 +282,36 @@
                             ],
                             "end": [
                                 1,
-                                32
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object"
+                    "summary": "Deleted the 'foo' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "4dcf79e103e6c92f8c96a1774535237b7b162817",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f36d9d7eb61a638531a82fbcac3c8d2093f908a1"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index 0d0f274..f7b54a5 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -1,2 +1 @@",
+        "-foo rescue nil",
+        " bar rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "14d5975cd55f2b7d27ce40f3491786b5644c10a6..0446bcdbd6fc1e4f75ecdd984d9428c2d82e4c2a"
 }
 ,{
-    "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
+    "testCaseDescription": "ruby-rescue-modifier2-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "objects-with-methods.js": [
+            "rescue-modifier2.rb": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +321,27 @@
                             ],
                             "end": [
                                 1,
-                                37
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object"
+                    "summary": "Deleted the 'bar' rescue modifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "objects-with-methods.js"
+        "rescue-modifier2.rb"
     ],
-    "sha1": "f36d9d7eb61a638531a82fbcac3c8d2093f908a1",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0ae7d23e3b8ca76072bab79fd0258880ca4413d5"
+    "patch": [
+        "diff --git a/rescue-modifier2.rb b/rescue-modifier2.rb",
+        "index f7b54a5..e69de29 100644",
+        "--- a/rescue-modifier2.rb",
+        "+++ b/rescue-modifier2.rb",
+        "@@ -1 +0,0 @@",
+        "-bar rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0446bcdbd6fc1e4f75ecdd984d9428c2d82e4c2a..375e457b7d8886bdbdb8b3e131a0c001d20ac41c"
 }]

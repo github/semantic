@@ -7,9 +7,16 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "51cb9277c2233716e2f002c08a23656f70425838",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index e69de29..a5821d2 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -0,0 +1 @@",
+        "+// This is a property"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "98ef3ccd95e55e93513f790185e4fc83ed93def2"
+    "shas": "81bc4513ad3979452e9e95586a5fbc9ca66eeadc..522a93132b55605393a0f7a5421f3d1f7b0d4a8c"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-insert-test",
@@ -20,9 +27,20 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "98ef3ccd95e55e93513f790185e4fc83ed93def2",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index a5821d2..761aa7a 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -1 +1,5 @@",
+        "+/*",
+        "+ * This is a method",
+        "+*/",
+        "+// This is a property",
+        " // This is a property"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1ac3dd727429b94a67241d8941f5360892a30fae"
+    "shas": "522a93132b55605393a0f7a5421f3d1f7b0d4a8c..f0aa09e8712b14d61160b16073cac5fbd0276038"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-insert-test",
@@ -33,9 +51,21 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "1ac3dd727429b94a67241d8941f5360892a30fae",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index 761aa7a..3b33406 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -1,5 +1,3 @@",
+        "-/*",
+        "- * This is a method",
+        "-*/",
+        "+// This is a property",
+        " // This is a property",
+        " // This is a property"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "722ca07f3cc31c8d961494547fab727ec588e3d8"
+    "shas": "f0aa09e8712b14d61160b16073cac5fbd0276038..9402b254de81dabcddcbd6d7308911822b6f0f59"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-test",
@@ -46,9 +76,21 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "722ca07f3cc31c8d961494547fab727ec588e3d8",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index 3b33406..761aa7a 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -1,3 +1,5 @@",
+        "-// This is a property",
+        "+/*",
+        "+ * This is a method",
+        "+*/",
+        " // This is a property",
+        " // This is a property"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ddbe0bb45770aad94db0b3db41bb85c6cf8667ea"
+    "shas": "9402b254de81dabcddcbd6d7308911822b6f0f59..ba788116c40403584cd03df9976350810a9b1162"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-replacement-test",
@@ -59,9 +101,21 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "ddbe0bb45770aad94db0b3db41bb85c6cf8667ea",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index 761aa7a..c2a8148 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -1,5 +1,4 @@",
+        "+// This is a property",
+        " /*",
+        "  * This is a method",
+        " */",
+        "-// This is a property",
+        "-// This is a property"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "16f46467d4d4394f04d1098d53f86503eb75c645"
+    "shas": "ba788116c40403584cd03df9976350810a9b1162..05a2041be1630b8a7309163d4b863cd8966adbe0"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-test",
@@ -72,9 +126,19 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "16f46467d4d4394f04d1098d53f86503eb75c645",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index c2a8148..7c74dcd 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -1,4 +1,3 @@",
+        "-// This is a property",
+        " /*",
+        "  * This is a method",
+        " */"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9be6ce33b023b9caecb8a2b0d01d7b040aa4da21"
+    "shas": "05a2041be1630b8a7309163d4b863cd8966adbe0..28ae9fb48ab99b60a709d3168a82f53017fa27a0"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-rest-test",
@@ -85,7 +149,16 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "9be6ce33b023b9caecb8a2b0d01d7b040aa4da21",
+    "patch": [
+        "diff --git a/comment.js b/comment.js",
+        "index 7c74dcd..e69de29 100644",
+        "--- a/comment.js",
+        "+++ b/comment.js",
+        "@@ -1,3 +0,0 @@",
+        "-/*",
+        "- * This is a method",
+        "-*/"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3061e328305d93ca2fd3a8aa7a86d645c4c28b15"
+    "shas": "28ae9fb48ab99b60a709d3168a82f53017fa27a0..8f7edd21ecef61769b82fb5a60a881f31ce30a01"
 }]

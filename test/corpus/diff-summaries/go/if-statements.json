@@ -5,101 +5,13 @@
             "if-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "if-statements.go"
-    ],
-    "sha1": "d721dbc2d0c1b003563fe79a82b9f2d3f609cc64",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "8ff80ea94d04e830ad846d865336e741c8364795"
-}
-,{
-    "testCaseDescription": "go-if-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "if-statements.go": [
-                {
-                    "span": {
                         "insert": {
                             "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
                                 3,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x()' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y := b(); c' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                13,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z()' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                14,
-                                1
-                            ],
-                            "end": [
-                                16,
                                 2
                             ]
                         }
@@ -110,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                17,
+                                4,
                                 1
                             ],
                             "end": [
-                                19,
+                                6,
                                 2
                             ]
                         }
@@ -125,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                20,
+                                7,
                                 1
                             ],
                             "end": [
-                                24,
+                                11,
                                 2
                             ]
                         }
@@ -143,9 +55,163 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "8ff80ea94d04e830ad846d865336e741c8364795",
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index e69de29..2266b8b 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -0,0 +1,11 @@",
+        "+if a() {",
+        "+b()",
+        "+}",
+        "+if a := b(); c {",
+        "+d()",
+        "+}",
+        "+if a() {",
+        "+b()",
+        "+} else {",
+        "+c()",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "184deca8ba9943201f8512be5ff7f986db1bd6ac"
+    "shas": "bd35724ed7512ba9bb228b806e5888f347bd3793..eae64fa16d42245a11d166f1bd836ed97eeb419d"
+}
+,{
+    "testCaseDescription": "go-if-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index 2266b8b..abacd6e 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,3 +1,25 @@",
+        "+if x() {",
+        "+b()",
+        "+}",
+        "+if y := b(); c {",
+        "+d()",
+        "+}",
+        "+if z() {",
+        "+b()",
+        "+} else {",
+        "+c()",
+        "+}",
+        "+if a() {",
+        "+b()",
+        "+}",
+        "+if a := b(); c {",
+        "+d()",
+        "+}",
+        "+if a() {",
+        "+b()",
+        "+} else {",
+        "+c()",
+        "+}",
+        " if a() {",
+        " b()",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "eae64fa16d42245a11d166f1bd836ed97eeb419d..409746cfde8f39fbd3a12243a73b81846da41749"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -157,21 +223,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -184,21 +250,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             }
@@ -211,21 +277,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    9,
+                                    7,
                                     4
                                 ],
                                 "end": [
-                                    9,
+                                    7,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    9,
+                                    7,
                                     4
                                 ],
                                 "end": [
-                                    9,
+                                    7,
                                     5
                                 ]
                             }
@@ -240,9 +306,28 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "184deca8ba9943201f8512be5ff7f986db1bd6ac",
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index abacd6e..b5fd21a 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,10 +1,10 @@",
+        "-if x() {",
+        "+if a() {",
+        " b()",
+        " }",
+        "-if y := b(); c {",
+        "+if a := b(); c {",
+        " d()",
+        " }",
+        "-if z() {",
+        "+if a() {",
+        " b()",
+        " } else {",
+        " c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1068ba7d4a382ce159ece211090eb64635d01d6f"
+    "shas": "409746cfde8f39fbd3a12243a73b81846da41749..56ba51da2e8ad7a81adbcd1e3a5fc413ea01b591"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -254,21 +339,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -281,21 +366,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             }
@@ -308,21 +393,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    9,
+                                    7,
                                     4
                                 ],
                                 "end": [
-                                    9,
+                                    7,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    9,
+                                    7,
                                     4
                                 ],
                                 "end": [
-                                    9,
+                                    7,
                                     5
                                 ]
                             }
@@ -337,9 +422,28 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "1068ba7d4a382ce159ece211090eb64635d01d6f",
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index b5fd21a..abacd6e 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,10 +1,10 @@",
+        "-if a() {",
+        "+if x() {",
+        " b()",
+        " }",
+        "-if a := b(); c {",
+        "+if y := b(); c {",
+        " d()",
+        " }",
+        "-if a() {",
+        "+if z() {",
+        " b()",
+        " } else {",
+        " c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "30bf2cf7b32f74fcb2eeeee6582adfff52d0f7f7"
+    "shas": "56ba51da2e8ad7a81adbcd1e3a5fc413ea01b591..876916554c152592cefc38a8f9a9e265f24fea7b"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -350,11 +454,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -365,11 +469,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -380,11 +484,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                13,
+                                11,
                                 2
                             ]
                         }
@@ -395,11 +499,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                14,
+                                12,
                                 1
                             ],
                             "end": [
-                                16,
+                                14,
                                 2
                             ]
                         }
@@ -410,11 +514,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                17,
+                                15,
                                 1
                             ],
                             "end": [
-                                19,
+                                17,
                                 2
                             ]
                         }
@@ -425,11 +529,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                20,
+                                18,
                                 1
                             ],
                             "end": [
-                                24,
+                                22,
                                 2
                             ]
                         }
@@ -440,11 +544,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                14,
+                                12,
                                 1
                             ],
                             "end": [
-                                16,
+                                14,
                                 2
                             ]
                         }
@@ -455,11 +559,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                17,
+                                15,
                                 1
                             ],
                             "end": [
-                                19,
+                                17,
                                 2
                             ]
                         }
@@ -470,11 +574,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                20,
+                                18,
                                 1
                             ],
                             "end": [
-                                24,
+                                22,
                                 2
                             ]
                         }
@@ -488,9 +592,46 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "30bf2cf7b32f74fcb2eeeee6582adfff52d0f7f7",
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index abacd6e..ccb09fd 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,14 +1,3 @@",
+        "-if x() {",
+        "-b()",
+        "-}",
+        "-if y := b(); c {",
+        "-d()",
+        "-}",
+        "-if z() {",
+        "-b()",
+        "-} else {",
+        "-c()",
+        "-}",
+        " if a() {",
+        " b()",
+        " }",
+        "@@ -20,13 +9,13 @@ b()",
+        " } else {",
+        " c()",
+        " }",
+        "-if a() {",
+        "+if x() {",
+        " b()",
+        " }",
+        "-if a := b(); c {",
+        "+if y := b(); c {",
+        " d()",
+        " }",
+        "-if a() {",
+        "+if z() {",
+        " b()",
+        " } else {",
+        " c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "944d39dd78c1bfad643bf098aff846ff74368f41"
+    "shas": "876916554c152592cefc38a8f9a9e265f24fea7b..df039b5f947ac9e901fd47d32263ba46ccc9a518"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-test",
@@ -501,11 +642,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -516,11 +657,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -531,11 +672,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                13,
+                                11,
                                 2
                             ]
                         }
@@ -549,9 +690,29 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "944d39dd78c1bfad643bf098aff846ff74368f41",
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index ccb09fd..2e63573 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,14 +1,3 @@",
+        "-if a() {",
+        "-b()",
+        "-}",
+        "-if a := b(); c {",
+        "-d()",
+        "-}",
+        "-if a() {",
+        "-b()",
+        "-} else {",
+        "-c()",
+        "-}",
+        " if x() {",
+        " b()",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e9ce6c61402f2e5b5b6a18eb58248f7108645a98"
+    "shas": "df039b5f947ac9e901fd47d32263ba46ccc9a518..07a2bf60cdec6bbf5cf0ffc5e10c6695b03ae176"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-rest-test",
@@ -560,30 +721,48 @@
             "if-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'x()' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z()' if statement"
                 }
             ]
         },
@@ -592,7 +771,24 @@
     "filePaths": [
         "if-statements.go"
     ],
-    "sha1": "e9ce6c61402f2e5b5b6a18eb58248f7108645a98",
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index 2e63573..e69de29 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,11 +0,0 @@",
+        "-if x() {",
+        "-b()",
+        "-}",
+        "-if y := b(); c {",
+        "-d()",
+        "-}",
+        "-if z() {",
+        "-b()",
+        "-} else {",
+        "-c()",
+        "-}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c960fcc65ac55182c76b10f2b295a3cc10166860"
+    "shas": "07a2bf60cdec6bbf5cf0ffc5e10c6695b03ae176..294f5cc0ef0e25ecf0309fd41ae6cd4b376ab627"
 }]

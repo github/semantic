@@ -7,16 +7,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                2,
                                 1
                             ],
                             "end": [
-                                11,
+                                2,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''0'' rune_literal"
                 },
                 {
                     "span": {
@@ -26,71 +41,173 @@
                                 1
                             ],
                             "end": [
-                                11,
+                                3,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable"
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                1
+                                5
                             ],
                             "end": [
-                                11,
-                                2
+                                3,
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Added the ''\\''' rune_literal"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                4,
                                 1
                             ],
                             "end": [
-                                11,
+                                4,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' rune_literal"
                 }
             ]
         },
-        "errors": {
-            "rune-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "a70b7582c8f3a84eac215e17fbe07868510577b3",
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index e69de29..23506f8 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -0,0 +1,9 @@",
+        "+const (",
+        "+a = '0'",
+        "+b = '\\''",
+        "+c = '\\'",
+        "+c = '",
+        "+'",
+        "+c = '\\u0000'",
+        "+c = '\\U01234567'",
+        "+)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cf6b204a6c6efc9314b6b2a035f42a6fa144b70c"
+    "shas": "c39ed98d50a7d8637ad13d6581d0d0d6a4bd083d..5bb2df3762d7788775b4a021c0de5a8464e87c55"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-insert-test",
@@ -101,11 +218,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -116,11 +233,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -131,11 +248,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -146,11 +263,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 1
                             ],
                             "end": [
-                                20,
+                                18,
                                 2
                             ]
                         }
@@ -161,11 +278,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 1
                             ],
                             "end": [
-                                20,
+                                18,
                                 2
                             ]
                         }
@@ -176,11 +293,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 1
                             ],
                             "end": [
-                                20,
+                                18,
                                 2
                             ]
                         }
@@ -191,16 +308,256 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 1
                             ],
                             "end": [
-                                20,
+                                18,
                                 2
                             ]
                         }
                     },
                     "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' rune_literal"
                 }
             ]
         },
@@ -210,31 +567,46 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 1, column 1 - line 9, column 2"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 1
                             ],
                             "end": [
-                                20,
+                                18,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 12, column 1 - line 20, column 2"
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 10, column 1 - line 18, column 2"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 19, column 1 - line 27, column 2"
                 }
             ]
         }
@@ -242,9 +614,37 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "cf6b204a6c6efc9314b6b2a035f42a6fa144b70c",
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index 23506f8..b369e37 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -1,4 +1,22 @@",
+        " const (",
+        "+a = '1'",
+        "+b = '",
+        "+''",
+        "+c = '\\u0011'",
+        "+c = '\\'",
+        "+c = '\\u0022'",
+        "+c = '\\U01234568'",
+        "+)",
+        "+const (",
+        "+a = '0'",
+        "+b = '\\''",
+        "+c = '\\'",
+        "+c = '",
+        "+'",
+        "+c = '\\u0000'",
+        "+c = '\\U01234567'",
+        "+)",
+        "+const (",
+        " a = '0'",
+        " b = '\\''",
+        " c = '\\'"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "55ba52157f6291f9e1ef5e52f35bafdc3d6a725c"
+    "shas": "5bb2df3762d7788775b4a021c0de5a8464e87c55..d689e07de6401ae64d5bf4467d8d89e0dca9930b"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -253,30 +653,33 @@
             "rune-literals.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ''1'' rune_literal with the ''0'' rune_literal in the a variable of the 'main' module"
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''0'' rune_literal"
                 },
                 {
                     "span": {
@@ -286,18 +689,168 @@
                                 1
                             ],
                             "end": [
-                                11,
+                                3,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable"
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ')\nconst (' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
                                 1
                             ],
                             "end": [
@@ -306,32 +859,392 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Added the 'a' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                1
+                                11,
+                                5
                             ],
                             "end": [
                                 11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                5
+                            ],
+                            "end": [
+                                12,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                5
+                            ],
+                            "end": [
+                                13,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                15,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                5
+                            ],
+                            "end": [
+                                16,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ')\nconst (' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                5
+                            ],
+                            "end": [
+                                20,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "end": [
+                                21,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                5
+                            ],
+                            "end": [
+                                21,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                5
+                            ],
+                            "end": [
+                                22,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                1
+                            ],
+                            "end": [
+                                23,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                23,
+                                5
+                            ],
+                            "end": [
+                                24,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                25,
+                                1
+                            ],
+                            "end": [
+                                25,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                25,
+                                5
+                            ],
+                            "end": [
+                                25,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                26,
+                                1
+                            ],
+                            "end": [
+                                26,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                26,
+                                5
+                            ],
+                            "end": [
+                                26,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' rune_literal"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
                                 2
                             ]
                         }
@@ -342,11 +1255,131 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
                                 2
                             ]
                         }
@@ -359,33 +1392,48 @@
             "rune-literals.go": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 1, column 1 - line 9, column 2"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                10,
                                 1
                             ],
                             "end": [
-                                11,
+                                18,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 10, column 1 - line 18, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 19, column 1 - line 27, column 2"
                 }
             ]
         }
@@ -393,9 +1441,32 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "55ba52157f6291f9e1ef5e52f35bafdc3d6a725c",
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index b369e37..aabbad7 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -1,11 +1,11 @@",
+        " const (",
+        "-a = '1'",
+        "-b = '",
+        "-''",
+        "-c = '\\u0011'",
+        "+a = '0'",
+        "+b = '\\''",
+        " c = '\\'",
+        "-c = '\\u0022'",
+        "-c = '\\U01234568'",
+        "+c = '",
+        "+'",
+        "+c = '\\u0000'",
+        "+c = '\\U01234567'",
+        " )",
+        " const (",
+        " a = '0'"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2641262d253b06cce5bb3cadc74b7d2a6ce4eecb"
+    "shas": "d689e07de6401ae64d5bf4467d8d89e0dca9930b..69b60b0054e8d0504ebf6ad05fefea28948036ab"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -404,269 +1475,13 @@
             "rune-literals.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ''0'' rune_literal with the ''1'' rune_literal in the a variable of the 'main' module"
-                },
-                {
-                    "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                }
-            ]
-        },
-        "errors": {
-            "rune-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "rune-literals.go"
-    ],
-    "sha1": "2641262d253b06cce5bb3cadc74b7d2a6ce4eecb",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "b868792d212d4083350fd4d4afb2fc9a7bad2d80"
-}
-,{
-    "testCaseDescription": "go-rune-literals-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "rune-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                20,
+                                9,
                                 2
                             ]
                         }
@@ -677,11 +1492,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                1,
                                 1
                             ],
                             "end": [
-                                20,
+                                9,
                                 2
                             ]
                         }
@@ -692,7 +1507,532 @@
                     "span": {
                         "insert": {
                             "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ')\nconst (' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                5
+                            ],
+                            "end": [
+                                12,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                13,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                5
+                            ],
+                            "end": [
+                                13,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                15,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                5
+                            ],
+                            "end": [
+                                16,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ')\nconst (' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                20,
                                 1
                             ],
                             "end": [
@@ -701,7 +2041,172 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                20,
+                                5
+                            ],
+                            "end": [
+                                20,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "end": [
+                                21,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                5
+                            ],
+                            "end": [
+                                21,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                5
+                            ],
+                            "end": [
+                                22,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                1
+                            ],
+                            "end": [
+                                23,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                23,
+                                5
+                            ],
+                            "end": [
+                                24,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                25,
+                                1
+                            ],
+                            "end": [
+                                25,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                25,
+                                5
+                            ],
+                            "end": [
+                                25,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                26,
+                                1
+                            ],
+                            "end": [
+                                26,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                26,
+                                5
+                            ],
+                            "end": [
+                                26,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' rune_literal"
                 }
             ]
         },
@@ -709,9 +2214,287 @@
             "rune-literals.go": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 1, column 1 - line 9, column 2"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 10, column 1 - line 18, column 2"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 19, column 1 - line 27, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index aabbad7..b369e37 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -1,11 +1,11 @@",
+        " const (",
+        "-a = '0'",
+        "-b = '\\''",
+        "+a = '1'",
+        "+b = '",
+        "+''",
+        "+c = '\\u0011'",
+        " c = '\\'",
+        "-c = '",
+        "-'",
+        "-c = '\\u0000'",
+        "-c = '\\U01234567'",
+        "+c = '\\u0022'",
+        "+c = '\\U01234568'",
+        " )",
+        " const (",
+        " a = '0'"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "69b60b0054e8d0504ebf6ad05fefea28948036ab..82a3e6fb5cfd43f8fd5fc730e8803d9a7f5cfba1"
+}
+,{
+    "testCaseDescription": "go-rune-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
                             "start": [
                                 3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ')\nconst (' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
                                 1
                             ],
                             "end": [
@@ -720,22 +2503,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                    "summary": "Added the 'a' identifier"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                12,
-                                1
+                                11,
+                                5
                             ],
                             "end": [
-                                20,
-                                2
+                                11,
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 12, column 1 - line 20, column 2"
+                    "summary": "Added the ''1'' rune_literal"
                 },
                 {
                     "span": {
@@ -745,37 +2528,172 @@
                                 1
                             ],
                             "end": [
-                                20,
+                                12,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 12, column 1 - line 20, column 2"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "rune-literals.go"
-    ],
-    "sha1": "b868792d212d4083350fd4d4afb2fc9a7bad2d80",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "23792f81b6b29fb055224aa60c02e96a1d3d6228"
-}
-,{
-    "testCaseDescription": "go-rune-literals-delete-test",
-    "expectedResult": {
-        "changes": {
-            "rune-literals.go": [
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                5
+                            ],
+                            "end": [
+                                13,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                2
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0011'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                5
+                            ],
+                            "end": [
+                                15,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                5
+                            ],
+                            "end": [
+                                16,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0022'' rune_literal"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234568'' rune_literal"
+                },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -786,26 +2704,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -816,11 +2719,131 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
                                 2
                             ]
                         }
@@ -835,7 +2858,344 @@
                     "span": {
                         "delete": {
                             "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 1, column 1 - line 9, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                18,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 10, column 1 - line 18, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "end": [
+                                27,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 19, column 1 - line 27, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "rune-literals.go"
+    ],
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index b369e37..34c7a16 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -1,13 +1,4 @@",
+        " const (",
+        "-a = '1'",
+        "-b = '",
+        "-''",
+        "-c = '\\u0011'",
+        "-c = '\\'",
+        "-c = '\\u0022'",
+        "-c = '\\U01234568'",
+        "-)",
+        "-const (",
+        " a = '0'",
+        " b = '\\''",
+        " c = '\\'",
+        "@@ -17,11 +8,11 @@ c = '\\u0000'",
+        " c = '\\U01234567'",
+        " )",
+        " const (",
+        "-a = '0'",
+        "-b = '\\''",
+        "+a = '1'",
+        "+b = '",
+        "+''",
+        "+c = '\\u0011'",
+        " c = '\\'",
+        "-c = '",
+        "-'",
+        "-c = '\\u0000'",
+        "-c = '\\U01234567'",
+        "+c = '\\u0022'",
+        "+c = '\\U01234568'",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "82a3e6fb5cfd43f8fd5fc730e8803d9a7f5cfba1..8ed6f66fd14bf48fb6413774648827afdbd8c159"
+}
+,{
+    "testCaseDescription": "go-rune-literals-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                5
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''0'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                5
+                            ],
+                            "end": [
+                                4,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ')\nconst (' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
                                 1
                             ],
                             "end": [
@@ -844,7 +3204,206 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 3, column 1 - line 11, column 2"
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''1'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                5
+                            ],
+                            "end": [
+                                13,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                2
+                            ],
+                            "end": [
+                                14,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                5
+                            ],
+                            "end": [
+                                14,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0011'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                5
+                            ],
+                            "end": [
+                                15,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\'' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                5
+                            ],
+                            "end": [
+                                16,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0022'' rune_literal"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                5
+                            ],
+                            "end": [
+                                17,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234568'' rune_literal"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 1, column 1 - line 9, column 2"
                 }
             ]
         }
@@ -852,9 +3411,28 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "23792f81b6b29fb055224aa60c02e96a1d3d6228",
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index 34c7a16..dc07d00 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -1,13 +1,4 @@",
+        " const (",
+        "-a = '0'",
+        "-b = '\\''",
+        "-c = '\\'",
+        "-c = '",
+        "-'",
+        "-c = '\\u0000'",
+        "-c = '\\U01234567'",
+        "-)",
+        "-const (",
+        " a = '1'",
+        " b = '",
+        " ''"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0b1cadf8e014685e276cc779ebb0a894a9ac3fd1"
+    "shas": "8ed6f66fd14bf48fb6413774648827afdbd8c159..40ed8ece89b9b38ab0ca6cd469486b874b187042"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-rest-test",
@@ -865,11 +3443,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -880,11 +3458,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -895,11 +3473,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
@@ -914,16 +3492,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                11,
+                                9,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 3, column 1 - line 11, column 2"
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 1, column 1 - line 9, column 2"
                 }
             ]
         }
@@ -931,7 +3509,22 @@
     "filePaths": [
         "rune-literals.go"
     ],
-    "sha1": "0b1cadf8e014685e276cc779ebb0a894a9ac3fd1",
+    "patch": [
+        "diff --git a/rune-literals.go b/rune-literals.go",
+        "index dc07d00..e69de29 100644",
+        "--- a/rune-literals.go",
+        "+++ b/rune-literals.go",
+        "@@ -1,9 +0,0 @@",
+        "-const (",
+        "-a = '1'",
+        "-b = '",
+        "-''",
+        "-c = '\\u0011'",
+        "-c = '\\'",
+        "-c = '\\u0022'",
+        "-c = '\\U01234568'",
+        "-)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6a5c5e925499fc0ac05bc20d3440592bebc89ea5"
+    "shas": "40ed8ece89b9b38ab0ca6cd469486b874b187042..6761a7543f7002279b3e1d53f388c0b6408e11ac"
 }]

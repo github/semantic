@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 29
                             ]
                         }
@@ -25,9 +25,16 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "ac21f9d0ee6f7ef2a5a607b08fe2b95f3a6470c8",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index e69de29..96bef76 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -0,0 +1 @@",
+        "+const a1 = [...]int{1, 2, 3}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b2003e760af2573de2e6b858f19cfdf65c60e100"
+    "shas": "5b7d43722e8258820bec8f43f32d77913026fbd1..edcc037141ca5e780da35e91b330a260a8f79838"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-insert-test",
@@ -38,11 +45,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 27
                             ]
                         }
@@ -53,11 +60,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 29
                             ]
                         }
@@ -71,9 +78,18 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "b2003e760af2573de2e6b858f19cfdf65c60e100",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index 96bef76..f49bee5 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1 +1,3 @@",
+        "+const a1 = [...]int{4,5,6}",
+        "+const a1 = [...]int{1, 2, 3}",
+        " const a1 = [...]int{1, 2, 3}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b9540f341273e90a488fdfb2bbd606bccf787d36"
+    "shas": "edcc037141ca5e780da35e91b330a260a8f79838..7d1007d97d728e64ee552482159b4198342facfe"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -85,84 +101,84 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '1' in the a1 variable of the 'main' module"
+                    "summary": "Replaced '4' with '1' in the a1 variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 24
                             ],
                             "end": [
-                                3,
+                                1,
                                 25
                             ]
                         }
                     },
-                    "summary": "Added '2' in the a1 variable of the 'main' module"
+                    "summary": "Added '2' in the a1 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     23
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     24
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     27
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     28
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '3' in the a1 variable of the 'main' module"
+                    "summary": "Replaced '5' with '3' in the a1 variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 25
                             ],
                             "end": [
-                                3,
+                                1,
                                 26
                             ]
                         }
                     },
-                    "summary": "Deleted '6' in the a1 variable of the 'main' module"
+                    "summary": "Deleted '6' in the a1 variable"
                 }
             ]
         },
@@ -171,9 +187,19 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "b9540f341273e90a488fdfb2bbd606bccf787d36",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index f49bee5..9dcd627 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,3 +1,3 @@",
+        "-const a1 = [...]int{4,5,6}",
+        "+const a1 = [...]int{1, 2, 3}",
+        " const a1 = [...]int{1, 2, 3}",
+        " const a1 = [...]int{1, 2, 3}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "06870e4f83b7bd64b0d91a7087c1969a1672c48f"
+    "shas": "7d1007d97d728e64ee552482159b4198342facfe..88d19b7c4c4bf31b65d977c10679944f9f88d95b"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -185,84 +211,84 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '4' in the a1 variable of the 'main' module"
+                    "summary": "Replaced '1' with '4' in the a1 variable"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 23
                             ],
                             "end": [
-                                3,
+                                1,
                                 24
                             ]
                         }
                     },
-                    "summary": "Added '5' in the a1 variable of the 'main' module"
+                    "summary": "Added '5' in the a1 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     24
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     25
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     25
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     26
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '6' in the a1 variable of the 'main' module"
+                    "summary": "Replaced '2' with '6' in the a1 variable"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 27
                             ],
                             "end": [
-                                3,
+                                1,
                                 28
                             ]
                         }
                     },
-                    "summary": "Deleted '3' in the a1 variable of the 'main' module"
+                    "summary": "Deleted '3' in the a1 variable"
                 }
             ]
         },
@@ -271,9 +297,19 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "06870e4f83b7bd64b0d91a7087c1969a1672c48f",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index 9dcd627..f49bee5 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,3 +1,3 @@",
+        "-const a1 = [...]int{1, 2, 3}",
+        "+const a1 = [...]int{4,5,6}",
+        " const a1 = [...]int{1, 2, 3}",
+        " const a1 = [...]int{1, 2, 3}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "78f16bf51a9b1140330341e26e8511bca810e7c4"
+    "shas": "88d19b7c4c4bf31b65d977c10679944f9f88d95b..905f1a72deb7cec5e88cefc93e9628cad1d4e2bc"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -284,11 +320,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 27
                             ]
                         }
@@ -299,11 +335,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 29
                             ]
                         }
@@ -314,11 +350,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 27
                             ]
                         }
@@ -332,9 +368,19 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "78f16bf51a9b1140330341e26e8511bca810e7c4",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index f49bee5..47b9eed 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,3 +1,2 @@",
+        "-const a1 = [...]int{4,5,6}",
+        "-const a1 = [...]int{1, 2, 3}",
+        " const a1 = [...]int{1, 2, 3}",
+        "+const a1 = [...]int{4,5,6}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e5ebc6a85298ceed84d950d738938506f90d50f1"
+    "shas": "905f1a72deb7cec5e88cefc93e9628cad1d4e2bc..fa1469f02d461361ba3454f261e10a6997fd8018"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-test",
@@ -345,11 +391,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 29
                             ]
                         }
@@ -363,9 +409,17 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "e5ebc6a85298ceed84d950d738938506f90d50f1",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index 47b9eed..4a8295f 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,2 +1 @@",
+        "-const a1 = [...]int{1, 2, 3}",
+        " const a1 = [...]int{4,5,6}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f94dc6ba5ee00ec4ec8aeea305dc3e0cedfa95ec"
+    "shas": "fa1469f02d461361ba3454f261e10a6997fd8018..474494799fa1d5404e6f73a5a5c8511431985ee2"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-rest-test",
@@ -376,11 +430,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 27
                             ]
                         }
@@ -394,7 +448,14 @@
     "filePaths": [
         "array-with-implicit-length.go"
     ],
-    "sha1": "f94dc6ba5ee00ec4ec8aeea305dc3e0cedfa95ec",
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index 4a8295f..e69de29 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1 +0,0 @@",
+        "-const a1 = [...]int{4,5,6}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3003ac02afb103f388ce64e485de8c028c6eb629"
+    "shas": "474494799fa1d5404e6f73a5a5c8511431985ee2..02421320cce3bcbcdb5d7bd248eb1aa0ef8aff93"
 }]

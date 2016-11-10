@@ -5,206 +5,13 @@
             "assignment-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment-statements.go"
-    ],
-    "sha1": "b320a69e5c137c5545033f688550f587c255cd27",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "8a2c5665152ae9b8684a39f596572feae6697877"
-}
-,{
-    "testCaseDescription": "go-assignment-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "assignment-statements.go": [
-                {
-                    "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
+                                1,
                                 2
                             ]
                         }
@@ -215,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                1,
                                 5
                             ],
                             "end": [
-                                7,
+                                1,
                                 6
                             ]
                         }
@@ -230,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 1
                             ],
                             "end": [
-                                8,
+                                2,
                                 2
                             ]
                         }
@@ -245,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 4
                             ],
                             "end": [
-                                8,
+                                2,
                                 5
                             ]
                         }
@@ -260,11 +67,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 9
                             ],
                             "end": [
-                                8,
+                                2,
                                 10
                             ]
                         }
@@ -275,11 +82,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 12
                             ],
                             "end": [
-                                8,
+                                2,
                                 13
                             ]
                         }
@@ -290,11 +97,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 1
                             ],
                             "end": [
-                                9,
+                                3,
                                 2
                             ]
                         }
@@ -305,11 +112,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 6
                             ],
                             "end": [
-                                9,
+                                3,
                                 7
                             ]
                         }
@@ -320,11 +127,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
+                                4,
                                 2
                             ]
                         }
@@ -335,11 +142,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                4,
                                 6
                             ],
                             "end": [
-                                10,
+                                4,
                                 7
                             ]
                         }
@@ -353,9 +160,352 @@
     "filePaths": [
         "assignment-statements.go"
     ],
-    "sha1": "8a2c5665152ae9b8684a39f596572feae6697877",
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index e69de29..91be59d 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -0,0 +1,4 @@",
+        "+a = 1",
+        "+b, c += 2, 3",
+        "+d *= 3",
+        "+e += 1"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8732e9a5f4751218dd8c7bd121b9b3f976144143"
+    "shas": "4c2cd3b8d03249a567a8ce63cdf8b9f5e4fd098c..051ee000ea11ca989223bb2cafb2fe6d5fb8417b"
+}
+,{
+    "testCaseDescription": "go-assignment-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                4
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                9
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                12
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'h' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                4
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                9
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '2'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                12
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'd' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '3'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added 'e' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '1'"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment-statements.go"
+    ],
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index 91be59d..9d7456f 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,3 +1,11 @@",
+        "+x = 1",
+        "+y, c += 2, 3",
+        "+z *= 3",
+        "+h += 1",
+        "+a = 1",
+        "+b, c += 2, 3",
+        "+d *= 3",
+        "+e += 1",
+        " a = 1",
+        " b, c += 2, 3",
+        " d *= 3"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "051ee000ea11ca989223bb2cafb2fe6d5fb8417b..2ee13da5baeb2504510d7e1dc5ebd2e45caffd72"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -367,21 +517,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -394,21 +544,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     2
                                 ]
                             }
@@ -421,21 +571,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     2
                                 ]
                             }
@@ -447,11 +597,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -462,11 +612,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -477,11 +627,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -492,11 +642,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -510,9 +660,26 @@
     "filePaths": [
         "assignment-statements.go"
     ],
-    "sha1": "8732e9a5f4751218dd8c7bd121b9b3f976144143",
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index 9d7456f..87b0c42 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,7 +1,7 @@",
+        "-x = 1",
+        "-y, c += 2, 3",
+        "-z *= 3",
+        "-h += 1",
+        "+a = 1",
+        "+b, c += 2, 3",
+        "+d *= 3",
+        "+e += 1",
+        " a = 1",
+        " b, c += 2, 3",
+        " d *= 3"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "18263c4aaf3e218b171b61d403d2757aa28021c8"
+    "shas": "2ee13da5baeb2504510d7e1dc5ebd2e45caffd72..34bb2cd36820df90bbc0e72b4158deb44485064d"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -524,21 +691,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -551,21 +718,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     2
                                 ]
                             }
@@ -578,21 +745,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     2
                                 ]
                             }
@@ -604,11 +771,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -619,11 +786,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -634,11 +801,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -649,11 +816,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -667,9 +834,26 @@
     "filePaths": [
         "assignment-statements.go"
     ],
-    "sha1": "18263c4aaf3e218b171b61d403d2757aa28021c8",
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index 87b0c42..9d7456f 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,7 +1,7 @@",
+        "-a = 1",
+        "-b, c += 2, 3",
+        "-d *= 3",
+        "-e += 1",
+        "+x = 1",
+        "+y, c += 2, 3",
+        "+z *= 3",
+        "+h += 1",
+        " a = 1",
+        " b, c += 2, 3",
+        " d *= 3"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "299b0c2fe77d0bd36984a4f639b71346f9b613f2"
+    "shas": "34bb2cd36820df90bbc0e72b4158deb44485064d..0ff7c4a6db9c0607f1da6c61bd140afd1e2cd2ed"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -680,11 +864,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 2
                             ]
                         }
@@ -695,11 +879,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 5
                             ],
                             "end": [
-                                3,
+                                1,
                                 6
                             ]
                         }
@@ -710,11 +894,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -725,11 +909,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -740,11 +924,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 9
                             ],
                             "end": [
-                                4,
+                                2,
                                 10
                             ]
                         }
@@ -755,11 +939,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 12
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -770,11 +954,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -785,11 +969,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 7
                             ]
                         }
@@ -800,11 +984,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -815,11 +999,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -830,11 +1014,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 2
                             ]
                         }
@@ -845,11 +1029,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 5
                             ],
                             "end": [
-                                7,
+                                5,
                                 6
                             ]
                         }
@@ -860,11 +1044,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -875,11 +1059,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 4
                             ],
                             "end": [
-                                8,
+                                6,
                                 5
                             ]
                         }
@@ -890,11 +1074,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 9
                             ],
                             "end": [
-                                8,
+                                6,
                                 10
                             ]
                         }
@@ -905,11 +1089,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 12
                             ],
                             "end": [
-                                8,
+                                6,
                                 13
                             ]
                         }
@@ -920,11 +1104,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 2
                             ]
                         }
@@ -935,11 +1119,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 6
                             ],
                             "end": [
-                                9,
+                                7,
                                 7
                             ]
                         }
@@ -950,11 +1134,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -965,11 +1149,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 6
                             ],
                             "end": [
-                                10,
+                                8,
                                 7
                             ]
                         }
@@ -980,11 +1164,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 2
                             ]
                         }
@@ -995,11 +1179,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 5
                             ],
                             "end": [
-                                7,
+                                5,
                                 6
                             ]
                         }
@@ -1010,11 +1194,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -1025,11 +1209,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 4
                             ],
                             "end": [
-                                8,
+                                6,
                                 5
                             ]
                         }
@@ -1040,11 +1224,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 9
                             ],
                             "end": [
-                                8,
+                                6,
                                 10
                             ]
                         }
@@ -1055,11 +1239,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 12
                             ],
                             "end": [
-                                8,
+                                6,
                                 13
                             ]
                         }
@@ -1070,11 +1254,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 2
                             ]
                         }
@@ -1085,11 +1269,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 6
                             ],
                             "end": [
-                                9,
+                                7,
                                 7
                             ]
                         }
@@ -1100,11 +1284,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -1115,11 +1299,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 6
                             ],
                             "end": [
-                                10,
+                                8,
                                 7
                             ]
                         }
@@ -1133,9 +1317,31 @@
     "filePaths": [
         "assignment-statements.go"
     ],
-    "sha1": "299b0c2fe77d0bd36984a4f639b71346f9b613f2",
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index 9d7456f..d51ed96 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,12 +1,8 @@",
+        "-x = 1",
+        "-y, c += 2, 3",
+        "-z *= 3",
+        "-h += 1",
+        "-a = 1",
+        "-b, c += 2, 3",
+        "-d *= 3",
+        "-e += 1",
+        " a = 1",
+        " b, c += 2, 3",
+        " d *= 3",
+        " e += 1",
+        "+x = 1",
+        "+y, c += 2, 3",
+        "+z *= 3",
+        "+h += 1"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b8fae5034ae26643f9e4f0749b6818be5c001503"
+    "shas": "0ff7c4a6db9c0607f1da6c61bd140afd1e2cd2ed..5d18144f94542fcc9740fa04c0564a62bc8360b0"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-test",
@@ -1146,11 +1352,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 2
                             ]
                         }
@@ -1161,11 +1367,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 5
                             ],
                             "end": [
-                                3,
+                                1,
                                 6
                             ]
                         }
@@ -1176,11 +1382,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -1191,11 +1397,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -1206,11 +1412,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 9
                             ],
                             "end": [
-                                4,
+                                2,
                                 10
                             ]
                         }
@@ -1221,11 +1427,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 12
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -1236,11 +1442,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -1251,11 +1457,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 7
                             ]
                         }
@@ -1266,11 +1472,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -1281,11 +1487,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -1299,9 +1505,22 @@
     "filePaths": [
         "assignment-statements.go"
     ],
-    "sha1": "b8fae5034ae26643f9e4f0749b6818be5c001503",
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index d51ed96..5f3e29f 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,7 +1,3 @@",
+        "-a = 1",
+        "-b, c += 2, 3",
+        "-d *= 3",
+        "-e += 1",
+        " x = 1",
+        " y, c += 2, 3",
+        " z *= 3"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6ff6167c1bf691334b36eab3c3da243812e31479"
+    "shas": "5d18144f94542fcc9740fa04c0564a62bc8360b0..93d7f29bad463009b3f832561f305471e4efe373"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-rest-test",
@@ -1310,30 +1529,153 @@
             "assignment-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced 'main' module with 'main' module"
+                    "summary": "Deleted 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                4
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'c' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                9
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                12
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                6
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'h' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1'"
                 }
             ]
         },
@@ -1342,7 +1684,17 @@
     "filePaths": [
         "assignment-statements.go"
     ],
-    "sha1": "6ff6167c1bf691334b36eab3c3da243812e31479",
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index 5f3e29f..e69de29 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,4 +0,0 @@",
+        "-x = 1",
+        "-y, c += 2, 3",
+        "-z *= 3",
+        "-h += 1"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d721dbc2d0c1b003563fe79a82b9f2d3f609cc64"
+    "shas": "93d7f29bad463009b3f832561f305471e4efe373..bd35724ed7512ba9bb228b806e5888f347bd3793"
 }]

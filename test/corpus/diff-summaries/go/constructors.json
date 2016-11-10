@@ -5,30 +5,198 @@
             "constructors.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'make' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                13
+                            ],
+                            "end": [
+                                1,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                13
+                            ],
+                            "end": [
+                                2,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                19
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                25
+                            ],
+                            "end": [
+                                2,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'old' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the '10'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                17
+                            ],
+                            "end": [
+                                4,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
                 }
             ]
         },
@@ -37,9 +205,19 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "bd92d81359528aecb248c2875d9cb620f555c9a7",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index e69de29..51ab923 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -0,0 +1,4 @@",
+        "+make(chan<- int)",
+        "+make(chan<- int, (new - old))",
+        "+make(chan<- int, 5, 10)",
+        "+ new(map[string]string)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "28e7694e2ed814c4a791ab79b7d746b1a983e06b"
+    "shas": "40bb3501528e6739138d99014546c14c14335b62..acf3ab754be165fc30a19be5c0f8127dd759b980"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-insert-test",
@@ -50,11 +228,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -65,11 +243,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 19
                             ]
                         }
@@ -80,11 +258,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -95,11 +273,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -110,11 +288,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 22
                             ],
                             "end": [
-                                4,
+                                2,
                                 25
                             ]
                         }
@@ -125,11 +303,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 28
                             ],
                             "end": [
-                                4,
+                                2,
                                 31
                             ]
                         }
@@ -140,11 +318,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 5
                             ]
                         }
@@ -155,11 +333,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 13
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -170,11 +348,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 21
                             ],
                             "end": [
-                                5,
+                                3,
                                 22
                             ]
                         }
@@ -185,11 +363,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 24
                             ],
                             "end": [
-                                5,
+                                3,
                                 26
                             ]
                         }
@@ -200,11 +378,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 5
                             ]
                         }
@@ -215,11 +393,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 10
                             ],
                             "end": [
-                                6,
+                                4,
                                 13
                             ]
                         }
@@ -230,11 +408,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 14
                             ],
                             "end": [
-                                6,
+                                4,
                                 17
                             ]
                         }
@@ -245,11 +423,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 5
                             ]
                         }
@@ -260,11 +438,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 13
                             ],
                             "end": [
-                                7,
+                                5,
                                 16
                             ]
                         }
@@ -275,11 +453,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 5
                             ]
                         }
@@ -290,11 +468,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 16
                             ]
                         }
@@ -305,11 +483,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 19
                             ],
                             "end": [
-                                8,
+                                6,
                                 22
                             ]
                         }
@@ -320,11 +498,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 25
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -335,11 +513,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 5
                             ]
                         }
@@ -350,11 +528,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 13
                             ],
                             "end": [
-                                9,
+                                7,
                                 16
                             ]
                         }
@@ -365,11 +543,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 18
                             ],
                             "end": [
-                                9,
+                                7,
                                 19
                             ]
                         }
@@ -380,11 +558,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 21
                             ],
                             "end": [
-                                9,
+                                7,
                                 23
                             ]
                         }
@@ -395,11 +573,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 2
                             ],
                             "end": [
-                                10,
+                                8,
                                 5
                             ]
                         }
@@ -410,11 +588,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 10
                             ],
                             "end": [
-                                10,
+                                8,
                                 16
                             ]
                         }
@@ -425,11 +603,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 17
                             ],
                             "end": [
-                                10,
+                                8,
                                 23
                             ]
                         }
@@ -443,9 +621,26 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "28e7694e2ed814c4a791ab79b7d746b1a983e06b",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index 51ab923..76b35ec 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,3 +1,11 @@",
+        "+make(chan<- string)",
+        "+make(chan<- string, (new - old))",
+        "+make(chan<- string, 7, 11)",
+        "+ new(map[int]int)",
+        "+make(chan<- int)",
+        "+make(chan<- int, (new - old))",
+        "+make(chan<- int, 5, 10)",
+        "+ new(map[string]string)",
+        " make(chan<- int)",
+        " make(chan<- int, (new - old))",
+        " make(chan<- int, 5, 10)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1af6763f4db005cf511659eca65857d5d22f85f7"
+    "shas": "acf3ab754be165fc30a19be5c0f8127dd759b980..22f58c3aa2ae0f0aa7a590f6cbbca5604c1ff8b2"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -457,6 +652,60 @@
                         "replace": [
                             {
                                 "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
                                     3,
                                     13
                                 ],
@@ -484,75 +733,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
-                                    13
-                                ],
-                                "end": [
-                                    4,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    13
-                                ],
-                                "end": [
-                                    4,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    13
-                                ],
-                                "end": [
-                                    5,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    13
-                                ],
-                                "end": [
-                                    5,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
+                                    3,
                                     21
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     22
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     18
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     19
                                 ]
                             }
@@ -565,21 +760,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     24
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     26
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     21
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     23
                                 ]
                             }
@@ -592,21 +787,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     10
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     10
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     16
                                 ]
                             }
@@ -619,21 +814,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     14
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     17
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     17
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     23
                                 ]
                             }
@@ -648,9 +843,26 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "1af6763f4db005cf511659eca65857d5d22f85f7",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index 76b35ec..b8e9fef 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,7 +1,7 @@",
+        "-make(chan<- string)",
+        "-make(chan<- string, (new - old))",
+        "-make(chan<- string, 7, 11)",
+        "- new(map[int]int)",
+        "+make(chan<- int)",
+        "+make(chan<- int, (new - old))",
+        "+make(chan<- int, 5, 10)",
+        "+ new(map[string]string)",
+        " make(chan<- int)",
+        " make(chan<- int, (new - old))",
+        " make(chan<- int, 5, 10)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f10e80490d6efd6487856a7a6a06e50ce7a04b10"
+    "shas": "22f58c3aa2ae0f0aa7a590f6cbbca5604c1ff8b2..95d582455ca3332a68b8c7811bc98060f0f4679e"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -662,6 +874,60 @@
                         "replace": [
                             {
                                 "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    13
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
                                     3,
                                     13
                                 ],
@@ -689,75 +955,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
-                                    13
-                                ],
-                                "end": [
-                                    4,
-                                    16
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    13
-                                ],
-                                "end": [
-                                    4,
-                                    19
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    13
-                                ],
-                                "end": [
-                                    5,
-                                    16
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    13
-                                ],
-                                "end": [
-                                    5,
-                                    19
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
+                                    3,
                                     18
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     19
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     21
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     22
                                 ]
                             }
@@ -770,21 +982,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     21
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     23
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     24
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     26
                                 ]
                             }
@@ -797,21 +1009,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     10
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     10
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     13
                                 ]
                             }
@@ -824,21 +1036,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     17
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     23
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     14
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     17
                                 ]
                             }
@@ -853,9 +1065,26 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "f10e80490d6efd6487856a7a6a06e50ce7a04b10",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index b8e9fef..76b35ec 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,7 +1,7 @@",
+        "-make(chan<- int)",
+        "-make(chan<- int, (new - old))",
+        "-make(chan<- int, 5, 10)",
+        "- new(map[string]string)",
+        "+make(chan<- string)",
+        "+make(chan<- string, (new - old))",
+        "+make(chan<- string, 7, 11)",
+        "+ new(map[int]int)",
+        " make(chan<- int)",
+        " make(chan<- int, (new - old))",
+        " make(chan<- int, 5, 10)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "915978c743b9e63ed5aad01d1978eee2273916b1"
+    "shas": "95d582455ca3332a68b8c7811bc98060f0f4679e..966f8623aff6bab7254d116a94f55de562fa27b6"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -866,11 +1095,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -881,11 +1110,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 19
                             ]
                         }
@@ -896,11 +1125,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -911,11 +1140,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -926,11 +1155,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 22
                             ],
                             "end": [
-                                4,
+                                2,
                                 25
                             ]
                         }
@@ -941,11 +1170,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 28
                             ],
                             "end": [
-                                4,
+                                2,
                                 31
                             ]
                         }
@@ -956,11 +1185,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 5
                             ]
                         }
@@ -971,11 +1200,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 13
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -986,11 +1215,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 21
                             ],
                             "end": [
-                                5,
+                                3,
                                 22
                             ]
                         }
@@ -1001,11 +1230,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 24
                             ],
                             "end": [
-                                5,
+                                3,
                                 26
                             ]
                         }
@@ -1016,11 +1245,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 5
                             ]
                         }
@@ -1031,11 +1260,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 10
                             ],
                             "end": [
-                                6,
+                                4,
                                 13
                             ]
                         }
@@ -1046,11 +1275,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 14
                             ],
                             "end": [
-                                6,
+                                4,
                                 17
                             ]
                         }
@@ -1061,11 +1290,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 5
                             ]
                         }
@@ -1076,11 +1305,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 13
                             ],
                             "end": [
-                                7,
+                                5,
                                 16
                             ]
                         }
@@ -1091,11 +1320,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 5
                             ]
                         }
@@ -1106,11 +1335,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 16
                             ]
                         }
@@ -1121,11 +1350,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 19
                             ],
                             "end": [
-                                8,
+                                6,
                                 22
                             ]
                         }
@@ -1136,11 +1365,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 25
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -1151,11 +1380,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 5
                             ]
                         }
@@ -1166,11 +1395,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 13
                             ],
                             "end": [
-                                9,
+                                7,
                                 16
                             ]
                         }
@@ -1181,11 +1410,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 18
                             ],
                             "end": [
-                                9,
+                                7,
                                 19
                             ]
                         }
@@ -1196,11 +1425,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 21
                             ],
                             "end": [
-                                9,
+                                7,
                                 23
                             ]
                         }
@@ -1211,11 +1440,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 2
                             ],
                             "end": [
-                                10,
+                                8,
                                 5
                             ]
                         }
@@ -1226,11 +1455,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 10
                             ],
                             "end": [
-                                10,
+                                8,
                                 16
                             ]
                         }
@@ -1241,11 +1470,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 17
                             ],
                             "end": [
-                                10,
+                                8,
                                 23
                             ]
                         }
@@ -1256,11 +1485,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 5
                             ]
                         }
@@ -1271,11 +1500,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 13
                             ],
                             "end": [
-                                7,
+                                5,
                                 19
                             ]
                         }
@@ -1286,11 +1515,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 5
                             ]
                         }
@@ -1301,11 +1530,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 19
                             ]
                         }
@@ -1316,11 +1545,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 22
                             ],
                             "end": [
-                                8,
+                                6,
                                 25
                             ]
                         }
@@ -1331,11 +1560,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 28
                             ],
                             "end": [
-                                8,
+                                6,
                                 31
                             ]
                         }
@@ -1346,11 +1575,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 5
                             ]
                         }
@@ -1361,11 +1590,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 13
                             ],
                             "end": [
-                                9,
+                                7,
                                 19
                             ]
                         }
@@ -1376,11 +1605,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 21
                             ],
                             "end": [
-                                9,
+                                7,
                                 22
                             ]
                         }
@@ -1391,11 +1620,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 24
                             ],
                             "end": [
-                                9,
+                                7,
                                 26
                             ]
                         }
@@ -1406,11 +1635,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 2
                             ],
                             "end": [
-                                10,
+                                8,
                                 5
                             ]
                         }
@@ -1421,11 +1650,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 10
                             ],
                             "end": [
-                                10,
+                                8,
                                 13
                             ]
                         }
@@ -1436,11 +1665,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 14
                             ],
                             "end": [
-                                10,
+                                8,
                                 17
                             ]
                         }
@@ -1454,9 +1683,31 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "915978c743b9e63ed5aad01d1978eee2273916b1",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index 76b35ec..12f44d5 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,12 +1,8 @@",
+        "-make(chan<- string)",
+        "-make(chan<- string, (new - old))",
+        "-make(chan<- string, 7, 11)",
+        "- new(map[int]int)",
+        "-make(chan<- int)",
+        "-make(chan<- int, (new - old))",
+        "-make(chan<- int, 5, 10)",
+        "- new(map[string]string)",
+        " make(chan<- int)",
+        " make(chan<- int, (new - old))",
+        " make(chan<- int, 5, 10)",
+        "  new(map[string]string)",
+        "+make(chan<- string)",
+        "+make(chan<- string, (new - old))",
+        "+make(chan<- string, 7, 11)",
+        "+ new(map[int]int)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "35b0d9fbe6420dfde238c2f3e568e7641b97a504"
+    "shas": "966f8623aff6bab7254d116a94f55de562fa27b6..dcf2177ce94c3b563ca14e21f7ffa1e302dadc59"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-test",
@@ -1467,11 +1718,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -1482,11 +1733,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 16
                             ]
                         }
@@ -1497,11 +1748,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -1512,11 +1763,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -1527,11 +1778,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 19
                             ],
                             "end": [
-                                4,
+                                2,
                                 22
                             ]
                         }
@@ -1542,11 +1793,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 25
                             ],
                             "end": [
-                                4,
+                                2,
                                 28
                             ]
                         }
@@ -1557,11 +1808,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 5
                             ]
                         }
@@ -1572,11 +1823,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 13
                             ],
                             "end": [
-                                5,
+                                3,
                                 16
                             ]
                         }
@@ -1587,11 +1838,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 18
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -1602,11 +1853,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 21
                             ],
                             "end": [
-                                5,
+                                3,
                                 23
                             ]
                         }
@@ -1617,11 +1868,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 5
                             ]
                         }
@@ -1632,11 +1883,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 10
                             ],
                             "end": [
-                                6,
+                                4,
                                 16
                             ]
                         }
@@ -1647,11 +1898,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 17
                             ],
                             "end": [
-                                6,
+                                4,
                                 23
                             ]
                         }
@@ -1665,9 +1916,22 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "35b0d9fbe6420dfde238c2f3e568e7641b97a504",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index 12f44d5..0720537 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,7 +1,3 @@",
+        "-make(chan<- int)",
+        "-make(chan<- int, (new - old))",
+        "-make(chan<- int, 5, 10)",
+        "- new(map[string]string)",
+        " make(chan<- string)",
+        " make(chan<- string, (new - old))",
+        " make(chan<- string, 7, 11)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "11b3dd12241fa6607fa6f9116fce96f3f43aaa6a"
+    "shas": "dcf2177ce94c3b563ca14e21f7ffa1e302dadc59..b842d9b78fdf1ecc8ae0b611e736a4a0d7f272a2"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-rest-test",
@@ -1676,30 +1940,198 @@
             "constructors.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'make' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                13
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'make' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                13
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                22
+                            ],
+                            "end": [
+                                2,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                28
+                            ],
+                            "end": [
+                                2,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'old' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'make' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                21
+                            ],
+                            "end": [
+                                3,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '7'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                24
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '11'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                14
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
                 }
             ]
         },
@@ -1708,7 +2140,17 @@
     "filePaths": [
         "constructors.go"
     ],
-    "sha1": "11b3dd12241fa6607fa6f9116fce96f3f43aaa6a",
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index 0720537..e69de29 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,4 +0,0 @@",
+        "-make(chan<- string)",
+        "-make(chan<- string, (new - old))",
+        "-make(chan<- string, 7, 11)",
+        "- new(map[int]int)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4f37802913bc6d0558da212b36497be55209c99b"
+    "shas": "b842d9b78fdf1ecc8ae0b611e736a4a0d7f272a2..bf82bf19d4c58176cb36d1c4e0cb934241bd5394"
 }]

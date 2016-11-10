@@ -195,9 +195,16 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "8f8309aab5b170620dd56a95dde3a0a1c4307c68",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index e69de29..c467478 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -0,0 +1 @@",
+        "+for (key in something && i = 0; i < n; i++) { doSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d4ef819b2032599dec76b1b8bca7a958bb532a7d"
+    "shas": "8dd4d424eeae076b657c04fb290058c4635ae818..9811288bc6b350e349973dec14748a359efedc76"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-insert-test",
@@ -886,9 +893,18 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "d4ef819b2032599dec76b1b8bca7a958bb532a7d",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index c467478..0147d31 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -1 +1,3 @@",
+        "+for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }",
+        "+for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        " for (key in something && i = 0; i < n; i++) { doSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "49650dfb0ab5263272659bbda9ff3973d87b27ba"
+    "shas": "9811288bc6b350e349973dec14748a359efedc76..63fc9f47c0b135eec17ac28e315a58a052f21fc8"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-insert-test",
@@ -1891,9 +1907,19 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "49650dfb0ab5263272659bbda9ff3973d87b27ba",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index 0147d31..306fa88 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }",
+        "+for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        " for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        " for (key in something && i = 0; i < n; i++) { doSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "22e9c180fbf1f60eb4100fa046df08f30da91ed0"
+    "shas": "63fc9f47c0b135eec17ac28e315a58a052f21fc8..2cd005d0e852939bc0e1af4e0de6d3fba1855845"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-test",
@@ -2896,9 +2922,19 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "22e9c180fbf1f60eb4100fa046df08f30da91ed0",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index 306fa88..0147d31 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        "+for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }",
+        " for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        " for (key in something && i = 0; i < n; i++) { doSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c0ffef38d1db59a8c01b722f43ff51088d0d5aab"
+    "shas": "2cd005d0e852939bc0e1af4e0de6d3fba1855845..a0f7c8fd3b681499414c0eb241efb7d677d12d93"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-replacement-test",
@@ -3746,9 +3782,19 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "c0ffef38d1db59a8c01b722f43ff51088d0d5aab",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index 0147d31..f23fa31 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }",
+        "-for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        " for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        "+for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3ffd2138c6d5f249ff6546a3be3b2f05964872bc"
+    "shas": "a0f7c8fd3b681499414c0eb241efb7d677d12d93..6b7a2fd51ee8f4d50b6694c613e614f365ae5043"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-test",
@@ -4278,9 +4324,17 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "3ffd2138c6d5f249ff6546a3be3b2f05964872bc",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index f23fa31..e968160 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -1,2 +1 @@",
+        "-for (key in something && i = 0; i < n; i++) { doSomething(); }",
+        " for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e8052ac71b7500d674a59d99771f30d9ada7d3a8"
+    "shas": "6b7a2fd51ee8f4d50b6694c613e614f365ae5043..1ae61c25b593a57731d6b465c56186922d43a9be"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-rest-test",
@@ -4479,7 +4533,14 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "e8052ac71b7500d674a59d99771f30d9ada7d3a8",
+    "patch": [
+        "diff --git a/for-loop-with-in-statement.js b/for-loop-with-in-statement.js",
+        "index e968160..e69de29 100644",
+        "--- a/for-loop-with-in-statement.js",
+        "+++ b/for-loop-with-in-statement.js",
+        "@@ -1 +0,0 @@",
+        "-for (otherKey in something && i = 0; i < n; i++) { doOtherSomething(); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ceb4421fb8736b7ea77887631c5d741c11d4b91c"
+    "shas": "1ae61c25b593a57731d6b465c56186922d43a9be..d86b209de9dedc4b2f245fbfc5ea1497b4f94189"
 }]

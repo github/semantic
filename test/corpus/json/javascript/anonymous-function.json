@@ -131,9 +131,16 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "9e5406166a9e280d7ad6cc8bf570b450e90347a5",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index e69de29..b592868 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -0,0 +1 @@",
+        "+function(a,b) { return a + b; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d7ffd2b2f9e060e93f1acc30e8cf6babd83002bd"
+    "shas": "193d1078ef93cde9a03725d1f4b6a42b856754d3..0f94ee7144066b4bf2e6fb86266fe3980d7c20aa"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
@@ -566,9 +573,18 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "d7ffd2b2f9e060e93f1acc30e8cf6babd83002bd",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index b592868..e1de356 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -1 +1,3 @@",
+        "+function(b,c) { return b * c; }",
+        "+function(a,b) { return a + b; }",
+        " function(a,b) { return a + b; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c8612009b5d29153c916c644de489394fe0e926f"
+    "shas": "0f94ee7144066b4bf2e6fb86266fe3980d7c20aa..85b50027ed8e318f409ebfdeec95d332e4372c9d"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
@@ -1191,9 +1207,19 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "c8612009b5d29153c916c644de489394fe0e926f",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index e1de356..4ca0d4c 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function(b,c) { return b * c; }",
+        "+function(a,b) { return a + b; }",
+        " function(a,b) { return a + b; }",
+        " function(a,b) { return a + b; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "706f7c74900a7e12c3a4d3213b84a8851e506efe"
+    "shas": "85b50027ed8e318f409ebfdeec95d332e4372c9d..277409950b39db70396ab88d79fef61e6f355cf9"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-test",
@@ -1816,9 +1842,19 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "706f7c74900a7e12c3a4d3213b84a8851e506efe",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index 4ca0d4c..e1de356 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-function(a,b) { return a + b; }",
+        "+function(b,c) { return b * c; }",
+        " function(a,b) { return a + b; }",
+        " function(a,b) { return a + b; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "33fbd33b9dee1ffe97a03a992231f3b0d536efa1"
+    "shas": "277409950b39db70396ab88d79fef61e6f355cf9..1f70d35c4fc7af5fef2b1f33af11fea8bf74ac64"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
@@ -2346,9 +2382,19 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "33fbd33b9dee1ffe97a03a992231f3b0d536efa1",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index e1de356..afdaccf 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -1,3 +1,2 @@",
+        "-function(b,c) { return b * c; }",
+        "-function(a,b) { return a + b; }",
+        " function(a,b) { return a + b; }",
+        "+function(b,c) { return b * c; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20847e86ad60bcd4413d73094a3ce3650c74c414"
+    "shas": "1f70d35c4fc7af5fef2b1f33af11fea8bf74ac64..085a8e51416cd260921607437cf74474535dd1e8"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-test",
@@ -2686,9 +2732,17 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "20847e86ad60bcd4413d73094a3ce3650c74c414",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index afdaccf..9f1856f 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -1,2 +1 @@",
+        "-function(a,b) { return a + b; }",
+        " function(b,c) { return b * c; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "39da8cd0e4fe3da04c3feaece752d84d14b46c58"
+    "shas": "085a8e51416cd260921607437cf74474535dd1e8..4dba50c9b3f7e53a052d78885254b1138bd11caa"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
@@ -2823,7 +2877,14 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "39da8cd0e4fe3da04c3feaece752d84d14b46c58",
+    "patch": [
+        "diff --git a/anonymous-function.js b/anonymous-function.js",
+        "index 9f1856f..e69de29 100644",
+        "--- a/anonymous-function.js",
+        "+++ b/anonymous-function.js",
+        "@@ -1 +0,0 @@",
+        "-function(b,c) { return b * c; }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e983da932d1dc1b84e8aef2db57c2cf7a5a9f208"
+    "shas": "4dba50c9b3f7e53a052d78885254b1138bd11caa..b6fb98d6c49e32009671313bca0c3f8b9f01f8d4"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -52,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 12
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -70,9 +70,17 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "4c8c99e5a735f66e43d41e65a75a75272a162c8c",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index e69de29..1b8dbe5 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -0,0 +1,2 @@",
+        "+type a []b",
+        "+type c [][]d"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "99a3831a6044a4a67c3097d126a27802bf1a070b"
+    "shas": "338fc2d73f62d9c316e48cf2390c1052834d4985..1ea577f2f81489221ed09ffb1ad11075a01a8c3c"
 }
 ,{
     "testCaseDescription": "go-slice-types-replacement-insert-test",
@@ -83,11 +91,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -98,11 +106,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 12
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -113,11 +121,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -128,11 +136,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -143,11 +151,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 7
                             ]
                         }
@@ -158,11 +166,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 10
                             ],
                             "end": [
-                                5,
+                                3,
                                 11
                             ]
                         }
@@ -173,11 +181,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -188,11 +196,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 12
                             ],
                             "end": [
-                                6,
+                                4,
                                 13
                             ]
                         }
@@ -206,9 +214,21 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "99a3831a6044a4a67c3097d126a27802bf1a070b",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index 1b8dbe5..d718ee8 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -1,2 +1,6 @@",
+        "+type a [][]p",
+        "+type c []y",
+        "+type a []b",
+        "+type c [][]d",
+        " type a []b",
+        " type c [][]d"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cc90097c8cf3490855377cf31aa3de2e3e92b08f"
+    "shas": "1ea577f2f81489221ed09ffb1ad11075a01a8c3c..ea4858c48ca03ca912291083660d83d19205240c"
 }
 ,{
     "testCaseDescription": "go-slice-types-delete-insert-test",
@@ -219,11 +239,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -234,11 +254,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 12
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -249,11 +269,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 12
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -264,11 +284,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -282,9 +302,22 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "cc90097c8cf3490855377cf31aa3de2e3e92b08f",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index d718ee8..e6836eb 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -1,5 +1,5 @@",
+        "-type a [][]p",
+        "-type c []y",
+        "+type a []b",
+        "+type c [][]d",
+        " type a []b",
+        " type c [][]d",
+        " type a []b"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b7bd35a7d0885f272b4308903892645a3fe5bbb7"
+    "shas": "ea4858c48ca03ca912291083660d83d19205240c..74a3b7c7d6431de72a0ab9d1fe827fb9207385bb"
 }
 ,{
     "testCaseDescription": "go-slice-types-replacement-test",
@@ -295,11 +328,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 12
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -310,11 +343,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -325,11 +358,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -340,11 +373,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 12
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -358,9 +391,22 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "b7bd35a7d0885f272b4308903892645a3fe5bbb7",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index e6836eb..d718ee8 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -1,5 +1,5 @@",
+        "-type a []b",
+        "-type c [][]d",
+        "+type a [][]p",
+        "+type c []y",
+        " type a []b",
+        " type c [][]d",
+        " type a []b"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7e67518ac3811296fdc770c881b134581998c9cd"
+    "shas": "74a3b7c7d6431de72a0ab9d1fe827fb9207385bb..3c1f3f0aaba3f93566e81fa6919588140c7f84f8"
 }
 ,{
     "testCaseDescription": "go-slice-types-delete-replacement-test",
@@ -371,11 +417,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -386,11 +432,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 12
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -401,11 +447,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -416,11 +462,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -431,11 +477,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 7
                             ]
                         }
@@ -446,11 +492,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 10
                             ],
                             "end": [
-                                5,
+                                3,
                                 11
                             ]
                         }
@@ -461,11 +507,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -476,11 +522,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 12
                             ],
                             "end": [
-                                6,
+                                4,
                                 13
                             ]
                         }
@@ -491,11 +537,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 7
                             ]
                         }
@@ -506,11 +552,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 12
                             ],
                             "end": [
-                                5,
+                                3,
                                 13
                             ]
                         }
@@ -521,11 +567,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 6
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -536,11 +582,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 10
                             ],
                             "end": [
-                                6,
+                                4,
                                 11
                             ]
                         }
@@ -554,9 +600,23 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "7e67518ac3811296fdc770c881b134581998c9cd",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index d718ee8..9f9c73f 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -1,6 +1,4 @@",
+        "-type a [][]p",
+        "-type c []y",
+        "-type a []b",
+        "-type c [][]d",
+        " type a []b",
+        " type c [][]d",
+        "+type a [][]p",
+        "+type c []y"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5fc6c996739c83c3b77acfb9fcd7e89ee3ffe347"
+    "shas": "3c1f3f0aaba3f93566e81fa6919588140c7f84f8..14884815c9c60888a7434f5537b7d37ed222154b"
 }
 ,{
     "testCaseDescription": "go-slice-types-delete-test",
@@ -567,11 +627,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -582,11 +642,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -597,11 +657,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -612,11 +672,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 12
                             ],
                             "end": [
-                                4,
+                                2,
                                 13
                             ]
                         }
@@ -630,9 +690,19 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "5fc6c996739c83c3b77acfb9fcd7e89ee3ffe347",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index 9f9c73f..964a319 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -1,4 +1,2 @@",
+        "-type a []b",
+        "-type c [][]d",
+        " type a [][]p",
+        " type c []y"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "16fcb96325446aa55183c41f179fb38b2288c374"
+    "shas": "14884815c9c60888a7434f5537b7d37ed222154b..9052f7f67fe0ab24fccfccd64c631ce9a5ea299d"
 }
 ,{
     "testCaseDescription": "go-slice-types-delete-rest-test",
@@ -643,11 +713,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -658,11 +728,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 12
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -673,11 +743,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -688,11 +758,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -706,7 +776,15 @@
     "filePaths": [
         "slice-types.go"
     ],
-    "sha1": "16fcb96325446aa55183c41f179fb38b2288c374",
+    "patch": [
+        "diff --git a/slice-types.go b/slice-types.go",
+        "index 964a319..e69de29 100644",
+        "--- a/slice-types.go",
+        "+++ b/slice-types.go",
+        "@@ -1,2 +0,0 @@",
+        "-type a [][]p",
+        "-type c []y"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "776befbec12285642ba8944297803b4289c10cf0"
+    "shas": "9052f7f67fe0ab24fccfccd64c631ce9a5ea299d..32e685f38686a99987e01d66161451aeba15b018"
 }]

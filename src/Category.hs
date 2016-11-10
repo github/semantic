@@ -128,6 +128,15 @@ data Category
   | Until
   -- | A unless/else expression.
   | Unless
+  | Begin
+  | Else
+  | Elsif
+  | Ensure
+  | Rescue
+  | RescueModifier
+  | When
+  | RescuedException
+  | Negate
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -188,6 +197,15 @@ instance Arbitrary Category where
     , pure Yield
     , pure Until
     , pure Unless
+    , pure Begin
+    , pure Else
+    , pure Elsif
+    , pure Ensure
+    , pure Rescue
+    , pure RescueModifier
+    , pure When
+    , pure RescuedException
+    , pure Negate
     , Other <$> arbitrary
     ]
 

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -25,9 +25,16 @@
     "filePaths": [
         "selector-expressions.go"
     ],
-    "sha1": "4f37802913bc6d0558da212b36497be55209c99b",
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index e69de29..7be43f2 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -0,0 +1 @@",
+        "+a.b.c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "41f3987a397e005336a1b76c91719e753cd5e3f4"
+    "shas": "bf82bf19d4c58176cb36d1c4e0cb934241bd5394..87d1fc7bef359bdd4e0dcc8aad67c08ce1c35f6c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-insert-test",
@@ -36,30 +43,33 @@
             "selector-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'method call()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'method call()' function call"
                 }
             ]
         },
@@ -68,9 +78,18 @@
     "filePaths": [
         "selector-expressions.go"
     ],
-    "sha1": "41f3987a397e005336a1b76c91719e753cd5e3f4",
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 7be43f2..4fa8605 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1 +1,3 @@",
+        "+x.y.z()",
+        "+a.b.c()",
+        " a.b.c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "201915f3eb57c8f53b28084b3080eae7376cf15d"
+    "shas": "87d1fc7bef359bdd4e0dcc8aad67c08ce1c35f6c..ca3e3a97e47529457509431057a09ae9f09774de"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -82,21 +101,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -109,21 +128,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     3
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     3
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             }
@@ -136,21 +155,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             }
@@ -165,9 +184,19 @@
     "filePaths": [
         "selector-expressions.go"
     ],
-    "sha1": "201915f3eb57c8f53b28084b3080eae7376cf15d",
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 4fa8605..2a586da 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,3 +1,3 @@",
+        "-x.y.z()",
+        "+a.b.c()",
+        " a.b.c()",
+        " a.b.c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "79f050f2e282ea00bd1a5a2379c9b22ec63a216e"
+    "shas": "ca3e3a97e47529457509431057a09ae9f09774de..4784dc00012db8262fb5321370d25c7f4e2cc8d6"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -179,21 +208,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -206,21 +235,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     3
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     3
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             }
@@ -233,21 +262,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             }
@@ -262,9 +291,19 @@
     "filePaths": [
         "selector-expressions.go"
     ],
-    "sha1": "79f050f2e282ea00bd1a5a2379c9b22ec63a216e",
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 2a586da..4fa8605 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,3 +1,3 @@",
+        "-a.b.c()",
+        "+x.y.z()",
+        " a.b.c()",
+        " a.b.c()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8a2fbcba91669a62575ba3e24b843c37a3e71184"
+    "shas": "4784dc00012db8262fb5321370d25c7f4e2cc8d6..cccdb91577b7d7e692a2940325435e7129bce6a0"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -275,11 +314,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -290,11 +329,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -305,11 +344,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -323,9 +362,19 @@
     "filePaths": [
         "selector-expressions.go"
     ],
-    "sha1": "8a2fbcba91669a62575ba3e24b843c37a3e71184",
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 4fa8605..3e2d0bd 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,3 +1,2 @@",
+        "-x.y.z()",
+        "-a.b.c()",
+        " a.b.c()",
+        "+x.y.z()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1f5ef7ae6dda1abe457f1344d1b89da8687703b9"
+    "shas": "cccdb91577b7d7e692a2940325435e7129bce6a0..a9b16a5fef8a8d18ff6629bba3baf8d652e1954a"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-test",
@@ -334,56 +383,13 @@
             "selector-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "selector-expressions.go"
-    ],
-    "sha1": "1f5ef7ae6dda1abe457f1344d1b89da8687703b9",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "a1ba277b8446b3a8e12bbeaa2146aaf2388971d3"
-}
-,{
-    "testCaseDescription": "go-selector-expressions-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "selector-expressions.go": [
-                {
-                    "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -397,7 +403,53 @@
     "filePaths": [
         "selector-expressions.go"
     ],
-    "sha1": "a1ba277b8446b3a8e12bbeaa2146aaf2388971d3",
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 3e2d0bd..00b9e7c 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,2 +1 @@",
+        "-a.b.c()",
+        " x.y.z()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7a0e56fcfbef48bf43e71d2d33c4b74a2cf05cb5"
+    "shas": "a9b16a5fef8a8d18ff6629bba3baf8d652e1954a..fa7f69becdee526370c1aea7e1530d2da4e1c8de"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'method call()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 00b9e7c..e69de29 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1 +0,0 @@",
+        "-x.y.z()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "fa7f69becdee526370c1aea7e1530d2da4e1c8de..5d7acec54aeae4a86833f9a0b00bf588083883ab"
 }]

@@ -25,9 +25,16 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "f9e62bf41467cae8ada35780dd97dbbbddf57da5",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index e69de29..8e828c0 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -0,0 +1 @@",
+        "+foo and bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3dbda12dac387b0d37ca78e7f01809e8f3e7a39b"
+    "shas": "c7d3f438c72d2ab2a09e3fa47ba1cf9b175d2a9b..0bc5f86f8c781f501003b94889818004364037b9"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-insert-test",
@@ -86,9 +93,19 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "3dbda12dac387b0d37ca78e7f01809e8f3e7a39b",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index 8e828c0..fe52247 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -1 +1,4 @@",
+        "+foo or bar",
+        "+a or b and c",
+        "+foo and bar",
+        " foo and bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e28ff49e1a934201eb081645ddbbd5983b7cff3e"
+    "shas": "0bc5f86f8c781f501003b94889818004364037b9..2c06275827cfa3bbaada5117072cd19574d8d7a9"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-insert-test",
@@ -117,9 +134,20 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "e28ff49e1a934201eb081645ddbbd5983b7cff3e",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index fe52247..b09c067 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -1,4 +1,3 @@",
+        "-foo or bar",
+        "-a or b and c",
+        "+foo and bar",
+        " foo and bar",
+        " foo and bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c3983115a7ed26e52980b39fbb57d1f26a31e1fe"
+    "shas": "2c06275827cfa3bbaada5117072cd19574d8d7a9..e800a12b636011a03bc99b86835317cd7ad3ecd1"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-test",
@@ -148,9 +176,20 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "c3983115a7ed26e52980b39fbb57d1f26a31e1fe",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index b09c067..fe52247 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -1,3 +1,4 @@",
+        "-foo and bar",
+        "+foo or bar",
+        "+a or b and c",
+        " foo and bar",
+        " foo and bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f6e7e8cee1becdcc3ecfb253d5004399b90c7638"
+    "shas": "e800a12b636011a03bc99b86835317cd7ad3ecd1..c9340cbb8ada35c896fa285761dd0e9dac96fd0b"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-replacement-test",
@@ -209,9 +248,20 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "f6e7e8cee1becdcc3ecfb253d5004399b90c7638",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index fe52247..a621325 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -1,4 +1,3 @@",
+        "+foo and bar",
+        " foo or bar",
+        " a or b and c",
+        "-foo and bar",
+        "-foo and bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a31ed69713710a876f50a672b66f36a10b49a681"
+    "shas": "c9340cbb8ada35c896fa285761dd0e9dac96fd0b..66224b27113350bc8e9d7ffddc2fe22fee05baa2"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-test",
@@ -240,9 +290,18 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "a31ed69713710a876f50a672b66f36a10b49a681",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index a621325..d2060f6 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -1,3 +1,2 @@",
+        "-foo and bar",
+        " foo or bar",
+        " a or b and c"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d9e002237b1f453c85a84df06bc86a871b453d97"
+    "shas": "66224b27113350bc8e9d7ffddc2fe22fee05baa2..22157102e33b0c6c91eed738c3c7a3ce0edc3fa7"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-rest-test",
@@ -286,7 +345,15 @@
     "filePaths": [
         "and-or.rb"
     ],
-    "sha1": "d9e002237b1f453c85a84df06bc86a871b453d97",
+    "patch": [
+        "diff --git a/and-or.rb b/and-or.rb",
+        "index d2060f6..e69de29 100644",
+        "--- a/and-or.rb",
+        "+++ b/and-or.rb",
+        "@@ -1,2 +0,0 @@",
+        "-foo or bar",
+        "-a or b and c"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e9bfaab31e3a83e3c8e8d890bd8e2a6cf1f5a529"
+    "shas": "22157102e33b0c6c91eed738c3c7a3ce0edc3fa7..956b136e24f76c977fefd27d5368ecd527f721ec"
 }]

@@ -5,86 +5,13 @@
             "unary-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "unary-expressions.go"
-    ],
-    "sha1": "423c95c361986c8807246777d0d1f5dd0602c5d7",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "12de993f257bdb9907574b17ef26c69eea4cecaa"
-}
-,{
-    "testCaseDescription": "go-unary-expressions-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "unary-expressions.go": [
-                {
-                    "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 4
                             ],
                             "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'identifier()' function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                4
-                            ],
-                            "end": [
-                                5,
+                                1,
                                 5
                             ]
                         }
@@ -95,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                2,
                                 1
                             ],
                             "end": [
-                                6,
+                                2,
                                 7
                             ]
                         }
@@ -113,9 +40,105 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "12de993f257bdb9907574b17ef26c69eea4cecaa",
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index e69de29..858c09a 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -0,0 +1,2 @@",
+        "+!<-a",
+        "+*foo()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "11145f78213cf405aad0a5d1324d6b806d3f472a"
+    "shas": "42975c2ba57995b8cc4cfe30c7599c673970dd25..383857c1c2527b50055c4dfe90fb44b26bf0fefa"
+}
+,{
+    "testCaseDescription": "go-unary-expressions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "unary-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unary-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index 858c09a..0b42f98 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -1,2 +1,6 @@",
+        "+!<-b",
+        "+*bar()",
+        "+!<-a",
+        "+*foo()",
+        " !<-a",
+        " *foo()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "383857c1c2527b50055c4dfe90fb44b26bf0fefa..9312cbe74e464febaa3f93fb1b2adf7011d1b95b"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -127,21 +150,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -154,21 +177,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             }
@@ -183,9 +206,22 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "11145f78213cf405aad0a5d1324d6b806d3f472a",
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index 0b42f98..25afb46 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -1,5 +1,5 @@",
+        "-!<-b",
+        "-*bar()",
+        "+!<-a",
+        "+*foo()",
+        " !<-a",
+        " *foo()",
+        " !<-a"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "fe320d2bd5724dc92c3702ebef1e3be53cf629d9"
+    "shas": "9312cbe74e464febaa3f93fb1b2adf7011d1b95b..57ec8fc14e1e8a6d8634011258174e08068a4198"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -197,21 +233,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -224,21 +260,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             }
@@ -253,9 +289,22 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "fe320d2bd5724dc92c3702ebef1e3be53cf629d9",
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index 25afb46..0b42f98 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -1,5 +1,5 @@",
+        "-!<-a",
+        "-*foo()",
+        "+!<-b",
+        "+*bar()",
+        " !<-a",
+        " *foo()",
+        " !<-a"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f4b3902991f22998eca4acc15dc987b62176c418"
+    "shas": "57ec8fc14e1e8a6d8634011258174e08068a4198..c8e2c9b5af896f4b2a72cc9862c60df9a1b65aa4"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -266,11 +315,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 4
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -281,11 +330,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -296,11 +345,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 4
                             ],
                             "end": [
-                                5,
+                                3,
                                 5
                             ]
                         }
@@ -311,11 +360,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -326,11 +375,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 4
                             ],
                             "end": [
-                                5,
+                                3,
                                 5
                             ]
                         }
@@ -341,11 +390,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 7
                             ]
                         }
@@ -359,9 +408,23 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "f4b3902991f22998eca4acc15dc987b62176c418",
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index 0b42f98..812fb68 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -1,6 +1,4 @@",
+        "-!<-b",
+        "-*bar()",
+        "-!<-a",
+        "-*foo()",
+        " !<-a",
+        " *foo()",
+        "+!<-b",
+        "+*bar()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3df238d0afc9c08d06ebe067685ec879aaab33a8"
+    "shas": "c8e2c9b5af896f4b2a72cc9862c60df9a1b65aa4..f3aa65ee6692f5aa37c6f8e6a01d2093e27999a0"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-test",
@@ -372,11 +435,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 4
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -387,11 +450,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -405,9 +468,19 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "3df238d0afc9c08d06ebe067685ec879aaab33a8",
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index 812fb68..6da661d 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -1,4 +1,2 @@",
+        "-!<-a",
+        "-*foo()",
+        " !<-b",
+        " *bar()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8d525b8c16c2b71695c639ccd70ee8a054da5f9f"
+    "shas": "f3aa65ee6692f5aa37c6f8e6a01d2093e27999a0..da09442b50bcb67001af1f6599a2d2cd37c86907"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-rest-test",
@@ -416,30 +489,33 @@
             "unary-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'identifier()' function call"
                 }
             ]
         },
@@ -448,7 +524,15 @@
     "filePaths": [
         "unary-expressions.go"
     ],
-    "sha1": "8d525b8c16c2b71695c639ccd70ee8a054da5f9f",
+    "patch": [
+        "diff --git a/unary-expressions.go b/unary-expressions.go",
+        "index 6da661d..e69de29 100644",
+        "--- a/unary-expressions.go",
+        "+++ b/unary-expressions.go",
+        "@@ -1,2 +0,0 @@",
+        "-!<-b",
+        "-*bar()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c084d45f7de68c3a9328f11b1ff483ad5260f06e"
+    "shas": "da09442b50bcb67001af1f6599a2d2cd37c86907..b3266e749035509bbbd882ef5e2d3ad93c3c60bf"
 }]

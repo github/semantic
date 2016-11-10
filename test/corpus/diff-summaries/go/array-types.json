@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 11
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -52,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -70,9 +70,16 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "6d7202f99aff5a0fefda7df058917f141335424f",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index e69de29..f9c11b8 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -0,0 +1 @@",
+        "+type a [2+2]x"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e22dc38811887835cdba8d7d0f0e3edfa6930c56"
+    "shas": "96ee23366cb8e34e0b1aef14810c83f5066a6f3b..f25c42f9d50f3a4f670ca6d82cb7120feb42e472"
 }
 ,{
     "testCaseDescription": "go-array-types-replacement-insert-test",
@@ -83,11 +90,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -98,11 +105,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -113,11 +120,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 11
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -128,11 +135,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -143,11 +150,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -158,11 +165,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 9
                             ],
                             "end": [
-                                4,
+                                2,
                                 10
                             ]
                         }
@@ -173,11 +180,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 11
                             ],
                             "end": [
-                                4,
+                                2,
                                 12
                             ]
                         }
@@ -188,11 +195,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 14
                             ]
                         }
@@ -206,9 +213,18 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "e22dc38811887835cdba8d7d0f0e3edfa6930c56",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index f9c11b8..d2b8166 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1 +1,3 @@",
+        "+type a [1+1]y",
+        "+type a [2+2]x",
+        " type a [2+2]x"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "31d6f9d239697a44741a23a1b37e6c2de4d70ddb"
+    "shas": "f25c42f9d50f3a4f670ca6d82cb7120feb42e472..159e876dd37dd92c673a5d42908dd4e39437c427"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-insert-test",
@@ -220,21 +236,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
@@ -247,21 +263,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     11
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     12
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     11
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     12
                                 ]
                             }
@@ -274,21 +290,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     14
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     14
                                 ]
                             }
@@ -303,9 +319,19 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "31d6f9d239697a44741a23a1b37e6c2de4d70ddb",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index d2b8166..823c5f1 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type a [1+1]y",
+        "+type a [2+2]x",
+        " type a [2+2]x",
+        " type a [2+2]x"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5f10f74b19bad493aea3a99c580e80e024e036fc"
+    "shas": "159e876dd37dd92c673a5d42908dd4e39437c427..d1f1827268467008a98150e05dbd55c35a6c158a"
 }
 ,{
     "testCaseDescription": "go-array-types-replacement-test",
@@ -317,21 +343,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
@@ -344,21 +370,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     11
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     12
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     11
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     12
                                 ]
                             }
@@ -371,21 +397,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     14
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     14
                                 ]
                             }
@@ -400,9 +426,19 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "5f10f74b19bad493aea3a99c580e80e024e036fc",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 823c5f1..d2b8166 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type a [2+2]x",
+        "+type a [1+1]y",
+        " type a [2+2]x",
+        " type a [2+2]x"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c79b560d124a946f56465001dc8f25492ec14de6"
+    "shas": "d1f1827268467008a98150e05dbd55c35a6c158a..1458fd09e1ef2e04e8b8ef9f689c2c1c97f51537"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-replacement-test",
@@ -413,11 +449,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -428,11 +464,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -443,11 +479,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 11
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -458,11 +494,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -473,11 +509,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -488,11 +524,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 9
                             ],
                             "end": [
-                                4,
+                                2,
                                 10
                             ]
                         }
@@ -503,11 +539,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 11
                             ],
                             "end": [
-                                4,
+                                2,
                                 12
                             ]
                         }
@@ -518,11 +554,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 14
                             ]
                         }
@@ -533,11 +569,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -548,11 +584,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 9
                             ],
                             "end": [
-                                4,
+                                2,
                                 10
                             ]
                         }
@@ -563,11 +599,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 11
                             ],
                             "end": [
-                                4,
+                                2,
                                 12
                             ]
                         }
@@ -578,11 +614,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 14
                             ]
                         }
@@ -596,9 +632,19 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "c79b560d124a946f56465001dc8f25492ec14de6",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index d2b8166..5b93d14 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,3 +1,2 @@",
+        "-type a [1+1]y",
+        "-type a [2+2]x",
+        " type a [2+2]x",
+        "+type a [1+1]y"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "eada01132d5a174337533994662482da20adf753"
+    "shas": "1458fd09e1ef2e04e8b8ef9f689c2c1c97f51537..c9e35d61508072dac51659d61f747dbb40ed1409"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-test",
@@ -609,11 +655,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -624,11 +670,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -639,11 +685,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 11
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -654,11 +700,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -672,9 +718,17 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "eada01132d5a174337533994662482da20adf753",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 5b93d14..967447e 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1,2 +1 @@",
+        "-type a [2+2]x",
+        " type a [1+1]y"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "28132de0b90eb8588e880b7237e7242e3195076c"
+    "shas": "c9e35d61508072dac51659d61f747dbb40ed1409..c6480a6cc44a0b8d54aec67dda72e6a765acace9"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-rest-test",
@@ -685,11 +739,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -700,11 +754,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -715,11 +769,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 11
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -730,11 +784,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 13
                             ],
                             "end": [
-                                3,
+                                1,
                                 14
                             ]
                         }
@@ -748,7 +802,14 @@
     "filePaths": [
         "array-types.go"
     ],
-    "sha1": "28132de0b90eb8588e880b7237e7242e3195076c",
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index 967447e..e69de29 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -1 +0,0 @@",
+        "-type a [1+1]y"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4c8c99e5a735f66e43d41e65a75a75272a162c8c"
+    "shas": "c6480a6cc44a0b8d54aec67dda72e6a765acace9..338fc2d73f62d9c316e48cf2390c1052834d4985"
 }]

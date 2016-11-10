@@ -1,0 +1,363 @@
+[{
+    "testCaseDescription": "ruby-rescue-last-ex-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index e69de29..a5dbb28 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -0,0 +1,4 @@",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e805bb575511867c24e67d81ccae909f2668e660..57fbaa6c0752b39141df6d2229a40d52ab46eec2"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index a5dbb28..9c0bf85 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,4 +1,13 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        "+end",
+        "+begin",
+        "+  foo",
+        "+rescue Error => x",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "57fbaa6c0752b39141df6d2229a40d52ab46eec2..1abc809f7c5f4bce8b655282c1a89c80acdb4719"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in the 'Error, x' rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 9c0bf85..e6fe0ab 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,7 +1,6 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1abc809f7c5f4bce8b655282c1a89c80acdb4719..4d3835c45aaafa64cf2ea5d23c0e0a7ca25f50ba"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in the 'Error, x' rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index e6fe0ab..9c0bf85 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,6 +1,7 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        " end",
+        " begin",
+        "   foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "4d3835c45aaafa64cf2ea5d23c0e0a7ca25f50ba..1a1c77e9e42914a1ec12b746fa9bfaf045f39be6"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 9c0bf85..23c7c1b 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,13 +1,9 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-  bar",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        " end",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "+  bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1a1c77e9e42914a1ec12b746fa9bfaf045f39be6..fba897776dd4e1be1f36e4a3685fcdb77e2fdd77"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index 23c7c1b..c247b6d 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,9 +1,5 @@",
+        " begin",
+        "   foo",
+        " rescue Error => x",
+        "-end",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        "   bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "fba897776dd4e1be1f36e4a3685fcdb77e2fdd77..c605c98f25261242ec2e73cc56004de8524dea2e"
+}
+,{
+    "testCaseDescription": "ruby-rescue-last-ex-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-last-ex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-last-ex.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-last-ex.rb b/rescue-last-ex.rb",
+        "index c247b6d..e69de29 100644",
+        "--- a/rescue-last-ex.rb",
+        "+++ b/rescue-last-ex.rb",
+        "@@ -1,5 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-rescue Error => x",
+        "-  bar",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c605c98f25261242ec2e73cc56004de8524dea2e..875face60282636c8ba6fbd9db4a50c6b8b38fd2"
+}]

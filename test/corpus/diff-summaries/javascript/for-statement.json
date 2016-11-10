@@ -25,9 +25,16 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "3b37b1f1ec583cf921f87b304b606d12b388bcd5",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index e69de29..2f51258 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -0,0 +1 @@",
+        "+for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b871597febfb405a61f6fe7b2bc357fb03aeafe3"
+    "shas": "eaeb10729b105d290f4091fea5f04c34030bb5a5..40bfcf71debc3d20926578f5d788f319165ccdbb"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "b871597febfb405a61f6fe7b2bc357fb03aeafe3",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 2f51258..095241f 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1 +1,3 @@",
+        "+for (i = 0, init(); i < 100; i++) { log(i); }",
+        "+for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9b1d937b78222de41c3c5144f67f075bb43e2c13"
+    "shas": "40bfcf71debc3d20926578f5d788f319165ccdbb..14acd05cf2f47feba3234c70af8afe86828370ce"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "9b1d937b78222de41c3c5144f67f075bb43e2c13",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 095241f..9b0e26d 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-for (i = 0, init(); i < 100; i++) { log(i); }",
+        "+for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c650295f1ecd192eaeae937b7f6175202839a1ea"
+    "shas": "14acd05cf2f47feba3234c70af8afe86828370ce..26784319f5f567d3017095b6f9d0ca081043b817"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "c650295f1ecd192eaeae937b7f6175202839a1ea",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 9b0e26d..095241f 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,3 +1,3 @@",
+        "-for (i = 0, init(); i < 10; i++) { log(i); }",
+        "+for (i = 0, init(); i < 100; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "92349c8f6582da8eee5c83e7e9d6a7e159b6bd79"
+    "shas": "26784319f5f567d3017095b6f9d0ca081043b817..5b15f8e9f8b68a8e4f4ba6ec6642a3cb37db7c60"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "92349c8f6582da8eee5c83e7e9d6a7e159b6bd79",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 095241f..39af699 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,3 +1,2 @@",
+        "-for (i = 0, init(); i < 100; i++) { log(i); }",
+        "-for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 10; i++) { log(i); }",
+        "+for (i = 0, init(); i < 100; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba90f5edb467195216326c4f5da878084a2247c8"
+    "shas": "5b15f8e9f8b68a8e4f4ba6ec6642a3cb37db7c60..70806220f9fba3804c162aed68cdfcb25c39ff0a"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "ba90f5edb467195216326c4f5da878084a2247c8",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index 39af699..de8ae87 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1,2 +1 @@",
+        "-for (i = 0, init(); i < 10; i++) { log(i); }",
+        " for (i = 0, init(); i < 100; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c20c08f9fc64911ac52a4f87ca4a60c7fb4c76b5"
+    "shas": "70806220f9fba3804c162aed68cdfcb25c39ff0a..9d01a0008d001fc966736db7d1583e0415da98fd"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "c20c08f9fc64911ac52a4f87ca4a60c7fb4c76b5",
+    "patch": [
+        "diff --git a/for-statement.js b/for-statement.js",
+        "index de8ae87..e69de29 100644",
+        "--- a/for-statement.js",
+        "+++ b/for-statement.js",
+        "@@ -1 +0,0 @@",
+        "-for (i = 0, init(); i < 100; i++) { log(i); }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f5dfc0945ffae36e0f9784dcfeb8472344055afc"
+    "shas": "9d01a0008d001fc966736db7d1583e0415da98fd..10c888c0caabf36cb211a96640afbe435dfad3fb"
 }]

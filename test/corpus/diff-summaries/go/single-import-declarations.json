@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -41,16 +41,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 28
                             ]
                         }
                     },
-                    "summary": "Added the 'import alias \"some/package\"' at line 5, column 1 - line 5, column 28"
+                    "summary": "Added the 'import alias \"some/package\"' at line 3, column 1 - line 3, column 28"
                 }
             ]
         }
@@ -58,9 +58,18 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "489adde209f940544e660d374c47bbc860b9c72b",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index e69de29..e30eddb 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -0,0 +1,3 @@",
+        "+import \"net/http\"",
+        "+import . \"some/dsl\"",
+        "+import alias \"some/package\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a6757a56251ba2d618305d1b2ae2fd719f8a3e28"
+    "shas": "b755f1d4404210b76f3d304569455d98b90fa186..437e7db7a8729ba8a685986dd98343129eaf289b"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-insert-test",
@@ -71,11 +80,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 17
                             ]
                         }
@@ -86,11 +95,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 21
                             ]
                         }
@@ -101,11 +110,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 18
                             ]
                         }
@@ -116,11 +125,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 20
                             ]
                         }
@@ -135,31 +144,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 32
                             ]
                         }
                     },
-                    "summary": "Added the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                    "summary": "Added the 'import alias \"awesome/packages\"' at line 3, column 1 - line 3, column 32"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
                     },
-                    "summary": "Added the 'import alias \"some/package\"' at line 8, column 1 - line 8, column 28"
+                    "summary": "Added the 'import alias \"some/package\"' at line 6, column 1 - line 6, column 28"
                 }
             ]
         }
@@ -167,9 +176,24 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "a6757a56251ba2d618305d1b2ae2fd719f8a3e28",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index e30eddb..a6141af 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -1,3 +1,9 @@",
+        "+import \"foo/bar\"",
+        "+import . \"types/dsl\"",
+        "+import alias \"awesome/packages\"",
+        "+import \"net/http\"",
+        "+import . \"some/dsl\"",
+        "+import alias \"some/package\"",
+        " import \"net/http\"",
+        " import . \"some/dsl\"",
+        " import alias \"some/package\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "960ff51ff3afe7ef94a8ca0f7eca90a7187f81bd"
+    "shas": "437e7db7a8729ba8a685986dd98343129eaf289b..24c2801f35fbac08fe710af7d34a6de746be8b8d"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-insert-test",
@@ -181,75 +205,75 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     17
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     18
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the \"net/http\" import statement of the 'main' module"
+                    "summary": "Replaced the \"foo/bar\" string with the \"net/http\" string in the \"net/http\" import statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     21
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     20
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement of the 'main' module"
+                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     14
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     32
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     14
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     28
                                 ]
                             }
@@ -264,9 +288,24 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "960ff51ff3afe7ef94a8ca0f7eca90a7187f81bd",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index a6141af..b54ad96 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        "-import \"foo/bar\"",
+        "-import . \"types/dsl\"",
+        "-import alias \"awesome/packages\"",
+        "+import \"net/http\"",
+        "+import . \"some/dsl\"",
+        "+import alias \"some/package\"",
+        " import \"net/http\"",
+        " import . \"some/dsl\"",
+        " import alias \"some/package\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5e23bd9f1d9ccbde466105805444a19d662a2281"
+    "shas": "24c2801f35fbac08fe710af7d34a6de746be8b8d..330336208dc9988acdd03b84111ed42f47a68cc1"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-test",
@@ -278,75 +317,75 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     18
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     17
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the \"foo/bar\" import statement of the 'main' module"
+                    "summary": "Replaced the \"net/http\" string with the \"foo/bar\" string in the \"foo/bar\" import statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     20
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     21
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement of the 'main' module"
+                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     14
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     28
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     14
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     32
                                 ]
                             }
@@ -361,9 +400,24 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "5e23bd9f1d9ccbde466105805444a19d662a2281",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index b54ad96..a6141af 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        "-import \"net/http\"",
+        "-import . \"some/dsl\"",
+        "-import alias \"some/package\"",
+        "+import \"foo/bar\"",
+        "+import . \"types/dsl\"",
+        "+import alias \"awesome/packages\"",
+        " import \"net/http\"",
+        " import . \"some/dsl\"",
+        " import alias \"some/package\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3a34d3922437ed1c541317cec4d6d0832a7c73c1"
+    "shas": "330336208dc9988acdd03b84111ed42f47a68cc1..fed29600ad272abe4d05fb7b4bb406a408ef62d9"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-replacement-test",
@@ -374,11 +428,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 17
                             ]
                         }
@@ -389,11 +443,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 21
                             ]
                         }
@@ -404,11 +458,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 18
                             ]
                         }
@@ -419,11 +473,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 20
                             ]
                         }
@@ -434,11 +488,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 17
                             ]
                         }
@@ -449,11 +503,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 21
                             ]
                         }
@@ -468,46 +522,46 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 32
                             ]
                         }
                     },
-                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 3, column 1 - line 3, column 32"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
                     },
-                    "summary": "Deleted the 'import alias \"some/package\"' at line 8, column 1 - line 8, column 28"
+                    "summary": "Deleted the 'import alias \"some/package\"' at line 6, column 1 - line 6, column 28"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 32
                             ]
                         }
                     },
-                    "summary": "Added the 'import alias \"awesome/packages\"' at line 8, column 1 - line 8, column 32"
+                    "summary": "Added the 'import alias \"awesome/packages\"' at line 6, column 1 - line 6, column 32"
                 }
             ]
         }
@@ -515,9 +569,27 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "3a34d3922437ed1c541317cec4d6d0832a7c73c1",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index a6141af..98c2392 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -1,9 +1,6 @@",
+        "-import \"foo/bar\"",
+        "-import . \"types/dsl\"",
+        "-import alias \"awesome/packages\"",
+        "-import \"net/http\"",
+        "-import . \"some/dsl\"",
+        "-import alias \"some/package\"",
+        " import \"net/http\"",
+        " import . \"some/dsl\"",
+        " import alias \"some/package\"",
+        "+import \"foo/bar\"",
+        "+import . \"types/dsl\"",
+        "+import alias \"awesome/packages\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c8c900b5aafe5f4f1cefb69838267401815cf0cd"
+    "shas": "fed29600ad272abe4d05fb7b4bb406a408ef62d9..d8fe5f813263407b360696c773393622f8626ac8"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-test",
@@ -528,11 +600,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -543,11 +615,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -562,16 +634,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 28
                             ]
                         }
                     },
-                    "summary": "Deleted the 'import alias \"some/package\"' at line 5, column 1 - line 5, column 28"
+                    "summary": "Deleted the 'import alias \"some/package\"' at line 3, column 1 - line 3, column 28"
                 }
             ]
         }
@@ -579,9 +651,21 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "c8c900b5aafe5f4f1cefb69838267401815cf0cd",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index 98c2392..8af8c6d 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -1,6 +1,3 @@",
+        "-import \"net/http\"",
+        "-import . \"some/dsl\"",
+        "-import alias \"some/package\"",
+        " import \"foo/bar\"",
+        " import . \"types/dsl\"",
+        " import alias \"awesome/packages\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "645d50be110772c29dd4a1c2e842bbf06aa43569"
+    "shas": "d8fe5f813263407b360696c773393622f8626ac8..a322dc7bac3a14fa7b2bc7584e05add891842d38"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-rest-test",
@@ -592,11 +676,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 17
                             ]
                         }
@@ -607,11 +691,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 21
                             ]
                         }
@@ -626,16 +710,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 32
                             ]
                         }
                     },
-                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 5, column 1 - line 5, column 32"
+                    "summary": "Deleted the 'import alias \"awesome/packages\"' at line 3, column 1 - line 3, column 32"
                 }
             ]
         }
@@ -643,7 +727,16 @@
     "filePaths": [
         "single-import-declarations.go"
     ],
-    "sha1": "645d50be110772c29dd4a1c2e842bbf06aa43569",
+    "patch": [
+        "diff --git a/single-import-declarations.go b/single-import-declarations.go",
+        "index 8af8c6d..e69de29 100644",
+        "--- a/single-import-declarations.go",
+        "+++ b/single-import-declarations.go",
+        "@@ -1,3 +0,0 @@",
+        "-import \"foo/bar\"",
+        "-import . \"types/dsl\"",
+        "-import alias \"awesome/packages\""
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "60d0595870f22587e7f31bed659faaa89e73c81d"
+    "shas": "a322dc7bac3a14fa7b2bc7584e05add891842d38..49405e780f45c25871a6c2c6a9c4bf847007c59f"
 }]

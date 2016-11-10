@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -40,9 +40,19 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "3f6fa7c6f499951a277e9ae6edce3681134ef5d9",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index e69de29..c1c0b16 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -0,0 +1,4 @@",
+        "+var (",
+        "+zero = 0",
+        "+one = 1",
+        "+)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6f2161f8593d0ec0dacd2958538ce5fa2a84f6ba"
+    "shas": "7ec7378727f160ff6fb78761d149f5f110898c3e..514932d92bd7fa7d087adb1d4968ff2d1b35d832"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-insert-test",
@@ -53,11 +63,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -68,11 +78,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -83,11 +93,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -98,11 +108,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -116,9 +126,27 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "6f2161f8593d0ec0dacd2958538ce5fa2a84f6ba",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index c1c0b16..6b9c91d 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,4 +1,12 @@",
+        " var (",
+        "+a = 0",
+        "+b = 1",
+        "+)",
+        "+var (",
+        "+zero = 0",
+        "+one = 1",
+        "+)",
+        "+var (",
+        " zero = 0",
+        " one = 1",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "aacd0b2f15a856a49e3d7fe131aed23a9c77224f"
+    "shas": "514932d92bd7fa7d087adb1d4968ff2d1b35d832..d8482bba7e246518bcaf8b8759b4ccaf7fd3f41d"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -130,54 +158,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable"
                 }
             ]
         },
@@ -186,9 +214,23 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "aacd0b2f15a856a49e3d7fe131aed23a9c77224f",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 6b9c91d..5ed0e06 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        " var (",
+        "-a = 0",
+        "-b = 1",
+        "+zero = 0",
+        "+one = 1",
+        " )",
+        " var (",
+        " zero = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8d277d6c567a51e3154eb9ee8d7f02f8ecda938e"
+    "shas": "d8482bba7e246518bcaf8b8759b4ccaf7fd3f41d..3221bb9fd5791c127b591e17941faf48d46e11f7"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -200,54 +242,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable of the 'main' module"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable"
                 }
             ]
         },
@@ -256,9 +298,23 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "8d277d6c567a51e3154eb9ee8d7f02f8ecda938e",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 5ed0e06..6b9c91d 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        " var (",
+        "-zero = 0",
+        "-one = 1",
+        "+a = 0",
+        "+b = 1",
+        " )",
+        " var (",
+        " zero = 0"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "10bfc15216d52a971377c98ada621b65d1f1d762"
+    "shas": "3221bb9fd5791c127b591e17941faf48d46e11f7..eb6cf49333e266ba6255891b55edc54e015cc8dd"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,11 +325,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -284,11 +340,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -299,11 +355,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -314,11 +370,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -329,11 +385,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -344,11 +400,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -362,9 +418,29 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "10bfc15216d52a971377c98ada621b65d1f1d762",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 6b9c91d..9094e82 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,12 +1,8 @@",
+        " var (",
+        "-a = 0",
+        "-b = 1",
+        "-)",
+        "-var (",
+        " zero = 0",
+        " one = 1",
+        " )",
+        " var (",
+        "-zero = 0",
+        "-one = 1",
+        "+a = 0",
+        "+b = 1",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ff81eb523089ada7047b28b1802b8f4ee6ce77d3"
+    "shas": "eb6cf49333e266ba6255891b55edc54e015cc8dd..3973fafa7c0a3f1f3cd2e92462d863df41f3a920"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-test",
@@ -375,11 +451,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -390,11 +466,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -408,9 +484,23 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "ff81eb523089ada7047b28b1802b8f4ee6ce77d3",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 9094e82..d954576 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,8 +1,4 @@",
+        " var (",
+        "-zero = 0",
+        "-one = 1",
+        "-)",
+        "-var (",
+        " a = 0",
+        " b = 1",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "706e2dd9a32626624b48a24e0b82d45574ccdbd1"
+    "shas": "3973fafa7c0a3f1f3cd2e92462d863df41f3a920..39e74e79c2f9366472ae046e56a3e0a60d1797e1"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-rest-test",
@@ -421,11 +511,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -436,11 +526,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -454,7 +544,17 @@
     "filePaths": [
         "grouped-var-declarations.go"
     ],
-    "sha1": "706e2dd9a32626624b48a24e0b82d45574ccdbd1",
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index d954576..e69de29 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,4 +0,0 @@",
+        "-var (",
+        "-a = 0",
+        "-b = 1",
+        "-)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ad009ae663a027f35bb25867c4aa1375820fd816"
+    "shas": "39e74e79c2f9366472ae046e56a3e0a60d1797e1..c8c183bd98d018d2097fe1ee036d32d979f4919b"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 24
                             ]
                         }
@@ -55,9 +55,18 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "3859e3f291b6fe933be02dbc730935422b0aafb0",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index e69de29..3ac1720 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -0,0 +1,3 @@",
+        "+func f1() { a() }",
+        "+func f2() { a(); b() }",
+        "+func f3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "05e1472680c28fa54012fee5a06f0f7a0e5912a9"
+    "shas": "9096649c53a965576d44aa8d1b52f7b63d420fea..cae2b3de861d0266a7437eed7937500a50a26873"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-insert-test",
@@ -68,11 +77,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -83,11 +92,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -98,11 +107,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 24
                             ]
                         }
@@ -113,11 +122,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 18
                             ]
                         }
@@ -128,11 +137,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 23
                             ]
                         }
@@ -143,11 +152,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 24
                             ]
                         }
@@ -161,9 +170,24 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "05e1472680c28fa54012fee5a06f0f7a0e5912a9",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index 3ac1720..39e0696 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -1,3 +1,9 @@",
+        "+func g1() { a() }",
+        "+func g2() { a(); b() }",
+        "+func g3() { a(); b(); }",
+        "+func f1() { a() }",
+        "+func f2() { a(); b() }",
+        "+func f3() { a(); b(); }",
+        " func f1() { a() }",
+        " func f2() { a(); b() }",
+        " func f3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3019b504597b211e81deb8d9c25d0b866d70e87d"
+    "shas": "cae2b3de861d0266a7437eed7937500a50a26873..48dfe25b8ab21ce6cc4d3b1d2047b474fe1cc13b"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-insert-test",
@@ -175,81 +199,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function of the 'main' module"
+                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function of the 'main' module"
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function of the 'main' module"
+                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function"
                 }
             ]
         },
@@ -258,9 +282,24 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "3019b504597b211e81deb8d9c25d0b866d70e87d",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index 39e0696..eec54a8 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        "-func g1() { a() }",
+        "-func g2() { a(); b() }",
+        "-func g3() { a(); b(); }",
+        "+func f1() { a() }",
+        "+func f2() { a(); b() }",
+        "+func f3() { a(); b(); }",
+        " func f1() { a() }",
+        " func f2() { a(); b() }",
+        " func f3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bd945223a19928035a820b953198e3ce94590248"
+    "shas": "48dfe25b8ab21ce6cc4d3b1d2047b474fe1cc13b..3741e0652eb253b416b04872a63d816ccc25d1a6"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-test",
@@ -272,81 +311,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function of the 'main' module"
+                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function of the 'main' module"
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function of the 'main' module"
+                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function"
                 }
             ]
         },
@@ -355,9 +394,24 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "bd945223a19928035a820b953198e3ce94590248",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index eec54a8..39e0696 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        "-func f1() { a() }",
+        "-func f2() { a(); b() }",
+        "-func f3() { a(); b(); }",
+        "+func g1() { a() }",
+        "+func g2() { a(); b() }",
+        "+func g3() { a(); b(); }",
+        " func f1() { a() }",
+        " func f2() { a(); b() }",
+        " func f3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d1fe7332442f0732a82dc41756a860a784461a01"
+    "shas": "3741e0652eb253b416b04872a63d816ccc25d1a6..d8b23ec7c0f30bb603eda112e423f35c5d53d1b1"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-replacement-test",
@@ -368,11 +422,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -383,11 +437,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -398,11 +452,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 24
                             ]
                         }
@@ -413,11 +467,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 18
                             ]
                         }
@@ -428,11 +482,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 23
                             ]
                         }
@@ -443,11 +497,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 24
                             ]
                         }
@@ -458,11 +512,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 18
                             ]
                         }
@@ -473,11 +527,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 23
                             ]
                         }
@@ -488,11 +542,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 24
                             ]
                         }
@@ -506,9 +560,27 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "d1fe7332442f0732a82dc41756a860a784461a01",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index 39e0696..7fcb3a1 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -1,9 +1,6 @@",
+        "-func g1() { a() }",
+        "-func g2() { a(); b() }",
+        "-func g3() { a(); b(); }",
+        "-func f1() { a() }",
+        "-func f2() { a(); b() }",
+        "-func f3() { a(); b(); }",
+        " func f1() { a() }",
+        " func f2() { a(); b() }",
+        " func f3() { a(); b(); }",
+        "+func g1() { a() }",
+        "+func g2() { a(); b() }",
+        "+func g3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "76cdb2d4f70ba087e9d75bf3e04d668a343d1d41"
+    "shas": "d8b23ec7c0f30bb603eda112e423f35c5d53d1b1..20c4ef7df079d3437ea04953c1c5312cb54f1002"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-test",
@@ -519,11 +591,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -534,11 +606,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -549,11 +621,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 24
                             ]
                         }
@@ -567,9 +639,21 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "76cdb2d4f70ba087e9d75bf3e04d668a343d1d41",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index 7fcb3a1..ef4196f 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -1,6 +1,3 @@",
+        "-func f1() { a() }",
+        "-func f2() { a(); b() }",
+        "-func f3() { a(); b(); }",
+        " func g1() { a() }",
+        " func g2() { a(); b() }",
+        " func g3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "155eee8f053d32a704ba6bc1502e2e2b828b81cb"
+    "shas": "20c4ef7df079d3437ea04953c1c5312cb54f1002..ad3299189246bfc5df44d7866c05fd40ccd34abc"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-rest-test",
@@ -580,11 +664,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 18
                             ]
                         }
@@ -595,11 +679,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -610,11 +694,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 24
                             ]
                         }
@@ -628,7 +712,16 @@
     "filePaths": [
         "single-line-function-declarations.go"
     ],
-    "sha1": "155eee8f053d32a704ba6bc1502e2e2b828b81cb",
+    "patch": [
+        "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
+        "index ef4196f..e69de29 100644",
+        "--- a/single-line-function-declarations.go",
+        "+++ b/single-line-function-declarations.go",
+        "@@ -1,3 +0,0 @@",
+        "-func g1() { a() }",
+        "-func g2() { a(); b() }",
+        "-func g3() { a(); b(); }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1011eae016159133bb9b3305fa29900aa6f06827"
+    "shas": "ad3299189246bfc5df44d7866c05fd40ccd34abc..256c131008b104fa15d57c0f3ff56131c11337fe"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -52,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -67,11 +67,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 8
                             ],
                             "end": [
-                                5,
+                                3,
                                 11
                             ]
                         }
@@ -82,11 +82,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 13
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -97,11 +97,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 22
                             ],
                             "end": [
-                                5,
+                                3,
                                 26
                             ]
                         }
@@ -112,11 +112,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 28
                             ],
                             "end": [
-                                5,
+                                3,
                                 33
                             ]
                         }
@@ -130,9 +130,19 @@
     "filePaths": [
         "function-types.go"
     ],
-    "sha1": "aaf85bbdfa8ebd0c5c6eb74df937ad3e46d6a51e",
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index e69de29..17987a3 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -0,0 +1,4 @@",
+        "+type (",
+        "+a func(int) int",
+        "+b func(int, string) (bool, error)",
+        "+)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f3b087e74afcb7e771a6f712ef632a94292c33c5"
+    "shas": "f7bf78dc6e8a6f8dc89e11e588e1661394381c0d..cc5a000625fb6bafbfba4f401635c45ded2b5bf9"
 }
 ,{
     "testCaseDescription": "go-function-types-replacement-insert-test",
@@ -143,11 +153,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -158,11 +168,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 14
                             ]
                         }
@@ -173,11 +183,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 16
                             ],
                             "end": [
-                                4,
+                                2,
                                 22
                             ]
                         }
@@ -188,11 +198,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -203,11 +213,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 8
                             ],
                             "end": [
-                                5,
+                                3,
                                 14
                             ]
                         }
@@ -218,11 +228,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 16
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -233,11 +243,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 26
                             ],
                             "end": [
-                                5,
+                                3,
                                 27
                             ]
                         }
@@ -248,11 +258,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 28
                             ],
                             "end": [
-                                5,
+                                3,
                                 33
                             ]
                         }
@@ -263,11 +273,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -278,11 +288,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 8
                             ],
                             "end": [
-                                8,
+                                6,
                                 11
                             ]
                         }
@@ -293,11 +303,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 16
                             ]
                         }
@@ -308,11 +318,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 1
                             ],
                             "end": [
-                                9,
+                                7,
                                 2
                             ]
                         }
@@ -323,11 +333,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 8
                             ],
                             "end": [
-                                9,
+                                7,
                                 11
                             ]
                         }
@@ -338,11 +348,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 13
                             ],
                             "end": [
-                                9,
+                                7,
                                 19
                             ]
                         }
@@ -353,11 +363,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 22
                             ],
                             "end": [
-                                9,
+                                7,
                                 26
                             ]
                         }
@@ -368,11 +378,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 28
                             ],
                             "end": [
-                                9,
+                                7,
                                 33
                             ]
                         }
@@ -386,9 +396,27 @@
     "filePaths": [
         "function-types.go"
     ],
-    "sha1": "f3b087e74afcb7e771a6f712ef632a94292c33c5",
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index 17987a3..e3dad40 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,4 +1,12 @@",
+        " type (",
+        "+x func(string) string",
+        "+y func(string, int) (chan, error)",
+        "+)",
+        "+type (",
+        "+a func(int) int",
+        "+b func(int, string) (bool, error)",
+        "+)",
+        "+type (",
+        " a func(int) int",
+        " b func(int, string) (bool, error)",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "1c48ef08aa7dd37ea68991c3148896b6854cb04c"
+    "shas": "cc5a000625fb6bafbfba4f401635c45ded2b5bf9..c2e26e55f3af2df5c73c0a46cfe638a312c6a2bc"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-insert-test",
@@ -397,136 +425,88 @@
             "function-types.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    8
-                                ],
-                                "end": [
-                                    4,
-                                    14
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    8
-                                ],
-                                "end": [
-                                    4,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    16
-                                ],
-                                "end": [
-                                    4,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    13
-                                ],
-                                "end": [
-                                    4,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                5,
-                                8
+                                2,
+                                1
                             ],
                             "end": [
-                                5,
-                                14
+                                2,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Added the 'a' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
                                 13
                             ],
                             "end": [
-                                5,
+                                2,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
                                 19
                             ]
                         }
@@ -537,11 +517,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 22
                             ],
                             "end": [
-                                5,
+                                3,
                                 26
                             ]
                         }
@@ -550,227 +530,13 @@
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                5,
-                                26
-                            ],
-                            "end": [
-                                5,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ',' ERROR"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                3,
                                 28
                             ],
                             "end": [
-                                5,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                28
-                            ],
-                            "end": [
-                                5,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-types.go"
-    ],
-    "sha1": "1c48ef08aa7dd37ea68991c3148896b6854cb04c",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "b6b98ec5f5396c1e2ec7554919a5e1ccd0fb6359"
-}
-,{
-    "testCaseDescription": "go-function-types-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "function-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    8
-                                ],
-                                "end": [
-                                    4,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    8
-                                ],
-                                "end": [
-                                    4,
-                                    14
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    13
-                                ],
-                                "end": [
-                                    4,
-                                    16
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    16
-                                ],
-                                "end": [
-                                    4,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                16
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                26
-                            ],
-                            "end": [
-                                5,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the ',' ERROR"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                28
-                            ],
-                            "end": [
-                                5,
+                                3,
                                 33
                             ]
                         }
@@ -781,57 +547,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                22
-                            ],
-                            "end": [
-                                5,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bool' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                28
-                            ],
-                            "end": [
-                                5,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-types.go"
-    ],
-    "sha1": "b6b98ec5f5396c1e2ec7554919a5e1ccd0fb6359",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "39567166784ff679ea59c24ff0c92f589fb2af3b"
-}
-,{
-    "testCaseDescription": "go-function-types-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "function-types.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -842,11 +562,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 14
                             ]
                         }
@@ -857,11 +577,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 16
                             ],
                             "end": [
-                                4,
+                                2,
                                 22
                             ]
                         }
@@ -872,11 +592,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -887,11 +607,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 8
                             ],
                             "end": [
-                                5,
+                                3,
                                 14
                             ]
                         }
@@ -902,11 +622,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 16
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -917,11 +637,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 26
                             ],
                             "end": [
-                                5,
+                                3,
                                 27
                             ]
                         }
@@ -932,146 +652,56 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 28
                             ],
                             "end": [
-                                5,
+                                3,
                                 33
                             ]
                         }
                     },
                     "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                13
-                            ],
-                            "end": [
-                                8,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                8
-                            ],
-                            "end": [
-                                9,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                13
-                            ],
-                            "end": [
-                                9,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                22
-                            ],
-                            "end": [
-                                9,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bool' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                28
-                            ],
-                            "end": [
-                                9,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index e3dad40..cf4da5d 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,6 +1,6 @@",
+        " type (",
+        "-x func(string) string",
+        "-y func(string, int) (chan, error)",
+        "+a func(int) int",
+        "+b func(int, string) (bool, error)",
+        " )",
+        " type (",
+        " a func(int) int"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c2e26e55f3af2df5c73c0a46cfe638a312c6a2bc..05a86172d0eaa1bced1e55b5b80b729ad3efee30"
+}
+,{
+    "testCaseDescription": "go-function-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 1
                             ],
                             "end": [
-                                8,
+                                2,
                                 2
                             ]
                         }
@@ -1082,11 +712,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 8
                             ],
                             "end": [
-                                8,
+                                2,
                                 14
                             ]
                         }
@@ -1097,11 +727,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                2,
                                 16
                             ],
                             "end": [
-                                8,
+                                2,
                                 22
                             ]
                         }
@@ -1112,11 +742,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 1
                             ],
                             "end": [
-                                9,
+                                3,
                                 2
                             ]
                         }
@@ -1127,11 +757,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 8
                             ],
                             "end": [
-                                9,
+                                3,
                                 14
                             ]
                         }
@@ -1142,11 +772,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 16
                             ],
                             "end": [
-                                9,
+                                3,
                                 19
                             ]
                         }
@@ -1157,11 +787,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 26
                             ],
                             "end": [
-                                9,
+                                3,
                                 27
                             ]
                         }
@@ -1172,11 +802,521 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                3,
                                 28
                             ],
                             "end": [
-                                9,
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                13
+                            ],
+                            "end": [
+                                2,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                13
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                22
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                28
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index cf4da5d..e3dad40 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,6 +1,6 @@",
+        " type (",
+        "-a func(int) int",
+        "-b func(int, string) (bool, error)",
+        "+x func(string) string",
+        "+y func(string, int) (chan, error)",
+        " )",
+        " type (",
+        " a func(int) int"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "05a86172d0eaa1bced1e55b5b80b729ad3efee30..3073170a4ab5ecc6b6bea2befa1613a2598db5f1"
+}
+,{
+    "testCaseDescription": "go-function-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                26
+                            ],
+                            "end": [
+                                3,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ',' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                28
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                13
+                            ],
+                            "end": [
+                                6,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                8
+                            ],
+                            "end": [
+                                7,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                13
+                            ],
+                            "end": [
+                                7,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                22
+                            ],
+                            "end": [
+                                7,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                28
+                            ],
+                            "end": [
+                                7,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                16
+                            ],
+                            "end": [
+                                6,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                8
+                            ],
+                            "end": [
+                                7,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                16
+                            ],
+                            "end": [
+                                7,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                26
+                            ],
+                            "end": [
+                                7,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the ',' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                28
+                            ],
+                            "end": [
+                                7,
                                 33
                             ]
                         }
@@ -1190,9 +1330,29 @@
     "filePaths": [
         "function-types.go"
     ],
-    "sha1": "39567166784ff679ea59c24ff0c92f589fb2af3b",
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index e3dad40..cc0d209 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,12 +1,8 @@",
+        " type (",
+        "-x func(string) string",
+        "-y func(string, int) (chan, error)",
+        "-)",
+        "-type (",
+        " a func(int) int",
+        " b func(int, string) (bool, error)",
+        " )",
+        " type (",
+        "-a func(int) int",
+        "-b func(int, string) (bool, error)",
+        "+x func(string) string",
+        "+y func(string, int) (chan, error)",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "30b9f649075f03e35a5d30c11d9b3c300a439cc1"
+    "shas": "3073170a4ab5ecc6b6bea2befa1613a2598db5f1..6f718d79236059d2bf226696aa32cdbd6d1a5d34"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-test",
@@ -1201,13 +1361,133 @@
             "function-types.go": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                26
+                            ],
+                            "end": [
+                                3,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the ',' ERROR"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                28
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
                                 2
                             ]
                         }
@@ -1218,11 +1498,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -1233,11 +1513,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 13
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -1248,11 +1528,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -1263,11 +1543,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 8
                             ],
                             "end": [
-                                5,
+                                3,
                                 11
                             ]
                         }
@@ -1278,11 +1558,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 13
                             ],
                             "end": [
-                                5,
+                                3,
                                 19
                             ]
                         }
@@ -1293,11 +1573,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 22
                             ],
                             "end": [
-                                5,
+                                3,
                                 26
                             ]
                         }
@@ -1308,42 +1588,26 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 28
                             ],
                             "end": [
-                                5,
+                                3,
                                 33
                             ]
                         }
                     },
                     "summary": "Deleted the 'error' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-types.go"
-    ],
-    "sha1": "30b9f649075f03e35a5d30c11d9b3c300a439cc1",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "5ed9a7cd06807d6afd5c95f2001442093f3f6ebd"
-}
-,{
-    "testCaseDescription": "go-function-types-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "function-types.go": [
+                },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                6,
                                 1
                             ],
                             "end": [
-                                4,
+                                6,
                                 2
                             ]
                         }
@@ -1354,11 +1618,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                6,
                                 8
                             ],
                             "end": [
-                                4,
+                                6,
                                 14
                             ]
                         }
@@ -1369,11 +1633,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                6,
                                 16
                             ],
                             "end": [
-                                4,
+                                6,
                                 22
                             ]
                         }
@@ -1384,11 +1648,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                7,
                                 1
                             ],
                             "end": [
-                                5,
+                                7,
                                 2
                             ]
                         }
@@ -1399,11 +1663,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                7,
                                 8
                             ],
                             "end": [
-                                5,
+                                7,
                                 14
                             ]
                         }
@@ -1414,11 +1678,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                7,
                                 16
                             ],
                             "end": [
-                                5,
+                                7,
                                 19
                             ]
                         }
@@ -1429,11 +1693,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                7,
                                 26
                             ],
                             "end": [
-                                5,
+                                7,
                                 27
                             ]
                         }
@@ -1444,11 +1708,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                7,
                                 28
                             ],
                             "end": [
-                                5,
+                                7,
                                 33
                             ]
                         }
@@ -1462,7 +1726,167 @@
     "filePaths": [
         "function-types.go"
     ],
-    "sha1": "5ed9a7cd06807d6afd5c95f2001442093f3f6ebd",
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index cc0d209..5deebe6 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,8 +1,4 @@",
+        " type (",
+        "-a func(int) int",
+        "-b func(int, string) (bool, error)",
+        "-)",
+        "-type (",
+        " x func(string) string",
+        " y func(string, int) (chan, error)",
+        " )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "67c9b2b4c39ded2b611f972919a115ed4b8759da"
+    "shas": "6f718d79236059d2bf226696aa32cdbd6d1a5d34..911f3760eb4f1e63a0ca9cdef8ee067d210f356d"
+}
+,{
+    "testCaseDescription": "go-function-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                26
+                            ],
+                            "end": [
+                                3,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ',' ERROR"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                28
+                            ],
+                            "end": [
+                                3,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'error' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-types.go"
+    ],
+    "patch": [
+        "diff --git a/function-types.go b/function-types.go",
+        "index 5deebe6..e69de29 100644",
+        "--- a/function-types.go",
+        "+++ b/function-types.go",
+        "@@ -1,4 +0,0 @@",
+        "-type (",
+        "-x func(string) string",
+        "-y func(string, int) (chan, error)",
+        "-)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "911f3760eb4f1e63a0ca9cdef8ee067d210f356d..72b83c0cd3955c0af628b6cfd369ee028685eeec"
 }]

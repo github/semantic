@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 2
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 4
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -55,9 +55,16 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "b1669d02e282b6c97db8719b314b3fc45b149496",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index e69de29..0765038 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -0,0 +1 @@",
+        "+x.(z.Person)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3eca1bc5dc05a442f328ece5d82eb5d668d0eaf7"
+    "shas": "d3f3af3265adb9413a11a3528b28667b0c70a1e2..7b6b8caa4b207c3c450f5e87744c58fb53baf8c3"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
@@ -66,30 +73,93 @@
             "type-assertion-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                4
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                6
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
                 }
             ]
         },
@@ -98,9 +168,18 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "3eca1bc5dc05a442f328ece5d82eb5d668d0eaf7",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index 0765038..56239fb 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -1 +1,3 @@",
+        "+b.(c.Dog)",
+        "+x.(z.Person)",
+        " x.(z.Person)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "18d82c20e80e8c2616e2bee249c6469ed80caf66"
+    "shas": "7b6b8caa4b207c3c450f5e87744c58fb53baf8c3..114120738b787beac6725da990d63863e4e2905b"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -112,21 +191,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -139,21 +218,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -166,21 +245,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     12
                                 ]
                             }
@@ -195,9 +274,19 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "18d82c20e80e8c2616e2bee249c6469ed80caf66",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index 56239fb..de94018 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -1,3 +1,3 @@",
+        "-b.(c.Dog)",
+        "+x.(z.Person)",
+        " x.(z.Person)",
+        " x.(z.Person)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f7f61458523524f9156c118a842acae8684a9fb8"
+    "shas": "114120738b787beac6725da990d63863e4e2905b..d01aada8630c1fa14c98e7c4344c6f91d0555e98"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -209,21 +298,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     2
                                 ]
                             }
@@ -236,21 +325,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     4
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     5
                                 ]
                             }
@@ -263,21 +352,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     12
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -292,9 +381,19 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "f7f61458523524f9156c118a842acae8684a9fb8",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index de94018..56239fb 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -1,3 +1,3 @@",
+        "-x.(z.Person)",
+        "+b.(c.Dog)",
+        " x.(z.Person)",
+        " x.(z.Person)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "eb4314e57e567795e18580f8bad6174d71f6079e"
+    "shas": "d01aada8630c1fa14c98e7c4344c6f91d0555e98..123e6af58b082c4fb361e05c141910b0e258c557"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -305,11 +404,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 2
                             ]
                         }
@@ -320,11 +419,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 4
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -335,11 +434,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -350,11 +449,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -365,11 +464,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -380,11 +479,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 12
                             ]
                         }
@@ -395,11 +494,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 2
                             ]
                         }
@@ -410,11 +509,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 5
                             ]
                         }
@@ -425,11 +524,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -443,9 +542,19 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "eb4314e57e567795e18580f8bad6174d71f6079e",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index 56239fb..aa7c34c 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -1,3 +1,2 @@",
+        "-b.(c.Dog)",
+        "-x.(z.Person)",
+        " x.(z.Person)",
+        "+b.(c.Dog)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0ce99c947903940b17396384f338c33a5ea5dbc7"
+    "shas": "123e6af58b082c4fb361e05c141910b0e258c557..986aa572f724e252f2bd33b8f1930f46b2b1314a"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-test",
@@ -454,30 +563,48 @@
             "type-assertion-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
                 }
             ]
         },
@@ -486,9 +613,17 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "0ce99c947903940b17396384f338c33a5ea5dbc7",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index aa7c34c..093a081 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -1,2 +1 @@",
+        "-x.(z.Person)",
+        " b.(c.Dog)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "54efa88da5245a5bd75fa463c4f286849d0ce1b7"
+    "shas": "986aa572f724e252f2bd33b8f1930f46b2b1314a..3e70ca6b1cd1883b8495832c3e57983edabf55b1"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
@@ -499,11 +634,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 2
                             ]
                         }
@@ -514,11 +649,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 4
                             ],
                             "end": [
-                                3,
+                                1,
                                 5
                             ]
                         }
@@ -529,11 +664,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -547,7 +682,14 @@
     "filePaths": [
         "type-assertion-expressions.go"
     ],
-    "sha1": "54efa88da5245a5bd75fa463c4f286849d0ce1b7",
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index 093a081..e69de29 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -1 +0,0 @@",
+        "-b.(c.Dog)"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ac77956a23a92cbf0da1aa714b566fb94d240162"
+    "shas": "3e70ca6b1cd1883b8495832c3e57983edabf55b1..693cdf76f21d015a636d4ac6c87f795ed6bd090b"
 }]

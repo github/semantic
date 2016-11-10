@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -55,9 +55,16 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "07104070f6fbb41df4ca2bfb623637db5ce223eb",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index e69de29..7840cac 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -0,0 +1 @@",
+        "+type a b.c"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "75ee6b013a64337b30d7a9d77f7b9a643b016f66"
+    "shas": "8b892c06025823500a32131e0005fe5ea0511bd9..cc9434572a9cf4dbb372c73f9f746edbbe46ddb2"
 }
 ,{
     "testCaseDescription": "go-qualified-types-replacement-insert-test",
@@ -68,11 +75,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -83,11 +90,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -98,11 +105,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -113,11 +120,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -128,11 +135,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -143,11 +150,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -161,9 +168,18 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "75ee6b013a64337b30d7a9d77f7b9a643b016f66",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 7840cac..0256b29 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1 +1,3 @@",
+        "+type x y.z",
+        "+type a b.c",
+        " type a b.c"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "69c54a54eedf5fe8a2a871dd2a5a09f8e9f21f7f"
+    "shas": "cc9434572a9cf4dbb372c73f9f746edbbe46ddb2..45ca504c2b13f39fb13a318350ce73ee051ded0a"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-insert-test",
@@ -175,21 +191,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     7
                                 ]
                             }
@@ -202,21 +218,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -229,21 +245,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     10
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     10
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     11
                                 ]
                             }
@@ -258,9 +274,19 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "69c54a54eedf5fe8a2a871dd2a5a09f8e9f21f7f",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 0256b29..e963dfd 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type x y.z",
+        "+type a b.c",
+        " type a b.c",
+        " type a b.c"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c75f6a304a1800e1316820d2276786724ef76d24"
+    "shas": "45ca504c2b13f39fb13a318350ce73ee051ded0a..1ca51b82d0783636e0e4a89c86d5e1f3d403f641"
 }
 ,{
     "testCaseDescription": "go-qualified-types-replacement-test",
@@ -272,21 +298,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     7
                                 ]
                             }
@@ -299,21 +325,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -326,21 +352,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     10
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     10
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     11
                                 ]
                             }
@@ -355,9 +381,19 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "c75f6a304a1800e1316820d2276786724ef76d24",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index e963dfd..0256b29 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type a b.c",
+        "+type x y.z",
+        " type a b.c",
+        " type a b.c"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "eb04e3d75fd1cbf8d9859e938313e1be66994f11"
+    "shas": "1ca51b82d0783636e0e4a89c86d5e1f3d403f641..cef08f468e0b80e81570eeff49e1aaf2f0819257"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-replacement-test",
@@ -368,11 +404,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -383,11 +419,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -398,11 +434,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -413,11 +449,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -428,11 +464,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -443,11 +479,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -458,11 +494,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
@@ -473,11 +509,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -488,11 +524,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 11
                             ]
                         }
@@ -506,9 +542,19 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "eb04e3d75fd1cbf8d9859e938313e1be66994f11",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 0256b29..4525e0a 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,3 +1,2 @@",
+        "-type x y.z",
+        "-type a b.c",
+        " type a b.c",
+        "+type x y.z"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "a1b8b1799e887e65a2962f74535fa3147a7f972f"
+    "shas": "cef08f468e0b80e81570eeff49e1aaf2f0819257..4749e1e8204299ef1dfe4ee61031f3f5b29e9763"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-test",
@@ -519,11 +565,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -534,11 +580,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -549,11 +595,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -567,9 +613,17 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "a1b8b1799e887e65a2962f74535fa3147a7f972f",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 4525e0a..f31a963 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,2 +1 @@",
+        "-type a b.c",
+        " type x y.z"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "97dc17cc5dc2739e249cfdcbd5c169030f7e6751"
+    "shas": "4749e1e8204299ef1dfe4ee61031f3f5b29e9763..7b55badd2f0f41090564ea56d00e8ffd57fda98f"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-rest-test",
@@ -580,11 +634,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 7
                             ]
                         }
@@ -595,11 +649,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -610,11 +664,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 10
                             ],
                             "end": [
-                                3,
+                                1,
                                 11
                             ]
                         }
@@ -628,7 +682,14 @@
     "filePaths": [
         "qualified-types.go"
     ],
-    "sha1": "97dc17cc5dc2739e249cfdcbd5c169030f7e6751",
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index f31a963..e69de29 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1 +0,0 @@",
+        "-type x y.z"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "6d7202f99aff5a0fefda7df058917f141335424f"
+    "shas": "7b55badd2f0f41090564ea56d00e8ffd57fda98f..96ee23366cb8e34e0b1aef14810c83f5066a6f3b"
 }]

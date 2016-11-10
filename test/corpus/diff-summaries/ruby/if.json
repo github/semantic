@@ -25,9 +25,22 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "03b2db1cb47a50501b36faf7fc35ebd3347c0a0a",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index e69de29..c4c729f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -0,0 +1,7 @@",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        "+end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "06f67f854a8c5278a30c80ea8daab16114f0705d"
+    "shas": "51729c359e350d71395532126c23bfed960f2373..eb8e4745aa2692c20519254d7b8d27b3a2c07cac"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-insert-test",
@@ -86,9 +99,29 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "06f67f854a8c5278a30c80ea8daab16114f0705d",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index c4c729f..326833f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,3 +1,14 @@",
+        "+if x",
+        "+end",
+        "+if y then",
+        "+end",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        "+end",
+        " if foo",
+        "   bar",
+        " elsif quux"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c2e0eaba62e5fb53f9dd334f0e21b52064b27c6e"
+    "shas": "eb8e4745aa2692c20519254d7b8d27b3a2c07cac..a0d707f1e50df11d0aa4d3407dfcf79fad65acc6"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-insert-test",
@@ -120,64 +153,37 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    3
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '\n' expression statements with the 'bar' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier in the 'foo' if statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'quux' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
+                                2,
                                 3
                             ],
                             "end": [
-                                4,
+                                2,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' identifier"
+                    "summary": "Added the 'bar' identifier in the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'quux' elsif block in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -192,7 +198,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bat' identifier"
+                    "summary": "Added the 'bat' identifier in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -216,9 +222,27 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "c2e0eaba62e5fb53f9dd334f0e21b52064b27c6e",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 326833f..2cbbfda 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,6 +1,9 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "+if foo",
+        "+  bar",
+        "+elsif quux",
+        "+  baz",
+        "+else",
+        "+  bat",
+        " end",
+        " if foo",
+        "   bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "321cfe0b9283c0b1f35c175e8259043b7f3fbc21"
+    "shas": "a0d707f1e50df11d0aa4d3407dfcf79fad65acc6..b9ef26ef27b3cf5ad0e522a145ede60f9b4f3dc2"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-test",
@@ -250,64 +274,37 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    3
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    1
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'bar' identifier with the '\n' expression statements"
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier in the 'x' if statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                7
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'quux' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
+                                2,
                                 3
                             ],
                             "end": [
-                                4,
+                                2,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' identifier"
+                    "summary": "Deleted the 'bar' identifier in the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'quux' elsif block in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -322,7 +319,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bat' identifier"
+                    "summary": "Deleted the 'bat' identifier in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -346,9 +343,27 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "321cfe0b9283c0b1f35c175e8259043b7f3fbc21",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 2cbbfda..326833f 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,9 +1,6 @@",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "+if x",
+        "+end",
+        "+if y then",
+        " end",
+        " if foo",
+        "   bar"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2eadf498c21757333d25f7c003b41afbe0579757"
+    "shas": "b9ef26ef27b3cf5ad0e522a145ede60f9b4f3dc2..af72ae7656106dce11ffcbd6c2a31e9a756b0342"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-replacement-test",
@@ -377,9 +392,36 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "2eadf498c21757333d25f7c003b41afbe0579757",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 326833f..2927cc0 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,7 +1,3 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "-end",
+        " if foo",
+        "   bar",
+        " elsif quux",
+        "@@ -9,10 +5,7 @@ elsif quux",
+        " else",
+        "   bat",
+        " end",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "+if x",
+        "+end",
+        "+if y then",
+        " end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "350fc0e2ea2916667a35b82f86f52cdcc479ff18"
+    "shas": "af72ae7656106dce11ffcbd6c2a31e9a756b0342..2aef901d538d790e42fec0a2a6b1522d8b4fce9e"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-test",
@@ -408,9 +450,25 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "350fc0e2ea2916667a35b82f86f52cdcc479ff18",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 2927cc0..5bfb167 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,10 +1,3 @@",
+        "-if foo",
+        "-  bar",
+        "-elsif quux",
+        "-  baz",
+        "-else",
+        "-  bat",
+        "-end",
+        " if x",
+        " end",
+        " if y then"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0a4501920cccb75d37d857ed92b235778d943997"
+    "shas": "2aef901d538d790e42fec0a2a6b1522d8b4fce9e..bd1fd56e20054df058e8bc8d3e2dd0d523ecce08"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-rest-test",
@@ -454,7 +512,17 @@
     "filePaths": [
         "if.rb"
     ],
-    "sha1": "0a4501920cccb75d37d857ed92b235778d943997",
+    "patch": [
+        "diff --git a/if.rb b/if.rb",
+        "index 5bfb167..e69de29 100644",
+        "--- a/if.rb",
+        "+++ b/if.rb",
+        "@@ -1,4 +0,0 @@",
+        "-if x",
+        "-end",
+        "-if y then",
+        "-end"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "482d92220765ab9cc71c4a13b264d98554a987b2"
+    "shas": "bd1fd56e20054df058e8bc8d3e2dd0d523ecce08..4fed48f0abf8058f93dbb4c7361358c434c9bb6d"
 }]

@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "ruby-rescue-modifier-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index e69de29..b0cea1a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -0,0 +1 @@",
+        "+foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "dbbf1ed8a8cafe556ea468af463f118f3ca0f4ba..ee8d8559b436b4434abf6fb62e720fd2b2e25e67"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' rescue modifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index b0cea1a..79b1f6a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -1 +1,3 @@",
+        "+foo rescue false",
+        "+foo rescue nil",
+        " foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ee8d8559b436b4434abf6fb62e720fd2b2e25e67..f757d66e78f7d4e6497ce72a70017e34180e6ed7"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' rescue modifier with the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index 79b1f6a..f59c8c2 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo rescue false",
+        "+foo rescue nil",
+        " foo rescue nil",
+        " foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f757d66e78f7d4e6497ce72a70017e34180e6ed7..48cf3c8ae9539479ada31649b7907f45750d3587"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' rescue modifier with the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index f59c8c2..79b1f6a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo rescue nil",
+        "+foo rescue false",
+        " foo rescue nil",
+        " foo rescue nil"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "48cf3c8ae9539479ada31649b7907f45750d3587..e27305bea14543e812e35efdfad8e15916b44bce"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' rescue modifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' rescue modifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index 79b1f6a..509bcea 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -1,3 +1,2 @@",
+        "-foo rescue false",
+        "-foo rescue nil",
+        " foo rescue nil",
+        "+foo rescue false"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e27305bea14543e812e35efdfad8e15916b44bce..8448399194931991c532e1431d5bb57feec7e9d2"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index 509bcea..c36274a 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -1,2 +1 @@",
+        "-foo rescue nil",
+        " foo rescue false"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "8448399194931991c532e1431d5bb57feec7e9d2..0aa3073a2d457a147b4ce034ab0576694ff7ed6d"
+}
+,{
+    "testCaseDescription": "ruby-rescue-modifier-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "rescue-modifier.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' rescue modifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue-modifier.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue-modifier.rb b/rescue-modifier.rb",
+        "index c36274a..e69de29 100644",
+        "--- a/rescue-modifier.rb",
+        "+++ b/rescue-modifier.rb",
+        "@@ -1 +0,0 @@",
+        "-foo rescue false"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0aa3073a2d457a147b4ce034ab0576694ff7ed6d..89be77a7b4f5ee9670276a33a97a6aa3941c9cfb"
+}]

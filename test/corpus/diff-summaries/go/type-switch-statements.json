@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 5
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -52,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 9
                             ],
                             "end": [
-                                6,
+                                4,
                                 12
                             ]
                         }
@@ -67,11 +67,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 5
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -85,9 +85,21 @@
     "filePaths": [
         "type-switch-statements.go"
     ],
-    "sha1": "5ed5348fda2a0c23b658e6e2a4a918d6abfd9b09",
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index e69de29..f353f0b 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -0,0 +1,6 @@",
+        "+switch e.(type) {",
+        "+  case []Person:",
+        "+    a()",
+        "+  case *Dog:",
+        "+    break",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8c9e10a92d4b505bf5d75bb8d8d7f0d387cd3cd3"
+    "shas": "2de5024544064b228b54159d60307f986fdc8ee9..17bfceb9e9c2b372da22522f373195d94a74ad04"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-replacement-insert-test",
@@ -96,30 +108,153 @@
             "type-switch-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    9,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                10
+                            ],
+                            "end": [
+                                2,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                8
+                            ],
+                            "end": [
+                                7,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                10
+                            ],
+                            "end": [
+                                8,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                5
+                            ],
+                            "end": [
+                                9,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                9
+                            ],
+                            "end": [
+                                10,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                5
+                            ],
+                            "end": [
+                                11,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'break' break_statement"
                 }
             ]
         },
@@ -128,9 +263,30 @@
     "filePaths": [
         "type-switch-statements.go"
     ],
-    "sha1": "8c9e10a92d4b505bf5d75bb8d8d7f0d387cd3cd3",
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index f353f0b..0c6eb84 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,3 +1,15 @@",
+        "+switch b.(type) {",
+        "+  case []Person:",
+        "+    a()",
+        "+  case *Dog:",
+        "+    break",
+        "+}",
+        "+switch e.(type) {",
+        "+  case []Person:",
+        "+    a()",
+        "+  case *Dog:",
+        "+    break",
+        "+}",
+        " switch e.(type) {",
+        "   case []Person:",
+        "     a()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7b554c76f25a54ff17905bf91c4b438d610ce906"
+    "shas": "17bfceb9e9c2b372da22522f373195d94a74ad04..90cd615275a1f4328af6280571ff5bbb5a76dcae"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-delete-insert-test",
@@ -142,21 +298,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -171,9 +327,20 @@
     "filePaths": [
         "type-switch-statements.go"
     ],
-    "sha1": "7b554c76f25a54ff17905bf91c4b438d610ce906",
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index 0c6eb84..b373d6d 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,4 +1,4 @@",
+        "-switch b.(type) {",
+        "+switch e.(type) {",
+        "   case []Person:",
+        "     a()",
+        "   case *Dog:"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "aa7c10f0b81dff8ff06579226a25180862120a0b"
+    "shas": "90cd615275a1f4328af6280571ff5bbb5a76dcae..dcee63cea9925a67454e2d836792c6523da654a0"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-replacement-test",
@@ -185,21 +352,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -214,9 +381,20 @@
     "filePaths": [
         "type-switch-statements.go"
     ],
-    "sha1": "aa7c10f0b81dff8ff06579226a25180862120a0b",
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index b373d6d..0c6eb84 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,4 +1,4 @@",
+        "-switch e.(type) {",
+        "+switch b.(type) {",
+        "   case []Person:",
+        "     a()",
+        "   case *Dog:"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "4f512515a026daf778573a4ee70423cf19ffe392"
+    "shas": "dcee63cea9925a67454e2d836792c6523da654a0..c9b764e71359b28661197d853ccbfb0750405231"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-delete-replacement-test",
@@ -227,11 +405,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -242,11 +420,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -257,11 +435,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 5
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -272,11 +450,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 9
                             ],
                             "end": [
-                                6,
+                                4,
                                 12
                             ]
                         }
@@ -287,11 +465,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 5
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -302,11 +480,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
+                                7,
                                 8
                             ],
                             "end": [
-                                9,
+                                7,
                                 9
                             ]
                         }
@@ -317,11 +495,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 10
                             ],
                             "end": [
-                                10,
+                                8,
                                 16
                             ]
                         }
@@ -332,11 +510,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 5
                             ],
                             "end": [
-                                11,
+                                9,
                                 8
                             ]
                         }
@@ -347,11 +525,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                12,
+                                10,
                                 9
                             ],
                             "end": [
-                                12,
+                                10,
                                 12
                             ]
                         }
@@ -362,11 +540,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                13,
+                                11,
                                 5
                             ],
                             "end": [
-                                13,
+                                11,
                                 10
                             ]
                         }
@@ -377,11 +555,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                9,
+                                7,
                                 8
                             ],
                             "end": [
-                                9,
+                                7,
                                 9
                             ]
                         }
@@ -392,11 +570,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 10
                             ],
                             "end": [
-                                10,
+                                8,
                                 16
                             ]
                         }
@@ -407,11 +585,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 5
                             ],
                             "end": [
-                                11,
+                                9,
                                 8
                             ]
                         }
@@ -422,11 +600,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 9
                             ],
                             "end": [
-                                12,
+                                10,
                                 12
                             ]
                         }
@@ -437,11 +615,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                13,
+                                11,
                                 5
                             ],
                             "end": [
-                                13,
+                                11,
                                 10
                             ]
                         }
@@ -455,9 +633,32 @@
     "filePaths": [
         "type-switch-statements.go"
     ],
-    "sha1": "4f512515a026daf778573a4ee70423cf19ffe392",
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index 0c6eb84..64567d6 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,16 +1,10 @@",
+        "-switch b.(type) {",
+        "-  case []Person:",
+        "-    a()",
+        "-  case *Dog:",
+        "-    break",
+        "-}",
+        " switch e.(type) {",
+        "   case []Person:",
+        "     a()",
+        "   case *Dog:",
+        "     break",
+        " }",
+        "-switch e.(type) {",
+        "+switch b.(type) {",
+        "   case []Person:",
+        "     a()",
+        "   case *Dog:"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "94f94a0f60ffe393994e557cfc35fdda7e350d09"
+    "shas": "c9b764e71359b28661197d853ccbfb0750405231..1021943f2594b7cd8c977fd0e6cef06c34bd4d70"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-delete-test",
@@ -466,71 +667,28 @@
             "type-switch-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    9,
-                                    1
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "type-switch-statements.go"
-    ],
-    "sha1": "94f94a0f60ffe393994e557cfc35fdda7e350d09",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "aa78c757ce8c988cc95998bfc375aadda963b79d"
-}
-,{
-    "testCaseDescription": "go-type-switch-statements-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "type-switch-statements.go": [
-                {
-                    "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'e' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 10
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -541,11 +699,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 5
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -556,11 +714,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 9
                             ],
                             "end": [
-                                6,
+                                4,
                                 12
                             ]
                         }
@@ -571,11 +729,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 5
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -589,7 +747,125 @@
     "filePaths": [
         "type-switch-statements.go"
     ],
-    "sha1": "aa78c757ce8c988cc95998bfc375aadda963b79d",
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index 64567d6..047534a 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,9 +1,3 @@",
+        "-switch e.(type) {",
+        "-  case []Person:",
+        "-    a()",
+        "-  case *Dog:",
+        "-    break",
+        "-}",
+        " switch b.(type) {",
+        "   case []Person:",
+        "     a()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "55c9268038cdb6e46dd211683ac12b462f9e590f"
+    "shas": "1021943f2594b7cd8c977fd0e6cef06c34bd4d70..501f3e52ab12fac877cd58fa6631284d8c7480ff"
+}
+,{
+    "testCaseDescription": "go-type-switch-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "type-switch-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                10
+                            ],
+                            "end": [
+                                2,
+                                16
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                5
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'break' break_statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/type-switch-statements.go b/type-switch-statements.go",
+        "index 047534a..e69de29 100644",
+        "--- a/type-switch-statements.go",
+        "+++ b/type-switch-statements.go",
+        "@@ -1,6 +0,0 @@",
+        "-switch b.(type) {",
+        "-  case []Person:",
+        "-    a()",
+        "-  case *Dog:",
+        "-    break",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "501f3e52ab12fac877cd58fa6631284d8c7480ff..e544e711890744c45f9b49604be9c175422f7e15"
 }]

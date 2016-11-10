@@ -142,7 +142,7 @@ runInitialCommitForSyntax metaRepo@JSONMetaRepo{..} metaSyntax@JSONMetaSyntax{..
   Prelude.putStrLn $ "Generating initial commit for " <> syntax <> " syntax."
 
   let repoFilePath' = repoFilePath metaRepo metaSyntax
-  
+
   result <- try . executeCommand (repoPath language) $ touchCommand repoFilePath' <> commitCommand syntax "Initial commit"
   case ( result :: Either Prelude.IOError String) of
     Left error -> Prelude.putStrLn $ "Initializing the " <> repoFilePath metaRepo metaSyntax <> " failed with: " <> show error <> ". " <> "Possible reason: file already initialized. \nProceeding to the next step."
@@ -192,14 +192,16 @@ runGenerateCommitAndTestCase opts JSONMetaRepo{..} testCaseFilePath (JSONMetaSyn
   _ <- executeCommand (repoPath language) command
   afterSha <- executeCommand (repoPath language) getLastCommitShaCommand
 
+  patch <- executeCommand (repoPath language) (gitDiffCommand beforeSha afterSha)
+
   expectedResult' <- runExpectedResult (repoPath language) beforeSha afterSha (syntax <> fileExt) opts
 
   let jsonTestCase = encodePretty JSONTestCase {
     gitDir = extractGitDir (repoPath language),
     testCaseDescription = language <> "-" <> syntax <> "-" <> description <> "-" <> "test",
     filePaths = [syntax <> fileExt],
-    sha1 = beforeSha,
-    sha2 = afterSha,
+    shas = beforeSha <> ".." <> afterSha,
+    patch = lines patch,
     expectedResult = expectedResult'
     }
 
@@ -255,26 +257,36 @@ generateJSON args = do
   let rows = fromMaybe (fromList [("rows", "")]) headResult ! "rows"
   pure $ JSONResult ( Map.fromList [ ("oids", oids), ("paths", paths), ("rows", rows) ] )
 
--- | Commands represent the various combination of patches (insert, delete, replacement)
--- | for a given syntax.
-commands :: JSONMetaRepo -> JSONMetaSyntax -> [(JSONMetaSyntax, String, String, String)]
-commands metaRepo@JSONMetaRepo{..} metaSyntax@JSONMetaSyntax{..} =
-  [ (metaSyntax, "insert", commaSeperator, fileAppendCommand repoFilePath' insert <> commitCommand syntax "insert")
-  , (metaSyntax, "replacement-insert", commaSeperator, fileWriteCommand repoFilePath' templateText' <> fileAppendCommand repoFilePath' (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement + insert + insert")
-  , (metaSyntax, "delete-insert", commaSeperator, fileWriteCommand repoFilePath' templateText' <> fileAppendCommand repoFilePath' (Prologue.intercalate "\n" [insert, insert, insert]) <> commitCommand syntax "delete + insert")
-  , (metaSyntax, "replacement", commaSeperator, fileWriteCommand repoFilePath' templateText' <> fileAppendCommand repoFilePath' (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement")
-  , (metaSyntax, "delete-replacement", commaSeperator, fileWriteCommand repoFilePath' templateText' <> fileAppendCommand repoFilePath' (Prologue.intercalate "\n" [insert, replacement]) <> commitCommand syntax "delete + replacement")
-  , (metaSyntax, "delete", commaSeperator, fileWriteCommand repoFilePath' templateText' <> fileAppendCommand repoFilePath' replacement <> commitCommand syntax "delete")
-  , (metaSyntax, "delete-rest", spaceSeperator, fileWriteCommand repoFilePath' templateText' <> commitCommand syntax "delete rest")
-  ]
-  where
-    commaSeperator = "\n,"
-    spaceSeperator = ""
-    templateText' = fromMaybe "" templateText
-    repoFilePath' = repoFilePath metaRepo metaSyntax
 
 repoFilePath :: JSONMetaRepo -> JSONMetaSyntax -> String
 repoFilePath metaRepo metaSyntax = syntax metaSyntax <> fileExt metaRepo
+
+-- | Commands represent the various combination of patches (insert, delete, replacement)
+-- | for a given syntax.
+commands :: JSONMetaRepo -> JSONMetaSyntax -> [(JSONMetaSyntax, String, String, String)]
+commands JSONMetaRepo{..} metaSyntax@JSONMetaSyntax{..} = case template of
+  (Just _) -> [ (metaSyntax, "setup", commaSeperator, fileWriteCommand repoFilePath (withTemplate "") <> commitCommand syntax "setup")
+              , (metaSyntax, "insert", commaSeperator, fileWriteCommand repoFilePath (withTemplate insert) <> commitCommand syntax "insert")
+              , (metaSyntax, "replacement", commaSeperator, fileWriteCommand repoFilePath (withTemplate replacement) <> commitCommand syntax "replacement")
+              , (metaSyntax, "delete-replacement", commaSeperator, fileWriteCommand repoFilePath (withTemplate insert) <> commitCommand syntax "delete replacement")
+              , (metaSyntax, "delete-insert", commaSeperator, fileWriteCommand repoFilePath (withTemplate "") <> commitCommand syntax "delete insert")
+              , (metaSyntax, "teardown", spaceSeperator, removeCommand repoFilePath <> touchCommand repoFilePath <> commitCommand syntax "teardown")
+              ]
+  Nothing -> [ (metaSyntax, "insert", commaSeperator, fileWriteCommand repoFilePath insert <> commitCommand syntax "insert")
+             , (metaSyntax, "replacement-insert", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement + insert + insert")
+             , (metaSyntax, "delete-insert", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [insert, insert, insert]) <> commitCommand syntax "delete + insert")
+             , (metaSyntax, "replacement", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement")
+             , (metaSyntax, "delete-replacement", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [insert, replacement]) <> commitCommand syntax "delete + replacement")
+             , (metaSyntax, "delete", commaSeperator, fileWriteCommand repoFilePath replacement <> commitCommand syntax "delete")
+             , (metaSyntax, "delete-rest", spaceSeperator, removeCommand repoFilePath <> touchCommand repoFilePath <> commitCommand syntax "delete rest")
+             ]
+  where commaSeperator = "\n,"
+        spaceSeperator = ""
+        repoFilePath = syntax <> fileExt
+        withTemplate = contentsWithTemplate template
+        contentsWithTemplate :: Maybe String -> String -> String
+        contentsWithTemplate (Just template) contents = DT.unpack $ DT.replace "{0}" (toS contents) (toS template)
+        contentsWithTemplate Nothing contents = contents
 
 -- | Attempts to pull from the git repository's remote repository.
 -- | If the pull fails, the exception is caught and continues to the next step.
@@ -320,6 +332,9 @@ addSubmoduleCommand repoUrl repoPath = "git submodule add " <> repoUrl <> " " <>
 
 getLastCommitShaCommand :: String
 getLastCommitShaCommand = "git log --pretty=format:\"%H\" -n 1;"
+
+gitDiffCommand :: String -> String -> String
+gitDiffCommand sha1 sha2 = "git diff " <> sha1 <> ".." <> sha2 <> ";"
 
 checkoutMasterCommand :: String
 checkoutMasterCommand = "git checkout master;"

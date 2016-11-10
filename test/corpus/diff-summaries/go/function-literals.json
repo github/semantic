@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -25,9 +25,18 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "feb6123e4d38848977a42544b3bae6334aecf1e0",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index e69de29..49cbe77 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -0,0 +1,3 @@",
+        "+const s1 = func(s string) (int, int) {",
+        "+return 1, 2",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "14647fcfa4649e9784df604fefe4128a4af732e7"
+    "shas": "67f60ac0f2697ef8db7d2d1dba1a0b6528d97d51..8755974c3cd7ac6f2006d4e0414296eb9db38d7e"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-insert-test",
@@ -38,11 +47,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -53,11 +62,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -71,9 +80,24 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "14647fcfa4649e9784df604fefe4128a4af732e7",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 49cbe77..913c35a 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,3 +1,9 @@",
+        "+const s1 = func(b int) (string, string) {",
+        "+return 1, 2",
+        "+}",
+        "+const s1 = func(s string) (int, int) {",
+        "+return 1, 2",
+        "+}",
+        " const s1 = func(s string) (int, int) {",
+        " return 1, 2",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "089bc8da72a692d35ffacd1ecf61cb5558608ad6"
+    "shas": "8755974c3cd7ac6f2006d4e0414296eb9db38d7e..ee675e2f15860cd9206b37838cbcaff58523fdba"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -85,54 +109,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     17
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     18
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     17
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     18
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the s1 variable of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 's' identifier in the s1 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     19
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     19
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     25
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the s1 variable of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the s1 variable"
                 }
             ]
         },
@@ -141,9 +165,20 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "089bc8da72a692d35ffacd1ecf61cb5558608ad6",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 913c35a..731e2c6 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,4 +1,4 @@",
+        "-const s1 = func(b int) (string, string) {",
+        "+const s1 = func(s string) (int, int) {",
+        " return 1, 2",
+        " }",
+        " const s1 = func(s string) (int, int) {"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "fd04c7101ea4fada80892f6d8266453324fc8bf7"
+    "shas": "ee675e2f15860cd9206b37838cbcaff58523fdba..a251d3cd5feeb8cfe7a47551c659b0b16e5a2d9f"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
@@ -155,54 +190,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     17
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     18
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     17
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     18
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the s1 variable of the 'main' module"
+                    "summary": "Replaced the 's' identifier with the 'b' identifier in the s1 variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     19
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     25
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     19
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the s1 variable of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the s1 variable"
                 }
             ]
         },
@@ -211,9 +246,20 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "fd04c7101ea4fada80892f6d8266453324fc8bf7",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 731e2c6..913c35a 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,4 +1,4 @@",
+        "-const s1 = func(s string) (int, int) {",
+        "+const s1 = func(b int) (string, string) {",
+        " return 1, 2",
+        " }",
+        " const s1 = func(s string) (int, int) {"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3d746e3f13a4392548edef656eeb9f8e7fa46ad7"
+    "shas": "a251d3cd5feeb8cfe7a47551c659b0b16e5a2d9f..ecfe71d5501411a8c39f306bd98ce8972e655c6f"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
@@ -224,11 +270,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -239,11 +285,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -254,11 +300,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 2
                             ]
                         }
@@ -272,9 +318,25 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "3d746e3f13a4392548edef656eeb9f8e7fa46ad7",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 913c35a..51820bc 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,9 +1,6 @@",
+        "-const s1 = func(b int) (string, string) {",
+        "-return 1, 2",
+        "-}",
+        " const s1 = func(s string) (int, int) {",
+        " return 1, 2",
+        " }",
+        "-const s1 = func(s string) (int, int) {",
+        "+const s1 = func(b int) (string, string) {",
+        " return 1, 2",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "49f2d11ce6eeb1be2843f138688487c077222380"
+    "shas": "ecfe71d5501411a8c39f306bd98ce8972e655c6f..aaf5cae89acd940e7de671e5ee7bde85182c18a6"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-test",
@@ -285,11 +347,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -303,9 +365,21 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "49f2d11ce6eeb1be2843f138688487c077222380",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 51820bc..d21dc2d 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,6 +1,3 @@",
+        "-const s1 = func(s string) (int, int) {",
+        "-return 1, 2",
+        "-}",
+        " const s1 = func(b int) (string, string) {",
+        " return 1, 2",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3f3560e2bd7986b84d183880a6709ba0d301722d"
+    "shas": "aaf5cae89acd940e7de671e5ee7bde85182c18a6..1619b15c7c4717361edf049d214759493d0cdc29"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-rest-test",
@@ -316,11 +390,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 2
                             ]
                         }
@@ -334,7 +408,16 @@
     "filePaths": [
         "function-literals.go"
     ],
-    "sha1": "3f3560e2bd7986b84d183880a6709ba0d301722d",
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index d21dc2d..e69de29 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,3 +0,0 @@",
+        "-const s1 = func(b int) (string, string) {",
+        "-return 1, 2",
+        "-}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f99392e84d40bc621fdc924228e731d179062c0b"
+    "shas": "1619b15c7c4717361edf049d214759493d0cdc29..47227a5c2dd60f353b45407e2d7695a53dc5bab9"
 }]

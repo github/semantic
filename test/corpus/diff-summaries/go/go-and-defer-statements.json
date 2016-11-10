@@ -5,30 +5,33 @@
             "go-and-defer-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'identifier()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                4
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier()' function call"
                 }
             ]
         },
@@ -37,9 +40,17 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "52c2367740c0d2f7f66fbb1638b6bbe52b8bb586",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index e69de29..2638f27 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -0,0 +1,2 @@",
+        "+defer x.y()",
+        "+go x.y()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ff145520e936a2f8287e7b7f560e648c86e37d73"
+    "shas": "c169e9683d54586a7fa6eab867dc6eb4eae7e85c..80641345f16131608a18991fe0a29736f5f5b66d"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-insert-test",
@@ -50,11 +61,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 7
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -65,11 +76,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -80,11 +91,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 7
                             ],
                             "end": [
-                                5,
+                                3,
                                 12
                             ]
                         }
@@ -95,11 +106,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 4
                             ],
                             "end": [
-                                6,
+                                4,
                                 9
                             ]
                         }
@@ -113,9 +124,21 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "ff145520e936a2f8287e7b7f560e648c86e37d73",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index 2638f27..0cb11d5 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,2 +1,6 @@",
+        "+defer a.b()",
+        "+go c.d()",
+        "+defer x.y()",
+        "+go x.y()",
+        " defer x.y()",
+        " go x.y()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "35d23458ecbda705d91d36133acb3ee06114160e"
+    "shas": "80641345f16131608a18991fe0a29736f5f5b66d..c4bf57adbccc55e8edec2a3e41f7a5e385b41e44"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -127,21 +150,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
@@ -154,21 +177,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
@@ -181,21 +204,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     4
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     4
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             }
@@ -208,21 +231,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     7
                                 ]
                             }
@@ -237,9 +260,22 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "35d23458ecbda705d91d36133acb3ee06114160e",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index 0cb11d5..bdc42aa 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,5 +1,5 @@",
+        "-defer a.b()",
+        "-go c.d()",
+        "+defer x.y()",
+        "+go x.y()",
+        " defer x.y()",
+        " go x.y()",
+        " defer x.y()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f88c96f73dcf4e7e57a35b85a54babeb4b8be7c1"
+    "shas": "c4bf57adbccc55e8edec2a3e41f7a5e385b41e44..ee1387252f87d4b177e4220468eb3464aca29649"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -251,21 +287,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     7
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
@@ -278,21 +314,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     9
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     10
                                 ]
                             }
@@ -305,21 +341,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     4
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     4
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     5
                                 ]
                             }
@@ -332,21 +368,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     7
                                 ]
                             }
@@ -361,9 +397,22 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "f88c96f73dcf4e7e57a35b85a54babeb4b8be7c1",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index bdc42aa..0cb11d5 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,5 +1,5 @@",
+        "-defer x.y()",
+        "-go x.y()",
+        "+defer a.b()",
+        "+go c.d()",
+        " defer x.y()",
+        " go x.y()",
+        " defer x.y()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b0fad2ef7fadce069db33e4d5d351cf07381ad0c"
+    "shas": "ee1387252f87d4b177e4220468eb3464aca29649..cf2d1e4c851ac68b7f34e8e038d2a4f1baed2c29"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -374,11 +423,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 7
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -389,11 +438,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -404,11 +453,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 7
                             ],
                             "end": [
-                                5,
+                                3,
                                 12
                             ]
                         }
@@ -419,11 +468,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 4
                             ],
                             "end": [
-                                6,
+                                4,
                                 9
                             ]
                         }
@@ -434,11 +483,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 7
                             ],
                             "end": [
-                                5,
+                                3,
                                 12
                             ]
                         }
@@ -449,11 +498,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 4
                             ],
                             "end": [
-                                6,
+                                4,
                                 9
                             ]
                         }
@@ -467,9 +516,23 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "b0fad2ef7fadce069db33e4d5d351cf07381ad0c",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index 0cb11d5..f18666e 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,6 +1,4 @@",
+        "-defer a.b()",
+        "-go c.d()",
+        "-defer x.y()",
+        "-go x.y()",
+        " defer x.y()",
+        " go x.y()",
+        "+defer a.b()",
+        "+go c.d()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "23967cd45fb4ea3b1ba4510a47506b8782b1842a"
+    "shas": "cf2d1e4c851ac68b7f34e8e038d2a4f1baed2c29..ac0dbf98bade4304c09fbf1c54659937d25ef4f6"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-test",
@@ -480,11 +543,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 7
                             ],
                             "end": [
-                                3,
+                                1,
                                 12
                             ]
                         }
@@ -495,11 +558,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 4
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -513,9 +576,19 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "23967cd45fb4ea3b1ba4510a47506b8782b1842a",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index f18666e..eefd2e4 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,4 +1,2 @@",
+        "-defer x.y()",
+        "-go x.y()",
+        " defer a.b()",
+        " go c.d()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f0dc69f90f6294734196eb47b4391629a1b7ef82"
+    "shas": "ac0dbf98bade4304c09fbf1c54659937d25ef4f6..9d87babf6dd8ad58fecae95e0fe516803ef693af"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-rest-test",
@@ -524,30 +597,33 @@
             "go-and-defer-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'identifier()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                4
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'identifier()' function call"
                 }
             ]
         },
@@ -556,7 +632,15 @@
     "filePaths": [
         "go-and-defer-statements.go"
     ],
-    "sha1": "f0dc69f90f6294734196eb47b4391629a1b7ef82",
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index eefd2e4..e69de29 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,2 +0,0 @@",
+        "-defer a.b()",
+        "-go c.d()"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c69fcfce40f178714107964705a6370513f7733e"
+    "shas": "9d87babf6dd8ad58fecae95e0fe516803ef693af..b36463027cca058b97d4495c8c08a1ab9ab5cc0a"
 }]

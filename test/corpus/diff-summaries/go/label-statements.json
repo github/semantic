@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 3
                             ],
                             "end": [
-                                4,
+                                2,
                                 15
                             ]
                         }
@@ -25,9 +25,18 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "c69fcfce40f178714107964705a6370513f7733e",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index e69de29..d0544fe 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -0,0 +1,3 @@",
+        "+{",
+        "+  insert_label:",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "06dfc9d634af0ab6cd3b7040a3abc3ace1d63978"
+    "shas": "b36463027cca058b97d4495c8c08a1ab9ab5cc0a..1fc84483617cdb29cf050b0bc3d87b01f6a13861"
 }
 ,{
     "testCaseDescription": "go-label-statements-replacement-insert-test",
@@ -36,30 +45,33 @@
             "label-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added the 'replacement_label' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'insert_label' identifier"
                 }
             ]
         },
@@ -68,9 +80,24 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "06dfc9d634af0ab6cd3b7040a3abc3ace1d63978",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index d0544fe..745311d 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -1,3 +1,9 @@",
+        " {",
+        "+  replacement_label:",
+        "+}",
+        "+{",
+        "+  insert_label:",
+        "+}",
+        "+{",
+        "   insert_label:",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d8bee422a1feb5d4dbe64d7347f3e79ef8aebebf"
+    "shas": "1fc84483617cdb29cf050b0bc3d87b01f6a13861..0ac867b531ff4bcdb53b74c34c691ba7953b5f59"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-insert-test",
@@ -82,21 +109,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     3
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     20
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     3
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     15
                                 ]
                             }
@@ -111,9 +138,21 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "d8bee422a1feb5d4dbe64d7347f3e79ef8aebebf",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index 745311d..be34b5c 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -1,5 +1,5 @@",
+        " {",
+        "-  replacement_label:",
+        "+  insert_label:",
+        " }",
+        " {",
+        "   insert_label:"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3ffc48383ff965acde1cb61bf128dba6b5a956b3"
+    "shas": "0ac867b531ff4bcdb53b74c34c691ba7953b5f59..8816a0dfb9ed2e8ce865f18a22e0a0fea91a972f"
 }
 ,{
     "testCaseDescription": "go-label-statements-replacement-test",
@@ -125,21 +164,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     3
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     15
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     3
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     20
                                 ]
                             }
@@ -154,9 +193,21 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "3ffc48383ff965acde1cb61bf128dba6b5a956b3",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index be34b5c..745311d 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -1,5 +1,5 @@",
+        " {",
+        "-  insert_label:",
+        "+  replacement_label:",
+        " }",
+        " {",
+        "   insert_label:"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f0999f5fb8404d7bf45b5b48a29f7594b3b1d59c"
+    "shas": "8816a0dfb9ed2e8ce865f18a22e0a0fea91a972f..86835321d9dfbb9cc746ae02c27c84f687d8588b"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-replacement-test",
@@ -167,11 +218,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 3
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -182,11 +233,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 3
                             ],
                             "end": [
-                                7,
+                                5,
                                 15
                             ]
                         }
@@ -197,11 +248,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 3
                             ],
                             "end": [
-                                7,
+                                5,
                                 20
                             ]
                         }
@@ -215,9 +266,25 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "f0999f5fb8404d7bf45b5b48a29f7594b3b1d59c",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index 745311d..57f6c03 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -1,9 +1,6 @@",
+        " {",
+        "-  replacement_label:",
+        "-}",
+        "-{",
+        "   insert_label:",
+        " }",
+        " {",
+        "-  insert_label:",
+        "+  replacement_label:",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "2d8e39fcd4c65814192407daa7416f6e3c50bb0a"
+    "shas": "86835321d9dfbb9cc746ae02c27c84f687d8588b..a86d97f2c6fe8abfe2a8f90c19b251059943d7a7"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-test",
@@ -226,30 +293,18 @@
             "label-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'insert_label' identifier"
                 }
             ]
         },
@@ -258,9 +313,21 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "2d8e39fcd4c65814192407daa7416f6e3c50bb0a",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index 57f6c03..6920e65 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -1,6 +1,3 @@",
+        " {",
+        "-  insert_label:",
+        "-}",
+        "-{",
+        "   replacement_label:",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "194bc6d2f7a068a5fcb156d56ed4ad56dcbdf0c2"
+    "shas": "a86d97f2c6fe8abfe2a8f90c19b251059943d7a7..71d4de7371642308a8d1786d6cb88461d4aaf8b5"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-rest-test",
@@ -271,11 +338,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 3
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -289,7 +356,16 @@
     "filePaths": [
         "label-statements.go"
     ],
-    "sha1": "194bc6d2f7a068a5fcb156d56ed4ad56dcbdf0c2",
+    "patch": [
+        "diff --git a/label-statements.go b/label-statements.go",
+        "index 6920e65..e69de29 100644",
+        "--- a/label-statements.go",
+        "+++ b/label-statements.go",
+        "@@ -1,3 +0,0 @@",
+        "-{",
+        "-  replacement_label:",
+        "-}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "150f53c8cfb31186993a9588c913d8bcad3cef1d"
+    "shas": "71d4de7371642308a8d1786d6cb88461d4aaf8b5..ca9ffb9a8bca75e34a2383f7d503d3b21d7b08cc"
 }]

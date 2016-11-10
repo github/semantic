@@ -104,9 +104,16 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "1011f24f71bd4ec75766ffbe5d5a27d625dabc58",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index e69de29..07ab90c 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -0,0 +1 @@",
+        "+object.someMethod(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8c8c6db2489fdb60319c45247ec81fc673013ed2"
+    "shas": "7aca49a04758f43f9e7c909ee616f33c18cf0e27..a391db61c291e9652b50630df1819b83df83ffea"
 }
 ,{
     "testCaseDescription": "javascript-method-call-replacement-insert-test",
@@ -431,9 +438,18 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "8c8c6db2489fdb60319c45247ec81fc673013ed2",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index 07ab90c..9341e17 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -1 +1,3 @@",
+        "+object.someMethod(arg1, \"arg3\");",
+        "+object.someMethod(arg1, \"arg2\");",
+        " object.someMethod(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2b25b3a837d54445ad73bf1f96830097063f02e5"
+    "shas": "a391db61c291e9652b50630df1819b83df83ffea..8a52922fc1e9800afafa4c5bb1bd7c6bf8bc1673"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-insert-test",
@@ -888,9 +904,19 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "2b25b3a837d54445ad73bf1f96830097063f02e5",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index 9341e17..f6ada2d 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -1,3 +1,3 @@",
+        "-object.someMethod(arg1, \"arg3\");",
+        "+object.someMethod(arg1, \"arg2\");",
+        " object.someMethod(arg1, \"arg2\");",
+        " object.someMethod(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a4bfcfb5d0dbb10b7defd87f552ef03f5741ae2"
+    "shas": "8a52922fc1e9800afafa4c5bb1bd7c6bf8bc1673..af43a2e5f963ea29cb4bbef3df5d610dfb0dd6c4"
 }
 ,{
     "testCaseDescription": "javascript-method-call-replacement-test",
@@ -1345,9 +1371,19 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "2a4bfcfb5d0dbb10b7defd87f552ef03f5741ae2",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index f6ada2d..9341e17 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -1,3 +1,3 @@",
+        "-object.someMethod(arg1, \"arg2\");",
+        "+object.someMethod(arg1, \"arg3\");",
+        " object.someMethod(arg1, \"arg2\");",
+        " object.someMethod(arg1, \"arg2\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "05f43c5f9431d13afc45f2f3086b603fd176c82b"
+    "shas": "af43a2e5f963ea29cb4bbef3df5d610dfb0dd6c4..51076f4ed7a3e7277b2d21eaecc04fe0ac703d33"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-replacement-test",
@@ -1740,9 +1776,19 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "05f43c5f9431d13afc45f2f3086b603fd176c82b",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index 9341e17..894dcf6 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -1,3 +1,2 @@",
+        "-object.someMethod(arg1, \"arg3\");",
+        "-object.someMethod(arg1, \"arg2\");",
+        " object.someMethod(arg1, \"arg2\");",
+        "+object.someMethod(arg1, \"arg3\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "17eca3c171596d5fdaecd6141987f1c43509824b"
+    "shas": "51076f4ed7a3e7277b2d21eaecc04fe0ac703d33..52f38ade18e39d463dad479757df8039e8f9cfb9"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-test",
@@ -1999,9 +2045,17 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "17eca3c171596d5fdaecd6141987f1c43509824b",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index 894dcf6..a82528c 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -1,2 +1 @@",
+        "-object.someMethod(arg1, \"arg2\");",
+        " object.someMethod(arg1, \"arg3\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "01cea748071c345d2f01f378df0da61b5ccfa0f8"
+    "shas": "52f38ade18e39d463dad479757df8039e8f9cfb9..2b82d812ce523f1c1ec125ab8590a1cd7191bda9"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-rest-test",
@@ -2109,7 +2163,14 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "01cea748071c345d2f01f378df0da61b5ccfa0f8",
+    "patch": [
+        "diff --git a/method-call.js b/method-call.js",
+        "index a82528c..e69de29 100644",
+        "--- a/method-call.js",
+        "+++ b/method-call.js",
+        "@@ -1 +0,0 @@",
+        "-object.someMethod(arg1, \"arg3\");"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "937d4af49d1685550ae5a457368e488ed62e26b0"
+    "shas": "2b82d812ce523f1c1ec125ab8590a1cd7191bda9..fc795a83fff7fcdcadac0ce15ce74b4c24bfcbd5"
 }]

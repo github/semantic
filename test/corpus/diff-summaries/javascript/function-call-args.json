@@ -25,9 +25,16 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "6087206d2569a100e711f522134188e6f4477aec",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index e69de29..699333d 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -0,0 +1 @@",
+        "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a33781a84e417f58c35f1842a5756a306d96e16"
+    "shas": "5d5d40b2fa515dfcb7494d9b83f22687c56de0f5..d2a8bcf4eb5c5193cb358f09a81b0239be2a84ad"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "2a33781a84e417f58c35f1842a5756a306d96e16",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 699333d..3f4ee6e 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1 +1,3 @@",
+        "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "00cbc206ce3e849a4f008481a388fe2cd16cdab0"
+    "shas": "d2a8bcf4eb5c5193cb358f09a81b0239be2a84ad..539cee544c8600977bd76181a692ef4e27c4b759"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-insert-test",
@@ -249,9 +265,19 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "00cbc206ce3e849a4f008481a388fe2cd16cdab0",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 3f4ee6e..dc419cb 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,3 +1,3 @@",
+        "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fe0562a6af2ef816cd033495c6dab8a098e9abd1"
+    "shas": "539cee544c8600977bd76181a692ef4e27c4b759..f808e14f78dbe08885649be38dff25564f90fd98"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-test",
@@ -427,9 +453,19 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "fe0562a6af2ef816cd033495c6dab8a098e9abd1",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index dc419cb..3f4ee6e 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,3 +1,3 @@",
+        "-someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3ffd66b0af62a4993f1ec9cec204e476a4b8f571"
+    "shas": "f808e14f78dbe08885649be38dff25564f90fd98..6df8cc03d89ad9408f10b3e84a8168891e16c824"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
@@ -488,9 +524,19 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "3ffd66b0af62a4993f1ec9cec204e476a4b8f571",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 3f4ee6e..cae967b 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,3 +1,2 @@",
+        "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)",
+        "-someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ee3a4e126eb1e8e72d6066c91087fb820fe81f81"
+    "shas": "6df8cc03d89ad9408f10b3e84a8168891e16c824..8fe5a2260c0258b29e266f904dcdb1dbe02d4c10"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-test",
@@ -519,9 +565,17 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "ee3a4e126eb1e8e72d6066c91087fb820fe81f81",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index cae967b..0d19573 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1,2 +1 @@",
+        "-someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)",
+        " someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f68da3ce3086b28dbf986f818ff4e85b20f72a1c"
+    "shas": "8fe5a2260c0258b29e266f904dcdb1dbe02d4c10..657ddea03b3413ea6f2d4e8546403ec115769828"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-rest-test",
@@ -550,7 +604,14 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "f68da3ce3086b28dbf986f818ff4e85b20f72a1c",
+    "patch": [
+        "diff --git a/function-call-args.js b/function-call-args.js",
+        "index 0d19573..e69de29 100644",
+        "--- a/function-call-args.js",
+        "+++ b/function-call-args.js",
+        "@@ -1 +0,0 @@",
+        "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3bd8ebcbe86dd538120a517b6420d768e8ce2b4c"
+    "shas": "657ddea03b3413ea6f2d4e8546403ec115769828..b1ed87edc6bf561edc524058ab781a95970a3258"
 }]

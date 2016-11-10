@@ -5,131 +5,13 @@
             "for-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'main' module with the 'main' module"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "for-statements.go"
-    ],
-    "sha1": "150f53c8cfb31186993a9588c913d8bcad3cef1d",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "21ac6fd6aef52591595b45a382ab3fbf4e5da753"
-}
-,{
-    "testCaseDescription": "go-for-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "for-statements.go": [
-                {
-                    "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 2
                             ],
                             "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'for ;; {\na()\ngoto loop\n}' for statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x := range y' for statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                14,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                1
-                            ],
-                            "end": [
-                                18,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i < 10; i++' for statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                19,
-                                1
-                            ],
-                            "end": [
-                                22,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                23,
-                                2
-                            ],
-                            "end": [
-                                26,
+                                4,
                                 2
                             ]
                         }
@@ -140,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                27,
+                                5,
                                 1
                             ],
                             "end": [
-                                30,
+                                8,
                                 2
                             ]
                         }
@@ -155,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                31,
+                                9,
                                 1
                             ],
                             "end": [
-                                34,
+                                12,
                                 2
                             ]
                         }
@@ -170,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                35,
+                                13,
                                 1
                             ],
                             "end": [
-                                38,
+                                16,
                                 2
                             ]
                         }
@@ -185,11 +67,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                39,
+                                17,
                                 1
                             ],
                             "end": [
-                                42,
+                                20,
                                 2
                             ]
                         }
@@ -203,12 +85,38 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "21ac6fd6aef52591595b45a382ab3fbf4e5da753",
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index e69de29..cf40a00 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -0,0 +1,20 @@",
+        "+ for {",
+        "+a()",
+        "+goto loop",
+        "+}",
+        "+for i := 0; i < 5; i++ {",
+        "+a()",
+        "+break loop",
+        "+}",
+        "+for ; i < 10; i++ {",
+        "+a()",
+        "+continue loop2",
+        "+}",
+        "+for ;; {",
+        "+a()",
+        "+continue",
+        "+}",
+        "+for x := range y {",
+        "+a(x)",
+        "+break",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e399c20d6dcbdd06e621ba91c2524985229c3f42"
+    "shas": "ca9ffb9a8bca75e34a2383f7d503d3b21d7b08cc..50e0a6df9a7ab1397bd3134f0eefb45dd0704f37"
 }
 ,{
-    "testCaseDescription": "go-for-statements-delete-insert-test",
+    "testCaseDescription": "go-for-statements-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "for-statements.go": [
@@ -216,26 +124,56 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
-                                1
+                                1,
+                                2
                             ],
                             "end": [
-                                10,
+                                4,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'i := 0; i < 5; i++' for statement"
+                    "summary": "Added the 'for ;; {\na()\ngoto loop\n}' for statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                5,
                                 1
                             ],
                             "end": [
-                                14,
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x := range y' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                16,
                                 2
                             ]
                         }
@@ -246,11 +184,196 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                17,
                                 1
                             ],
                             "end": [
-                                18,
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                2
+                            ],
+                            "end": [
+                                24,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for {\na()\ngoto loop\n}' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                25,
+                                1
+                            ],
+                            "end": [
+                                28,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                29,
+                                1
+                            ],
+                            "end": [
+                                32,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                33,
+                                1
+                            ],
+                            "end": [
+                                36,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                37,
+                                1
+                            ],
+                            "end": [
+                                40,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x := range y' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statements.go"
+    ],
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index cf40a00..4fd7ac5 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -1,3 +1,43 @@",
+        "+ for ;; {",
+        "+a()",
+        "+goto loop",
+        "+}",
+        "+for x := range y {",
+        "+a()",
+        "+break loop",
+        "+}",
+        "+for ;; {",
+        "+a()",
+        "+continue loop2",
+        "+}",
+        "+for ; i < 10; i++ {",
+        "+a()",
+        "+continue",
+        "+}",
+        "+for  {",
+        "+a(x)",
+        "+break",
+        "+}",
+        "+ for {",
+        "+a()",
+        "+goto loop",
+        "+}",
+        "+for i := 0; i < 5; i++ {",
+        "+a()",
+        "+break loop",
+        "+}",
+        "+for ; i < 10; i++ {",
+        "+a()",
+        "+continue loop2",
+        "+}",
+        "+for ;; {",
+        "+a()",
+        "+continue",
+        "+}",
+        "+for x := range y {",
+        "+a(x)",
+        "+break",
+        "+}",
+        "  for {",
+        " a()",
+        " goto loop"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "50e0a6df9a7ab1397bd3134f0eefb45dd0704f37..75845b55d73d133b7257cd14340d3d76cb3f1011"
+}
+,{
+    "testCaseDescription": "go-for-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                16,
                                 2
                             ]
                         }
@@ -262,21 +385,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    8,
+                                    6,
                                     1
                                 ],
                                 "end": [
-                                    8,
+                                    6,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    20,
+                                    18,
                                     1
                                 ],
                                 "end": [
-                                    20,
+                                    18,
                                     2
                                 ]
                             }
@@ -289,21 +412,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    9,
+                                    7,
                                     7
                                 ],
                                 "end": [
-                                    9,
+                                    7,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    21,
+                                    19,
                                     1
                                 ],
                                 "end": [
-                                    21,
+                                    19,
                                     6
                                 ]
                             }
@@ -315,11 +438,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -330,11 +453,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 1
                             ],
                             "end": [
-                                18,
+                                16,
                                 2
                             ]
                         }
@@ -345,11 +468,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                19,
+                                17,
                                 1
                             ],
                             "end": [
-                                22,
+                                20,
                                 2
                             ]
                         }
@@ -363,9 +486,40 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "e399c20d6dcbdd06e621ba91c2524985229c3f42",
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index 4fd7ac5..ac76ef3 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -1,20 +1,20 @@",
+        "- for ;; {",
+        "+ for {",
+        " a()",
+        " goto loop",
+        " }",
+        "-for x := range y {",
+        "+for i := 0; i < 5; i++ {",
+        " a()",
+        " break loop",
+        " }",
+        "-for ;; {",
+        "+for ; i < 10; i++ {",
+        " a()",
+        " continue loop2",
+        " }",
+        "-for ; i < 10; i++ {",
+        "+for ;; {",
+        " a()",
+        " continue",
+        " }",
+        "-for  {",
+        "+for x := range y {",
+        " a(x)",
+        " break",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "da9601af0446030e832c0f250e004c135eb5f47e"
+    "shas": "75845b55d73d133b7257cd14340d3d76cb3f1011..cfc21bc775eca1f8281e9fcef32641941086ec88"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -376,11 +530,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -391,11 +545,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -406,11 +560,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 1
                             ],
                             "end": [
-                                18,
+                                16,
                                 2
                             ]
                         }
@@ -421,11 +575,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                19,
+                                17,
                                 1
                             ],
                             "end": [
-                                22,
+                                20,
                                 2
                             ]
                         }
@@ -436,11 +590,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -451,11 +605,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -466,11 +620,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 1
                             ],
                             "end": [
-                                18,
+                                16,
                                 2
                             ]
                         }
@@ -481,11 +635,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                19,
+                                17,
                                 1
                             ],
                             "end": [
-                                22,
+                                20,
                                 2
                             ]
                         }
@@ -499,9 +653,40 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "da9601af0446030e832c0f250e004c135eb5f47e",
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index ac76ef3..4fd7ac5 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -1,20 +1,20 @@",
+        "- for {",
+        "+ for ;; {",
+        " a()",
+        " goto loop",
+        " }",
+        "-for i := 0; i < 5; i++ {",
+        "+for x := range y {",
+        " a()",
+        " break loop",
+        " }",
+        "-for ; i < 10; i++ {",
+        "+for ;; {",
+        " a()",
+        " continue loop2",
+        " }",
+        "-for ;; {",
+        "+for ; i < 10; i++ {",
+        " a()",
+        " continue",
+        " }",
+        "-for x := range y {",
+        "+for  {",
+        " a(x)",
+        " break",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "eb6fc97aa06a82c1a8c4e7706eb9e5aae065179e"
+    "shas": "cfc21bc775eca1f8281e9fcef32641941086ec88..3a95c2458393f4b7f5ab711b62e22371fbddd11d"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -512,11 +697,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -527,11 +712,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -542,11 +727,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -557,11 +742,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 1
                             ],
                             "end": [
-                                18,
+                                16,
                                 2
                             ]
                         }
@@ -572,11 +757,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                19,
+                                17,
                                 1
                             ],
                             "end": [
-                                22,
+                                20,
                                 2
                             ]
                         }
@@ -587,11 +772,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                27,
+                                25,
                                 1
                             ],
                             "end": [
-                                30,
+                                28,
                                 2
                             ]
                         }
@@ -602,11 +787,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                31,
+                                29,
                                 1
                             ],
                             "end": [
-                                34,
+                                32,
                                 2
                             ]
                         }
@@ -617,11 +802,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                35,
+                                33,
                                 1
                             ],
                             "end": [
-                                38,
+                                36,
                                 2
                             ]
                         }
@@ -632,11 +817,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                39,
+                                37,
                                 1
                             ],
                             "end": [
-                                42,
+                                40,
                                 2
                             ]
                         }
@@ -647,11 +832,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                47,
+                                45,
                                 1
                             ],
                             "end": [
-                                50,
+                                48,
                                 2
                             ]
                         }
@@ -662,11 +847,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                51,
+                                49,
                                 1
                             ],
                             "end": [
-                                54,
+                                52,
                                 2
                             ]
                         }
@@ -677,11 +862,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                55,
+                                53,
                                 1
                             ],
                             "end": [
-                                58,
+                                56,
                                 2
                             ]
                         }
@@ -692,11 +877,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                59,
+                                57,
                                 1
                             ],
                             "end": [
-                                62,
+                                60,
                                 2
                             ]
                         }
@@ -710,9 +895,67 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "eb6fc97aa06a82c1a8c4e7706eb9e5aae065179e",
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index 4fd7ac5..53849f8 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -1,23 +1,3 @@",
+        "- for ;; {",
+        "-a()",
+        "-goto loop",
+        "-}",
+        "-for x := range y {",
+        "-a()",
+        "-break loop",
+        "-}",
+        "-for ;; {",
+        "-a()",
+        "-continue loop2",
+        "-}",
+        "-for ; i < 10; i++ {",
+        "-a()",
+        "-continue",
+        "-}",
+        "-for  {",
+        "-a(x)",
+        "-break",
+        "-}",
+        "  for {",
+        " a()",
+        " goto loop",
+        "@@ -38,23 +18,23 @@ for x := range y {",
+        " a(x)",
+        " break",
+        " }",
+        "- for {",
+        "+ for ;; {",
+        " a()",
+        " goto loop",
+        " }",
+        "-for i := 0; i < 5; i++ {",
+        "+for x := range y {",
+        " a()",
+        " break loop",
+        " }",
+        "-for ; i < 10; i++ {",
+        "+for ;; {",
+        " a()",
+        " continue loop2",
+        " }",
+        "-for ;; {",
+        "+for ; i < 10; i++ {",
+        " a()",
+        " continue",
+        " }",
+        "-for x := range y {",
+        "+for  {",
+        " a(x)",
+        " break",
+        " }"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7b11abfad6e1feb091a1e4ef17ac950317e10f3d"
+    "shas": "3a95c2458393f4b7f5ab711b62e22371fbddd11d..8435f02e02c478569822e353e06af4d8ac894751"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-test",
@@ -723,11 +966,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 2
                             ],
                             "end": [
-                                6,
+                                4,
                                 2
                             ]
                         }
@@ -738,11 +981,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                8,
                                 2
                             ]
                         }
@@ -753,11 +996,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 2
                             ]
                         }
@@ -768,11 +1011,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 1
                             ],
                             "end": [
-                                18,
+                                16,
                                 2
                             ]
                         }
@@ -783,11 +1026,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                19,
+                                17,
                                 1
                             ],
                             "end": [
-                                22,
+                                20,
                                 2
                             ]
                         }
@@ -801,9 +1044,38 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "7b11abfad6e1feb091a1e4ef17ac950317e10f3d",
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index 53849f8..c242f13 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -1,23 +1,3 @@",
+        "- for {",
+        "-a()",
+        "-goto loop",
+        "-}",
+        "-for i := 0; i < 5; i++ {",
+        "-a()",
+        "-break loop",
+        "-}",
+        "-for ; i < 10; i++ {",
+        "-a()",
+        "-continue loop2",
+        "-}",
+        "-for ;; {",
+        "-a()",
+        "-continue",
+        "-}",
+        "-for x := range y {",
+        "-a(x)",
+        "-break",
+        "-}",
+        "  for ;; {",
+        " a()",
+        " goto loop"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e610b3e454426cc74c7e50dea1796a8bc38028c3"
+    "shas": "8435f02e02c478569822e353e06af4d8ac894751..16022407f09de24425959f7b36c7710231a372c5"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-rest-test",
@@ -812,30 +1084,78 @@
             "for-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Deleted the 'for ;; {\na()\ngoto loop\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x := range y' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue loop2\n}' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "end": [
+                                16,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i < 10; i++' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "end": [
+                                20,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for  {\na(x)\nbreak\n}' for statement"
                 }
             ]
         },
@@ -844,7 +1164,33 @@
     "filePaths": [
         "for-statements.go"
     ],
-    "sha1": "e610b3e454426cc74c7e50dea1796a8bc38028c3",
+    "patch": [
+        "diff --git a/for-statements.go b/for-statements.go",
+        "index c242f13..e69de29 100644",
+        "--- a/for-statements.go",
+        "+++ b/for-statements.go",
+        "@@ -1,20 +0,0 @@",
+        "- for ;; {",
+        "-a()",
+        "-goto loop",
+        "-}",
+        "-for x := range y {",
+        "-a()",
+        "-break loop",
+        "-}",
+        "-for ;; {",
+        "-a()",
+        "-continue loop2",
+        "-}",
+        "-for ; i < 10; i++ {",
+        "-a()",
+        "-continue",
+        "-}",
+        "-for  {",
+        "-a(x)",
+        "-break",
+        "-}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e16450a4f5054f826123def384b72eb4946a4544"
+    "shas": "16022407f09de24425959f7b36c7710231a372c5..26a36f6042d04bfd0685dc779d24c8601a19a4ce"
 }]

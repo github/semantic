@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -55,9 +55,20 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "475deec198e080301901a65778b6e2ee6255ee60",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index e69de29..938a571 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -0,0 +1,5 @@",
+        "+const (",
+        "+ zero = iota",
+        "+ one",
+        "+ two",
+        "+ )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ac39692dc8e60b73af4c24df31d58e96a8cf4ae4"
+    "shas": "479bb7390b5a93cd2d670d77d3ac6bf6c4169be4..deb921d5c92c5599bf92d3a73434561717cc51fb"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-insert-test",
@@ -68,11 +79,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -83,11 +94,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -98,11 +109,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -113,11 +124,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -128,11 +139,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -143,11 +154,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -161,9 +172,29 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "ac39692dc8e60b73af4c24df31d58e96a8cf4ae4",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index 938a571..071b359 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -1,4 +1,14 @@",
+        " const (",
+        "+ a = iota",
+        "+ b",
+        "+ c",
+        "+ )",
+        "+const (",
+        "+ zero = iota",
+        "+ one",
+        "+ two",
+        "+ )",
+        "+const (",
+        "  zero = iota",
+        "  one",
+        "  two"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "784d367a0e4ba45ac0659e22c03a3f34d3c5394c"
+    "shas": "deb921d5c92c5599bf92d3a73434561717cc51fb..845186fb5aa10cf909a91e344b0642b04c714c6e"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -175,48 +206,48 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     3
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     2
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     3
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     2
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     5
                                 ]
                             }
@@ -229,21 +260,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     2
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     3
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     2
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             }
@@ -258,9 +289,25 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "784d367a0e4ba45ac0659e22c03a3f34d3c5394c",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index 071b359..8a6d638 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -1,7 +1,7 @@",
+        " const (",
+        "- a = iota",
+        "- b",
+        "- c",
+        "+ zero = iota",
+        "+ one",
+        "+ two",
+        "  )",
+        " const (",
+        "  zero = iota"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "d6fea3f4d2a09fb831635228ffd52e4029a66690"
+    "shas": "845186fb5aa10cf909a91e344b0642b04c714c6e..7d478cd8b81e9bd6ceab2d831e67fe84c2e5302b"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -272,48 +319,48 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     2
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     3
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' module"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     2
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     2
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     3
                                 ]
                             }
@@ -326,21 +373,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     2
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    6,
+                                    4,
                                     2
                                 ],
                                 "end": [
-                                    6,
+                                    4,
                                     3
                                 ]
                             }
@@ -355,9 +402,25 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "d6fea3f4d2a09fb831635228ffd52e4029a66690",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index 8a6d638..071b359 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -1,7 +1,7 @@",
+        " const (",
+        "- zero = iota",
+        "- one",
+        "- two",
+        "+ a = iota",
+        "+ b",
+        "+ c",
+        "  )",
+        " const (",
+        "  zero = iota"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b4617614ee8c58faf89055b68cbcd640663208d3"
+    "shas": "7d478cd8b81e9bd6ceab2d831e67fe84c2e5302b..c7803f6793bf104045f60805ea29e82b1e15c8de"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -368,11 +431,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -383,11 +446,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -398,11 +461,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -413,11 +476,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -428,11 +491,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -443,11 +506,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -458,11 +521,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -473,11 +536,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -488,11 +551,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                12,
+                                10,
                                 3
                             ]
                         }
@@ -506,9 +569,33 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "b4617614ee8c58faf89055b68cbcd640663208d3",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index 071b359..ae8b277 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -1,15 +1,10 @@",
+        " const (",
+        "- a = iota",
+        "- b",
+        "- c",
+        "- )",
+        "-const (",
+        "  zero = iota",
+        "  one",
+        "  two",
+        "  )",
+        " const (",
+        "- zero = iota",
+        "- one",
+        "- two",
+        "+ a = iota",
+        "+ b",
+        "+ c",
+        "  )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "0c0cd503b0f4d88a94cbee4fa7ad2b973e8960ac"
+    "shas": "c7803f6793bf104045f60805ea29e82b1e15c8de..549397a8b29323bb63774a7e6e7c9cbe12e8d585"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-test",
@@ -519,11 +606,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -534,11 +621,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -549,11 +636,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -567,9 +654,24 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "0c0cd503b0f4d88a94cbee4fa7ad2b973e8960ac",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index ae8b277..dfb4fad 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -1,9 +1,4 @@",
+        " const (",
+        "- zero = iota",
+        "- one",
+        "- two",
+        "- )",
+        "-const (",
+        "  a = iota",
+        "  b",
+        "  c"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "295241a104dec9ecba7fa69ba2012d53d4f88618"
+    "shas": "549397a8b29323bb63774a7e6e7c9cbe12e8d585..791136ead6293a07a456aeece9d8fca54919f160"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-rest-test",
@@ -580,11 +682,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -595,11 +697,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -610,11 +712,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -628,7 +730,18 @@
     "filePaths": [
         "const-with-implicit-values.go"
     ],
-    "sha1": "295241a104dec9ecba7fa69ba2012d53d4f88618",
+    "patch": [
+        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
+        "index dfb4fad..e69de29 100644",
+        "--- a/const-with-implicit-values.go",
+        "+++ b/const-with-implicit-values.go",
+        "@@ -1,5 +0,0 @@",
+        "-const (",
+        "- a = iota",
+        "- b",
+        "- c",
+        "- )"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "bd92d81359528aecb248c2875d9cb620f555c9a7"
+    "shas": "791136ead6293a07a456aeece9d8fca54919f160..40bb3501528e6739138d99014546c14c14335b62"
 }]

@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 21
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -52,11 +52,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 21
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -67,11 +67,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 24
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -82,11 +82,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -97,11 +97,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 3
                             ]
                         }
@@ -112,11 +112,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -127,11 +127,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 4
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -142,11 +142,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 2
                             ],
                             "end": [
-                                8,
+                                6,
                                 12
                             ]
                         }
@@ -157,11 +157,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 14
                             ]
                         }
@@ -172,11 +172,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 15
                             ],
                             "end": [
-                                8,
+                                6,
                                 21
                             ]
                         }
@@ -187,11 +187,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 23
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -205,9 +205,22 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "728019c0b896205942333966d15ec7058abf5edd",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index e69de29..7f8493c 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -0,0 +1,7 @@",
+        "+type i1 interface {}",
+        "+type i2 interface { io.Reader }",
+        "+type i3 interface {",
+        "+i1",
+        "+io.Reader",
+        "+ SomeMethod(s string) error",
+        "+}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "479c023b591447db1971b4f2d1760e3980c81675"
+    "shas": "68a6be5450d3faa920cd8148a582aacf50d05b22..c3a161e4b63779b44e2c92805df414ac93bf1088"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-insert-test",
@@ -218,11 +231,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -233,11 +246,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 21
                             ]
                         }
@@ -248,11 +261,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -263,11 +276,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 21
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -278,11 +291,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 24
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -293,11 +306,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -308,11 +321,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 3
                             ]
                         }
@@ -323,11 +336,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -338,11 +351,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 4
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -353,11 +366,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 2
                             ],
                             "end": [
-                                8,
+                                6,
                                 12
                             ]
                         }
@@ -368,11 +381,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 14
                             ]
                         }
@@ -383,11 +396,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 15
                             ],
                             "end": [
-                                8,
+                                6,
                                 21
                             ]
                         }
@@ -398,11 +411,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 23
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -413,11 +426,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 6
                             ],
                             "end": [
-                                10,
+                                8,
                                 8
                             ]
                         }
@@ -428,11 +441,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 9
                             ],
                             "end": [
-                                10,
+                                8,
                                 21
                             ]
                         }
@@ -443,11 +456,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 6
                             ],
                             "end": [
-                                11,
+                                9,
                                 8
                             ]
                         }
@@ -458,11 +471,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 21
                             ],
                             "end": [
-                                11,
+                                9,
                                 23
                             ]
                         }
@@ -473,11 +486,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 24
                             ],
                             "end": [
-                                11,
+                                9,
                                 30
                             ]
                         }
@@ -488,11 +501,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 6
                             ],
                             "end": [
-                                12,
+                                10,
                                 8
                             ]
                         }
@@ -503,11 +516,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                13,
+                                11,
                                 1
                             ],
                             "end": [
-                                13,
+                                11,
                                 3
                             ]
                         }
@@ -518,11 +531,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                14,
+                                12,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 3
                             ]
                         }
@@ -533,11 +546,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                14,
+                                12,
                                 4
                             ],
                             "end": [
-                                14,
+                                12,
                                 10
                             ]
                         }
@@ -548,11 +561,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 2
                             ],
                             "end": [
-                                15,
+                                13,
                                 12
                             ]
                         }
@@ -563,11 +576,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 13
                             ],
                             "end": [
-                                15,
+                                13,
                                 14
                             ]
                         }
@@ -578,11 +591,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 15
                             ],
                             "end": [
-                                15,
+                                13,
                                 21
                             ]
                         }
@@ -593,11 +606,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 23
                             ],
                             "end": [
-                                15,
+                                13,
                                 28
                             ]
                         }
@@ -611,9 +624,32 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "479c023b591447db1971b4f2d1760e3980c81675",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index 7f8493c..8ad5847 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -1,3 +1,17 @@",
+        "+type j1 interface {}",
+        "+type j2 interface { io.Reader }",
+        "+type j3 interface {",
+        "+i1",
+        "+io.Reader",
+        "+ SomeMethod(s string) error",
+        "+}",
+        "+type i1 interface {}",
+        "+type i2 interface { io.Reader }",
+        "+type i3 interface {",
+        "+i1",
+        "+io.Reader",
+        "+ SomeMethod(s string) error",
+        "+}",
+        " type i1 interface {}",
+        " type i2 interface { io.Reader }",
+        " type i3 interface {"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "614b595fa47140bbdbc220c96c97c8bd7733d81f"
+    "shas": "c3a161e4b63779b44e2c92805df414ac93bf1088..6c6f0a26477322ea443c184c6de4d249682f084f"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -625,21 +661,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
@@ -652,21 +688,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
@@ -679,21 +715,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
@@ -708,9 +744,24 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "614b595fa47140bbdbc220c96c97c8bd7733d81f",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index 8ad5847..105bfc8 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -1,6 +1,6 @@",
+        "-type j1 interface {}",
+        "-type j2 interface { io.Reader }",
+        "-type j3 interface {",
+        "+type i1 interface {}",
+        "+type i2 interface { io.Reader }",
+        "+type i3 interface {",
+        " i1",
+        " io.Reader",
+        "  SomeMethod(s string) error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "56a0aef20e33d5a164df7ed7bcc29b4dbb621e4b"
+    "shas": "6c6f0a26477322ea443c184c6de4d249682f084f..70a67d481c42e5ceb5cd815380b35b9da3207adc"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -722,21 +773,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
@@ -749,21 +800,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
@@ -776,21 +827,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
@@ -805,9 +856,24 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "56a0aef20e33d5a164df7ed7bcc29b4dbb621e4b",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index 105bfc8..8ad5847 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -1,6 +1,6 @@",
+        "-type i1 interface {}",
+        "-type i2 interface { io.Reader }",
+        "-type i3 interface {",
+        "+type j1 interface {}",
+        "+type j2 interface { io.Reader }",
+        "+type j3 interface {",
+        " i1",
+        " io.Reader",
+        "  SomeMethod(s string) error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ef3c8f435489c311ff2a8800c1aeb1dd59349741"
+    "shas": "70a67d481c42e5ceb5cd815380b35b9da3207adc..f3630526601f49c4583ac382943596c3972fc14f"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -818,11 +884,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -833,11 +899,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 21
                             ]
                         }
@@ -848,11 +914,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -863,11 +929,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 21
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -878,11 +944,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 24
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -893,11 +959,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -908,11 +974,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 3
                             ]
                         }
@@ -923,11 +989,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -938,11 +1004,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 4
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -953,11 +1019,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 2
                             ],
                             "end": [
-                                8,
+                                6,
                                 12
                             ]
                         }
@@ -968,11 +1034,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 14
                             ]
                         }
@@ -983,11 +1049,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 15
                             ],
                             "end": [
-                                8,
+                                6,
                                 21
                             ]
                         }
@@ -998,11 +1064,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 23
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -1013,11 +1079,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 6
                             ],
                             "end": [
-                                10,
+                                8,
                                 8
                             ]
                         }
@@ -1028,11 +1094,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                10,
+                                8,
                                 9
                             ],
                             "end": [
-                                10,
+                                8,
                                 21
                             ]
                         }
@@ -1043,11 +1109,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 6
                             ],
                             "end": [
-                                11,
+                                9,
                                 8
                             ]
                         }
@@ -1058,11 +1124,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 21
                             ],
                             "end": [
-                                11,
+                                9,
                                 23
                             ]
                         }
@@ -1073,11 +1139,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                11,
+                                9,
                                 24
                             ],
                             "end": [
-                                11,
+                                9,
                                 30
                             ]
                         }
@@ -1088,11 +1154,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                12,
+                                10,
                                 6
                             ],
                             "end": [
-                                12,
+                                10,
                                 8
                             ]
                         }
@@ -1103,11 +1169,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                13,
+                                11,
                                 1
                             ],
                             "end": [
-                                13,
+                                11,
                                 3
                             ]
                         }
@@ -1118,11 +1184,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                14,
+                                12,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 3
                             ]
                         }
@@ -1133,11 +1199,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                14,
+                                12,
                                 4
                             ],
                             "end": [
-                                14,
+                                12,
                                 10
                             ]
                         }
@@ -1148,11 +1214,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 2
                             ],
                             "end": [
-                                15,
+                                13,
                                 12
                             ]
                         }
@@ -1163,11 +1229,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 13
                             ],
                             "end": [
-                                15,
+                                13,
                                 14
                             ]
                         }
@@ -1178,11 +1244,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 15
                             ],
                             "end": [
-                                15,
+                                13,
                                 21
                             ]
                         }
@@ -1193,11 +1259,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                15,
+                                13,
                                 23
                             ],
                             "end": [
-                                15,
+                                13,
                                 28
                             ]
                         }
@@ -1208,11 +1274,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 6
                             ],
                             "end": [
-                                10,
+                                8,
                                 8
                             ]
                         }
@@ -1223,11 +1289,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                10,
+                                8,
                                 9
                             ],
                             "end": [
-                                10,
+                                8,
                                 21
                             ]
                         }
@@ -1238,11 +1304,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 6
                             ],
                             "end": [
-                                11,
+                                9,
                                 8
                             ]
                         }
@@ -1253,11 +1319,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 21
                             ],
                             "end": [
-                                11,
+                                9,
                                 23
                             ]
                         }
@@ -1268,11 +1334,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                11,
+                                9,
                                 24
                             ],
                             "end": [
-                                11,
+                                9,
                                 30
                             ]
                         }
@@ -1283,11 +1349,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                10,
                                 6
                             ],
                             "end": [
-                                12,
+                                10,
                                 8
                             ]
                         }
@@ -1298,11 +1364,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                13,
+                                11,
                                 1
                             ],
                             "end": [
-                                13,
+                                11,
                                 3
                             ]
                         }
@@ -1313,11 +1379,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                14,
+                                12,
                                 1
                             ],
                             "end": [
-                                14,
+                                12,
                                 3
                             ]
                         }
@@ -1328,11 +1394,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                14,
+                                12,
                                 4
                             ],
                             "end": [
-                                14,
+                                12,
                                 10
                             ]
                         }
@@ -1343,11 +1409,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 2
                             ],
                             "end": [
-                                15,
+                                13,
                                 12
                             ]
                         }
@@ -1358,11 +1424,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 13
                             ],
                             "end": [
-                                15,
+                                13,
                                 14
                             ]
                         }
@@ -1373,11 +1439,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 15
                             ],
                             "end": [
-                                15,
+                                13,
                                 21
                             ]
                         }
@@ -1388,11 +1454,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                15,
+                                13,
                                 23
                             ],
                             "end": [
-                                15,
+                                13,
                                 28
                             ]
                         }
@@ -1406,9 +1472,38 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "ef3c8f435489c311ff2a8800c1aeb1dd59349741",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index 8ad5847..7ff818b 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -1,10 +1,3 @@",
+        "-type j1 interface {}",
+        "-type j2 interface { io.Reader }",
+        "-type j3 interface {",
+        "-i1",
+        "-io.Reader",
+        "- SomeMethod(s string) error",
+        "-}",
+        " type i1 interface {}",
+        " type i2 interface { io.Reader }",
+        " type i3 interface {",
+        "@@ -12,9 +5,9 @@ i1",
+        " io.Reader",
+        "  SomeMethod(s string) error",
+        " }",
+        "-type i1 interface {}",
+        "-type i2 interface { io.Reader }",
+        "-type i3 interface {",
+        "+type j1 interface {}",
+        "+type j2 interface { io.Reader }",
+        "+type j3 interface {",
+        " i1",
+        " io.Reader",
+        "  SomeMethod(s string) error"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e00dc2a1614395b65d8e85a536e3c7d7e80a38ba"
+    "shas": "f3630526601f49c4583ac382943596c3972fc14f..3c75edf9d8c8aac6af1024c19a0d72c810cdafe3"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-test",
@@ -1419,11 +1514,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -1434,11 +1529,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 21
                             ]
                         }
@@ -1449,11 +1544,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -1464,11 +1559,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 21
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -1479,11 +1574,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 24
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -1494,11 +1589,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -1509,11 +1604,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 3
                             ]
                         }
@@ -1524,11 +1619,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -1539,11 +1634,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 4
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -1554,11 +1649,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 2
                             ],
                             "end": [
-                                8,
+                                6,
                                 12
                             ]
                         }
@@ -1569,11 +1664,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 14
                             ]
                         }
@@ -1584,11 +1679,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 15
                             ],
                             "end": [
-                                8,
+                                6,
                                 21
                             ]
                         }
@@ -1599,11 +1694,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 23
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -1617,9 +1712,25 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "e00dc2a1614395b65d8e85a536e3c7d7e80a38ba",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index 7ff818b..eb92de5 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -1,10 +1,3 @@",
+        "-type i1 interface {}",
+        "-type i2 interface { io.Reader }",
+        "-type i3 interface {",
+        "-i1",
+        "-io.Reader",
+        "- SomeMethod(s string) error",
+        "-}",
+        " type j1 interface {}",
+        " type j2 interface { io.Reader }",
+        " type j3 interface {"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "9484e06029a987b400e6fef739e2cc417d0b0ac0"
+    "shas": "3c75edf9d8c8aac6af1024c19a0d72c810cdafe3..785723423fc2b7ba95d0b724df63e663178e4333"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-rest-test",
@@ -1630,11 +1741,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 6
                             ],
                             "end": [
-                                3,
+                                1,
                                 8
                             ]
                         }
@@ -1645,11 +1756,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 9
                             ],
                             "end": [
-                                3,
+                                1,
                                 21
                             ]
                         }
@@ -1660,11 +1771,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 6
                             ],
                             "end": [
-                                4,
+                                2,
                                 8
                             ]
                         }
@@ -1675,11 +1786,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 21
                             ],
                             "end": [
-                                4,
+                                2,
                                 23
                             ]
                         }
@@ -1690,11 +1801,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 24
                             ],
                             "end": [
-                                4,
+                                2,
                                 30
                             ]
                         }
@@ -1705,11 +1816,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 6
                             ],
                             "end": [
-                                5,
+                                3,
                                 8
                             ]
                         }
@@ -1720,11 +1831,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 3
                             ]
                         }
@@ -1735,11 +1846,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 3
                             ]
                         }
@@ -1750,11 +1861,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 4
                             ],
                             "end": [
-                                7,
+                                5,
                                 10
                             ]
                         }
@@ -1765,11 +1876,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 2
                             ],
                             "end": [
-                                8,
+                                6,
                                 12
                             ]
                         }
@@ -1780,11 +1891,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 13
                             ],
                             "end": [
-                                8,
+                                6,
                                 14
                             ]
                         }
@@ -1795,11 +1906,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 15
                             ],
                             "end": [
-                                8,
+                                6,
                                 21
                             ]
                         }
@@ -1810,11 +1921,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 23
                             ],
                             "end": [
-                                8,
+                                6,
                                 28
                             ]
                         }
@@ -1828,7 +1939,20 @@
     "filePaths": [
         "interface-types.go"
     ],
-    "sha1": "9484e06029a987b400e6fef739e2cc417d0b0ac0",
+    "patch": [
+        "diff --git a/interface-types.go b/interface-types.go",
+        "index eb92de5..e69de29 100644",
+        "--- a/interface-types.go",
+        "+++ b/interface-types.go",
+        "@@ -1,7 +0,0 @@",
+        "-type j1 interface {}",
+        "-type j2 interface { io.Reader }",
+        "-type j3 interface {",
+        "-i1",
+        "-io.Reader",
+        "- SomeMethod(s string) error",
+        "-}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c818cf5bb28cfc9175040ba099cef324698884d8"
+    "shas": "785723423fc2b7ba95d0b724df63e663178e4333..ce33c1bfeb0cbfdd024d65479c25db256cdd12cc"
 }]

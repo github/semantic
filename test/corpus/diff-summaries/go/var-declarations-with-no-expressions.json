@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -55,9 +55,17 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "70ce013ae911ea6eada76f2e5739baddcd04613f",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index e69de29..f156385 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -0,0 +1,2 @@",
+        "+var zero int",
+        "+var one, two uint64"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cc1f8ac20228e18260eb8d54b2ba0ed54bb74630"
+    "shas": "a2b3bd32a19f7f76f1536197e193b8699b844991..a2b836d16d1c5f0e706cd50d82e0f04a5fb91a7a"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-insert-test",
@@ -68,11 +76,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -83,11 +91,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -98,11 +106,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -113,11 +121,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 13
                             ]
                         }
@@ -128,11 +136,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 20
                             ]
                         }
@@ -143,11 +151,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 20
                             ]
                         }
@@ -161,9 +169,21 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "cc1f8ac20228e18260eb8d54b2ba0ed54bb74630",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index f156385..f696db9 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,2 +1,6 @@",
+        "+var a int",
+        "+var b, c uint64",
+        "+var zero int",
+        "+var one, two uint64",
+        " var zero int",
+        " var one, two uint64"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "c0b885c04fe0c5033537181739830e44d9c3575d"
+    "shas": "a2b836d16d1c5f0e706cd50d82e0f04a5fb91a7a..de01c957dd54df2dd44c5e7c32b524ab0e5ae288"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
@@ -175,21 +195,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -202,21 +222,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     6
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
@@ -229,21 +249,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     8
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     13
                                 ]
                             }
@@ -258,9 +278,22 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "c0b885c04fe0c5033537181739830e44d9c3575d",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index f696db9..e5e3183 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,5 +1,5 @@",
+        "-var a int",
+        "-var b, c uint64",
+        "+var zero int",
+        "+var one, two uint64",
+        " var zero int",
+        " var one, two uint64",
+        " var zero int"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "ac406800d15885c84b561071d4dfc6df4a0d4d64"
+    "shas": "de01c957dd54df2dd44c5e7c32b524ab0e5ae288..ec8bb1e3302da7a2a19ced73e7de72165c0bc5cc"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
@@ -272,21 +305,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     6
                                 ]
                             }
@@ -299,21 +332,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     5
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     6
                                 ]
                             }
@@ -326,21 +359,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     8
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     9
                                 ]
                             }
@@ -355,9 +388,22 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "ac406800d15885c84b561071d4dfc6df4a0d4d64",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index e5e3183..f696db9 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,5 +1,5 @@",
+        "-var zero int",
+        "-var one, two uint64",
+        "+var a int",
+        "+var b, c uint64",
+        " var zero int",
+        " var one, two uint64",
+        " var zero int"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "21e30df645b4718de28a23a53812adeff14ec120"
+    "shas": "ec8bb1e3302da7a2a19ced73e7de72165c0bc5cc..abc39ff623686b60f6dfb97f81a22bc99616fc32"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
@@ -368,11 +414,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -383,11 +429,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -398,11 +444,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -413,11 +459,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 13
                             ]
                         }
@@ -428,11 +474,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 20
                             ]
                         }
@@ -443,11 +489,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 20
                             ]
                         }
@@ -458,11 +504,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 10
                             ]
                         }
@@ -473,11 +519,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 16
                             ]
                         }
@@ -488,11 +534,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 16
                             ]
                         }
@@ -506,9 +552,23 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "21e30df645b4718de28a23a53812adeff14ec120",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index f696db9..137ee10 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,6 +1,4 @@",
+        "-var a int",
+        "-var b, c uint64",
+        "-var zero int",
+        "-var one, two uint64",
+        " var zero int",
+        " var one, two uint64",
+        "+var a int",
+        "+var b, c uint64"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "7f979d33c8675dcf2060cca3ee72e2f3df901e76"
+    "shas": "abc39ff623686b60f6dfb97f81a22bc99616fc32..ca2096e1754ebad8a421c0aec68b934eb6fe5946"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-test",
@@ -519,11 +579,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 13
                             ]
                         }
@@ -534,11 +594,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -549,11 +609,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 20
                             ]
                         }
@@ -567,9 +627,19 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "7f979d33c8675dcf2060cca3ee72e2f3df901e76",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index 137ee10..443ec9e 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,4 +1,2 @@",
+        "-var zero int",
+        "-var one, two uint64",
+        " var a int",
+        " var b, c uint64"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5e63095f508ef9950f3ea36b9db98288c0a0b736"
+    "shas": "ca2096e1754ebad8a421c0aec68b934eb6fe5946..7cde9f681f73bc4b0fe063954142d9aac568b776"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-rest-test",
@@ -580,11 +650,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 10
                             ]
                         }
@@ -595,11 +665,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -610,11 +680,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 16
                             ]
                         }
@@ -628,7 +698,15 @@
     "filePaths": [
         "var-declarations-with-no-expressions.go"
     ],
-    "sha1": "5e63095f508ef9950f3ea36b9db98288c0a0b736",
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index 443ec9e..e69de29 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -1,2 +0,0 @@",
+        "-var a int",
+        "-var b, c uint64"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3f6fa7c6f499951a277e9ae6edce3681134ef5d9"
+    "shas": "7cde9f681f73bc4b0fe063954142d9aac568b776..7ec7378727f160ff6fb78761d149f5f110898c3e"
 }]

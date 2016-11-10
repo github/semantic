@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -37,11 +37,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 23
                             ]
                         }
@@ -55,9 +55,18 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "1011eae016159133bb9b3305fa29900aa6f06827",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index e69de29..e9d461f 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -0,0 +1,3 @@",
+        "+func f1(a ...*int) {}",
+        "+func f2(...int) {}",
+        "+func f3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "55231bf51a6d46385791a80a387bba6b481cce3a"
+    "shas": "256c131008b104fa15d57c0f3ff56131c11337fe..b6ef32833f1cf331e26caedfd359c593f9b370b9"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-insert-test",
@@ -68,11 +77,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -83,11 +92,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -98,11 +107,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 23
                             ]
                         }
@@ -113,11 +122,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 22
                             ]
                         }
@@ -128,11 +137,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 19
                             ]
                         }
@@ -143,11 +152,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 23
                             ]
                         }
@@ -161,9 +170,24 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "55231bf51a6d46385791a80a387bba6b481cce3a",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index e9d461f..1e4f816 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -1,3 +1,9 @@",
+        "+func g1(a ...*int) {}",
+        "+func g2(...int) {}",
+        "+func g3(a, ...bool) {}",
+        "+func f1(a ...*int) {}",
+        "+func f2(...int) {}",
+        "+func f3(a, ...bool) {}",
+        " func f1(a ...*int) {}",
+        " func f2(...int) {}",
+        " func f3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f61b087e33996e9582f497ed495b150158b0030f"
+    "shas": "b6ef32833f1cf331e26caedfd359c593f9b370b9..ef0f85884738262f219743f46d645a73d12f5b99"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -175,81 +199,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function of the 'main' module"
+                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the f1 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function of the 'main' module"
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function of the 'main' module"
+                    "summary": "Replaced the 'g3' identifier with the 'f3' identifier in the f3 function"
                 }
             ]
         },
@@ -258,9 +282,24 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "f61b087e33996e9582f497ed495b150158b0030f",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index 1e4f816..3198ec6 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        "-func g1(a ...*int) {}",
+        "-func g2(...int) {}",
+        "-func g3(a, ...bool) {}",
+        "+func f1(a ...*int) {}",
+        "+func f2(...int) {}",
+        "+func f3(a, ...bool) {}",
+        " func f1(a ...*int) {}",
+        " func f2(...int) {}",
+        " func f3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b6501ace5d04c639c61e4600f543ec61a1557b1b"
+    "shas": "ef0f85884738262f219743f46d645a73d12f5b99..6920ba9ae6296e24e09e55ea342020521f5443b7"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -272,81 +311,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function of the 'main' module"
+                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the g1 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    2,
                                     6
                                 ],
                                 "end": [
-                                    4,
+                                    2,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function of the 'main' module"
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2 function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    3,
                                     6
                                 ],
                                 "end": [
-                                    5,
+                                    3,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function of the 'main' module"
+                    "summary": "Replaced the 'f3' identifier with the 'g3' identifier in the g3 function"
                 }
             ]
         },
@@ -355,9 +394,24 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "b6501ace5d04c639c61e4600f543ec61a1557b1b",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index 3198ec6..1e4f816 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        "-func f1(a ...*int) {}",
+        "-func f2(...int) {}",
+        "-func f3(a, ...bool) {}",
+        "+func g1(a ...*int) {}",
+        "+func g2(...int) {}",
+        "+func g3(a, ...bool) {}",
+        " func f1(a ...*int) {}",
+        " func f2(...int) {}",
+        " func f3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "5c6438d74774c5505b9710c5095be94697ab5fdc"
+    "shas": "6920ba9ae6296e24e09e55ea342020521f5443b7..ffa8638d6bc29fe639cc3a3bdcb94d61b5c35336"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -368,11 +422,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -383,11 +437,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -398,11 +452,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 23
                             ]
                         }
@@ -413,11 +467,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 22
                             ]
                         }
@@ -428,11 +482,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 19
                             ]
                         }
@@ -443,11 +497,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 23
                             ]
                         }
@@ -458,11 +512,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
+                                4,
                                 22
                             ]
                         }
@@ -473,11 +527,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                7,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
+                                5,
                                 19
                             ]
                         }
@@ -488,11 +542,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
+                                6,
                                 23
                             ]
                         }
@@ -506,9 +560,27 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "5c6438d74774c5505b9710c5095be94697ab5fdc",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index 1e4f816..99d1e54 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -1,9 +1,6 @@",
+        "-func g1(a ...*int) {}",
+        "-func g2(...int) {}",
+        "-func g3(a, ...bool) {}",
+        "-func f1(a ...*int) {}",
+        "-func f2(...int) {}",
+        "-func f3(a, ...bool) {}",
+        " func f1(a ...*int) {}",
+        " func f2(...int) {}",
+        " func f3(a, ...bool) {}",
+        "+func g1(a ...*int) {}",
+        "+func g2(...int) {}",
+        "+func g3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "e9c290c1f1bfc40557b2a947889eacec12be44fc"
+    "shas": "ffa8638d6bc29fe639cc3a3bdcb94d61b5c35336..724f49666d07410a3e8ec439bb133609ed92d2aa"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-test",
@@ -519,11 +591,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -534,11 +606,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -549,11 +621,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 23
                             ]
                         }
@@ -567,9 +639,21 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "e9c290c1f1bfc40557b2a947889eacec12be44fc",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index 99d1e54..4a0a10b 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -1,6 +1,3 @@",
+        "-func f1(a ...*int) {}",
+        "-func f2(...int) {}",
+        "-func f3(a, ...bool) {}",
+        " func g1(a ...*int) {}",
+        " func g2(...int) {}",
+        " func g3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f13f83e149b557f9ae2a7d43a03f1bfb49bbcedd"
+    "shas": "724f49666d07410a3e8ec439bb133609ed92d2aa..6d26c7b498f60c3ccc84002c96dc08b024d685c7"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-rest-test",
@@ -580,11 +664,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 22
                             ]
                         }
@@ -595,11 +679,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 19
                             ]
                         }
@@ -610,11 +694,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 1
                             ],
                             "end": [
-                                5,
+                                3,
                                 23
                             ]
                         }
@@ -628,7 +712,16 @@
     "filePaths": [
         "variadic-function-declarations.go"
     ],
-    "sha1": "f13f83e149b557f9ae2a7d43a03f1bfb49bbcedd",
+    "patch": [
+        "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
+        "index 4a0a10b..e69de29 100644",
+        "--- a/variadic-function-declarations.go",
+        "+++ b/variadic-function-declarations.go",
+        "@@ -1,3 +0,0 @@",
+        "-func g1(a ...*int) {}",
+        "-func g2(...int) {}",
+        "-func g3(a, ...bool) {}"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "cbfe90e40b3f1a5f8f1a76f1e2b9dbebe28783ee"
+    "shas": "6d26c7b498f60c3ccc84002c96dc08b024d685c7..d533fb4333ed523cd36d6f2bb4f1c31eb61596f1"
 }]

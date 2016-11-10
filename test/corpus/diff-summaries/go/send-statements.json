@@ -7,11 +7,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 4
                             ]
                         }
@@ -22,11 +22,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -40,9 +40,16 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "a4eb90cc8a9cbf4002ab1c646f3b965bce70cc47",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index e69de29..9df974c 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -0,0 +1 @@",
+        "+foo <- 5"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "62add87261e8579b065c88e1ebe0c4a342edc4de"
+    "shas": "1afdfc9d2ffbe4b43ec47892c4583237f382efd2..714795be33defefb56b589bf1984b5013bfd3d0f"
 }
 ,{
     "testCaseDescription": "go-send-statements-replacement-insert-test",
@@ -51,30 +58,63 @@
             "send-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Added 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '6'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '5'"
                 }
             ]
         },
@@ -83,9 +123,18 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "62add87261e8579b065c88e1ebe0c4a342edc4de",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 9df974c..de76cee 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1 +1,3 @@",
+        "+bar <- 6",
+        "+foo <- 5",
+        " foo <- 5"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "34a4f845249f85d7c1dbca944865f358e54bd5aa"
+    "shas": "714795be33defefb56b589bf1984b5013bfd3d0f..d67f3c65395ec2d583d2838eb62e633160dc5bb0"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-insert-test",
@@ -97,21 +146,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             }
@@ -124,21 +173,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -153,9 +202,19 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "34a4f845249f85d7c1dbca944865f358e54bd5aa",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index de76cee..d487575 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,3 +1,3 @@",
+        "-bar <- 6",
+        "+foo <- 5",
+        " foo <- 5",
+        " foo <- 5"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "3ad99151e7a17d306cbc9188d1e972ee7eabd9f2"
+    "shas": "d67f3c65395ec2d583d2838eb62e633160dc5bb0..f3edb65315d77ba6c2c56272b231534fb537d8cc"
 }
 ,{
     "testCaseDescription": "go-send-statements-replacement-test",
@@ -167,21 +226,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     4
                                 ]
                             }
@@ -194,21 +253,21 @@
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     8
                                 ],
                                 "end": [
-                                    3,
+                                    1,
                                     9
                                 ]
                             }
@@ -223,9 +282,19 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "3ad99151e7a17d306cbc9188d1e972ee7eabd9f2",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index d487575..de76cee 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,3 +1,3 @@",
+        "-foo <- 5",
+        "+bar <- 6",
+        " foo <- 5",
+        " foo <- 5"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "fe6d8f386756e9bf034aa26611533f41325d33e7"
+    "shas": "f3edb65315d77ba6c2c56272b231534fb537d8cc..0bab01c74332f89cf225e90aec13c47f76180a4a"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-replacement-test",
@@ -236,11 +305,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 4
                             ]
                         }
@@ -251,11 +320,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -266,11 +335,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 4
                             ]
                         }
@@ -281,11 +350,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -296,11 +365,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 1
                             ],
                             "end": [
-                                4,
+                                2,
                                 4
                             ]
                         }
@@ -311,11 +380,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                2,
                                 8
                             ],
                             "end": [
-                                4,
+                                2,
                                 9
                             ]
                         }
@@ -329,9 +398,19 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "fe6d8f386756e9bf034aa26611533f41325d33e7",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index de76cee..65a1c23 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,3 +1,2 @@",
+        "-bar <- 6",
+        "-foo <- 5",
+        " foo <- 5",
+        "+bar <- 6"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "27a0815cc703e9ca882601641e3ff5106b08f1b3"
+    "shas": "0bab01c74332f89cf225e90aec13c47f76180a4a..659323e1c3b72c8aeb375fe6afca8af9afd91380"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-test",
@@ -340,30 +419,33 @@
             "send-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
                     },
-                    "summary": "Replaced 'main' module with 'main' module"
+                    "summary": "Deleted 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '5'"
                 }
             ]
         },
@@ -372,9 +454,17 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "27a0815cc703e9ca882601641e3ff5106b08f1b3",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index 65a1c23..bab29cb 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1,2 +1 @@",
+        "-foo <- 5",
+        " bar <- 6"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f49d172b1fdce66fae95c6d73f01dd5f27a9a5d8"
+    "shas": "659323e1c3b72c8aeb375fe6afca8af9afd91380..659afeebaae01516ea3532538f0ea665e2823020"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-rest-test",
@@ -385,11 +475,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 1
                             ],
                             "end": [
-                                3,
+                                1,
                                 4
                             ]
                         }
@@ -400,11 +490,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                1,
                                 8
                             ],
                             "end": [
-                                3,
+                                1,
                                 9
                             ]
                         }
@@ -418,7 +508,14 @@
     "filePaths": [
         "send-statements.go"
     ],
-    "sha1": "f49d172b1fdce66fae95c6d73f01dd5f27a9a5d8",
+    "patch": [
+        "diff --git a/send-statements.go b/send-statements.go",
+        "index bab29cb..e69de29 100644",
+        "--- a/send-statements.go",
+        "+++ b/send-statements.go",
+        "@@ -1 +0,0 @@",
+        "-bar <- 6"
+    ],
     "gitDir": "test/corpus/repos/go",
-    "sha2": "353e531a55c6c3d0540570c523e799df46615898"
+    "shas": "659afeebaae01516ea3532538f0ea665e2823020..acf23921d6e89772dac98a78ba280e58c2429050"
 }]
