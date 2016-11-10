@@ -5,9 +5,9 @@
     "repoUrl": "https://github.com/diff-fixtures/ruby.git",
     "syntaxes": [
       {
-        "syntax": "module",
-        "insert": "module Foo\nend",
-        "replacement": "module Foo\n  def bar\n  end\nend"
+        "syntax": "hash",
+        "insert": "{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        "replacement": "{ key1: \"changed value\", key2: 2, key3: true }"
       }
     ]
   }

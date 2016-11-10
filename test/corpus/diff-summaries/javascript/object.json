@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\" }' object"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+{ \"key1\": \"value1\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "aaba67c460efdf59f04a498c4699fcb690d9b490..7faf2acf9f69d7f3b03dde0d6a5e1d2f65871d01"
+    "shas": "5dede241573c8e353a4d8c662194e8e3b750e01a..45f29912e03b7de277df4c10ad238121235b6ed7"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\" }' object"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " { \"key1\": \"value1\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7faf2acf9f69d7f3b03dde0d6a5e1d2f65871d01..0b2c6e3141cb23beeb872694d5f1587716ac4040"
+    "shas": "45f29912e03b7de277df4c10ad238121235b6ed7..4e17781769a2098bcce839e1282b1fa0d1df7821"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-insert-test",
@@ -109,7 +109,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key2\": …' pair"
+                    "summary": "Deleted the '\"key2\": \"value2\"' pair"
                 },
                 {
                     "span": {
@@ -124,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key3\": …' pair"
+                    "summary": "Deleted the '\"key3\": \"3.0\"' pair"
                 }
             ]
         },
@@ -145,7 +145,7 @@
         " { \"key1\": \"value1\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0b2c6e3141cb23beeb872694d5f1587716ac4040..fd282261939913a45699187bcebd1df33dd8f354"
+    "shas": "4e17781769a2098bcce839e1282b1fa0d1df7821..d035734af1172dab5eb30ad01fe898f5d850606c"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-test",
@@ -165,7 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"key2\": …' pair"
+                    "summary": "Added the '\"key2\": \"value2\"' pair"
                 },
                 {
                     "span": {
@@ -180,7 +180,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"key3\": …' pair"
+                    "summary": "Added the '\"key3\": \"3.0\"' pair"
                 }
             ]
         },
@@ -201,7 +201,7 @@
         " { \"key1\": \"value1\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fd282261939913a45699187bcebd1df33dd8f354..cf63812f1b4711a1dff84db2df97b987df9cfb6d"
+    "shas": "d035734af1172dab5eb30ad01fe898f5d850606c..d172e093c2f663040bb8d2c429564a4d273753d3"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-replacement-test",
@@ -221,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 },
                 {
                     "span": {
@@ -236,7 +236,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\" }' object"
                 },
                 {
                     "span": {
@@ -251,7 +251,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 }
             ]
         },
@@ -272,7 +272,7 @@
         "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cf63812f1b4711a1dff84db2df97b987df9cfb6d..1b3cdfbad081f4c455fa9534d9cba4547f5ab6f1"
+    "shas": "d172e093c2f663040bb8d2c429564a4d273753d3..337ff59260d3eed7762de977645c68224ea4d46c"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-test",
@@ -292,7 +292,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\" }' object"
                 }
             ]
         },
@@ -311,7 +311,7 @@
         " { \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1b3cdfbad081f4c455fa9534d9cba4547f5ab6f1..607a72ed7ff28c76667ef67aca1472e2aa4be099"
+    "shas": "337ff59260d3eed7762de977645c68224ea4d46c..9d30494c528991b340e861222f5a6276e874a964"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-rest-test",
@@ -331,7 +331,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 }
             ]
         },
@@ -349,5 +349,5 @@
         "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "607a72ed7ff28c76667ef67aca1472e2aa4be099..5f4dfa791577127cebc7f5fa8c7d94b7427980f3"
+    "shas": "9d30494c528991b340e861222f5a6276e874a964..ba01e3794a8efa31353fd2d5726c70bb2ad8c6a8"
 }]

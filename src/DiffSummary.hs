@@ -13,7 +13,8 @@ import Syntax as S
 import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
-import Data.Text as Text (intercalate)
+import Data.Text (intercalate)
+import qualified Data.Text as Text (head)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
@@ -60,6 +61,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Switch{} -> Identifiable
           S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
+          S.Pair{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -215,7 +217,7 @@ toTermName source term = case unwrap term of
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
-  S.Pair a _ -> toTermName' a <> ": …"
+  S.Pair k v -> toKeyName k <> toArgName v
   S.Return expr -> maybe "empty" toTermName' expr
   S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
@@ -250,6 +252,9 @@ toTermName source term = case unwrap term of
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
+        toKeyName key = case toTermName' key of
+          n | Text.head n == ':' -> n <> " => "
+          n -> n <> ": "
 
 parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
 parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
@@ -388,7 +393,14 @@ instance HasCategory Category where
     C.RescueModifier -> "rescue modifier"
     C.When -> "when comparison"
     C.RescuedException -> "last exception"
+    C.RescueArgs -> "arguments"
     C.Negate -> "negate"
+    C.ArgumentPair -> "argument"
+    C.KeywordParameter -> "parameter"
+    C.OptionalParameter -> "parameter"
+    C.SplatParameter -> "parameter"
+    C.HashSplatParameter -> "parameter"
+    C.BlockParameter -> "parameter"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
