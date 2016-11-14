@@ -35,13 +35,19 @@ termConstructor source sourceSpan name range children = case (name, children) of
       [rangeClause, body] | category (extract rangeClause) == Other "range_clause" ->
         S.For (toList $ unwrap rangeClause) (toList $ unwrap body)
       other -> S.Error other
-  ("expression_switch_statement", children) -> case Prologue.break isCaseClause children of
-    (clauses, cases) -> do
-      clauses' <- withDefaultInfo $ S.Indexed clauses
-      withDefaultInfo $ S.Switch clauses' cases
-    where isCaseClause = (== Case) . category . extract
-
-
+  ("expression_switch_statement", children) ->
+    case Prologue.break isCaseClause children of
+      (clauses, cases) -> do
+        clauses' <- withDefaultInfo $ S.Indexed clauses
+        withDefaultInfo $ S.Switch clauses' cases
+      where isCaseClause = (== Case) . category . extract
+  ("type_switch_statement", children) ->
+    case Prologue.break isCaseClause children of
+      (clauses, cases) -> do
+        withDefaultInfo $ case clauses of
+          [id] -> S.Switch id cases
+          _ -> S.Error children
+      where isCaseClause = (== Case) . category . extract
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -135,5 +141,7 @@ categoryForGoName = \case
   "for_statement" -> For
   "expression_switch_statement" -> Switch
   "expression_case_clause" -> Case
+  "type_switch_statement" -> Switch
+  "type_case_clause" -> Case
   s -> Other (toS s)
 
