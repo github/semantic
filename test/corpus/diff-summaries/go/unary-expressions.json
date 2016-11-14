@@ -50,7 +50,7 @@
         "+*foo()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "42975c2ba57995b8cc4cfe30c7599c673970dd25..383857c1c2527b50055c4dfe90fb44b26bf0fefa"
+    "shas": "4022a54f49bc1b2781f0b6865bdd6e11f0d19706..8c6ec033c5dd158076146b739d58d3dafd43030d"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-insert-test",
@@ -138,7 +138,7 @@
         " *foo()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "383857c1c2527b50055c4dfe90fb44b26bf0fefa..9312cbe74e464febaa3f93fb1b2adf7011d1b95b"
+    "shas": "8c6ec033c5dd158076146b739d58d3dafd43030d..3c58f690ca85b2401de1fd10fed390e6d1965efd"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -221,7 +221,7 @@
         " !<-a"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9312cbe74e464febaa3f93fb1b2adf7011d1b95b..57ec8fc14e1e8a6d8634011258174e08068a4198"
+    "shas": "3c58f690ca85b2401de1fd10fed390e6d1965efd..4c4047d5d4b947f079c3a630b280f95dbb908248"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -304,7 +304,7 @@
         " !<-a"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57ec8fc14e1e8a6d8634011258174e08068a4198..c8e2c9b5af896f4b2a72cc9862c60df9a1b65aa4"
+    "shas": "4c4047d5d4b947f079c3a630b280f95dbb908248..a5d46b178ec9fd2c29078163e231274cbbbbc297"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -424,7 +424,7 @@
         "+*bar()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c8e2c9b5af896f4b2a72cc9862c60df9a1b65aa4..f3aa65ee6692f5aa37c6f8e6a01d2093e27999a0"
+    "shas": "a5d46b178ec9fd2c29078163e231274cbbbbc297..52edd63b518f1daf2f1664ab3132819fb1a30aa6"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-test",
@@ -480,7 +480,7 @@
         " *bar()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f3aa65ee6692f5aa37c6f8e6a01d2093e27999a0..da09442b50bcb67001af1f6599a2d2cd37c86907"
+    "shas": "52edd63b518f1daf2f1664ab3132819fb1a30aa6..c4e91c2f203a646ab075aa05bec94bdb2cd22ec4"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-rest-test",
@@ -534,5 +534,5 @@
         "-*bar()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "da09442b50bcb67001af1f6599a2d2cd37c86907..b3266e749035509bbbd882ef5e2d3ad93c3c60bf"
+    "shas": "c4e91c2f203a646ab075aa05bec94bdb2cd22ec4..05b5bb3e99b81bc5dd8fc85b344408d5d669d004"
 }]

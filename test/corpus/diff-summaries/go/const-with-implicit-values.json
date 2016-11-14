@@ -68,7 +68,7 @@
         "+ )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "479bb7390b5a93cd2d670d77d3ac6bf6c4169be4..deb921d5c92c5599bf92d3a73434561717cc51fb"
+    "shas": "df8b821b2bfd28b8fcd7723443ad7df7a67116f1..dc32dbb8a86020388ddf3fa89f8b0fbf0fc32922"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-insert-test",
@@ -194,7 +194,7 @@
         "  two"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "deb921d5c92c5599bf92d3a73434561717cc51fb..845186fb5aa10cf909a91e344b0642b04c714c6e"
+    "shas": "dc32dbb8a86020388ddf3fa89f8b0fbf0fc32922..e846a8c81e8b83fbfa0edf0d96750a2f297b2bd8"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -307,7 +307,7 @@
         "  zero = iota"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "845186fb5aa10cf909a91e344b0642b04c714c6e..7d478cd8b81e9bd6ceab2d831e67fe84c2e5302b"
+    "shas": "e846a8c81e8b83fbfa0edf0d96750a2f297b2bd8..1adbd2e8a44489837cef9e34ac10ce101fed0171"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -420,7 +420,7 @@
         "  zero = iota"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d478cd8b81e9bd6ceab2d831e67fe84c2e5302b..c7803f6793bf104045f60805ea29e82b1e15c8de"
+    "shas": "1adbd2e8a44489837cef9e34ac10ce101fed0171..78c15c7b3e5a4958fa316524b49771986e1db90e"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -595,7 +595,7 @@
         "  )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c7803f6793bf104045f60805ea29e82b1e15c8de..549397a8b29323bb63774a7e6e7c9cbe12e8d585"
+    "shas": "78c15c7b3e5a4958fa316524b49771986e1db90e..20a6fde6a7f484cbd60cc04815e89fc76f126587"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-test",
@@ -671,7 +671,7 @@
         "  c"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "549397a8b29323bb63774a7e6e7c9cbe12e8d585..791136ead6293a07a456aeece9d8fca54919f160"
+    "shas": "20a6fde6a7f484cbd60cc04815e89fc76f126587..59f499d2842ad62f5d6cca95129c9ac3d1b1ce19"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-rest-test",
@@ -743,5 +743,5 @@
         "- )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "791136ead6293a07a456aeece9d8fca54919f160..40bb3501528e6739138d99014546c14c14335b62"
+    "shas": "59f499d2842ad62f5d6cca95129c9ac3d1b1ce19..4e668c07958fe236629f9e5e665415ca2e36b5d7"
 }]
