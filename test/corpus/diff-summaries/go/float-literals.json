@@ -173,7 +173,7 @@
         "+f5 = .5e-50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05b5bb3e99b81bc5dd8fc85b344408d5d669d004..8c59c5fea4492f592119b09169b0fbef637faba1"
+    "shas": "9ea5390ceebf6bd8d034f14489ef2fffed7ab82c..0d41c7a03d612f2d273aa9d86f86cbe306da00eb"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-insert-test",
@@ -508,7 +508,7 @@
         " f3 = 1.5e+50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c59c5fea4492f592119b09169b0fbef637faba1..3d61385d62087a0e3c77a037af457d78d71191ca"
+    "shas": "0d41c7a03d612f2d273aa9d86f86cbe306da00eb..3ab37d04bdfe82743cb8a7d44a79c958406e549e"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-insert-test",
@@ -777,7 +777,7 @@
         " f3 = 1.5e+50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3d61385d62087a0e3c77a037af457d78d71191ca..db63d884ac900ddc158744d7819fdc3ee58e170b"
+    "shas": "3ab37d04bdfe82743cb8a7d44a79c958406e549e..5109da5abedf1f2d34f8229036233245277dc5e4"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-test",
@@ -1112,7 +1112,7 @@
         " f3 = 1.5e+50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "db63d884ac900ddc158744d7819fdc3ee58e170b..a988e2984149b616d63fb030ac584a522dbca203"
+    "shas": "5109da5abedf1f2d34f8229036233245277dc5e4..2f06ce8acfa6a2c808c5ddbe019db08e3858a8db"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-replacement-test",
@@ -1604,7 +1604,7 @@
         "+f6 = .5e-50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a988e2984149b616d63fb030ac584a522dbca203..51516cc6e2f0ca2cca07f5a903c86235d5f404c8"
+    "shas": "2f06ce8acfa6a2c808c5ddbe019db08e3858a8db..ee2784409e683e0814e349748ef863def4fe4c57"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-test",
@@ -1784,7 +1784,7 @@
         " f4 = 1.5e+50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "51516cc6e2f0ca2cca07f5a903c86235d5f404c8..4e31c96bdb7fbb81950ce04ebb246a5a7cb6e874"
+    "shas": "ee2784409e683e0814e349748ef863def4fe4c57..d40aa149f85ce2dd87adef7a5c248d2e29fc9685"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-rest-test",
@@ -1961,5 +1961,5 @@
         "-f6 = .5e-50"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4e31c96bdb7fbb81950ce04ebb246a5a7cb6e874..21aa9932fdc0f37c92440b9d244915d32f18b356"
+    "shas": "d40aa149f85ce2dd87adef7a5c248d2e29fc9685..6637f1e53feb14a2ff9cb4718c08831b5d159898"
 }]

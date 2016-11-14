@@ -137,6 +137,8 @@ data Category
   | When
   | RescuedException
   | Negate
+  -- | A select expression in Go.
+  | Select
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

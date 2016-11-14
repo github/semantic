@@ -48,6 +48,8 @@ termConstructor source sourceSpan name range children = case (name, children) of
           [id] -> S.Switch id cases
           _ -> S.Error children
       where isCaseClause = (== Case) . category . extract
+  ("select_statement", children) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
+    where toCommunicationCase = toList . unwrap
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -143,5 +145,7 @@ categoryForGoName = \case
   "expression_case_clause" -> Case
   "type_switch_statement" -> Switch
   "type_case_clause" -> Case
+  "select_statement" -> Select
+  "communication_case" -> Case
   s -> Other (toS s)
 

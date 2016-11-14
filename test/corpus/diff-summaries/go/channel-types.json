@@ -113,7 +113,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bba0830e8ef0d6c3522a956eefc4e1f489a332a3..6c51b4e9b43ce87073715b987815d9c03c71ada6"
+    "shas": "f595ea8e2aacd192ac0e7c9f3ea58fbeb620ea30..a1b787595b1c19ae30d0fb395d62b8cfedb4342b"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-insert-test",
@@ -329,7 +329,7 @@
         " c3 chan<- <-chan int"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6c51b4e9b43ce87073715b987815d9c03c71ada6..ace15c502131066489acd5dcdff032d5040d8489"
+    "shas": "a1b787595b1c19ae30d0fb395d62b8cfedb4342b..6ef808e07a041b1560ce7ecc0eea6bfd9664f0d1"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-insert-test",
@@ -481,7 +481,7 @@
         " c1 chan<- chan int"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ace15c502131066489acd5dcdff032d5040d8489..0ebc8b57dac1abb4d4c35696cde655d52b3adcc5"
+    "shas": "6ef808e07a041b1560ce7ecc0eea6bfd9664f0d1..2005307484fece8f944db9045951483939c9cb47"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-test",
@@ -654,7 +654,7 @@
         " c1 chan<- chan int"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0ebc8b57dac1abb4d4c35696cde655d52b3adcc5..781d594a9d55fc9e8d5fb4400d71ec183bc05f2d"
+    "shas": "2005307484fece8f944db9045951483939c9cb47..9ef16c86528e2445393f316bc30851df7ee8449d"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-replacement-test",
@@ -964,7 +964,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "781d594a9d55fc9e8d5fb4400d71ec183bc05f2d..11552d823b3957815aa1916c9ed62d0144597e89"
+    "shas": "9ef16c86528e2445393f316bc30851df7ee8449d..eff7b1dde17028fd3baecd618b05ed6401383770"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-test",
@@ -1085,7 +1085,7 @@
         " c4 chan<- <-chan string"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "11552d823b3957815aa1916c9ed62d0144597e89..8db0bd31a8127d7716bdaed712485789d1cf714f"
+    "shas": "eff7b1dde17028fd3baecd618b05ed6401383770..51ff3d97ab486c7cd0e7230451635edbf9fdb0e5"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-rest-test",
@@ -1202,5 +1202,5 @@
         "-)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8db0bd31a8127d7716bdaed712485789d1cf714f..b62e1f2c806c3e229014a9ad2c673cca77fcacbe"
+    "shas": "51ff3d97ab486c7cd0e7230451635edbf9fdb0e5..dea5e28249fe3080e631932fdaa648dcc9b1ce35"
 }]
