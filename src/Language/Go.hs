@@ -50,18 +50,10 @@ termConstructor source sourceSpan name range children = case (name, children) of
       where isCaseClause = (== Case) . category . extract
   ("select_statement", children) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
-  ("go_statement", children) -> withDefaultInfo $ case children of
-    [expr] -> S.Go expr
-    rest -> S.Error rest
-  ("defer_statement", children) -> withDefaultInfo $ case children of
-    [expr] -> S.Defer expr
-    rest -> S.Error rest
-  ("selector_expression", children) -> withDefaultInfo $ case children of
-    [a, b] -> S.SubscriptAccess a b
-    rest -> S.Error rest
-  ("index_expression", children) -> withDefaultInfo $ case children of
-    [a, b] -> S.SubscriptAccess a b
-    rest -> S.Error rest
+  ("go_statement", children) -> withDefaultInfo $ toExpression S.Go children
+  ("defer_statement", children) -> withDefaultInfo $ toExpression S.Defer children
+  ("selector_expression", children) -> withDefaultInfo $ toSubscriptAccess children
+  ("index_expression", children) -> withDefaultInfo $ toSubscriptAccess children
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -72,7 +64,13 @@ termConstructor source sourceSpan name range children = case (name, children) of
   (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
   _  -> withDefaultInfo $ S.Indexed children
   where
-    toIfStatement clauses = case clauses of
+    toExpression f = \case
+      [expr] -> f expr
+      rest -> S.Error rest
+    toSubscriptAccess = \case
+      [a, b] -> S.SubscriptAccess a b
+      rest -> S.Error rest
+    toIfStatement = \case
       [clause, block] ->
         withDefaultInfo $ S.If clause (toList $ unwrap block)
       [expr, block, elseBlock] | category (extract block) == Other "block" ->
@@ -80,7 +78,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
       [expr, clause, block] -> do
         clause' <- withRanges range If [expr, clause] (S.Indexed [expr, clause])
         withDefaultInfo $ S.If clause' (toList $ unwrap block)
-      _ -> withCategory Error (S.Error clauses)
+      rest -> withCategory Error (S.Error rest)
     toImports imports = do
       imports' <- mapM toImport imports
       withDefaultInfo $ S.Indexed (mconcat imports')
@@ -91,6 +89,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
           [] -> pure []
 
     toVarDecl varSpec = listToVarDecls (toList $ unwrap varSpec)
+
     listToVarDecls list = case list of
       [idList, exprs] | category (extract exprs) == Other "expression_list" -> do
         assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
@@ -117,7 +116,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
         [idList] -> do
            varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
            withDefaultInfo (S.Indexed varDecls)
-        _ -> withCategory Error (S.Error [constSpec])
+        rest -> withCategory Error (S.Error rest)
 
     withRanges originalRange category' terms syntax = do
       let ranges' = getField . extract <$> terms
