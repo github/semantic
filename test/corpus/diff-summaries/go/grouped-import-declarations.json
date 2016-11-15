@@ -71,7 +71,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "925d3d16e8d2bb1a995298cd95b1fd09dfec3b2e..8ee75c8b9bb0e0a18ba30cefc6962a974bfab756"
+    "shas": "89da6e4a443ce2afa657b3b6b4860c59a8c8ff3a..1891e70e065618ae81ca39475d8750c9dfb88629"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-replacement-insert-test",
@@ -200,7 +200,7 @@
         "   alias \"some/package\""
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ee75c8b9bb0e0a18ba30cefc6962a974bfab756..22b7445b13e02d8d78d9acc186d2d3c48b8ddc69"
+    "shas": "1891e70e065618ae81ca39475d8750c9dfb88629..37e9f6f8526fe6b819ff2e57dcaa103db100c07d"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-insert-test",
@@ -313,7 +313,7 @@
         " \"net/http\""
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "22b7445b13e02d8d78d9acc186d2d3c48b8ddc69..5bb9e71478a0b35af210b7170d45ab1c0826f5d5"
+    "shas": "37e9f6f8526fe6b819ff2e57dcaa103db100c07d..4468832fc598e633215baf65a3f2ed3f74a546d0"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-replacement-test",
@@ -426,7 +426,7 @@
         " \"net/http\""
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5bb9e71478a0b35af210b7170d45ab1c0826f5d5..92f2a450a3b57dd5a48ed1d77a784468b24c2dfa"
+    "shas": "4468832fc598e633215baf65a3f2ed3f74a546d0..683ea70dd0d1820bc9cf5e6ec8ad29ebdd06c9b8"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-replacement-test",
@@ -604,7 +604,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "92f2a450a3b57dd5a48ed1d77a784468b24c2dfa..aadb809c091e783a3fd84d11a725d6f148050513"
+    "shas": "683ea70dd0d1820bc9cf5e6ec8ad29ebdd06c9b8..35c109f060b0cd2fb5536a14d2b6e8cb147c08c6"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-test",
@@ -683,7 +683,7 @@
         "   alias \"awesome/package\""
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aadb809c091e783a3fd84d11a725d6f148050513..58bb20503217c8b8d90f9396a7733dda51774231"
+    "shas": "35c109f060b0cd2fb5536a14d2b6e8cb147c08c6..77600c3191400bffd16e07b51eedbe26da299f54"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-rest-test",
@@ -758,5 +758,5 @@
         "-)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "58bb20503217c8b8d90f9396a7733dda51774231..7166b1cb67dd7dd96e0a10492218fffb3ef3b227"
+    "shas": "77600c3191400bffd16e07b51eedbe26da299f54..644ac76703103ccfb79e7fd42580932ea3d221ee"
 }]

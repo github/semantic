@@ -124,7 +124,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c61cd68e5e8fc1747ac12ac38729c6b895e9b7cc..766c51c40f571bc662ff9b657b679f59ff148503"
+    "shas": "d43e97cf3d55daf77e94c9e6674bf2554d561a9c..90d8240954529e4bf88b4305b19bcc6271f3928e"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-insert-test",
@@ -359,7 +359,7 @@
         " func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "766c51c40f571bc662ff9b657b679f59ff148503..b2a1925ca40702d44181f5ae5b55b1a59783e506"
+    "shas": "90d8240954529e4bf88b4305b19bcc6271f3928e..15b8421caa069b073abde86be2a9c9426c9e9657"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -439,7 +439,7 @@
         " func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b2a1925ca40702d44181f5ae5b55b1a59783e506..448af345fe51186be2eb89e1468db5c45439c42f"
+    "shas": "15b8421caa069b073abde86be2a9c9426c9e9657..6c44249c4fd0e0969d9545660b4fa1d1a321cdff"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -519,7 +519,7 @@
         " func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "448af345fe51186be2eb89e1468db5c45439c42f..58ef209b6679a923aca9d593037b54abf3a538b3"
+    "shas": "6c44249c4fd0e0969d9545660b4fa1d1a321cdff..f3df7f5b69ceeca38febafe37b24042a57a51832"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -860,7 +860,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "58ef209b6679a923aca9d593037b54abf3a538b3..deaeecc894c3f70fc84df6350dd869155fe64cbe"
+    "shas": "f3df7f5b69ceeca38febafe37b24042a57a51832..470699b978cfc573dacf88d821fefb6255631c67"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-test",
@@ -989,7 +989,7 @@
         " func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "deaeecc894c3f70fc84df6350dd869155fe64cbe..ec8ea36322873f0f94097acd8dadd8e8a94fb498"
+    "shas": "470699b978cfc573dacf88d821fefb6255631c67..a633961f23a56e5d1f0e178b62b84ec0c986c117"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-rest-test",
@@ -1117,5 +1117,5 @@
         "-func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ec8ea36322873f0f94097acd8dadd8e8a94fb498..41d53560db987758aae21796e447ef05f87f531c"
+    "shas": "a633961f23a56e5d1f0e178b62b84ec0c986c117..84772ce610446a7a9751f866e59e6c70a32a8a15"
 }]

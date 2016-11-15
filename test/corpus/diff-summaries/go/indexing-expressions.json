@@ -12,26 +12,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                5
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Added 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -249,7 +234,7 @@
         "+ f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b4384ec05c9ec0655535c310026675051d3e254..da689392d5e82eab685ece748bf56a8ec4c62503"
+    "shas": "0c38dcb2700dab0aa4967a116dc89514d3180c85..c1cbaaccef69771d709316060f5a2ba9d0b1743c"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-insert-test",
@@ -505,26 +490,11 @@
                             ],
                             "end": [
                                 7,
-                                2
+                                5
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                3
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -751,7 +721,7 @@
         "  c[1:]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "da689392d5e82eab685ece748bf56a8ec4c62503..439f7f52e259ac4df884f0f567824cc133e30ade"
+    "shas": "c1cbaaccef69771d709316060f5a2ba9d0b1743c..01a35b4e15327480f2d483d2475390d16d5f3bb3"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -767,41 +737,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                5
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Added the 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -818,6 +758,48 @@
                             },
                             {
                                 "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
                                     3,
                                     2
                                 ],
@@ -828,64 +810,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    4
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    4
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '2' with '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Replaced the 'y' identifier with the 'c' identifier"
                 },
                 {
                     "span": {
@@ -941,7 +866,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "439f7f52e259ac4df884f0f567824cc133e30ade..70de4665372c80a230710e6e9c7e6305aff860b3"
+    "shas": "01a35b4e15327480f2d483d2475390d16d5f3bb3..6ae0f32efe6a2c205c6c7c9e073010adfc86a332"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -1047,26 +972,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -1137,7 +1047,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "70de4665372c80a230710e6e9c7e6305aff860b3..7d2046ba347d119186ecaea6528319f06a6549cd"
+    "shas": "6ae0f32efe6a2c205c6c7c9e073010adfc86a332..ca4ce0915aebecbacb4d8e52786e61980f5d4b9b"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -1483,26 +1393,11 @@
                             ],
                             "end": [
                                 13,
-                                2
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                3
-                            ],
-                            "end": [
-                                13,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -1585,7 +1480,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d2046ba347d119186ecaea6528319f06a6549cd..ad401d9d35f9ce2d5007b098225a0983a08c7e6c"
+    "shas": "ca4ce0915aebecbacb4d8e52786e61980f5d4b9b..74f0b066fe03c164621e8e16a0f6e6affcdf206c"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-test",
@@ -1601,26 +1496,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -1841,7 +1721,7 @@
         "  x[1:]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad401d9d35f9ce2d5007b098225a0983a08c7e6c..4c6376e6f79c12b188371064d5cdbec2ace3aa41"
+    "shas": "74f0b066fe03c164621e8e16a0f6e6affcdf206c..181a026fa941d2836e956885ce4b57b5c57528ac"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-rest-test",
@@ -2109,5 +1989,5 @@
         "- f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4c6376e6f79c12b188371064d5cdbec2ace3aa41..f31b4744820d0b1e584a81d1bd544e42bd6a027e"
+    "shas": "181a026fa941d2836e956885ce4b57b5c57528ac..a7009cc104897491cd77050892b71f6e145e5cca"
 }]
