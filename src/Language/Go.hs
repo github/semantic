@@ -23,7 +23,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
     | category (extract packageName) == Other "package_clause" ->
       case unwrap packageName of
         S.Indexed [id] -> withCategory Module (S.Module id rest)
-        _ -> withCategory Error (S.Error $ packageName : rest)
+        _ -> withCategory Error (S.Error children)
   ("import_declaration", imports) -> toImports imports
   ("function_declaration", [id, params, block]) ->
     withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
