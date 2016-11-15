@@ -130,4 +130,6 @@ syntaxToTermField syntax = case syntax of
   S.Negate expr -> [ "negate" .= expr ]
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
   S.Select cases -> childrenFields cases
+  S.Go cases -> childrenFields cases
+  S.Defer cases -> childrenFields cases
   where childrenFields c = [ "children" .= c ]

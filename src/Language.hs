@@ -38,7 +38,7 @@ languageForType mediaType = case mediaType of
     ".js" -> Just JavaScript
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
-    ".go" -> Just Go
+    ".go" -> Just Language.Go
     _ -> Nothing
 
 termConstructor

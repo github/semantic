@@ -74,7 +74,7 @@ parserForType mediaType = case languageForType mediaType of
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
   Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby ts_language_ruby
-  Just Go -> treeSitterParser Go ts_language_go
+  Just Language.Go -> treeSitterParser Language.Go ts_language_go
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.

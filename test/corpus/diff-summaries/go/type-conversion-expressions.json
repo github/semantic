@@ -42,26 +42,11 @@
                             ],
                             "end": [
                                 1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier"
+                    "summary": "Added the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -102,26 +87,11 @@
                             ],
                             "end": [
                                 2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier"
+                    "summary": "Added the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -132,26 +102,11 @@
                             ],
                             "end": [
                                 3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
                                 5
                             ]
                         }
                     },
-                    "summary": "Added the 'f' identifier"
+                    "summary": "Added the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -177,26 +132,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'f' identifier"
+                    "summary": "Added the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -232,7 +172,7 @@
         "+ (e.f)(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a3ff39d200ab9619cd6b82cc14d008e3ae0a8764..66b463e26785378e248e929df8f8204cec7b7def"
+    "shas": "c75adf5d16797d4135f685f212951eb42c572f6a..9af74a2aea13ec1508ced98fcd3c3f6d195d4ac0"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-insert-test",
@@ -278,26 +218,11 @@
                             ],
                             "end": [
                                 1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the 'e' identifier"
+                    "summary": "Added the 'z[e]' subscript access"
                 },
                 {
                     "span": {
@@ -338,26 +263,11 @@
                             ],
                             "end": [
                                 2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'i' identifier"
+                    "summary": "Added the 'h[i]' subscript access"
                 },
                 {
                     "span": {
@@ -368,26 +278,11 @@
                             ],
                             "end": [
                                 3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'j' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
                                 5
                             ]
                         }
                     },
-                    "summary": "Added the 'k' identifier"
+                    "summary": "Added the 'j[k]' subscript access"
                 },
                 {
                     "span": {
@@ -413,26 +308,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'n' identifier"
+                    "summary": "Added the 'm[n]' subscript access"
                 },
                 {
                     "span": {
@@ -488,26 +368,11 @@
                             ],
                             "end": [
                                 5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                9
-                            ],
-                            "end": [
-                                5,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier"
+                    "summary": "Added the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -548,26 +413,11 @@
                             ],
                             "end": [
                                 6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                12
-                            ],
-                            "end": [
-                                6,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier"
+                    "summary": "Added the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -578,26 +428,11 @@
                             ],
                             "end": [
                                 7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                4
-                            ],
-                            "end": [
-                                7,
                                 5
                             ]
                         }
                     },
-                    "summary": "Added the 'f' identifier"
+                    "summary": "Added the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -623,26 +458,11 @@
                             ],
                             "end": [
                                 8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                5
-                            ],
-                            "end": [
-                                8,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'f' identifier"
+                    "summary": "Added the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -685,7 +505,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66b463e26785378e248e929df8f8204cec7b7def..9185f511b712fc233a0f6375096f9fceb3e75fa0"
+    "shas": "9af74a2aea13ec1508ced98fcd3c3f6d195d4ac0..c8f2a6f631443961b07229de4fef2bc34ef862d3"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -771,7 +591,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier"
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c[d] subscript access"
                 },
                 {
                     "span": {
@@ -798,7 +618,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'e' identifier with the 'd' identifier"
+                    "summary": "Replaced the 'e' identifier with the 'd' identifier in the c[d] subscript access"
                 },
                 {
                     "span": {
@@ -879,7 +699,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'c' identifier"
+                    "summary": "Replaced the 'h' identifier with the 'c' identifier in the c[d] subscript access"
                 },
                 {
                     "span": {
@@ -906,7 +726,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i' identifier with the 'd' identifier"
+                    "summary": "Replaced the 'i' identifier with the 'd' identifier in the c[d] subscript access"
                 },
                 {
                     "span": {
@@ -933,7 +753,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j' identifier with the 'e' identifier"
+                    "summary": "Replaced the 'j' identifier with the 'e' identifier in the e[f] subscript access"
                 },
                 {
                     "span": {
@@ -960,7 +780,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'k' identifier with the 'f' identifier"
+                    "summary": "Replaced the 'k' identifier with the 'f' identifier in the e[f] subscript access"
                 },
                 {
                     "span": {
@@ -1014,7 +834,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'm' identifier with the 'e' identifier"
+                    "summary": "Replaced the 'm' identifier with the 'e' identifier in the e[f] subscript access"
                 },
                 {
                     "span": {
@@ -1041,7 +861,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'n' identifier with the 'f' identifier"
+                    "summary": "Replaced the 'n' identifier with the 'f' identifier in the e[f] subscript access"
                 },
                 {
                     "span": {
@@ -1096,7 +916,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9185f511b712fc233a0f6375096f9fceb3e75fa0..d6955dd0182231db0a945e9c70d666efdb85bc1d"
+    "shas": "c8f2a6f631443961b07229de4fef2bc34ef862d3..2a16c9d5fe0e27ca97c21b70148a808b9e0bb29f"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -1182,7 +1002,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier"
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the z[e] subscript access"
                 },
                 {
                     "span": {
@@ -1209,7 +1029,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'd' identifier with the 'e' identifier"
+                    "summary": "Replaced the 'd' identifier with the 'e' identifier in the z[e] subscript access"
                 },
                 {
                     "span": {
@@ -1290,7 +1110,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'h' identifier"
+                    "summary": "Replaced the 'c' identifier with the 'h' identifier in the h[i] subscript access"
                 },
                 {
                     "span": {
@@ -1317,7 +1137,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'd' identifier with the 'i' identifier"
+                    "summary": "Replaced the 'd' identifier with the 'i' identifier in the h[i] subscript access"
                 },
                 {
                     "span": {
@@ -1344,7 +1164,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'e' identifier with the 'j' identifier"
+                    "summary": "Replaced the 'e' identifier with the 'j' identifier in the j[k] subscript access"
                 },
                 {
                     "span": {
@@ -1371,7 +1191,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f' identifier with the 'k' identifier"
+                    "summary": "Replaced the 'f' identifier with the 'k' identifier in the j[k] subscript access"
                 },
                 {
                     "span": {
@@ -1425,7 +1245,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'e' identifier with the 'm' identifier"
+                    "summary": "Replaced the 'e' identifier with the 'm' identifier in the m[n] subscript access"
                 },
                 {
                     "span": {
@@ -1452,7 +1272,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f' identifier with the 'n' identifier"
+                    "summary": "Replaced the 'f' identifier with the 'n' identifier in the m[n] subscript access"
                 },
                 {
                     "span": {
@@ -1507,7 +1327,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d6955dd0182231db0a945e9c70d666efdb85bc1d..5e2f569f5c2ac1c6bac6109bd07bbc314bb51acd"
+    "shas": "2a16c9d5fe0e27ca97c21b70148a808b9e0bb29f..f38160a59a8c162c1fb048948a0a1327064b383f"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -1553,26 +1373,11 @@
                             ],
                             "end": [
                                 1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e' identifier"
+                    "summary": "Deleted the 'z[e]' subscript access"
                 },
                 {
                     "span": {
@@ -1613,26 +1418,11 @@
                             ],
                             "end": [
                                 2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
                                 13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i' identifier"
+                    "summary": "Deleted the 'h[i]' subscript access"
                 },
                 {
                     "span": {
@@ -1643,26 +1433,11 @@
                             ],
                             "end": [
                                 3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'j' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
                                 5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'k' identifier"
+                    "summary": "Deleted the 'j[k]' subscript access"
                 },
                 {
                     "span": {
@@ -1688,26 +1463,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'n' identifier"
+                    "summary": "Deleted the 'm[n]' subscript access"
                 },
                 {
                     "span": {
@@ -1763,26 +1523,11 @@
                             ],
                             "end": [
                                 5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                9
-                            ],
-                            "end": [
-                                5,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -1823,26 +1568,11 @@
                             ],
                             "end": [
                                 6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                12
-                            ],
-                            "end": [
-                                6,
                                 13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -1853,26 +1583,11 @@
                             ],
                             "end": [
                                 7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                4
-                            ],
-                            "end": [
-                                7,
                                 5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' identifier"
+                    "summary": "Deleted the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -1898,26 +1613,11 @@
                             ],
                             "end": [
                                 8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                5
-                            ],
-                            "end": [
-                                8,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' identifier"
+                    "summary": "Deleted the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -1973,26 +1673,11 @@
                             ],
                             "end": [
                                 5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                9
-                            ],
-                            "end": [
-                                5,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the 'e' identifier"
+                    "summary": "Added the 'z[e]' subscript access"
                 },
                 {
                     "span": {
@@ -2033,26 +1718,11 @@
                             ],
                             "end": [
                                 6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                12
-                            ],
-                            "end": [
-                                6,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'i' identifier"
+                    "summary": "Added the 'h[i]' subscript access"
                 },
                 {
                     "span": {
@@ -2063,26 +1733,11 @@
                             ],
                             "end": [
                                 7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'j' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                4
-                            ],
-                            "end": [
-                                7,
                                 5
                             ]
                         }
                     },
-                    "summary": "Added the 'k' identifier"
+                    "summary": "Added the 'j[k]' subscript access"
                 },
                 {
                     "span": {
@@ -2108,26 +1763,11 @@
                             ],
                             "end": [
                                 8,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                5
-                            ],
-                            "end": [
-                                8,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'n' identifier"
+                    "summary": "Added the 'm[n]' subscript access"
                 },
                 {
                     "span": {
@@ -2175,7 +1815,7 @@
         "+ (m.n)(o)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5e2f569f5c2ac1c6bac6109bd07bbc314bb51acd..5c6f8eae3374c451a1b6b290a0a9fc41e0e1b7b0"
+    "shas": "f38160a59a8c162c1fb048948a0a1327064b383f..3425938b2bd9297174666f41cdf6aa12e78668f2"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-test",
@@ -2221,26 +1861,11 @@
                             ],
                             "end": [
                                 1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -2281,26 +1906,11 @@
                             ],
                             "end": [
                                 2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
                                 13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier"
+                    "summary": "Deleted the 'c[d]' subscript access"
                 },
                 {
                     "span": {
@@ -2311,26 +1921,11 @@
                             ],
                             "end": [
                                 3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
                                 5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' identifier"
+                    "summary": "Deleted the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -2356,26 +1951,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' identifier"
+                    "summary": "Deleted the 'e[f]' subscript access"
                 },
                 {
                     "span": {
@@ -2414,7 +1994,7 @@
         "  j.k(l)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c6f8eae3374c451a1b6b290a0a9fc41e0e1b7b0..7217d3184e3aec2e3d862894b0153ce98aa2b230"
+    "shas": "3425938b2bd9297174666f41cdf6aa12e78668f2..5f9fb03069de45a3be1306c9fab388b02761f3dd"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-rest-test",
@@ -2460,26 +2040,11 @@
                             ],
                             "end": [
                                 1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e' identifier"
+                    "summary": "Deleted the 'z[e]' subscript access"
                 },
                 {
                     "span": {
@@ -2520,26 +2085,11 @@
                             ],
                             "end": [
                                 2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
                                 13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i' identifier"
+                    "summary": "Deleted the 'h[i]' subscript access"
                 },
                 {
                     "span": {
@@ -2550,26 +2100,11 @@
                             ],
                             "end": [
                                 3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'j' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
                                 5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'k' identifier"
+                    "summary": "Deleted the 'j[k]' subscript access"
                 },
                 {
                     "span": {
@@ -2595,26 +2130,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                5
-                            ],
-                            "end": [
-                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'n' identifier"
+                    "summary": "Deleted the 'm[n]' subscript access"
                 },
                 {
                     "span": {
@@ -2650,5 +2170,5 @@
         "- (m.n)(o)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7217d3184e3aec2e3d862894b0153ce98aa2b230..6ac81ae927283567f897f6bee943e167a2d5de24"
+    "shas": "5f9fb03069de45a3be1306c9fab388b02761f3dd..142b51b372830779b51b522b0164e7b3289906af"
 }]

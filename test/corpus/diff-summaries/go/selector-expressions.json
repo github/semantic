@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'method call()' function call"
+                    "summary": "Added the 'a[b][c]()' function call"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e91f5a4e4e8c4c5c825fba7ecaec365598eea16..695c3ccd796f0f82d8b5a9f2941343366c528fd1"
+    "shas": "6437316b47162d1d0e8725a908a74ea0ade40808..271f157de158334c1c62e74034453b8e9204b7a8"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'method call()' function call"
+                    "summary": "Added the 'x[y][z]()' function call"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'method call()' function call"
+                    "summary": "Added the 'a[b][c]()' function call"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "695c3ccd796f0f82d8b5a9f2941343366c528fd1..845bdcafa292fa4a1e66ba5c1a5813f3852ecfd9"
+    "shas": "271f157de158334c1c62e74034453b8e9204b7a8..de77572b641ade14badcb35bf2f825c99e683bf0"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the method call() function call"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a[b] subscript access"
                 },
                 {
                     "span": {
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the method call() function call"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the a[b] subscript access"
                 },
                 {
                     "span": {
@@ -175,7 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the method call() function call"
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the a[b][c] subscript access"
                 }
             ]
         },
@@ -196,7 +196,7 @@
         " a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "845bdcafa292fa4a1e66ba5c1a5813f3852ecfd9..fed4d037eeed10674d353030a2d200967022ae7c"
+    "shas": "de77572b641ade14badcb35bf2f825c99e683bf0..739b4f99d54d9948bf5441bfd3e01295c107019c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -228,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the method call() function call"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x[y] subscript access"
                 },
                 {
                     "span": {
@@ -255,7 +255,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the method call() function call"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the x[y] subscript access"
                 },
                 {
                     "span": {
@@ -282,7 +282,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the method call() function call"
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the x[y][z] subscript access"
                 }
             ]
         },
@@ -303,7 +303,7 @@
         " a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fed4d037eeed10674d353030a2d200967022ae7c..2f8ad1dc6f6164d6b82dcc1be2be750325170200"
+    "shas": "739b4f99d54d9948bf5441bfd3e01295c107019c..281f64d337426bbe8f66ebcbe15e42335903bc13"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -323,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'method call()' function call"
+                    "summary": "Deleted the 'x[y][z]()' function call"
                 },
                 {
                     "span": {
@@ -338,7 +338,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'method call()' function call"
+                    "summary": "Deleted the 'a[b][c]()' function call"
                 },
                 {
                     "span": {
@@ -353,7 +353,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'method call()' function call"
+                    "summary": "Added the 'x[y][z]()' function call"
                 }
             ]
         },
@@ -374,7 +374,7 @@
         "+x.y.z()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f8ad1dc6f6164d6b82dcc1be2be750325170200..ecd332e2098239b73e632d12ff0e87a65c91bdef"
+    "shas": "281f64d337426bbe8f66ebcbe15e42335903bc13..afbdc5567587cf710b4113bbe53ea310c0978f06"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-test",
@@ -394,7 +394,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'method call()' function call"
+                    "summary": "Deleted the 'a[b][c]()' function call"
                 }
             ]
         },
@@ -413,7 +413,7 @@
         " x.y.z()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ecd332e2098239b73e632d12ff0e87a65c91bdef..934a867c69922768312956712c3e22163b4a02ec"
+    "shas": "afbdc5567587cf710b4113bbe53ea310c0978f06..2e2b929d2272a3dab7eae1a6c0636d2bc276874f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-rest-test",
@@ -433,7 +433,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'method call()' function call"
+                    "summary": "Deleted the 'x[y][z]()' function call"
                 }
             ]
         },
@@ -451,5 +451,5 @@
         "-x.y.z()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "934a867c69922768312956712c3e22163b4a02ec..aae85c54128ac5ea35d01e547620f1f4ce55e725"
+    "shas": "2e2b929d2272a3dab7eae1a6c0636d2bc276874f..7b4384ec05c9ec0655535c310026675051d3e254"
 }]

@@ -50,6 +50,15 @@ termConstructor source sourceSpan name range children = case (name, children) of
       where isCaseClause = (== Case) . category . extract
   ("select_statement", children) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
+  ("go_statement", children) -> withDefaultInfo $ case children of
+    [expr] -> S.Go expr
+    rest -> S.Error rest
+  ("defer_statement", children) -> withDefaultInfo $ case children of
+    [expr] -> S.Defer expr
+    rest -> S.Error rest
+  ("selector_expression", children) -> withDefaultInfo $ case children of
+    [a, b] -> S.SubscriptAccess a b
+    rest -> S.Error rest
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -131,7 +140,7 @@ categoryForGoName = \case
   "function_declaration" -> Function
   "func_literal" -> AnonymousFunction
   "call_expression" -> FunctionCall
-  "selector_expression" -> MethodCall
+  "selector_expression" -> SubscriptAccess
   "parameters" -> Args
   "short_var_declaration" -> VarDecl
   "var_declaration" -> VarDecl
@@ -147,5 +156,7 @@ categoryForGoName = \case
   "type_case_clause" -> Case
   "select_statement" -> Select
   "communication_case" -> Case
+  "defer_statement" -> Defer
+  "go_statement" -> Go
   s -> Other (toS s)
 

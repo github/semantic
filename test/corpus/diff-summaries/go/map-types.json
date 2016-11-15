@@ -64,7 +64,7 @@
         "+type m1 map[string]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "704114280ade45d3d88ece9348c00e72bc1aabed..ad6c1f502acc10dd5aba66f0c3116d2e3eca3534"
+    "shas": "b9479d652daeb29664f30b6786e9a90d040752f2..319fd9ca3d221dab5dbd1971cf5fe411cd8023bf"
 }
 ,{
     "testCaseDescription": "go-map-types-replacement-insert-test",
@@ -179,7 +179,7 @@
         " type m1 map[string]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad6c1f502acc10dd5aba66f0c3116d2e3eca3534..e78b0654ab6d82723c635017bce4c7c65e3429ba"
+    "shas": "319fd9ca3d221dab5dbd1971cf5fe411cd8023bf..3bee8ab10515ae16766faa820d7d210ab2cbbe21"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-insert-test",
@@ -232,7 +232,7 @@
         " type m1 map[string]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e78b0654ab6d82723c635017bce4c7c65e3429ba..c9e3a5e98d4ddb75bdcdb26eb07d7ad3d566e16e"
+    "shas": "3bee8ab10515ae16766faa820d7d210ab2cbbe21..cc709f605ebd2e4dd9b523b690859f1757a4573d"
 }
 ,{
     "testCaseDescription": "go-map-types-replacement-test",
@@ -285,7 +285,7 @@
         " type m1 map[string]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c9e3a5e98d4ddb75bdcdb26eb07d7ad3d566e16e..baf0819ed06f73db23008026dbd7d9313784df51"
+    "shas": "cc709f605ebd2e4dd9b523b690859f1757a4573d..f734a2ebf12fb1de7f5b2e48fd93354614fd04d1"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-replacement-test",
@@ -446,7 +446,7 @@
         "+type m1 map[int]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "baf0819ed06f73db23008026dbd7d9313784df51..78d0999fe0b973da85cb87d15343753e787757dc"
+    "shas": "f734a2ebf12fb1de7f5b2e48fd93354614fd04d1..57103d7cd990a970e473dfaa5d1441bff1091cec"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-test",
@@ -515,7 +515,7 @@
         " type m1 map[int]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "78d0999fe0b973da85cb87d15343753e787757dc..e8ba73f47eb0384642c9649f178e88ad54badc80"
+    "shas": "57103d7cd990a970e473dfaa5d1441bff1091cec..1ad458fae9735e3a1fae97d06924f33c894fd86f"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-rest-test",
@@ -583,5 +583,5 @@
         "-type m1 map[int]error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e8ba73f47eb0384642c9649f178e88ad54badc80..058ec6b8345b653c1220d288e780dbecd2af6d8f"
+    "shas": "1ad458fae9735e3a1fae97d06924f33c894fd86f..807173f65c51d6b4e3296849dd3054f15a932fdf"
 }]

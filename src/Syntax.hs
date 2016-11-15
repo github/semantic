@@ -84,6 +84,8 @@ data Syntax a f
   | Negate f
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
   | Rescue [f] [f]
+  | Go f
+  | Defer f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

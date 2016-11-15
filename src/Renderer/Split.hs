@@ -100,6 +100,8 @@ styleName category = "category-" <> case category of
   C.RescuedException -> "last_exception"
   C.Negate -> "negate"
   C.Select -> "select_statement"
+  C.Go -> "go_statement"
+  C.Defer -> "defer_statement"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

@@ -64,7 +64,7 @@
         "+x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbe3cf8913f350d2e6076d643bc6d45526fd21bb..11bbeae067ec62014bd0c64e096b995295a03046"
+    "shas": "f31b4744820d0b1e584a81d1bd544e42bd6a027e..de4e71cd5141dec1beaf81d65ab37b5df3ece32b"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
@@ -179,7 +179,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "11bbeae067ec62014bd0c64e096b995295a03046..25e2f2afe7c05282464f0faf5d7139faa2515980"
+    "shas": "de4e71cd5141dec1beaf81d65ab37b5df3ece32b..53f63817d7cc0edfe8190ac167f1a07be6a4bf2c"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -286,7 +286,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "25e2f2afe7c05282464f0faf5d7139faa2515980..1a0d50828127893751115b6103fef98d6f725677"
+    "shas": "53f63817d7cc0edfe8190ac167f1a07be6a4bf2c..a6753fe3842a88e2cce08a8ebe6c43dbe044e814"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -393,7 +393,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a0d50828127893751115b6103fef98d6f725677..e25454b384b2acf2255e045c382436f5fedfec1f"
+    "shas": "a6753fe3842a88e2cce08a8ebe6c43dbe044e814..bcf553512c0bb580b51a2bbc785c1b5f7240e5a9"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -554,7 +554,7 @@
         "+b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e25454b384b2acf2255e045c382436f5fedfec1f..2852f7b72a500b40984b849e314300ef99c6accc"
+    "shas": "bcf553512c0bb580b51a2bbc785c1b5f7240e5a9..ee703e7b91f98bf453eb65eca282095e32edfb35"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-test",
@@ -623,7 +623,7 @@
         " b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2852f7b72a500b40984b849e314300ef99c6accc..8a09ddec5779b307022d798bae057213f6fcd73a"
+    "shas": "ee703e7b91f98bf453eb65eca282095e32edfb35..ed6bfd56d45aff07bc84dc3ed71945747ebb3f16"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
@@ -691,5 +691,5 @@
         "-b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8a09ddec5779b307022d798bae057213f6fcd73a..a3ff39d200ab9619cd6b82cc14d008e3ae0a8764"
+    "shas": "ed6bfd56d45aff07bc84dc3ed71945747ebb3f16..c75adf5d16797d4135f685f212951eb42c572f6a"
 }]

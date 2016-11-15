@@ -8,7 +8,7 @@
                         "insert": {
                             "start": [
                                 1,
-                                7
+                                1
                             ],
                             "end": [
                                 1,
@@ -16,14 +16,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'x[y]()' defer statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 2,
-                                4
+                                1
                             ],
                             "end": [
                                 2,
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'x[y]()' go statement"
                 }
             ]
         },
@@ -50,7 +50,7 @@
         "+go x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "83f784e3656d1bab0853dd001679a74827f28518..61084c77c8af618d270eb6d86c2392764c3f1a04"
+    "shas": "430f150040921e52f446cf12075666fac38a5dae..2420861b27a730e7be04bfdd5999b3079930c4f8"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-insert-test",
@@ -62,7 +62,7 @@
                         "insert": {
                             "start": [
                                 1,
-                                7
+                                1
                             ],
                             "end": [
                                 1,
@@ -70,14 +70,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'a[b]()' defer statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 2,
-                                4
+                                1
                             ],
                             "end": [
                                 2,
@@ -85,14 +85,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'c[d]()' go statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                7
+                                1
                             ],
                             "end": [
                                 3,
@@ -100,14 +100,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'x[y]()' defer statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                4
+                                1
                             ],
                             "end": [
                                 4,
@@ -115,7 +115,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'x[y]()' go statement"
                 }
             ]
         },
@@ -138,7 +138,7 @@
         " go x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "61084c77c8af618d270eb6d86c2392764c3f1a04..23fd5e14e8936468816668f39f2aac9a4f5939e0"
+    "shas": "2420861b27a730e7be04bfdd5999b3079930c4f8..71a6e3b09fbac5d8e496b9fb0d8bd51436359af5"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -170,7 +170,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the identifier() function call"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x[y] subscript access"
                 },
                 {
                     "span": {
@@ -197,7 +197,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the identifier() function call"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the x[y] subscript access"
                 },
                 {
                     "span": {
@@ -224,7 +224,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the identifier() function call"
+                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the x[y] subscript access"
                 },
                 {
                     "span": {
@@ -251,7 +251,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'd' identifier with the 'y' identifier in the identifier() function call"
+                    "summary": "Replaced the 'd' identifier with the 'y' identifier in the x[y] subscript access"
                 }
             ]
         },
@@ -275,7 +275,7 @@
         " defer x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "23fd5e14e8936468816668f39f2aac9a4f5939e0..047b5b30d6e7d7e8fbb08c6040eb299789eb68d1"
+    "shas": "71a6e3b09fbac5d8e496b9fb0d8bd51436359af5..bb95dba28dfd6b76bcab384c2c7f98c45a654620"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -307,7 +307,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the identifier() function call"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a[b] subscript access"
                 },
                 {
                     "span": {
@@ -334,7 +334,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the identifier() function call"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the a[b] subscript access"
                 },
                 {
                     "span": {
@@ -361,7 +361,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the identifier() function call"
+                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the c[d] subscript access"
                 },
                 {
                     "span": {
@@ -388,7 +388,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'd' identifier in the identifier() function call"
+                    "summary": "Replaced the 'y' identifier with the 'd' identifier in the c[d] subscript access"
                 }
             ]
         },
@@ -412,7 +412,7 @@
         " defer x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "047b5b30d6e7d7e8fbb08c6040eb299789eb68d1..860176f2031241b3d1c0c93f23bb2911aa297e93"
+    "shas": "bb95dba28dfd6b76bcab384c2c7f98c45a654620..b92c89b9ea967f8803b0a49955a2505aa0b440b1"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -424,7 +424,7 @@
                         "delete": {
                             "start": [
                                 1,
-                                7
+                                1
                             ],
                             "end": [
                                 1,
@@ -432,14 +432,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'a[b]()' defer statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                4
+                                1
                             ],
                             "end": [
                                 2,
@@ -447,14 +447,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'c[d]()' go statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                7
+                                1
                             ],
                             "end": [
                                 3,
@@ -462,14 +462,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'x[y]()' defer statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                4
+                                1
                             ],
                             "end": [
                                 4,
@@ -477,14 +477,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'x[y]()' go statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                7
+                                1
                             ],
                             "end": [
                                 3,
@@ -492,14 +492,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'a[b]()' defer statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                4
+                                1
                             ],
                             "end": [
                                 4,
@@ -507,7 +507,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'c[d]()' go statement"
                 }
             ]
         },
@@ -532,7 +532,7 @@
         "+go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "860176f2031241b3d1c0c93f23bb2911aa297e93..5488cff5570790a118bc99f27723665a1d0c23cd"
+    "shas": "b92c89b9ea967f8803b0a49955a2505aa0b440b1..43fb27c3264f7d843b10635ca9d613416f3f2986"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-test",
@@ -544,7 +544,7 @@
                         "delete": {
                             "start": [
                                 1,
-                                7
+                                1
                             ],
                             "end": [
                                 1,
@@ -552,14 +552,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'x[y]()' defer statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                4
+                                1
                             ],
                             "end": [
                                 2,
@@ -567,7 +567,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'x[y]()' go statement"
                 }
             ]
         },
@@ -588,7 +588,7 @@
         " go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5488cff5570790a118bc99f27723665a1d0c23cd..b9a58aa64df83e3b68960dcd2c2d1efd195acb6f"
+    "shas": "43fb27c3264f7d843b10635ca9d613416f3f2986..887b0f2dece341280ff82f6138e8f35b89de8aa3"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-rest-test",
@@ -600,7 +600,7 @@
                         "delete": {
                             "start": [
                                 1,
-                                7
+                                1
                             ],
                             "end": [
                                 1,
@@ -608,14 +608,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'a[b]()' defer statement"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                4
+                                1
                             ],
                             "end": [
                                 2,
@@ -623,7 +623,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'c[d]()' go statement"
                 }
             ]
         },
@@ -642,5 +642,5 @@
         "-go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b9a58aa64df83e3b68960dcd2c2d1efd195acb6f..eb1c18cee4420f8afeaac8ebd0941c144a5cba8b"
+    "shas": "887b0f2dece341280ff82f6138e8f35b89de8aa3..6d2fc8cc4203f2bb568b5645c23802b7431b4c5c"
 }]

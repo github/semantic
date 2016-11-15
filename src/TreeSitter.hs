@@ -59,7 +59,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         termConstructor = case language of
           JavaScript -> JS.termConstructor
           C -> C.termConstructor
-          Go -> Go.termConstructor
+          Language.Go -> Go.termConstructor
           Ruby -> Ruby.termConstructor
           _ -> Language.termConstructor
         isNonEmpty child = category (extract child) /= Empty

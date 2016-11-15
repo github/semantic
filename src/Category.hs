@@ -139,6 +139,8 @@ data Category
   | Negate
   -- | A select expression in Go.
   | Select
+  | Defer
+  | Go
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -208,6 +210,9 @@ instance Arbitrary Category where
     , pure When
     , pure RescuedException
     , pure Negate
+    , pure Select
+    , pure Defer
+    , pure Go
     , Other <$> arbitrary
     ]
 
