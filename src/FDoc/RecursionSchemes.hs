@@ -69,7 +69,5 @@ termToStringCata = cata algebra
   where
     algebra term = case term of
       (_ :< Leaf value) -> [value]
-      (_ :< Indexed []) -> ["indexed"]
-      -- (_ :< Indexed [x:xs]) -> [x]
-      -- (_ :< Indexed [x:s:xs]) -> [x, s]
+      (_ :< Indexed values) -> ["indexed"] <> (Prologue.concat values)
       _ -> ["unknown"]
