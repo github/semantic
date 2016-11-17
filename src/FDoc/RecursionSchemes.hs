@@ -14,7 +14,7 @@ import FDoc.Term
 data NewField = NewField deriving (Show)
 
 {-
-Anamorphism
+Anamorphism -- add a new field to each term's Record fields
 
 ana :: (a -> Base t a) -- ^ a (Base t)-coalgebra
     -> a               -- ^ seed
@@ -24,16 +24,14 @@ Anamorphism as a recursion scheme "builds up" a recursive structure.
 Anamorphisms work by using a coalgebra, which maps a seed value to a fixed point structure.
 
 The example below adds a new field to the `Record` fields.
-
 -}
-
 indexedTermAna :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
 indexedTermAna childrenLeaves = ana coalgebra (indexedTerm childrenLeaves)
   where
     coalgebra term = (NewField .: (extract term)) :< (unwrap term)
 
 {-
-Catamorphism
+Catamorphism example -- add a new field to each term's Record fields
 
 cata :: (Base t a -> a) -- ^ a (Base t)-algebra
        -> t               -- ^ fixed point
