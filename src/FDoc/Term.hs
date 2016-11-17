@@ -31,3 +31,25 @@ Example (from GHCi):
 
 leafTermF :: leaf -> TermF (Syntax leaf) (Record '[Range, Category]) b
 leafTermF leaf = (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf leaf
+
+{-
+
+Constructs a Syntax.Leaf using the polymorphic type variable `leaf`.
+
+This is in the Term shape: Cofree f a where
+  f is the functor (Syntax.Leaf `leaf`)
+  a is the annotation (Record '[Range, Category])
+
+Two common convenience operations when working with Cofree (for docs, see Control.Comonad.Trans.Cofree.Types.Cofree) are `extract` and `unwrap`. `extract` returns the annotation portion of the Cofree structure, and `unwrap` returns the functor portion (Syntax).
+
+Example (from GHCi):
+
+> let leaf = leafTerm "example"
+> extract leaf
+> Range {start = 1, end = 10} .: MethodCall .: RNil
+> unwrap leaf
+> Leaf "example"
+
+-}
+leafTerm :: leaf -> Cofree (Syntax leaf) (Record '[Range, Category])
+leafTerm = cofree . leafTermF
