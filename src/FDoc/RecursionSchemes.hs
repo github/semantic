@@ -46,3 +46,15 @@ indexedTermCata :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Categ
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
     algebra term = cofree $ (NewField .: (headF term)) :< (tailF term)
+
+{-
+Anamorphism -- construct a Term from a string
+
+The example below shows how to build up a recursive Term structure from a string representation.
+-}
+stringToTermAna :: String -> Term (Syntax String) (Record '[Range, Category])
+stringToTermAna = ana coalgebra
+  where
+    coalgebra representation = case representation of
+      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf"]
+      _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
