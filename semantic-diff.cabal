@@ -57,6 +57,7 @@ library
                      , Term.Instances
                      , TreeSitter
                      , FDoc.Term
+                     , FDoc.RecursionSchemes
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , async-pool
