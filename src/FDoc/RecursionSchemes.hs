@@ -58,3 +58,18 @@ stringToTermAna = ana coalgebra
     coalgebra representation = case representation of
       "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf"]
       _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
+
+{-
+Catamorphism -- construct a list of Strings from a recursive Term structure.
+
+The example below shows how to tear down a recursive Term structure into a list of String representation.
+-}
+termToStringCata :: Term (Syntax String) (Record '[Range, Category]) -> [String]
+termToStringCata = cata algebra
+  where
+    algebra term = case term of
+      (_ :< Leaf value) -> [value]
+      (_ :< Indexed []) -> ["indexed"]
+      -- (_ :< Indexed [x:xs]) -> [x]
+      -- (_ :< Indexed [x:s:xs]) -> [x, s]
+      _ -> ["unknown"]
