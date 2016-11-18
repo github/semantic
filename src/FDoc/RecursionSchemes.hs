@@ -85,7 +85,7 @@ An algebra (catamorphism) is applied to this structure. Because of fusion the an
 catamorphism occur in a single pass.
 
 The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna
-can be utilized as a hylomorphism. 
+can be utilized as a hylomorphism.
 -}
 stringTermHylo :: String -> [String]
 stringTermHylo = hylo algebra coalgebra
