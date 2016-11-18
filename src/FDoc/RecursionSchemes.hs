@@ -71,3 +71,29 @@ termToStringCata = cata algebra
       (_ :< Leaf value) -> [value]
       (_ :< Indexed values) -> ["indexed"] <> (Prologue.concat values)
       _ -> ["unknown"]
+
+{-
+Hylomorphism -- An anamorphism followed by a catamorphism
+
+hylo :: Functor f => (f b -> b) -- an algebra
+                  -> (a -> f a) -- a coalgebra
+                  -> a          -- seed value
+                  -> b          -- result
+
+Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a virtual structure.
+An algebra (catamorphism) is applied to this structure. Because of fusion the anamorphism and
+catamorphism occur in a single pass.
+
+The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna
+can be utilized as a hylomorphism. 
+-}
+stringTermHylo :: String -> [String]
+stringTermHylo = hylo algebra coalgebra
+  where
+    algebra term = case term of
+      (_ :< Leaf value) -> [value]
+      (_ :< Indexed values) -> ["indexed"] <> (Prologue.concat values)
+      _ -> ["unknown"]
+    coalgebra representation = case representation of
+      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf"]
+      _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
