@@ -97,3 +97,20 @@ stringTermHylo = hylo algebra coalgebra
     coalgebra representation = case representation of
       "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf"]
       _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
+
+{-
+Paramorphism -- primitive recursion that maintains a reference to the original subobject and its computed value.
+
+para :: (Base t (t, a) -> a) -- an algebra that takes a tuple of the last input
+       -> t                  -- fixed point
+       -> a                  -- result
+
+Paramorphisms work by providing both the original subobject and the value computed recursively from it.
+-}
+termPara :: Term (Syntax String) (Record '[Range, Category]) -> [(Term (Syntax String) (Record '[Range, Category]), String)]
+termPara = para algebra
+  where
+    algebra term = case term of
+      (annotation :< Leaf representation) -> [(cofree (annotation :< Leaf representation), representation)]
+      (annotation :< Indexed values) -> [(cofree (annotation :< Indexed []), "indexed")] <> (values >>= Prelude.snd) -- (values >>= Prelude.snd) = Prologue.concat $ Prelude.snd <$> values
+      _ -> [(cofree ((Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "unknown"), "unknown")]
