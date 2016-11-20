@@ -107,10 +107,14 @@ hylo :: Functor f => (f b -> b) -- an algebra
 
 Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a virtual structure.
 An algebra (catamorphism) is applied to this structure. Because of fusion the anamorphism and
-catamorphism occur in a single pass.
+catamorphism occur in a single pass rather than two separate traversals.
 
 The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna
 can be utilized as a hylomorphism.
+
+Example Usage:
+stringTermHylo "indexed" => ["indexed", "leaf1", "leaf2", "leaf3"]
+
 -}
 stringTermHylo :: String -> [String]
 stringTermHylo = hylo algebra coalgebra
@@ -119,9 +123,9 @@ stringTermHylo = hylo algebra coalgebra
       (_ :< Leaf value) -> [value]
       (_ :< Indexed values) -> ["indexed"] <> (Prologue.concat values)
       _ -> ["unknown"]
-    coalgebra representation = case representation of
-      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf"]
-      _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
+    coalgebra stringRepresentation = case stringRepresentation of
+      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"]
+      _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf stringRepresentation
 
 {-
 Paramorphism -- primitive recursion that maintains a reference to the original subobject and its computed value.
