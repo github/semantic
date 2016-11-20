@@ -105,7 +105,32 @@ para :: (Base t (t, a) -> a) -- an algebra that takes a tuple of the last input
        -> t                  -- fixed point
        -> a                  -- result
 
-Paramorphisms work by providing both the original subobject and the value computed recursively from it.
+Paramorphisms, like all recursion schemes, work via a bottom up traversal (leaves to root), in which an algebra is applied to every node in the recursive structure. The difference between paramorphisms and catamorphisms is the algebra receives a tuple of the original subobject and its computed value (t, a) where `t` is the original suboject and `a` is the computed value.
+
+The example implementation below calculates a string representation for each Syntax type, flattening the recursive structure into a one dimensional list to tuples. The tuple contains the original syntax subobject, and its computed string representation. This example aims to showcase how paramorphisms work by returning a final list of tuples that mimics the intermediate tuple shapes the algebra receives throughout the bottom up traversal.
+
+Example Usage:
+let terms = indexedTerm ["leaf1", "leaf2", "leaf3"]
+termPara terms = Recurse over the structure to start at the leaves (bottom up traversal):
+
+tuple3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf3")), "leaf3" ) : []
+
+Continue the traversal from leaves to root:
+
+tuple2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf2")), "leaf2") : tuple3
+
+tuple1:2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf1" )), "leaf1") : tuple2:3
+
+Compute the root:
+tupleIndexed:1:2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Indexed [])), "indexed" ) : tuple1:2:3
+
+Final shape:
+[ (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Indexed []))  , "indexed")
+, (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf1")), "leaf1")
+, (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf2")), "leaf2")
+, (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf3")), "leaf3")
+]
+
 -}
 termPara :: Term (Syntax String) (Record '[Range, Category]) -> [(Term (Syntax String) (Record '[Range, Category]), String)]
 termPara = para algebra
