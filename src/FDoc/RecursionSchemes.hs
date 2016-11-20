@@ -51,12 +51,37 @@ indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
 Anamorphism -- construct a Term from a string
 
 The example below shows how to build up a recursive Term structure from a string representation.
+
+Example usage:
+
+stringToTermAna "indexed" =>
+  CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil)
+                      :<
+                      Indexed
+                        [ CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf1" ) )
+                        , CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf2" ) )
+                        , CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf3" ) )
+                        ] ))
+
+  First step is to match against the "indexed" string and begin building up a Cofree Indexed structure:
+
+  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"] ) )
+
+  While building up the `Indexed` structure, we continue to recurse over the `Indexed` terms ["leaf1", "leaf2", "leaf3"].
+  These are pattern matched using the catch all `_` and default to `Leaf` Syntax shapes:
+
+  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf1" ) )
+  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf2" ) )
+  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf3" ) )
+
+  These structures are substituted in place of ["leaf1", "leaf2", "leaf3"] in the new cofree `Indexed` structure,
+  resulting in a expansion of all possible string terms.
 -}
 stringToTermAna :: String -> Term (Syntax String) (Record '[Range, Category])
 stringToTermAna = ana coalgebra
   where
     coalgebra representation = case representation of
-      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf"]
+      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"]
       _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
 
 {-
