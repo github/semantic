@@ -180,6 +180,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.TypeAssertion _ _ -> termNameFromSource term
+  S.TypeConversion _ _ -> termNameFromSource term
   S.Go expr -> toTermName' expr
   S.Defer expr -> toTermName' expr
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
@@ -402,6 +403,7 @@ instance HasCategory Category where
     C.Slice -> "slice expression"
     C.Defer -> "defer statement"
     C.TypeAssertion -> "type assertion"
+    C.TypeConversion -> "type conversion"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

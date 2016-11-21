@@ -143,6 +143,7 @@ data Category
   | Go
   | Slice
   | TypeAssertion
+  | TypeConversion
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -217,6 +218,7 @@ instance Arbitrary Category where
     , pure Go
     , pure Slice
     , pure TypeAssertion
+    , pure TypeConversion
     , Other <$> arbitrary
     ]
 
