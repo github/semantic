@@ -55,6 +55,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("defer_statement", children) -> withDefaultInfo $ toExpression S.Defer children
   ("selector_expression", children) -> withDefaultInfo $ toSubscriptAccess children
   ("index_expression", children) -> withDefaultInfo $ toSubscriptAccess children
+  ("slice_expression", children) -> sliceToSubscriptAccess children
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -71,6 +72,12 @@ termConstructor source sourceSpan name range children = case (name, children) of
     toSubscriptAccess = \case
       [a, b] -> S.SubscriptAccess a b
       rest -> S.Error rest
+    sliceToSubscriptAccess = \case
+      a : rest -> do
+        slice <- withDefaultInfo $ S.Fixed rest
+        withDefaultInfo $ S.SubscriptAccess a slice
+      rest -> withDefaultInfo $ S.Error rest
+
     toIfStatement = \case
       [clause, block] ->
         withDefaultInfo $ S.If clause (toList $ unwrap block)
