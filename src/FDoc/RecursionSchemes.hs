@@ -121,7 +121,7 @@ stringTermHylo = hylo algebra coalgebra
       _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf stringRepresentation
 
 {-
-Paramorphism -- primitive recursion that maintains a reference to the original subobject and its computed value.
+Paramorphism -- primitive recursion that maintains a reference to the original value and its computed value.
 
 para :: (Base t (t, a) -> a) -- an algebra that takes a tuple of the last input
        -> t                  -- fixed point
