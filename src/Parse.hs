@@ -23,7 +23,12 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import Renderer.JSON()
 
-data ParseJSON f a = ParseJSON { category :: Text, range :: Range, syntax :: Syntax f a, sourceText :: SourceText } deriving (Show, Generic, ToJSON, Functor)
+data ParseJSON f a =
+  ParseJSON
+    { category :: Text
+    , range :: Range
+    , sourceText :: SourceText
+    } deriving (Show, Generic, ToJSON, Functor)
 
 run :: Arguments -> IO ()
 run Arguments{..} = do
@@ -31,25 +36,20 @@ run Arguments{..} = do
 
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
   let parsers = parserWithSource <$> filePaths
-  let parsersAndBlobs = zip parsers sourceBlobs
 
-  terms <- traverse (uncurry folder) parsersAndBlobs
+  terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers sourceBlobs
 
-  traverse_ (\ (parseJSON :< annotation) -> putStrLn . encodePretty $ parseJSON) (runCofree <$> terms)
+  let termsWithParseJSON = (cata algebra <$> terms)
+
+  traverse_ (\ (annotation :< syntax) -> putStrLn annotation) (head $ runCofree <$> termsWithParseJSON)
 
   pure ()
   where
-    folder parser sourceBlob = do
-      term <- parser sourceBlob
-      pure $ (ana coalgebra :: (HasField fields Range, HasField fields Category, HasField fields SourceText) => Cofree (Syntax f) (Record fields) -> Cofree (ParseJSON f) (Record fields)) term
-      where
-        coalgebra term =
-          case runCofree term of
-            (annotation :< syntax) -> annotation :< ParseJSON category' range' syntax sourceText'
-              where
-                category' = toS $ Info.category annotation
-                range' = characterRange annotation
-                sourceText' = Info.sourceText annotation
+    algebra term = case term of
+      (annotation :< syntax) -> cofree $ encodePretty (ParseJSON category' range' sourceText') :< syntax
+        where category' = toS $ Info.category annotation
+              range' = characterRange annotation
+              sourceText' = Info.sourceText annotation
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
