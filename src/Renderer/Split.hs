@@ -102,6 +102,9 @@ styleName category = "category-" <> case category of
   C.Select -> "select_statement"
   C.Go -> "go_statement"
   C.Defer -> "defer_statement"
+  C.Slice -> "slice_expression"
+  C.TypeAssertion -> "type_assertion"
+  C.TypeConversion -> "type_conversion"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
