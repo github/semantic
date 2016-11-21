@@ -142,6 +142,7 @@ data Category
   | Defer
   | Go
   | Slice
+  | TypeAssertion
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -215,6 +216,7 @@ instance Arbitrary Category where
     , pure Defer
     , pure Go
     , pure Slice
+    , pure TypeAssertion
     , Other <$> arbitrary
     ]
 

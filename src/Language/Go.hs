@@ -56,6 +56,9 @@ termConstructor source sourceSpan name range children = case (name, children) of
   ("selector_expression", children) -> withDefaultInfo $ toSubscriptAccess children
   ("index_expression", children) -> withDefaultInfo $ toSubscriptAccess children
   ("slice_expression", children) -> sliceToSubscriptAccess children
+  ("type_assertion_expression", children) -> withDefaultInfo $ case children of
+    [a, b] -> S.TypeAssertion a b
+    rest -> S.Error rest
   -- TODO: Handle multiple var specs
   ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
   ("short_var_declaration", children) -> listToVarDecls children
@@ -170,5 +173,6 @@ categoryForGoName = \case
   "communication_case" -> Case
   "defer_statement" -> Defer
   "go_statement" -> Go
+  "type_assertion_expression" -> TypeAssertion
   s -> Other (toS s)
 
