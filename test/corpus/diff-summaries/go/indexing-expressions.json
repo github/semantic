@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'a[1]' subscript access"
+                    "summary": "Added the 'a[1]' subscript access"
                 },
                 {
                     "span": {
@@ -27,191 +27,71 @@
                             ],
                             "end": [
                                 2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'b[b[:]]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
-                                7
+                                3,
+                                2
                             ],
                             "end": [
-                                5,
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'd[1:2]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                5,
                                 2
                             ],
                             "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'e[2:3]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f[1:2:3]' subscript access"
                 }
             ]
         },
@@ -234,7 +114,7 @@
         "+ f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c38dcb2700dab0aa4967a116dc89514d3180c85..c1cbaaccef69771d709316060f5a2ba9d0b1743c"
+    "shas": "5a80afc3c0dcecbaea8d511c091fd805defc43e3..f39e7b1d6c18c3a9e5eadf7232557320487a84ad"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-insert-test",
@@ -250,236 +130,86 @@
                             ],
                             "end": [
                                 1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'z[2]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                2,
                                 2
                             ],
                             "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'y[1]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                3,
                                 2
                             ],
                             "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
+                                3,
                                 7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
                             ],
                             "end": [
-                                5,
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'd[1:2]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                5,
                                 2
                             ],
                             "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'e[2:3]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f[1:2:3]' subscript access"
                 },
                 {
                     "span": {
@@ -505,191 +235,71 @@
                             ],
                             "end": [
                                 8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                2
-                            ],
-                            "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                4
-                            ],
-                            "end": [
-                                9,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                2
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                4
-                            ],
-                            "end": [
-                                10,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                2
-                            ],
-                            "end": [
-                                11,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                5
-                            ],
-                            "end": [
-                                11,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'b[b[:]]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                11,
-                                7
+                                9,
+                                2
                             ],
                             "end": [
-                                11,
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                2
+                            ],
+                            "end": [
+                                10,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'd[1:2]' subscript access"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                11,
                                 2
                             ],
                             "end": [
-                                12,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                4
-                            ],
-                            "end": [
-                                12,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                6
-                            ],
-                            "end": [
-                                12,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                8
-                            ],
-                            "end": [
-                                12,
+                                11,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'e[2:3]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                2
+                            ],
+                            "end": [
+                                12,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f[1:2:3]' subscript access"
                 }
             ]
         },
@@ -721,7 +331,7 @@
         "  c[1:]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c1cbaaccef69771d709316060f5a2ba9d0b1743c..01a35b4e15327480f2d483d2475390d16d5f3bb3"
+    "shas": "f39e7b1d6c18c3a9e5eadf7232557320487a84ad..72870e81eed4cf53e8873d7a7a28329d6df88a31"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -745,72 +355,63 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    3
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'z' identifier with the 'b' identifier"
+                    "summary": "Added the 'b[b[:]]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c[1]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                4
+                                1
                             ],
                             "end": [
                                 1,
-                                5
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'z[2]' subscript access"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    3
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'y' identifier with the 'c' identifier"
+                    "summary": "Deleted the 'y[1]' subscript access"
                 },
                 {
                     "span": {
@@ -821,26 +422,11 @@
                             ],
                             "end": [
                                 3,
-                                3
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'x[1]' subscript access"
                 }
             ]
         },
@@ -866,7 +452,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "01a35b4e15327480f2d483d2475390d16d5f3bb3..6ae0f32efe6a2c205c6c7c9e073010adfc86a332"
+    "shas": "72870e81eed4cf53e8873d7a7a28329d6df88a31..ca873f994ba2bc546977e2393bd5d43926b4489f"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -882,26 +468,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                6
                             ]
                         }
                     },
-                    "summary": "Added 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
+                    "summary": "Added the 'z[2]' subscript access"
                 },
                 {
                     "span": {
@@ -912,18 +483,45 @@
                             ],
                             "end": [
                                 2,
-                                3
+                                7
                             ]
                         }
                     },
-                    "summary": "Added 'y' identifier"
+                    "summary": "Added the 'y[1]' subscript access"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a[1]' subscript access with the 'x[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
                             "start": [
                                 2,
-                                5
+                                2
                             ],
                             "end": [
                                 2,
@@ -931,67 +529,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'b[b[:]]' subscript access"
                 },
                 {
                     "span": {
@@ -1002,26 +540,11 @@
                             ],
                             "end": [
                                 3,
-                                3
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'c[1]' subscript access"
                 }
             ]
         },
@@ -1047,7 +570,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ae0f32efe6a2c205c6c7c9e073010adfc86a332..ca4ce0915aebecbacb4d8e52786e61980f5d4b9b"
+    "shas": "ca873f994ba2bc546977e2393bd5d43926b4489f..41a585cd8687f33ed3cfec241ced6507e87ad8bb"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -1063,236 +586,86 @@
                             ],
                             "end": [
                                 1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'z[2]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                2,
                                 2
                             ],
                             "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'y[1]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 2
                             ],
                             "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                3,
                                 7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
                             ],
                             "end": [
-                                5,
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted '3'"
+                    "summary": "Deleted the 'd[1:2]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                5,
                                 2
                             ],
                             "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted '3'"
+                    "summary": "Deleted the 'e[2:3]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f[1:2:3]' subscript access"
                 },
                 {
                     "span": {
@@ -1303,56 +676,26 @@
                             ],
                             "end": [
                                 7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                4
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                5
-                            ],
-                            "end": [
-                                8,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'z[2]' subscript access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y[1]' subscript access"
                 },
                 {
                     "span": {
@@ -1363,26 +706,11 @@
                             ],
                             "end": [
                                 9,
-                                3
+                                7
                             ]
                         }
                     },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                4
-                            ],
-                            "end": [
-                                9,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'x[1]' subscript access"
                 },
                 {
                     "span": {
@@ -1408,11 +736,11 @@
                             ],
                             "end": [
                                 14,
-                                3
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Deleted the 'b[b[:]]' subscript access"
                 },
                 {
                     "span": {
@@ -1423,26 +751,11 @@
                             ],
                             "end": [
                                 15,
-                                3
+                                7
                             ]
                         }
                     },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                4
-                            ],
-                            "end": [
-                                15,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'c[1]' subscript access"
                 }
             ]
         },
@@ -1480,7 +793,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca4ce0915aebecbacb4d8e52786e61980f5d4b9b..74f0b066fe03c164621e8e16a0f6e6affcdf206c"
+    "shas": "41a585cd8687f33ed3cfec241ced6507e87ad8bb..c5511b25990d7979e7648b25e6d00c7d2950cca6"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-test",
@@ -1511,191 +824,71 @@
                             ],
                             "end": [
                                 2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'b[b[:]]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                7
+                                3,
+                                2
                             ],
                             "end": [
-                                5,
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted '3'"
+                    "summary": "Deleted the 'd[1:2]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                5,
                                 2
                             ],
                             "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted '3'"
+                    "summary": "Deleted the 'e[2:3]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f[1:2:3]' subscript access"
                 }
             ]
         },
@@ -1721,7 +914,7 @@
         "  x[1:]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "74f0b066fe03c164621e8e16a0f6e6affcdf206c..181a026fa941d2836e956885ce4b57b5c57528ac"
+    "shas": "c5511b25990d7979e7648b25e6d00c7d2950cca6..b5a43de8693a8defc939ad5d64ac3a3eea1a9dcc"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-rest-test",
@@ -1737,236 +930,86 @@
                             ],
                             "end": [
                                 1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'z[2]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                2,
                                 2
                             ],
                             "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                4
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
+                                2,
                                 7
                             ]
                         }
                     },
-                    "summary": "Deleted '2'"
+                    "summary": "Deleted the 'y[1]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                3,
                                 2
                             ],
                             "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                3,
                                 7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[1]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
                             ],
                             "end": [
-                                5,
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted '3'"
+                    "summary": "Deleted the 'd[1:2]' subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                5,
                                 2
                             ],
                             "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted '3'"
+                    "summary": "Deleted the 'e[2:3]' subscript access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f[1:2:3]' subscript access"
                 }
             ]
         },
@@ -1989,5 +1032,5 @@
         "- f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "181a026fa941d2836e956885ce4b57b5c57528ac..a7009cc104897491cd77050892b71f6e145e5cca"
+    "shas": "b5a43de8693a8defc939ad5d64ac3a3eea1a9dcc..c6e0402773f57a52886c06b291b5a05b77ad1e7a"
 }]

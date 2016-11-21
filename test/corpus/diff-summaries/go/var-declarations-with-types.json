@@ -65,7 +65,7 @@
         "+var one, two uint64 = 1, 2"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ceaa985f4241c068cb17d87c113975b1340e6971..38e2650fe93ca90e9535d44c9513014032359488"
+    "shas": "72718ba523e15bd28af063cb44da09558a71a02e..8cd9670c71169a693297d5ae07e968f9b077a5d9"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-insert-test",
@@ -183,7 +183,7 @@
         " var one, two uint64 = 1, 2"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38e2650fe93ca90e9535d44c9513014032359488..c6746d9e6c0d4d3a49b39d1c2891d1b8f2b7b6cc"
+    "shas": "8cd9670c71169a693297d5ae07e968f9b077a5d9..be20013fbe71ae98f7b78b96c8dc0833c22a38bb"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -293,7 +293,7 @@
         " var zero int = 0"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c6746d9e6c0d4d3a49b39d1c2891d1b8f2b7b6cc..b0a3d6e8a1c3b180036911c6f91b853951f720ed"
+    "shas": "be20013fbe71ae98f7b78b96c8dc0833c22a38bb..0997475fc119e79b4c4d9ce58d0db26e59304c73"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -403,7 +403,7 @@
         " var zero int = 0"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b0a3d6e8a1c3b180036911c6f91b853951f720ed..84704968d01cc5e3361dcf8b0fbc7d4e6da6fc30"
+    "shas": "0997475fc119e79b4c4d9ce58d0db26e59304c73..ec2a358801db7e3e1d8b7bddf644898240b81c10"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -568,7 +568,7 @@
         "+ var b, c uint64 = 1, 2"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "84704968d01cc5e3361dcf8b0fbc7d4e6da6fc30..0e67787bc34d907a1eda93db269bf8f0325967eb"
+    "shas": "ec2a358801db7e3e1d8b7bddf644898240b81c10..dc00b0e893ac37e03c2cdd858cfe33504c80f14b"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-test",
@@ -639,7 +639,7 @@
         "  var b, c uint64 = 1, 2"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e67787bc34d907a1eda93db269bf8f0325967eb..02c67531cd297716cbee773fb203b44833cbb0e2"
+    "shas": "dc00b0e893ac37e03c2cdd858cfe33504c80f14b..bccaf3350c1c5f32cd189d8d9d305f3c721c02a3"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-rest-test",
@@ -708,5 +708,5 @@
         "- var b, c uint64 = 1, 2"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "02c67531cd297716cbee773fb203b44833cbb0e2..7eca4d811d912df0bd9d2b432cc34641fcb7519c"
+    "shas": "bccaf3350c1c5f32cd189d8d9d305f3c721c02a3..55b3f8b890b9f705b0212314bf20e93eb362862a"
 }]
