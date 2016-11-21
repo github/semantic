@@ -74,7 +74,7 @@ termConstructor source sourceSpan name range children = case (name, children) of
       rest -> S.Error rest
     sliceToSubscriptAccess = \case
       a : rest -> do
-        slice <- withDefaultInfo $ S.Fixed rest
+        slice <- withRanges range Slice rest $ S.Fixed rest
         withDefaultInfo $ S.SubscriptAccess a slice
       rest -> withDefaultInfo $ S.Error rest
 
@@ -152,6 +152,7 @@ categoryForGoName = \case
   "call_expression" -> FunctionCall
   "selector_expression" -> SubscriptAccess
   "index_expression" -> SubscriptAccess
+  "slice_expression" -> SubscriptAccess
   "parameters" -> Args
   "short_var_declaration" -> VarDecl
   "var_declaration" -> VarDecl

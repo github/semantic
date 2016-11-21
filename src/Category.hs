@@ -141,6 +141,7 @@ data Category
   | Select
   | Defer
   | Go
+  | Slice
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -213,6 +214,7 @@ instance Arbitrary Category where
     , pure Select
     , pure Defer
     , pure Go
+    , pure Slice
     , Other <$> arbitrary
     ]
 

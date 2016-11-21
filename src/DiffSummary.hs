@@ -182,7 +182,7 @@ toTermName source term = case unwrap term of
   S.Go expr -> toTermName' expr
   S.Defer expr -> toTermName' expr
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
-  S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Fixed children -> termNameFromChildren term children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
@@ -398,6 +398,7 @@ instance HasCategory Category where
     C.Negate -> "negate"
     C.Select -> "select statement"
     C.Go -> "go statement"
+    C.Slice -> "slice expression"
     C.Defer -> "defer statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
