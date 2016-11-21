@@ -12,41 +12,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier"
+                    "summary": "Added the 'x.(z.Person)' type assertion"
                 }
             ]
         },
@@ -64,7 +34,7 @@
         "+x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c6e0402773f57a52886c06b291b5a05b77ad1e7a..a9076ff33fcaf67bab6b9781f052588e4a662ef2"
+    "shas": "edec8719680eac8a1808e80e267f45e0c7dcc7f5..cd5537699c4ff7850aad48902680a46c486e15a8"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
@@ -80,41 +50,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Dog' identifier"
+                    "summary": "Added the 'b.(c.Dog)' type assertion"
                 },
                 {
                     "span": {
@@ -125,41 +65,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier"
+                    "summary": "Added the 'x.(z.Person)' type assertion"
                 }
             ]
         },
@@ -179,7 +89,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a9076ff33fcaf67bab6b9781f052588e4a662ef2..fec4d06c49255b53d937d1644ab39b01d195507d"
+    "shas": "cd5537699c4ff7850aad48902680a46c486e15a8..e947dea632616d33eeb86dec25c145969f1a428f"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -286,7 +196,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fec4d06c49255b53d937d1644ab39b01d195507d..a22ed7fa95ae6c920f963a4605cc96f493ccda9c"
+    "shas": "e947dea632616d33eeb86dec25c145969f1a428f..0e33d8bc20d68aef9b77868f57e6bea166d773d4"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -393,7 +303,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a22ed7fa95ae6c920f963a4605cc96f493ccda9c..7a18f76fcd19e542984b2eb74f1ba9c518309c25"
+    "shas": "0e33d8bc20d68aef9b77868f57e6bea166d773d4..0e36094f9b598fdfc7c91dc42e5f14950527445a"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -409,41 +319,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Dog' identifier"
+                    "summary": "Deleted the 'b.(c.Dog)' type assertion"
                 },
                 {
                     "span": {
@@ -454,41 +334,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' identifier"
+                    "summary": "Deleted the 'x.(z.Person)' type assertion"
                 },
                 {
                     "span": {
@@ -499,41 +349,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Dog' identifier"
+                    "summary": "Added the 'b.(c.Dog)' type assertion"
                 }
             ]
         },
@@ -554,7 +374,7 @@
         "+b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a18f76fcd19e542984b2eb74f1ba9c518309c25..4769a755d8f67e6cc85ea74adc184a3f3338b2b9"
+    "shas": "0e36094f9b598fdfc7c91dc42e5f14950527445a..27090effdf84d49e1591a8ab64fe609ee972dabc"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-test",
@@ -570,41 +390,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' identifier"
+                    "summary": "Deleted the 'x.(z.Person)' type assertion"
                 }
             ]
         },
@@ -623,7 +413,7 @@
         " b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4769a755d8f67e6cc85ea74adc184a3f3338b2b9..3a0f4a87fd680d23b32ac678b03a844e773a6bf7"
+    "shas": "27090effdf84d49e1591a8ab64fe609ee972dabc..adafc01aee7ffefe0548463df7eb63e05c884ac5"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
@@ -639,41 +429,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Dog' identifier"
+                    "summary": "Deleted the 'b.(c.Dog)' type assertion"
                 }
             ]
         },
@@ -691,5 +451,5 @@
         "-b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a0f4a87fd680d23b32ac678b03a844e773a6bf7..da4a8b5834b007738b711745a7e03d37696e61e8"
+    "shas": "adafc01aee7ffefe0548463df7eb63e05c884ac5..d81f91c711cd9759bde9a91c71727f0a2c3a3b88"
 }]
