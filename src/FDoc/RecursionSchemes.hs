@@ -105,8 +105,8 @@ hylo :: Functor f => (f b -> b) -- an algebra
                   -> a          -- seed value
                   -> b          -- result
 
-Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a virtual structure.
-An algebra (catamorphism) is applied to this structure. Because of fusion the anamorphism and
+Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a structure.
+An algebra (catamorphism) is then applied to this structure. Because of fusion the anamorphism and
 catamorphism occur in a single pass rather than two separate traversals.
 
 The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna
