@@ -159,5 +159,5 @@ termPara = para algebra
   where
     algebra term = case term of
       (annotation :< Leaf representation) -> [(cofree (annotation :< Leaf representation), representation)]
-      (annotation :< Indexed values) -> [(cofree (annotation :< Indexed []), "indexed")] <> (values >>= Prelude.snd) -- (values >>= Prelude.snd) = Prologue.concat $ Prelude.snd <$> values
+      (annotation :< Indexed values) -> [(cofree (annotation :< Indexed []), "indexed")] <> (values >>= Prelude.snd)
       _ -> [(cofree ((Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "unknown"), "unknown")]
