@@ -20,8 +20,7 @@ ana :: (a -> Base t a) -- a (Base t)-coalgebra
     -> a               -- seed
     -> t               -- resulting fixed point
 
-Anamorphism as a recursion scheme "builds up" a recursive structure.
-Anamorphisms work by using a coalgebra, which maps a seed value to a fixed point structure.
+Anamorphism as a recursion scheme "builds up" a recursive structure. Anamorphisms work by using a coalgebra, which maps a seed value to a fixed point structure.
 
 The example below adds a new field to the `Record` fields.
 -}
@@ -37,8 +36,7 @@ cata :: (Base t a -> a) -- a (Base t)-algebra
        -> t             -- fixed point
        -> a             -- result
 
-Catamorphism as a recursion scheme "tears down" a recursive structure.
-Catamorphisms work by using an algebra, which maps a shape in our fixed point structure to a new shape.
+Catamorphism as a recursion scheme "tears down" a recursive structure. Catamorphisms work by using an algebra, which maps a shape in our fixed point structure to a new shape.
 
 The example below adds a new field to the `Record` fields.
 -}
@@ -67,15 +65,13 @@ stringToTermAna "indexed" =>
 
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"] ) )
 
-  While building up the `Indexed` structure, we continue to recurse over the `Indexed` terms ["leaf1", "leaf2", "leaf3"].
-  These are pattern matched using the catch all `_` and default to `Leaf` Syntax shapes:
+  While building up the `Indexed` structure, we continue to recurse over the `Indexed` terms ["leaf1", "leaf2", "leaf3"]. These are pattern matched using the catch all `_` and default to `Leaf` Syntax shapes:
 
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf1" ) )
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf2" ) )
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf3" ) )
 
-  These structures are substituted in place of ["leaf1", "leaf2", "leaf3"] in the new cofree `Indexed` structure,
-  resulting in a expansion of all possible string terms.
+  These structures are substituted in place of ["leaf1", "leaf2", "leaf3"] in the new cofree `Indexed` structure, resulting in a expansion of all possible string terms.
 -}
 stringToTermAna :: String -> Term (Syntax String) (Record '[Range, Category])
 stringToTermAna = ana coalgebra
@@ -105,12 +101,9 @@ hylo :: Functor f => (f b -> b) -- an algebra
                   -> a          -- seed value
                   -> b          -- result
 
-Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a structure.
-An algebra (catamorphism) is then applied to this structure. Because of fusion the anamorphism and
-catamorphism occur in a single pass rather than two separate traversals.
+Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a structure. An algebra (catamorphism) is then applied to this structure. Because of fusion the anamorphism and catamorphism occur in a single pass rather than two separate traversals.
 
-The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna
-can be utilized as a hylomorphism.
+The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna can be utilized as a hylomorphism.
 
 Example Usage:
 stringTermHylo "indexed" => ["indexed", "leaf1", "leaf2", "leaf3"]
