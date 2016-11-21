@@ -48,7 +48,7 @@ natHylo num = hylo algebra coalgebra num
       0 -> ZeroF
       _ -> SuccF (num - 1)
 
--- Paramorphism: primitive recursion maintaining the original suboject along with its computed value.
+-- Paramorphism: primitive recursion maintaining the original value along with its computed value.
 natPara :: Nat -> Int
 natPara nats = para algebra nats
   where
