@@ -28,7 +28,7 @@ The example below adds a new field to the `Record` fields.
 indexedTermAna :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
 indexedTermAna childrenLeaves = ana coalgebra (indexedTerm childrenLeaves)
   where
-    coalgebra term = (NewField .: (extract term)) :< (unwrap term)
+    coalgebra term = (NewField .: (extract term)) :< unwrap term
 
 {-
 Catamorphism example -- add a new field to each term's Record fields
@@ -45,7 +45,7 @@ The example below adds a new field to the `Record` fields.
 indexedTermCata :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
-    algebra term = cofree $ (NewField .: (headF term)) :< (tailF term)
+    algebra term = cofree $ (NewField .: (headF term)) :< tailF term
 
 {-
 Anamorphism -- construct a Term from a string
@@ -94,7 +94,7 @@ termToStringCata = cata algebra
   where
     algebra term = case term of
       (_ :< Leaf value) -> [value]
-      (_ :< Indexed values) -> ["indexed"] <> (Prologue.concat values)
+      (_ :< Indexed values) -> ["indexed"] <> Prologue.concat values
       _ -> ["unknown"]
 
 {-
@@ -121,7 +121,7 @@ stringTermHylo = hylo algebra coalgebra
   where
     algebra term = case term of
       (_ :< Leaf value) -> [value]
-      (_ :< Indexed values) -> ["indexed"] <> (Prologue.concat values)
+      (_ :< Indexed values) -> ["indexed"] <> Prologue.concat values
       _ -> ["unknown"]
     coalgebra stringRepresentation = case stringRepresentation of
       "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"]
