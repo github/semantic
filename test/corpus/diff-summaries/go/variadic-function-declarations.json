@@ -66,7 +66,7 @@
         "+func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "726da6b0b3b9f8a54b58dea6c03f9372250080bc..bc26c9b2dfc615a809804ff7ba60d66f0e83735d"
+    "shas": "15ddf67aac70c3c977ecfe9656d094cbe1f5fefb..674de4921138bade39dfb49c09df89dde9e5f672"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-insert-test",
@@ -187,7 +187,7 @@
         " func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc26c9b2dfc615a809804ff7ba60d66f0e83735d..ab2ceb40d50aff16927f28c1b6ab6cb1fdf2378b"
+    "shas": "674de4921138bade39dfb49c09df89dde9e5f672..83241e62ce4a7f17c25de2c0f9daaeb315c0f907"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -299,7 +299,7 @@
         " func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ab2ceb40d50aff16927f28c1b6ab6cb1fdf2378b..d9ff3b33f6361bb33f82c0fe50d52f99b9185681"
+    "shas": "83241e62ce4a7f17c25de2c0f9daaeb315c0f907..a536d37f916da7ad5fd8f6627659920480d11eb3"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -411,7 +411,7 @@
         " func f3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d9ff3b33f6361bb33f82c0fe50d52f99b9185681..c706f98fee71d836c20c1893459f0163f67d3f49"
+    "shas": "a536d37f916da7ad5fd8f6627659920480d11eb3..fb2d7cd1d51c76d2e79ee31a61b7d5e9e627680d"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -580,7 +580,7 @@
         "+func g3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c706f98fee71d836c20c1893459f0163f67d3f49..26d7f5debfac01a35904c2761da499f8de416bb6"
+    "shas": "fb2d7cd1d51c76d2e79ee31a61b7d5e9e627680d..70ed44e95cd0c14a40e4057e5c496eff6d576c5f"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-test",
@@ -653,7 +653,7 @@
         " func g3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "26d7f5debfac01a35904c2761da499f8de416bb6..dc67086b83a44efa947e180d51d832278f7cba88"
+    "shas": "70ed44e95cd0c14a40e4057e5c496eff6d576c5f..49f21d68c33dc2117bccb6bd2176ca4f5f5a11b6"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-rest-test",
@@ -723,5 +723,5 @@
         "-func g3(a, ...bool) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc67086b83a44efa947e180d51d832278f7cba88..865ca59192491ff141e98db1297f1d3576c12062"
+    "shas": "49f21d68c33dc2117bccb6bd2176ca4f5f5a11b6..1564e9c02c34d715ada30d7758d82acfc1ce4abb"
 }]

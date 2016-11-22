@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[]a.b(c.d)' type conversion"
+                    "summary": "Added the '[]a.b(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '([]a.b)(c.d)' type conversion"
+                    "summary": "Added the '([]a.b)(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -112,7 +112,7 @@
         "+ (e.f)(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53fe0b58c4003c0bf0518c9d3d32fffc2e3c59bf..0e844935106278c0c0ed48d98b894d88a51bf6f4"
+    "shas": "90c514fd42fd17c4c370f5c271399cc88ef9d318..8999cf52532f6141a6d4ca3a248c8847a3083262"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-insert-test",
@@ -132,7 +132,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[]x.y(z.e)' type conversion"
+                    "summary": "Added the '[]x.y(z.e)' type conversion expression"
                 },
                 {
                     "span": {
@@ -147,7 +147,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '([]f.g)(h.i)' type conversion"
+                    "summary": "Added the '([]f.g)(h.i)' type conversion expression"
                 },
                 {
                     "span": {
@@ -222,7 +222,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[]a.b(c.d)' type conversion"
+                    "summary": "Added the '[]a.b(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -237,7 +237,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '([]a.b)(c.d)' type conversion"
+                    "summary": "Added the '([]a.b)(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -325,7 +325,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e844935106278c0c0ed48d98b894d88a51bf6f4..aa5c43704aaead7b70ab57f358e17cb7ccb33a85"
+    "shas": "8999cf52532f6141a6d4ca3a248c8847a3083262..3ac3dbfbe3b39fb3fc5606ebd725f3f5b224597c"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -736,7 +736,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aa5c43704aaead7b70ab57f358e17cb7ccb33a85..b954ba51fd496b7699711f53e61ce88f9e4b3ba5"
+    "shas": "3ac3dbfbe3b39fb3fc5606ebd725f3f5b224597c..8a62c2dc833e466f861fd81a774541bca4032051"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -1147,7 +1147,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b954ba51fd496b7699711f53e61ce88f9e4b3ba5..5fe4936b8d5cb4bb1bb02c54bbbd8c831d0a5b94"
+    "shas": "8a62c2dc833e466f861fd81a774541bca4032051..21ecb227c0df30064fc3de67ad4b1cc3727413b4"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -1167,7 +1167,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[]x.y(z.e)' type conversion"
+                    "summary": "Deleted the '[]x.y(z.e)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1182,7 +1182,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '([]f.g)(h.i)' type conversion"
+                    "summary": "Deleted the '([]f.g)(h.i)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1257,7 +1257,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[]a.b(c.d)' type conversion"
+                    "summary": "Deleted the '[]a.b(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1272,7 +1272,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '([]a.b)(c.d)' type conversion"
+                    "summary": "Deleted the '([]a.b)(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1347,7 +1347,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[]x.y(z.e)' type conversion"
+                    "summary": "Added the '[]x.y(z.e)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1362,7 +1362,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '([]f.g)(h.i)' type conversion"
+                    "summary": "Added the '([]f.g)(h.i)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1455,7 +1455,7 @@
         "+ (m.n)(o)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5fe4936b8d5cb4bb1bb02c54bbbd8c831d0a5b94..b9a5daf632c8dc51d36a5f528788142e833f382e"
+    "shas": "21ecb227c0df30064fc3de67ad4b1cc3727413b4..b65795f22fbe000e1cc16b999e5dcbee6964d42a"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-test",
@@ -1475,7 +1475,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[]a.b(c.d)' type conversion"
+                    "summary": "Deleted the '[]a.b(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1490,7 +1490,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '([]a.b)(c.d)' type conversion"
+                    "summary": "Deleted the '([]a.b)(c.d)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1574,7 +1574,7 @@
         "  j.k(l)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b9a5daf632c8dc51d36a5f528788142e833f382e..7eba099bb5f5533a10fac8fad3c4228692166b5d"
+    "shas": "b65795f22fbe000e1cc16b999e5dcbee6964d42a..cc74909169678cd5933e0366e58e25af31a5430a"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-rest-test",
@@ -1594,7 +1594,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[]x.y(z.e)' type conversion"
+                    "summary": "Deleted the '[]x.y(z.e)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1609,7 +1609,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '([]f.g)(h.i)' type conversion"
+                    "summary": "Deleted the '([]f.g)(h.i)' type conversion expression"
                 },
                 {
                     "span": {
@@ -1690,5 +1690,5 @@
         "- (m.n)(o)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7eba099bb5f5533a10fac8fad3c4228692166b5d..37199b35694043d8a6d218a5c20b4949726e23b1"
+    "shas": "cc74909169678cd5933e0366e58e25af31a5430a..bb72eac862023a89f38dae6d74bff7f8f685bb29"
 }]

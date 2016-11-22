@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.(z.Person)' type assertion"
+                    "summary": "Added the 'x.(z.Person)' type assertion statement"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3922846ac01fdd53cbd7a4bf08e35280edf8344d..2c7fad492ae11a4722830577c0458a7d2338c2f1"
+    "shas": "b352e08981a2c46b7f95fe4b0df553214d1d3859..e659a74ff478fd47b33f036a99072faf57b81a08"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b.(c.Dog)' type assertion"
+                    "summary": "Added the 'b.(c.Dog)' type assertion statement"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.(z.Person)' type assertion"
+                    "summary": "Added the 'x.(z.Person)' type assertion statement"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2c7fad492ae11a4722830577c0458a7d2338c2f1..bece5d3337f294621b50e6b647c8fac456e86de1"
+    "shas": "e659a74ff478fd47b33f036a99072faf57b81a08..5475d58a5bc4ecda32353481cfd7f1bf2a74a27d"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -196,7 +196,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bece5d3337f294621b50e6b647c8fac456e86de1..d6eba70c06949dcd7840ff41c30d0884f0248d18"
+    "shas": "5475d58a5bc4ecda32353481cfd7f1bf2a74a27d..095ff104ac2064f6b58a4a4b075eb50fde68611d"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -303,7 +303,7 @@
         " x.(z.Person)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d6eba70c06949dcd7840ff41c30d0884f0248d18..f5699e2667f852803562f9ef726c3e90e622df7a"
+    "shas": "095ff104ac2064f6b58a4a4b075eb50fde68611d..e7a85f0ae8dfaccda389db652c90125fbf520f0d"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -323,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b.(c.Dog)' type assertion"
+                    "summary": "Deleted the 'b.(c.Dog)' type assertion statement"
                 },
                 {
                     "span": {
@@ -338,7 +338,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.(z.Person)' type assertion"
+                    "summary": "Deleted the 'x.(z.Person)' type assertion statement"
                 },
                 {
                     "span": {
@@ -353,7 +353,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b.(c.Dog)' type assertion"
+                    "summary": "Added the 'b.(c.Dog)' type assertion statement"
                 }
             ]
         },
@@ -374,7 +374,7 @@
         "+b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f5699e2667f852803562f9ef726c3e90e622df7a..5aa60cb2e44db6d0a8cf6ad462549630c8cde85a"
+    "shas": "e7a85f0ae8dfaccda389db652c90125fbf520f0d..c06167baeb8f9a6db24cbeb99ba6a59623608041"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-test",
@@ -394,7 +394,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.(z.Person)' type assertion"
+                    "summary": "Deleted the 'x.(z.Person)' type assertion statement"
                 }
             ]
         },
@@ -413,7 +413,7 @@
         " b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5aa60cb2e44db6d0a8cf6ad462549630c8cde85a..7d9fbe1c4e730f0d04367522caa4a817d0854158"
+    "shas": "c06167baeb8f9a6db24cbeb99ba6a59623608041..868900ad0784c523ae9b8ee9f1ce47b6167c7352"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
@@ -433,7 +433,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b.(c.Dog)' type assertion"
+                    "summary": "Deleted the 'b.(c.Dog)' type assertion statement"
                 }
             ]
         },
@@ -451,5 +451,5 @@
         "-b.(c.Dog)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d9fbe1c4e730f0d04367522caa4a817d0854158..53fe0b58c4003c0bf0518c9d3d32fffc2e3c59bf"
+    "shas": "868900ad0784c523ae9b8ee9f1ce47b6167c7352..90c514fd42fd17c4c370f5c271399cc88ef9d318"
 }]
