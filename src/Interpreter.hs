@@ -54,7 +54,10 @@ algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff)
                    -> Term (Syntax leaf) a
                    -> Algorithm (Term (Syntax leaf) a) diff diff
 algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) -> Just $ Indexed <$> bySimilarity a b
+  (Indexed a, Indexed b) ->
+    Just $ Indexed <$> bySimilarity a b
+  (S.Module idA a, S.Module idB b) ->
+    Just $ S.Module <$> recursively idA idB <*> bySimilarity a b
   (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> Just $
     S.FunctionCall <$> recursively identifierA identifierB
                    <*> bySimilarity argsA argsB

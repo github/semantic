@@ -1,0 +1,1469 @@
+[{
+    "testCaseDescription": "go-type-conversion-expressions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]a.b(c.d)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '([]a.b)(c.d)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e.f(g)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(e.f)(g)' at line 4, column 2 - line 4, column 10"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index e69de29..9bf5745 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -0,0 +1,4 @@",
+        "+[]a.b(c.d)",
+        "+ ([]a.b)(c.d)",
+        "+ e.f(g)",
+        "+ (e.f)(g)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "5f76f266d80a0de28bb0535282f740664c37c11d..a5d5c3de64d875d0222b5a597e8e2c92d5c1b797"
+}
+,{
+    "testCaseDescription": "go-type-conversion-expressions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]x.y(z.e)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '([]f.g)(h.i)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]a.b(c.d)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '([]a.b)(c.d)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j.k(l)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(m.n)(o)' at line 4, column 2 - line 4, column 10"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e.f(g)' at line 7, column 2 - line 7, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(e.f)(g)' at line 8, column 2 - line 8, column 10"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index 9bf5745..f32ac9a 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -1,3 +1,11 @@",
+        "+[]x.y(z.e)",
+        "+ ([]f.g)(h.i)",
+        "+ j.k(l)",
+        "+ (m.n)(o)",
+        "+[]a.b(c.d)",
+        "+ ([]a.b)(c.d)",
+        "+ e.f(g)",
+        "+ (e.f)(g)",
+        " []a.b(c.d)",
+        "  ([]a.b)(c.d)",
+        "  e.f(g)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a5d5c3de64d875d0222b5a597e8e2c92d5c1b797..dc70dc6ccde1a13f0ccbf025729857f7aa42e5ff"
+}
+,{
+    "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c[d] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'd' identifier in the c[d] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    7
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    7
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'c' identifier in the c[d] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    12
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    12
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i' identifier with the 'd' identifier in the c[d] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'j' identifier with the 'e' identifier in the e[f] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'k' identifier with the 'f' identifier in the e[f] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'l' identifier with the 'g' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'm' identifier with the 'e' identifier in the e[f] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'n' identifier with the 'f' identifier in the e[f] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'o' identifier with the 'g' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index f32ac9a..3104653 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -1,7 +1,7 @@",
+        "-[]x.y(z.e)",
+        "- ([]f.g)(h.i)",
+        "- j.k(l)",
+        "- (m.n)(o)",
+        "+[]a.b(c.d)",
+        "+ ([]a.b)(c.d)",
+        "+ e.f(g)",
+        "+ (e.f)(g)",
+        " []a.b(c.d)",
+        "  ([]a.b)(c.d)",
+        "  e.f(g)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "dc70dc6ccde1a13f0ccbf025729857f7aa42e5ff..13fe07e08beef38430c64c8b6fae670e03bf209c"
+}
+,{
+    "testCaseDescription": "go-type-conversion-expressions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the z[e] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'e' identifier in the z[e] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'f' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    7
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    7
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'g' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'h' identifier in the h[i] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    12
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    12
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'i' identifier in the h[i] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'j' identifier in the j[k] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    4
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f' identifier with the 'k' identifier in the j[k] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    6
+                                ],
+                                "end": [
+                                    3,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'l' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    4,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'm' identifier in the m[n] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f' identifier with the 'n' identifier in the m[n] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    8
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'o' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index 3104653..f32ac9a 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -1,7 +1,7 @@",
+        "-[]a.b(c.d)",
+        "- ([]a.b)(c.d)",
+        "- e.f(g)",
+        "- (e.f)(g)",
+        "+[]x.y(z.e)",
+        "+ ([]f.g)(h.i)",
+        "+ j.k(l)",
+        "+ (m.n)(o)",
+        " []a.b(c.d)",
+        "  ([]a.b)(c.d)",
+        "  e.f(g)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "13fe07e08beef38430c64c8b6fae670e03bf209c..2e6a0bb8b7564e2524ad96989dfb27ab349bcd34"
+}
+,{
+    "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]x.y(z.e)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '([]f.g)(h.i)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]a.b(c.d)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '([]a.b)(c.d)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]x.y(z.e)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the '([]f.g)(h.i)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j.k(l)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(m.n)(o)' at line 4, column 2 - line 4, column 10"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e.f(g)' at line 7, column 2 - line 7, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(e.f)(g)' at line 8, column 2 - line 8, column 10"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j.k(l)' at line 7, column 2 - line 7, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(m.n)(o)' at line 8, column 2 - line 8, column 10"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index f32ac9a..91844af 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -1,12 +1,8 @@",
+        "-[]x.y(z.e)",
+        "- ([]f.g)(h.i)",
+        "- j.k(l)",
+        "- (m.n)(o)",
+        "-[]a.b(c.d)",
+        "- ([]a.b)(c.d)",
+        "- e.f(g)",
+        "- (e.f)(g)",
+        " []a.b(c.d)",
+        "  ([]a.b)(c.d)",
+        "  e.f(g)",
+        "  (e.f)(g)",
+        "+[]x.y(z.e)",
+        "+ ([]f.g)(h.i)",
+        "+ j.k(l)",
+        "+ (m.n)(o)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2e6a0bb8b7564e2524ad96989dfb27ab349bcd34..02d798ecf15d1825d00d0f8f9261c9c6fe89a836"
+}
+,{
+    "testCaseDescription": "go-type-conversion-expressions-delete-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]a.b(c.d)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '([]a.b)(c.d)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e.f(g)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(e.f)(g)' at line 4, column 2 - line 4, column 10"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index 91844af..7f172bc 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -1,7 +1,3 @@",
+        "-[]a.b(c.d)",
+        "- ([]a.b)(c.d)",
+        "- e.f(g)",
+        "- (e.f)(g)",
+        " []x.y(z.e)",
+        "  ([]f.g)(h.i)",
+        "  j.k(l)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "02d798ecf15d1825d00d0f8f9261c9c6fe89a836..958f40e15fc2c02a629b7ad096c573da07e5ffc3"
+}
+,{
+    "testCaseDescription": "go-type-conversion-expressions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]x.y(z.e)' type conversion expression"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                2
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '([]f.g)(h.i)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j.k(l)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(m.n)(o)' at line 4, column 2 - line 4, column 10"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "type-conversion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
+        "index 7f172bc..e69de29 100644",
+        "--- a/type-conversion-expressions.go",
+        "+++ b/type-conversion-expressions.go",
+        "@@ -1,4 +0,0 @@",
+        "-[]x.y(z.e)",
+        "- ([]f.g)(h.i)",
+        "- j.k(l)",
+        "- (m.n)(o)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "958f40e15fc2c02a629b7ad096c573da07e5ffc3..3403cd75b5874d1bc6c4c3c737525b7bd1271113"
+}]

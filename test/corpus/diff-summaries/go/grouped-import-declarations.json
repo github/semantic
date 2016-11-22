@@ -1,0 +1,762 @@
+[{
+    "testCaseDescription": "go-grouped-import-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"some/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)' at line 1, column 1 - line 5, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index e69de29..6560136 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -0,0 +1,5 @@",
+        "+import (",
+        "+\"net/http\"",
+        "+  . \"some/dsl\"",
+        "+  alias \"some/package\"",
+        "+)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3a1a004fc80ca40433336cc35ed31bd631b4d589..233d90c5a8f2097b27795d5e5e5eecc5c3415a31"
+}
+,{
+    "testCaseDescription": "go-grouped-import-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/socket\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"types/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"some/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import (\n\"net/socket\"\n  . \"types/dsl\"\n  alias \"awesome/package\"\n)' at line 1, column 1 - line 5, column 2"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)' at line 6, column 1 - line 10, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index 6560136..31d6bd7 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -1,4 +1,14 @@",
+        " import (",
+        "+\"net/socket\"",
+        "+  . \"types/dsl\"",
+        "+  alias \"awesome/package\"",
+        "+)",
+        "+import (",
+        "+\"net/http\"",
+        "+  . \"some/dsl\"",
+        "+  alias \"some/package\"",
+        "+)",
+        "+import (",
+        " \"net/http\"",
+        "   . \"some/dsl\"",
+        "   alias \"some/package\""
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "233d90c5a8f2097b27795d5e5e5eecc5c3415a31..78e66d25bd964ed3c89453c89f7aaae054c874f0"
+}
+,{
+    "testCaseDescription": "go-grouped-import-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"net/socket\" string with the \"net/http\" string in the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"types/dsl\" string with the \"some/dsl\" string in the \"some/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"awesome/package\" string with the \"some/package\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index 31d6bd7..b045ab3 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -1,7 +1,7 @@",
+        " import (",
+        "-\"net/socket\"",
+        "-  . \"types/dsl\"",
+        "-  alias \"awesome/package\"",
+        "+\"net/http\"",
+        "+  . \"some/dsl\"",
+        "+  alias \"some/package\"",
+        " )",
+        " import (",
+        " \"net/http\""
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "78e66d25bd964ed3c89453c89f7aaae054c874f0..e37ef96d6ab2271602eb954f430703de6c409c55"
+}
+,{
+    "testCaseDescription": "go-grouped-import-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"net/http\" string with the \"net/socket\" string in the \"net/socket\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"some/dsl\" string with the \"types/dsl\" string in the \"types/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"some/package\" string with the \"awesome/package\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index b045ab3..31d6bd7 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -1,7 +1,7 @@",
+        " import (",
+        "-\"net/http\"",
+        "-  . \"some/dsl\"",
+        "-  alias \"some/package\"",
+        "+\"net/socket\"",
+        "+  . \"types/dsl\"",
+        "+  alias \"awesome/package\"",
+        " )",
+        " import (",
+        " \"net/http\""
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e37ef96d6ab2271602eb954f430703de6c409c55..90f9553085893a3d87bd9797f65d3083643431c4"
+}
+,{
+    "testCaseDescription": "go-grouped-import-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/socket\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"types/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"some/dsl\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"net/socket\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"types/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import (\n\"net/socket\"\n  . \"types/dsl\"\n  alias \"awesome/package\"\n)' at line 1, column 1 - line 5, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)' at line 6, column 1 - line 10, column 2"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'import (\n\"net/socket\"\n  . \"types/dsl\"\n  alias \"awesome/package\"\n)' at line 6, column 1 - line 10, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index 31d6bd7..62facc6 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -1,15 +1,10 @@",
+        " import (",
+        "-\"net/socket\"",
+        "-  . \"types/dsl\"",
+        "-  alias \"awesome/package\"",
+        "-)",
+        "-import (",
+        " \"net/http\"",
+        "   . \"some/dsl\"",
+        "   alias \"some/package\"",
+        " )",
+        " import (",
+        "-\"net/http\"",
+        "-  . \"some/dsl\"",
+        "-  alias \"some/package\"",
+        "+\"net/socket\"",
+        "+  . \"types/dsl\"",
+        "+  alias \"awesome/package\"",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "90f9553085893a3d87bd9797f65d3083643431c4..5ea9646b5663b469d1d05d122fc573b0bbf249b6"
+}
+,{
+    "testCaseDescription": "go-grouped-import-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/http\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"some/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import (\n\"net/http\"\n  . \"some/dsl\"\n  alias \"some/package\"\n)' at line 1, column 1 - line 5, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index 62facc6..e2f9293 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -1,9 +1,4 @@",
+        " import (",
+        "-\"net/http\"",
+        "-  . \"some/dsl\"",
+        "-  alias \"some/package\"",
+        "-)",
+        "-import (",
+        " \"net/socket\"",
+        "   . \"types/dsl\"",
+        "   alias \"awesome/package\""
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "5ea9646b5663b469d1d05d122fc573b0bbf249b6..03ae54522feab408ae78aabc67aa66fb1bbd9e5d"
+}
+,{
+    "testCaseDescription": "go-grouped-import-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"net/socket\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"types/dsl\" import statement"
+                }
+            ]
+        },
+        "errors": {
+            "grouped-import-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'import (\n\"net/socket\"\n  . \"types/dsl\"\n  alias \"awesome/package\"\n)' at line 1, column 1 - line 5, column 2"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "grouped-import-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
+        "index e2f9293..e69de29 100644",
+        "--- a/grouped-import-declarations.go",
+        "+++ b/grouped-import-declarations.go",
+        "@@ -1,5 +0,0 @@",
+        "-import (",
+        "-\"net/socket\"",
+        "-  . \"types/dsl\"",
+        "-  alias \"awesome/package\"",
+        "-)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "03ae54522feab408ae78aabc67aa66fb1bbd9e5d..f506441da93c9b84b48df54338a1c9a9314a3f6b"
+}]

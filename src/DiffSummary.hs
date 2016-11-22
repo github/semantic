@@ -149,6 +149,7 @@ determiner (LeafInfo "number" _ _) = ""
 determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "begin statement" _ _) = "a"
+determiner (LeafInfo "select statement" _ _) = "a"
 determiner (LeafInfo "else block" _ _) = "an"
 determiner (LeafInfo "ensure block" _ _) = "an"
 determiner (LeafInfo "when block" _ _) = "a"
@@ -166,6 +167,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"begin statement" _ _) -> toDoc cName
+  (LeafInfo cName@"select statement" _ _) -> toDoc cName
   (LeafInfo cName@"else block" _ _) -> toDoc cName
   (LeafInfo cName@"ensure block" _ _) -> toDoc cName
   (LeafInfo cName@"when block" _ _) -> toDoc cName
@@ -179,8 +181,12 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
+  S.TypeAssertion _ _ -> termNameFromSource term
+  S.TypeConversion _ _ -> termNameFromSource term
+  S.Go expr -> toTermName' expr
+  S.Defer expr -> toTermName' expr
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
-  S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Fixed children -> termNameFromChildren term children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
@@ -228,6 +234,7 @@ toTermName source term = case unwrap term of
   S.Throw expr -> termNameFromSource expr
   S.Constructor expr -> toTermName' expr
   S.Try clauses _ _ _ -> termNameFromChildren term clauses
+  S.Select clauses -> termNameFromChildren term clauses
   S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
@@ -261,6 +268,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
   where
     identifiableDoc (c, t) = case c of
       C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
+      C.Select -> "in a" <+> catName c
       C.Begin -> "in a" <+> catName c
       C.Else -> "in an" <+> catName c
       C.Elsif -> "in the" <+> squotes (termName t) <+> catName c
@@ -379,6 +387,7 @@ instance HasCategory Category where
     C.Module -> "module"
     C.Import -> "import statement"
     C.Export -> "export statement"
+    C.AnonymousFunction -> "anonymous function"
     C.Interpolation -> "interpolation"
     C.Subshell -> "subshell command"
     C.ConditionalAssignment -> "conditional assignment"
@@ -395,6 +404,12 @@ instance HasCategory Category where
     C.RescuedException -> "last exception"
     C.RescueArgs -> "arguments"
     C.Negate -> "negate"
+    C.Select -> "select statement"
+    C.Go -> "go statement"
+    C.Slice -> "slice expression"
+    C.Defer -> "defer statement"
+    C.TypeAssertion -> "type assertion statement"
+    C.TypeConversion -> "type conversion expression"
     C.ArgumentPair -> "argument"
     C.KeywordParameter -> "parameter"
     C.OptionalParameter -> "parameter"

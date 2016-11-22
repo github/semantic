@@ -114,6 +114,8 @@ data Category
   | Import
   -- | An export
   | Export
+  -- | An anonymous function.
+  | AnonymousFunction
   -- | An interpolation (e.g. "#{bar}" in Ruby)
   | Interpolation
   -- | A subshell command (e.g. `ls -la` in Ruby)
@@ -136,6 +138,13 @@ data Category
   | RescueArgs
   | When
   | Negate
+  -- | A select expression in Go.
+  | Select
+  | Defer
+  | Go
+  | Slice
+  | TypeAssertion
+  | TypeConversion
   -- | An argument pair, e.g. foo(run: true) or foo(:run => true) in Ruby.
   | ArgumentPair
   -- | A keyword parameter, e.g. def foo(name:) or def foo(name:false) in Ruby.
@@ -218,6 +227,12 @@ instance Arbitrary Category where
     , pure RescueArgs
     , pure When
     , pure Negate
+    , pure Select
+    , pure Defer
+    , pure Go
+    , pure Slice
+    , pure TypeAssertion
+    , pure TypeConversion
     , pure ArgumentPair
     , pure KeywordParameter
     , pure OptionalParameter

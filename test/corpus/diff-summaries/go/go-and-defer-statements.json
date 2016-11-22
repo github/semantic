@@ -1,0 +1,646 @@
+[{
+    "testCaseDescription": "go-go-and-defer-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y]()' defer statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y]()' go statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index e69de29..2638f27 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -0,0 +1,2 @@",
+        "+defer x.y()",
+        "+go x.y()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "201c2f06d17d14e12c9861e2a94372fc41441178..4c2c5d9bf86b0e00910db4151d8cb1be6e261245"
+}
+,{
+    "testCaseDescription": "go-go-and-defer-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a[b]()' defer statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c[d]()' go statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y]()' defer statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y]()' go statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index 2638f27..0cb11d5 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,2 +1,6 @@",
+        "+defer a.b()",
+        "+go c.d()",
+        "+defer x.y()",
+        "+go x.y()",
+        " defer x.y()",
+        " go x.y()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4c2c5d9bf86b0e00910db4151d8cb1be6e261245..0af27bad18af4c3f10e18adf6824bc24be7cdf18"
+}
+,{
+    "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x[y] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the x[y] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    4
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    4
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the x[y] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    6
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    6
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'y' identifier in the x[y] subscript access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index 0cb11d5..bdc42aa 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,5 +1,5 @@",
+        "-defer a.b()",
+        "-go c.d()",
+        "+defer x.y()",
+        "+go x.y()",
+        " defer x.y()",
+        " go x.y()",
+        " defer x.y()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0af27bad18af4c3f10e18adf6824bc24be7cdf18..e8853de747eee3ecdd93e3344be1e54dbc28e8fe"
+}
+,{
+    "testCaseDescription": "go-go-and-defer-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a[b] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the a[b] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    4
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    4
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the c[d] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    6
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    6
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'd' identifier in the c[d] subscript access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index bdc42aa..0cb11d5 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,5 +1,5 @@",
+        "-defer x.y()",
+        "-go x.y()",
+        "+defer a.b()",
+        "+go c.d()",
+        " defer x.y()",
+        " go x.y()",
+        " defer x.y()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e8853de747eee3ecdd93e3344be1e54dbc28e8fe..baf0c568b56a2909465365b10b1764e574ffdcbf"
+}
+,{
+    "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[b]()' defer statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c[d]()' go statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y]()' defer statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y]()' go statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a[b]()' defer statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c[d]()' go statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index 0cb11d5..f18666e 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,6 +1,4 @@",
+        "-defer a.b()",
+        "-go c.d()",
+        "-defer x.y()",
+        "-go x.y()",
+        " defer x.y()",
+        " go x.y()",
+        "+defer a.b()",
+        "+go c.d()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "baf0c568b56a2909465365b10b1764e574ffdcbf..8449fd5df5a995e61d8ca8b450f83468e79a5246"
+}
+,{
+    "testCaseDescription": "go-go-and-defer-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y]()' defer statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y]()' go statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index f18666e..eefd2e4 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,4 +1,2 @@",
+        "-defer x.y()",
+        "-go x.y()",
+        " defer a.b()",
+        " go c.d()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8449fd5df5a995e61d8ca8b450f83468e79a5246..129278c1c54e5bcd112a0f7bc5a4876b0890b5a9"
+}
+,{
+    "testCaseDescription": "go-go-and-defer-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[b]()' defer statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c[d]()' go statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "go-and-defer-statements.go"
+    ],
+    "patch": [
+        "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
+        "index eefd2e4..e69de29 100644",
+        "--- a/go-and-defer-statements.go",
+        "+++ b/go-and-defer-statements.go",
+        "@@ -1,2 +0,0 @@",
+        "-defer a.b()",
+        "-go c.d()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "129278c1c54e5bcd112a0f7bc5a4876b0890b5a9..13fa148e00739eba43f10562e024e15d2fc7e5d9"
+}]

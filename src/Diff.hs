@@ -17,7 +17,6 @@ type Diff f annotation = Free (TermF f (Both annotation)) (Patch (Term f annotat
 
 type SyntaxDiff leaf fields = Diff (Syntax leaf) (Record fields)
 
-
 type instance Base (Free f a) = FreeF f a
 instance Functor f => Recursive (Free f a) where project = runFree
 instance Functor f => Corecursive (Free f a) where embed = free

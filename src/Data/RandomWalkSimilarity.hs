@@ -37,6 +37,7 @@ import Data.These
 import Diff
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
+type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
 
 -- | Given a function comparing two terms recursively,
 -- a function to compute a Hashable label from an unpacked term, and two lists of terms,
@@ -45,12 +46,8 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields label.
-    (GAlign f,
-     Traversable f,
-     Eq (f (Term f Category)),
-     Hashable label,
-     HasField fields Category)
-    => (Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+       (GAlign f, Traversable f, Eq (f (Term f Category)), Hashable label, HasField fields Category)
+    => DiffTerms f fields -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
     -> Label f fields label
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
@@ -220,7 +217,11 @@ defaultM :: Integer
 defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm f fields = UnmappedTerm { termIndex :: Int, feature :: Vector.Vector Double, term :: (Term f (Record fields)) }
+data UnmappedTerm f fields = UnmappedTerm {
+    termIndex :: Int -- ^ The index of the term within its root term.
+  , feature   :: Vector.Vector Double -- ^ Feature vector
+  , term      :: Term f (Record fields) -- ^ The unmapped term
+}
 
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNil term = Term term | Index Int | Nil

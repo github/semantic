@@ -44,23 +44,23 @@ diffFiles :: (HasField fields Category, HasField fields Cost)
           -> Renderer (Record fields)
           -> Both SourceBlob
           -> IO Output
-diffFiles parser renderer sourceBlobs = do
-  terms <- traverse parser sourceBlobs
+diffFiles parse render sourceBlobs = do
+  terms <- traverse parse sourceBlobs
+  pure $! render sourceBlobs (diffTerms' terms)
 
-  let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
-  let textDiff = case areNullOids of
+  where
+    diffTerms' terms = case runBothWith areNullOids sourceBlobs of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
           runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts getLabel) terms
-
-  pure $! renderer sourceBlobs textDiff
-
-  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-        getCost diff = case runFree diff of
-          Free (info :< _) -> cost <$> info
-          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
+    areNullOids a b = (hasNullOid a, hasNullOid b)
+    hasNullOid blob = oid blob == nullOid || null (source blob)
+    construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+    sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+    getCost diff = case runFree diff of
+      Free (info :< _) -> cost <$> info
+      Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 getLabel :: HasField fields Category => CofreeF (Syntax leaf) (Record fields) b -> (Category, Maybe leaf)
 getLabel (h :< t) = (category h, case t of
@@ -74,6 +74,7 @@ parserForType mediaType = case languageForType mediaType of
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
   Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby ts_language_ruby
+  Just Language.Go -> treeSitterParser Language.Go ts_language_go
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
@@ -146,13 +147,15 @@ truncatedDiff arguments sources = pure $ case format arguments of
 printDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
-  let renderedText = case rendered of
-                       SplitOutput text -> text
-                       PatchOutput text -> text
-                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON series
-                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON summaries
-
-  writeToOutput (output arguments) renderedText
+  writeToOutput (output arguments) $
+    case rendered of
+      SplitOutput text -> text
+      PatchOutput text -> text
+      JSONOutput series -> encodingToText (toJSON series)
+      SummaryOutput summaries -> encodingToText (toJSON summaries)
+  where
+    -- TODO: Don't go from Value to Text?
+    encodingToText = toS . encodingToLazyByteString . toEncoding
 
 -- | Writes text to an output file or stdout.
 writeToOutput :: Maybe FilePath -> Text -> IO ()

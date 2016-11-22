@@ -1,0 +1,491 @@
+[{
+    "testCaseDescription": "go-const-declarations-without-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index e69de29..2f2e175 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -0,0 +1 @@",
+        "+const zero = 0"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e3cc7c05800e63045739cf83cc9bed769e582946..7893139bc48344b1c6e4eb30e84badf05a6da6b9"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 2f2e175..2d4a6fd 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1 +1,3 @@",
+        "+const one, two = 1, 2",
+        "+const zero = 0",
+        " const zero = 0"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "7893139bc48344b1c6e4eb30e84badf05a6da6b9..f2ca37e6df2f0e6601317ce53fa41dae85ac6eb7"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    14
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in the zero variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 2d4a6fd..b60f29e 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-const one, two = 1, 2",
+        "+const zero = 0",
+        " const zero = 0",
+        " const zero = 0"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f2ca37e6df2f0e6601317ce53fa41dae85ac6eb7..ac0f95fa20cf28c4db79a2d2a6ea3748cf3a5c53"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    14
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in the one variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index b60f29e..2d4a6fd 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-const zero = 0",
+        "+const one, two = 1, 2",
+        " const zero = 0",
+        " const zero = 0"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "ac0f95fa20cf28c4db79a2d2a6ea3748cf3a5c53..cc922e34d63773be705f8bb45da94eb6633d6d9d"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 2d4a6fd..0cb8229 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,3 +1,2 @@",
+        "-const one, two = 1, 2",
+        "-const zero = 0",
+        " const zero = 0",
+        "+const one, two = 1, 2"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "cc922e34d63773be705f8bb45da94eb6633d6d9d..4f7206f8d97e09d920a16ed0d34acd5d03a7993a"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 0cb8229..83cc71f 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1,2 +1 @@",
+        "-const zero = 0",
+        " const one, two = 1, 2"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4f7206f8d97e09d920a16ed0d34acd5d03a7993a..65836ac955a739028b5745b140b306784a47fadf"
+}
+,{
+    "testCaseDescription": "go-const-declarations-without-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-without-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
+        "index 83cc71f..e69de29 100644",
+        "--- a/const-declarations-without-types.go",
+        "+++ b/const-declarations-without-types.go",
+        "@@ -1 +0,0 @@",
+        "-const one, two = 1, 2"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "65836ac955a739028b5745b140b306784a47fadf..32b315c37909ee768458a4eb9ea7845a06769621"
+}]

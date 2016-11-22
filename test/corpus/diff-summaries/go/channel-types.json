@@ -1,0 +1,1206 @@
+[{
+    "testCaseDescription": "go-channel-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index e69de29..bd7de07 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+type (",
+        "+c1 chan<- chan int",
+        "+c2 chan<- chan<- struct{}",
+        "+c3 chan<- <-chan int",
+        "+)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "043e40fb43f738d1d0ddd89c38bc83159bcc7a8f..2715ec49ee99831d6009a5bbc2e6ddea280f6fef"
+}
+,{
+    "testCaseDescription": "go-channel-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                16
+                            ],
+                            "end": [
+                                7,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                18
+                            ],
+                            "end": [
+                                8,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                18
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index bd7de07..df89eec 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -1,4 +1,14 @@",
+        " type (",
+        "+c2 chan<- chan string",
+        "+c3 chan<- chan<- struct{}",
+        "+c4 chan<- <-chan string",
+        "+)",
+        "+type (",
+        "+c1 chan<- chan int",
+        "+c2 chan<- chan<- struct{}",
+        "+c3 chan<- <-chan int",
+        "+)",
+        "+type (",
+        " c1 chan<- chan int",
+        " c2 chan<- chan<- struct{}",
+        " c3 chan<- <-chan int"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2715ec49ee99831d6009a5bbc2e6ddea280f6fef..580f6f19a43b489719d990145f593472c24de077"
+}
+,{
+    "testCaseDescription": "go-channel-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c1' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index df89eec..de689af 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -1,7 +1,7 @@",
+        " type (",
+        "-c2 chan<- chan string",
+        "-c3 chan<- chan<- struct{}",
+        "-c4 chan<- <-chan string",
+        "+c1 chan<- chan int",
+        "+c2 chan<- chan<- struct{}",
+        "+c3 chan<- <-chan int",
+        " )",
+        " type (",
+        " c1 chan<- chan int"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "580f6f19a43b489719d990145f593472c24de077..aad0cd135c90902c837eb2ee51d8dcd1d22f8e91"
+}
+,{
+    "testCaseDescription": "go-channel-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c1' identifier with the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    16
+                                ],
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    16
+                                ],
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c2' identifier with the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index de689af..df89eec 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -1,7 +1,7 @@",
+        " type (",
+        "-c1 chan<- chan int",
+        "-c2 chan<- chan<- struct{}",
+        "-c3 chan<- <-chan int",
+        "+c2 chan<- chan string",
+        "+c3 chan<- chan<- struct{}",
+        "+c4 chan<- <-chan string",
+        " )",
+        " type (",
+        " c1 chan<- chan int"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "aad0cd135c90902c837eb2ee51d8dcd1d22f8e91..0eb2569b0fea68a214a069fa32df49ee1be07d92"
+}
+,{
+    "testCaseDescription": "go-channel-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                16
+                            ],
+                            "end": [
+                                7,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                18
+                            ],
+                            "end": [
+                                8,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                18
+                            ],
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                16
+                            ],
+                            "end": [
+                                7,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                18
+                            ],
+                            "end": [
+                                8,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                18
+                            ],
+                            "end": [
+                                9,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'string' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index df89eec..145001b 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -1,15 +1,10 @@",
+        " type (",
+        "-c2 chan<- chan string",
+        "-c3 chan<- chan<- struct{}",
+        "-c4 chan<- <-chan string",
+        "-)",
+        "-type (",
+        " c1 chan<- chan int",
+        " c2 chan<- chan<- struct{}",
+        " c3 chan<- <-chan int",
+        " )",
+        " type (",
+        "-c1 chan<- chan int",
+        "-c2 chan<- chan<- struct{}",
+        "-c3 chan<- <-chan int",
+        "+c2 chan<- chan string",
+        "+c3 chan<- chan<- struct{}",
+        "+c4 chan<- <-chan string",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0eb2569b0fea68a214a069fa32df49ee1be07d92..9cb5f5999f5ab5fbc4edcbf54d36bedb7f7c1120"
+}
+,{
+    "testCaseDescription": "go-channel-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c1' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index 145001b..a3506d3 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -1,9 +1,4 @@",
+        " type (",
+        "-c1 chan<- chan int",
+        "-c2 chan<- chan<- struct{}",
+        "-c3 chan<- <-chan int",
+        "-)",
+        "-type (",
+        " c2 chan<- chan string",
+        " c3 chan<- chan<- struct{}",
+        " c4 chan<- <-chan string"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "9cb5f5999f5ab5fbc4edcbf54d36bedb7f7c1120..90ca3e30448b2c46eeef569572a6336993884459"
+}
+,{
+    "testCaseDescription": "go-channel-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "channel-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c3' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                18
+                            ],
+                            "end": [
+                                3,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct_type"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c4' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                18
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "channel-types.go"
+    ],
+    "patch": [
+        "diff --git a/channel-types.go b/channel-types.go",
+        "index a3506d3..e69de29 100644",
+        "--- a/channel-types.go",
+        "+++ b/channel-types.go",
+        "@@ -1,5 +0,0 @@",
+        "-type (",
+        "-c2 chan<- chan string",
+        "-c3 chan<- chan<- struct{}",
+        "-c4 chan<- <-chan string",
+        "-)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "90ca3e30448b2c46eeef569572a6336993884459..dfdf7a0d7752c21eb75fdbe0c82e214ce2a946bd"
+}]

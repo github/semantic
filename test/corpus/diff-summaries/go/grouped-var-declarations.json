@@ -1,0 +1,560 @@
+[{
+    "testCaseDescription": "go-grouped-var-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index e69de29..c1c0b16 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -0,0 +1,4 @@",
+        "+var (",
+        "+zero = 0",
+        "+one = 1",
+        "+)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "87119afd9d847041735cf640ecc066ad2804a85f..3d2221718774634aaf05f9751f1eac96639c8867"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index c1c0b16..6b9c91d 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,4 +1,12 @@",
+        " var (",
+        "+a = 0",
+        "+b = 1",
+        "+)",
+        "+var (",
+        "+zero = 0",
+        "+one = 1",
+        "+)",
+        "+var (",
+        " zero = 0",
+        " one = 1",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3d2221718774634aaf05f9751f1eac96639c8867..028abd80df67d44f7cd18c889e31248c955453ae"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 6b9c91d..5ed0e06 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        " var (",
+        "-a = 0",
+        "-b = 1",
+        "+zero = 0",
+        "+one = 1",
+        " )",
+        " var (",
+        " zero = 0"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "028abd80df67d44f7cd18c889e31248c955453ae..25b8fae28eebfaaa5e88a04d68b10205a277ed91"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 5ed0e06..6b9c91d 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,6 +1,6 @@",
+        " var (",
+        "-zero = 0",
+        "-one = 1",
+        "+a = 0",
+        "+b = 1",
+        " )",
+        " var (",
+        " zero = 0"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "25b8fae28eebfaaa5e88a04d68b10205a277ed91..34a449a972a1a710b5cd14ca0c174c15dcaeb003"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 6b9c91d..9094e82 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,12 +1,8 @@",
+        " var (",
+        "-a = 0",
+        "-b = 1",
+        "-)",
+        "-var (",
+        " zero = 0",
+        " one = 1",
+        " )",
+        " var (",
+        "-zero = 0",
+        "-one = 1",
+        "+a = 0",
+        "+b = 1",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "34a449a972a1a710b5cd14ca0c174c15dcaeb003..513b36b7a4797c5c95576f1bdcfe5c3aff699138"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index 9094e82..d954576 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,8 +1,4 @@",
+        " var (",
+        "-zero = 0",
+        "-one = 1",
+        "-)",
+        "-var (",
+        " a = 0",
+        " b = 1",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "513b36b7a4797c5c95576f1bdcfe5c3aff699138..b9336abbeeb3b7e8e18bd0757837c28f3d1b41e1"
+}
+,{
+    "testCaseDescription": "go-grouped-var-declarations-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "grouped-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "grouped-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
+        "index d954576..e69de29 100644",
+        "--- a/grouped-var-declarations.go",
+        "+++ b/grouped-var-declarations.go",
+        "@@ -1,4 +0,0 @@",
+        "-var (",
+        "-a = 0",
+        "-b = 1",
+        "-)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b9336abbeeb3b7e8e18bd0757837c28f3d1b41e1..25238a93bb3b92d4e2609c44f320e44fd9f4b537"
+}]

@@ -129,4 +129,9 @@ syntaxToTermField syntax = case syntax of
   S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Negate expr -> [ "negate" .= expr ]
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
+  S.Select cases -> childrenFields cases
+  S.Go cases -> childrenFields cases
+  S.Defer cases -> childrenFields cases
+  S.TypeAssertion a b -> childrenFields [a, b]
+  S.TypeConversion a b -> childrenFields [a, b]
   where childrenFields c = [ "children" .= c ]

@@ -47,6 +47,7 @@ data Syntax a f
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
+  | Select { cases :: [f] }
   | Object { keyValues :: [f] }
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
@@ -83,6 +84,10 @@ data Syntax a f
   | Negate f
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
   | Rescue [f] [f]
+  | Go f
+  | Defer f
+  | TypeAssertion f f
+  | TypeConversion f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
