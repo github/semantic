@@ -218,9 +218,9 @@ defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm {
-  termIndex :: Int,
-  feature :: Vector.Vector Double,
-  term :: Term f (Record fields)
+    termIndex :: Int -- ^ The index of the term within its root term.
+  , feature   :: Vector.Vector Double -- ^ Feature vector
+  , term      :: Term f (Record fields) -- ^ The unmapped term
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
