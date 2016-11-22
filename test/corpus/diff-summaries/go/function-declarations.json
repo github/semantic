@@ -17,133 +17,17 @@
                         }
                     },
                     "summary": "Added the 'f1' function"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "function-declarations.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                24
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                32
-                            ],
-                            "end": [
-                                2,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                36
+                                1
                             ],
                             "end": [
                                 2,
@@ -151,74 +35,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Added the 'func f2(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                17
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                24
+                                1
                             ],
                             "end": [
                                 3,
@@ -226,104 +50,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Added the 'func f2() (int, error) {}' at line 3, column 1 - line 3, column 26"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                19
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                24
-                            ],
-                            "end": [
-                                4,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                28
-                            ],
-                            "end": [
-                                4,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                35
+                                1
                             ],
                             "end": [
                                 4,
@@ -331,11 +65,10 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Added the 'func f2() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "function-declarations.go"
@@ -352,7 +85,7 @@
         "+func f2() (result int, err error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8dd40bb91580306459251df1f1029fc05d9268f8..3c3cfbd318f66bda6c2ff6f4dd83c5f07b5d3392"
+    "shas": "1cfc4770f33afe51641b5c1ed9683984d1ac4ae5..b8ea4fd0800ac92d14585218798b6958a31c0fc7"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-insert-test",
@@ -378,321 +111,6 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'fb' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                24
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                32
-                            ],
-                            "end": [
-                                2,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                36
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Added the '{}' block"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'fc' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                17
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                24
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added the '{}' block"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'fd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                19
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                24
-                            ],
-                            "end": [
-                                4,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                28
-                            ],
-                            "end": [
-                                4,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                35
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Added the '{}' block"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 5,
                                 1
                             ],
@@ -703,133 +121,62 @@
                         }
                     },
                     "summary": "Added the 'f1' function"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "function-declarations.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                6
+                                2,
+                                1
                             ],
                             "end": [
-                                6,
-                                8
+                                2,
+                                38
                             ]
                         }
                     },
-                    "summary": "Added the 'f2' identifier"
+                    "summary": "Added the 'func fb(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                9
+                                3,
+                                1
                             ],
                             "end": [
-                                6,
-                                10
+                                3,
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'func fc() (int, error) {}' at line 3, column 1 - line 3, column 26"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                11
+                                4,
+                                1
                             ],
                             "end": [
-                                6,
-                                14
+                                4,
+                                37
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier"
+                    "summary": "Added the 'func fd() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 6,
-                                16
-                            ],
-                            "end": [
-                                6,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                19
-                            ],
-                            "end": [
-                                6,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                22
-                            ],
-                            "end": [
-                                6,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                24
-                            ],
-                            "end": [
-                                6,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                32
-                            ],
-                            "end": [
-                                6,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                36
+                                1
                             ],
                             "end": [
                                 6,
@@ -837,74 +184,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Added the 'func f2(a int, b, c, d string) int {}' at line 6, column 1 - line 6, column 38"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                8
-                            ],
-                            "end": [
-                                7,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                12
-                            ],
-                            "end": [
-                                7,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                17
-                            ],
-                            "end": [
-                                7,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                24
+                                1
                             ],
                             "end": [
                                 7,
@@ -912,104 +199,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Added the 'func f2() (int, error) {}' at line 7, column 1 - line 7, column 26"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                12
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                19
-                            ],
-                            "end": [
-                                8,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                24
-                            ],
-                            "end": [
-                                8,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                28
-                            ],
-                            "end": [
-                                8,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                35
+                                1
                             ],
                             "end": [
                                 8,
@@ -1017,11 +214,10 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Added the 'func f2() (result int, err error) {}' at line 8, column 1 - line 8, column 37"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "function-declarations.go"
@@ -1045,7 +241,7 @@
         " func f2() (int, error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c3cfbd318f66bda6c2ff6f4dd83c5f07b5d3392..30a422712b0c49e2ea12eb277e47a9845df28e83"
+    "shas": "b8ea4fd0800ac92d14585218798b6958a31c0fc7..fcf6ccf0f476627c8abc746a558adb081ed9d7fa"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -1186,7 +382,7 @@
         " func f2() (int, error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "30a422712b0c49e2ea12eb277e47a9845df28e83..673287894ebdcf184351f0511ecd3212091e1ca9"
+    "shas": "fcf6ccf0f476627c8abc746a558adb081ed9d7fa..94fb4817ecc9299b9e1dd90ac05f48c53f5f984a"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -1327,7 +523,7 @@
         " func f2() (int, error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "673287894ebdcf184351f0511ecd3212091e1ca9..5f59e09781b11fd553ec06bd339bd351a255df93"
+    "shas": "94fb4817ecc9299b9e1dd90ac05f48c53f5f984a..b60b66e9fa94b50e4756d060078a0804547be3d9"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -1353,321 +549,6 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fb' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                24
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                32
-                            ],
-                            "end": [
-                                2,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                36
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fc' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                17
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                24
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                19
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                24
-                            ],
-                            "end": [
-                                4,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                28
-                            ],
-                            "end": [
-                                4,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                35
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 5,
                                 1
                             ],
@@ -1678,321 +559,6 @@
                         }
                     },
                     "summary": "Deleted the 'f1' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                11
-                            ],
-                            "end": [
-                                6,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                16
-                            ],
-                            "end": [
-                                6,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                19
-                            ],
-                            "end": [
-                                6,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                22
-                            ],
-                            "end": [
-                                6,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                24
-                            ],
-                            "end": [
-                                6,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                32
-                            ],
-                            "end": [
-                                6,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                36
-                            ],
-                            "end": [
-                                6,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                8
-                            ],
-                            "end": [
-                                7,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                12
-                            ],
-                            "end": [
-                                7,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                17
-                            ],
-                            "end": [
-                                7,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                24
-                            ],
-                            "end": [
-                                7,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                12
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                19
-                            ],
-                            "end": [
-                                8,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                24
-                            ],
-                            "end": [
-                                8,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                28
-                            ],
-                            "end": [
-                                8,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                35
-                            ],
-                            "end": [
-                                8,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block"
                 },
                 {
                     "span": {
@@ -2008,133 +574,62 @@
                         }
                     },
                     "summary": "Added the 'fa' function"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "function-declarations.go": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                6,
-                                6
+                                2,
+                                1
                             ],
                             "end": [
-                                6,
-                                8
+                                2,
+                                38
                             ]
                         }
                     },
-                    "summary": "Added the 'fb' identifier"
+                    "summary": "Deleted the 'func fb(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                6,
-                                9
+                                3,
+                                1
                             ],
                             "end": [
-                                6,
-                                10
+                                3,
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Deleted the 'func fc() (int, error) {}' at line 3, column 1 - line 3, column 26"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                6,
-                                11
+                                4,
+                                1
                             ],
                             "end": [
-                                6,
-                                14
+                                4,
+                                37
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier"
+                    "summary": "Deleted the 'func fd() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 6,
-                                16
-                            ],
-                            "end": [
-                                6,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                19
-                            ],
-                            "end": [
-                                6,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                22
-                            ],
-                            "end": [
-                                6,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                24
-                            ],
-                            "end": [
-                                6,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                32
-                            ],
-                            "end": [
-                                6,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                36
+                                1
                             ],
                             "end": [
                                 6,
@@ -2142,74 +637,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Deleted the 'func f2(a int, b, c, d string) int {}' at line 6, column 1 - line 6, column 38"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'fc' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                8
-                            ],
-                            "end": [
-                                7,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                12
-                            ],
-                            "end": [
-                                7,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                17
-                            ],
-                            "end": [
-                                7,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                24
+                                1
                             ],
                             "end": [
                                 7,
@@ -2217,104 +652,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Deleted the 'func f2() (int, error) {}' at line 7, column 1 - line 7, column 26"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'fd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '()' arguments"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                12
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                19
-                            ],
-                            "end": [
-                                8,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                24
-                            ],
-                            "end": [
-                                8,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                28
-                            ],
-                            "end": [
-                                8,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                35
+                                1
                             ],
                             "end": [
                                 8,
@@ -2322,11 +667,55 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block"
+                    "summary": "Deleted the 'func f2() (result int, err error) {}' at line 8, column 1 - line 8, column 37"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'func fb(a int, b, c, d string) int {}' at line 6, column 1 - line 6, column 38"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'func fc() (int, error) {}' at line 7, column 1 - line 7, column 26"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'func fd() (result int, err error) {}' at line 8, column 1 - line 8, column 37"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "function-declarations.go"
@@ -2355,7 +744,7 @@
         "+func fd() (result int, err error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f59e09781b11fd553ec06bd339bd351a255df93..dc9ae6ff616858e0bce27734c7740fd0fd1fb74c"
+    "shas": "b60b66e9fa94b50e4756d060078a0804547be3d9..9677cee90e50ac019d16f74a7499da0d81896c91"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-test",
@@ -2376,133 +765,17 @@
                         }
                     },
                     "summary": "Deleted the 'f1' function"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "function-declarations.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                24
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                32
-                            ],
-                            "end": [
-                                2,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                36
+                                1
                             ],
                             "end": [
                                 2,
@@ -2510,74 +783,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block"
+                    "summary": "Deleted the 'func f2(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                17
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                24
+                                1
                             ],
                             "end": [
                                 3,
@@ -2585,104 +798,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block"
+                    "summary": "Deleted the 'func f2() (int, error) {}' at line 3, column 1 - line 3, column 26"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                19
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                24
-                            ],
-                            "end": [
-                                4,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                28
-                            ],
-                            "end": [
-                                4,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                35
+                                1
                             ],
                             "end": [
                                 4,
@@ -2690,11 +813,10 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block"
+                    "summary": "Deleted the 'func f2() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "function-declarations.go"
@@ -2714,7 +836,7 @@
         " func fc() (int, error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc9ae6ff616858e0bce27734c7740fd0fd1fb74c..23379b519c471e14ee16c665dd5485618a6df571"
+    "shas": "9677cee90e50ac019d16f74a7499da0d81896c91..3847a6a7099687b768bdfc04aad517f2df75bf47"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-rest-test",
@@ -2735,133 +857,17 @@
                         }
                     },
                     "summary": "Deleted the 'fa' function"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "function-declarations.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fb' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                24
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                32
-                            ],
-                            "end": [
-                                2,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                36
+                                1
                             ],
                             "end": [
                                 2,
@@ -2869,74 +875,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block"
+                    "summary": "Deleted the 'func fb(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fc' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                8
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                12
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                17
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                24
+                                1
                             ],
                             "end": [
                                 3,
@@ -2944,104 +890,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block"
+                    "summary": "Deleted the 'func fc() (int, error) {}' at line 3, column 1 - line 3, column 26"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '()' arguments"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                12
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'result' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                19
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                24
-                            ],
-                            "end": [
-                                4,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'err' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                28
-                            ],
-                            "end": [
-                                4,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                35
+                                1
                             ],
                             "end": [
                                 4,
@@ -3049,11 +905,10 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block"
+                    "summary": "Deleted the 'func fd() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "function-declarations.go"
@@ -3070,5 +925,5 @@
         "-func fd() (result int, err error) {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "23379b519c471e14ee16c665dd5485618a6df571..bd6863ea897df8ffa4a3b1d5e6bce6d32cc332a3"
+    "shas": "3847a6a7099687b768bdfc04aad517f2df75bf47..03191e600093d2810fbd1457b8ce453f3a9696bf"
 }]

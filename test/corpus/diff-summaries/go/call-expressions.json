@@ -1,7 +1,8 @@
 [{
     "testCaseDescription": "go-call-expressions-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -12,41 +13,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -57,41 +28,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -102,45 +43,14 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -156,12 +66,13 @@
         "+z(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3769ea1b9bd2c24db26b802a6d3ae3d3c0bec8ce..f52f75801561c2fa3f30e17760fb850a9bf9d154"
+    "shas": "b47f159a4e69c481019748b1b4451ca5480b48ac..c8763d16606cda825fb974369f9a2b519439e29e"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -172,41 +83,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -217,41 +98,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -262,41 +113,11 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
                 },
                 {
                     "span": {
@@ -307,41 +128,11 @@
                             ],
                             "end": [
                                 4,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'x(b, c...)' at line 4, column 1 - line 4, column 11"
                 },
                 {
                     "span": {
@@ -352,41 +143,11 @@
                             ],
                             "end": [
                                 5,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'y(b, c,)' at line 5, column 1 - line 5, column 9"
                 },
                 {
                     "span": {
@@ -397,45 +158,14 @@
                             ],
                             "end": [
                                 6,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                5
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'z(b,c...,)' at line 6, column 1 - line 6, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -457,12 +187,13 @@
         " z(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f52f75801561c2fa3f30e17760fb850a9bf9d154..f170ad7ae1d33e70f4a09856658a72d1fee119ba"
+    "shas": "c8763d16606cda825fb974369f9a2b519439e29e..efeb7a0f095a0f9412a310203ec9147cc43a093a"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -473,41 +204,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -518,41 +219,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -563,41 +234,11 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
                 },
                 {
                     "span": {
@@ -608,41 +249,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -653,41 +264,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -698,45 +279,14 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -758,12 +308,13 @@
         " z(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f170ad7ae1d33e70f4a09856658a72d1fee119ba..ac376c5fd2bb5969e63a9de36085046066ec87a2"
+    "shas": "efeb7a0f095a0f9412a310203ec9147cc43a093a..9c07ff15f6bdc008d045bbaebae934200a2a6734"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -774,41 +325,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -819,41 +340,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -864,41 +355,11 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
                 },
                 {
                     "span": {
@@ -909,41 +370,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -954,41 +385,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -999,45 +400,14 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -1059,12 +429,13 @@
         " z(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac376c5fd2bb5969e63a9de36085046066ec87a2..8531d9e782883cb99947ce7e382154d95a59bda5"
+    "shas": "9c07ff15f6bdc008d045bbaebae934200a2a6734..a1710da50116f9380b25e096b698eec1b03325f6"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-replacement-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -1075,41 +446,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -1120,41 +461,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -1165,41 +476,11 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
                 },
                 {
                     "span": {
@@ -1210,41 +491,11 @@
                             ],
                             "end": [
                                 4,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'x(b, c...)' at line 4, column 1 - line 4, column 11"
                 },
                 {
                     "span": {
@@ -1255,41 +506,11 @@
                             ],
                             "end": [
                                 5,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'y(b, c,)' at line 5, column 1 - line 5, column 9"
                 },
                 {
                     "span": {
@@ -1300,41 +521,11 @@
                             ],
                             "end": [
                                 6,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                5
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'z(b,c...,)' at line 6, column 1 - line 6, column 11"
                 },
                 {
                     "span": {
@@ -1345,41 +536,11 @@
                             ],
                             "end": [
                                 4,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'a(b, c...)' at line 4, column 1 - line 4, column 11"
                 },
                 {
                     "span": {
@@ -1390,41 +551,11 @@
                             ],
                             "end": [
                                 5,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                3
-                            ],
-                            "end": [
-                                5,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'b(b, c,)' at line 5, column 1 - line 5, column 9"
                 },
                 {
                     "span": {
@@ -1435,45 +566,14 @@
                             ],
                             "end": [
                                 6,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                5
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' identifier"
+                    "summary": "Added the 'c(b,c...,)' at line 6, column 1 - line 6, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -1498,12 +598,13 @@
         "+c(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8531d9e782883cb99947ce7e382154d95a59bda5..a390ae02bfc9838ec6e494d043d37bef1bfdb71b"
+    "shas": "a1710da50116f9380b25e096b698eec1b03325f6..a1c6a59603e72f43ab5a830e99818da54d6fb95b"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -1514,41 +615,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -1559,41 +630,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -1604,45 +645,14 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -1661,12 +671,13 @@
         " c(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a390ae02bfc9838ec6e494d043d37bef1bfdb71b..00635b4df8c9b2421760871438c8d985dd0bf6f4"
+    "shas": "a1c6a59603e72f43ab5a830e99818da54d6fb95b..9293baf00488ad7785e23a8b78ab5f95342ebab3"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-rest-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -1677,41 +688,11 @@
                             ],
                             "end": [
                                 1,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                3
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
                 },
                 {
                     "span": {
@@ -1722,41 +703,11 @@
                             ],
                             "end": [
                                 2,
-                                2
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
                 },
                 {
                     "span": {
@@ -1767,45 +718,14 @@
                             ],
                             "end": [
                                 3,
-                                2
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                3
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                5
-                            ],
-                            "end": [
-                                3,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' identifier"
+                    "summary": "Deleted the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "call-expressions.go"
@@ -1821,5 +741,5 @@
         "-c(b,c...,)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "00635b4df8c9b2421760871438c8d985dd0bf6f4..96bed34391e2a73e19634e703ed8762f0c52c02a"
+    "shas": "9293baf00488ad7785e23a8b78ab5f95342ebab3..8cef11ced56e7aed74af10acde19377ccfe0b6af"
 }]

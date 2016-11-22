@@ -1,7 +1,8 @@
 [{
     "testCaseDescription": "go-constructors-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "constructors.go": [
                 {
                     "span": {
@@ -12,26 +13,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
+                    "summary": "Added the 'make(chan<- int)' at line 1, column 1 - line 1, column 17"
                 },
                 {
                     "span": {
@@ -42,56 +28,11 @@
                             ],
                             "end": [
                                 2,
-                                5
+                                30
                             ]
                         }
                     },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                25
-                            ],
-                            "end": [
-                                2,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'old' identifier"
+                    "summary": "Added the 'make(chan<- int, (new - old))' at line 2, column 1 - line 2, column 30"
                 },
                 {
                     "span": {
@@ -102,56 +43,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                13
-                            ],
-                            "end": [
-                                3,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                18
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the '5'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the '10'"
+                    "summary": "Added the 'make(chan<- int, 5, 10)' at line 3, column 1 - line 3, column 24"
                 },
                 {
                     "span": {
@@ -162,45 +58,14 @@
                             ],
                             "end": [
                                 4,
-                                5
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                17
-                            ],
-                            "end": [
-                                4,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
+                    "summary": "Added the 'new(map[string]string)' at line 4, column 2 - line 4, column 24"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "constructors.go"
@@ -217,12 +82,13 @@
         "+ new(map[string]string)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6f710ad3f8a3be285d345e77c024748224ccdcd9..beb24abc86a82adb40795c995ea1e2bc4f790919"
+    "shas": "966bee07072f36b83494af4ac7d3c83673e1f3f8..c7bdb07eb72049fd69abdcc143aec04d926f21ce"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "constructors.go": [
                 {
                     "span": {
@@ -233,26 +99,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                20
                             ]
                         }
                     },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
+                    "summary": "Added the 'make(chan<- string)' at line 1, column 1 - line 1, column 20"
                 },
                 {
                     "span": {
@@ -263,56 +114,11 @@
                             ],
                             "end": [
                                 2,
-                                5
+                                33
                             ]
                         }
                     },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                28
-                            ],
-                            "end": [
-                                2,
-                                31
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'old' identifier"
+                    "summary": "Added the 'make(chan<- string, (new - old))' at line 2, column 1 - line 2, column 33"
                 },
                 {
                     "span": {
@@ -323,56 +129,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                27
                             ]
                         }
                     },
-                    "summary": "Added 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                13
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added '7'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                24
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added '11'"
+                    "summary": "Added the 'make(chan<- string, 7, 11)' at line 3, column 1 - line 3, column 27"
                 },
                 {
                     "span": {
@@ -383,191 +144,56 @@
                             ],
                             "end": [
                                 4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                14
-                            ],
-                            "end": [
-                                4,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                13
-                            ],
-                            "end": [
-                                5,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                13
-                            ],
-                            "end": [
-                                6,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                19
-                            ],
-                            "end": [
-                                6,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                25
-                            ],
-                            "end": [
-                                6,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'old' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                13
-                            ],
-                            "end": [
-                                7,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
                                 18
-                            ],
-                            "end": [
-                                7,
-                                19
                             ]
                         }
                     },
-                    "summary": "Added '5'"
+                    "summary": "Added the 'new(map[int]int)' at line 4, column 2 - line 4, column 18"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- int)' at line 5, column 1 - line 5, column 17"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- int, (new - old))' at line 6, column 1 - line 6, column 30"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 7,
-                                21
+                                1
                             ],
                             "end": [
                                 7,
-                                23
+                                24
                             ]
                         }
                     },
-                    "summary": "Added '10'"
+                    "summary": "Added the 'make(chan<- int, 5, 10)' at line 7, column 1 - line 7, column 24"
                 },
                 {
                     "span": {
@@ -578,45 +204,14 @@
                             ],
                             "end": [
                                 8,
-                                5
+                                24
                             ]
                         }
                     },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                10
-                            ],
-                            "end": [
-                                8,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                17
-                            ],
-                            "end": [
-                                8,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
+                    "summary": "Added the 'new(map[string]string)' at line 8, column 2 - line 8, column 24"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "constructors.go"
@@ -640,7 +235,7 @@
         " make(chan<- int, 5, 10)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "beb24abc86a82adb40795c995ea1e2bc4f790919..d0edc7f93674c864081ee63c5b7858218a75d2e1"
+    "shas": "c7bdb07eb72049fd69abdcc143aec04d926f21ce..68ef8db50537542788d5ddc486ef718468df5d09"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -862,7 +457,7 @@
         " make(chan<- int, 5, 10)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0edc7f93674c864081ee63c5b7858218a75d2e1..82e9b5230178a6414f72fe4163e94e882d25f357"
+    "shas": "68ef8db50537542788d5ddc486ef718468df5d09..20ffdb2472a383a950316cc2db621c93f16d4cb9"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -1084,12 +679,13 @@
         " make(chan<- int, 5, 10)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82e9b5230178a6414f72fe4163e94e882d25f357..e1d432adae4d3b1a1f6b47bf9a88f5baf3b30f6c"
+    "shas": "20ffdb2472a383a950316cc2db621c93f16d4cb9..6e664ada44333ddd3d6d3ecb7763941c96ad59d7"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "constructors.go": [
                 {
                     "span": {
@@ -1100,26 +696,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                20
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Deleted the 'make(chan<- string)' at line 1, column 1 - line 1, column 20"
                 },
                 {
                     "span": {
@@ -1130,56 +711,11 @@
                             ],
                             "end": [
                                 2,
-                                5
+                                33
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                28
-                            ],
-                            "end": [
-                                2,
-                                31
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'old' identifier"
+                    "summary": "Deleted the 'make(chan<- string, (new - old))' at line 2, column 1 - line 2, column 33"
                 },
                 {
                     "span": {
@@ -1190,56 +726,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                27
                             ]
                         }
                     },
-                    "summary": "Deleted 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                13
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '7'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                24
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '11'"
+                    "summary": "Deleted the 'make(chan<- string, 7, 11)' at line 3, column 1 - line 3, column 27"
                 },
                 {
                     "span": {
@@ -1250,386 +741,116 @@
                             ],
                             "end": [
                                 4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                14
-                            ],
-                            "end": [
-                                4,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                13
-                            ],
-                            "end": [
-                                5,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                13
-                            ],
-                            "end": [
-                                6,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                19
-                            ],
-                            "end": [
-                                6,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                25
-                            ],
-                            "end": [
-                                6,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'old' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                13
-                            ],
-                            "end": [
-                                7,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
                                 18
-                            ],
-                            "end": [
-                                7,
-                                19
                             ]
                         }
                     },
-                    "summary": "Deleted '5'"
+                    "summary": "Deleted the 'new(map[int]int)' at line 4, column 2 - line 4, column 18"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                7,
-                                21
+                                5,
+                                1
                             ],
                             "end": [
-                                7,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '10'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                10
-                            ],
-                            "end": [
-                                8,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
+                                5,
                                 17
-                            ],
-                            "end": [
-                                8,
-                                23
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Deleted the 'make(chan<- int)' at line 5, column 1 - line 5, column 17"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                13
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 6,
                                 1
                             ],
                             "end": [
                                 6,
-                                5
+                                30
                             ]
                         }
                     },
-                    "summary": "Added the 'make' identifier"
+                    "summary": "Deleted the 'make(chan<- int, (new - old))' at line 6, column 1 - line 6, column 30"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                13
-                            ],
-                            "end": [
-                                6,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                22
-                            ],
-                            "end": [
-                                6,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                28
-                            ],
-                            "end": [
-                                6,
-                                31
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'old' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 7,
                                 1
                             ],
                             "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'make' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                13
-                            ],
-                            "end": [
-                                7,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                21
-                            ],
-                            "end": [
-                                7,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added '7'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 7,
                                 24
-                            ],
-                            "end": [
-                                7,
-                                26
                             ]
                         }
                     },
-                    "summary": "Added '11'"
+                    "summary": "Deleted the 'make(chan<- int, 5, 10)' at line 7, column 1 - line 7, column 24"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new(map[string]string)' at line 8, column 2 - line 8, column 24"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- string)' at line 5, column 1 - line 5, column 20"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- string, (new - old))' at line 6, column 1 - line 6, column 33"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- string, 7, 11)' at line 7, column 1 - line 7, column 27"
                 },
                 {
                     "span": {
@@ -1640,45 +861,14 @@
                             ],
                             "end": [
                                 8,
-                                5
+                                18
                             ]
                         }
                     },
-                    "summary": "Added the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                10
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                14
-                            ],
-                            "end": [
-                                8,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
+                    "summary": "Added the 'new(map[int]int)' at line 8, column 2 - line 8, column 18"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "constructors.go"
@@ -1707,12 +897,13 @@
         "+ new(map[int]int)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1d432adae4d3b1a1f6b47bf9a88f5baf3b30f6c..575da9e5368ee042a6fe73e51a5147dc01b94350"
+    "shas": "6e664ada44333ddd3d6d3ecb7763941c96ad59d7..f09151cf0ca950addb02dcd5eb4a5c3175c8d948"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "constructors.go": [
                 {
                     "span": {
@@ -1723,26 +914,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
+                    "summary": "Deleted the 'make(chan<- int)' at line 1, column 1 - line 1, column 17"
                 },
                 {
                     "span": {
@@ -1753,56 +929,11 @@
                             ],
                             "end": [
                                 2,
-                                5
+                                30
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                25
-                            ],
-                            "end": [
-                                2,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'old' identifier"
+                    "summary": "Deleted the 'make(chan<- int, (new - old))' at line 2, column 1 - line 2, column 30"
                 },
                 {
                     "span": {
@@ -1813,56 +944,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                24
                             ]
                         }
                     },
-                    "summary": "Deleted 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                13
-                            ],
-                            "end": [
-                                3,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                18
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '10'"
+                    "summary": "Deleted the 'make(chan<- int, 5, 10)' at line 3, column 1 - line 3, column 24"
                 },
                 {
                     "span": {
@@ -1873,45 +959,14 @@
                             ],
                             "end": [
                                 4,
-                                5
+                                24
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                17
-                            ],
-                            "end": [
-                                4,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Deleted the 'new(map[string]string)' at line 4, column 2 - line 4, column 24"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "constructors.go"
@@ -1931,12 +986,13 @@
         " make(chan<- string, 7, 11)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "575da9e5368ee042a6fe73e51a5147dc01b94350..8581b72ae6df89e42a604aff5237e08b6917be07"
+    "shas": "f09151cf0ca950addb02dcd5eb4a5c3175c8d948..97793eb040912a5c749583ac0be44dec6763e577"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-rest-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "constructors.go": [
                 {
                     "span": {
@@ -1947,26 +1003,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                20
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Deleted the 'make(chan<- string)' at line 1, column 1 - line 1, column 20"
                 },
                 {
                     "span": {
@@ -1977,56 +1018,11 @@
                             ],
                             "end": [
                                 2,
-                                5
+                                33
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                22
-                            ],
-                            "end": [
-                                2,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                28
-                            ],
-                            "end": [
-                                2,
-                                31
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'old' identifier"
+                    "summary": "Deleted the 'make(chan<- string, (new - old))' at line 2, column 1 - line 2, column 33"
                 },
                 {
                     "span": {
@@ -2037,56 +1033,11 @@
                             ],
                             "end": [
                                 3,
-                                5
+                                27
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                13
-                            ],
-                            "end": [
-                                3,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                21
-                            ],
-                            "end": [
-                                3,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '7'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                24
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '11'"
+                    "summary": "Deleted the 'make(chan<- string, 7, 11)' at line 3, column 1 - line 3, column 27"
                 },
                 {
                     "span": {
@@ -2097,45 +1048,14 @@
                             ],
                             "end": [
                                 4,
-                                5
+                                18
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                14
-                            ],
-                            "end": [
-                                4,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
+                    "summary": "Deleted the 'new(map[int]int)' at line 4, column 2 - line 4, column 18"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "constructors.go"
@@ -2152,5 +1072,5 @@
         "- new(map[int]int)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8581b72ae6df89e42a604aff5237e08b6917be07..871eea5dca96febccafa6c8b60c82cc23cfb1732"
+    "shas": "97793eb040912a5c749583ac0be44dec6763e577..b8520b47d7e23a8b805613ba5e28d123748a7e86"
 }]

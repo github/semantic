@@ -32,7 +32,11 @@
                         }
                     },
                     "summary": "Added the '([]a.b)(c.d)' type conversion expression"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
                 {
                     "span": {
                         "insert": {
@@ -42,60 +46,29 @@
                             ],
                             "end": [
                                 3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
                                 8
-                            ],
-                            "end": [
-                                4,
-                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'g' identifier"
+                    "summary": "Added the 'e.f(g)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(e.f)(g)' at line 4, column 2 - line 4, column 10"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "type-conversion-expressions.go"
@@ -112,7 +85,7 @@
         "+ (e.f)(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90c514fd42fd17c4c370f5c271399cc88ef9d318..8999cf52532f6141a6d4ca3a248c8847a3083262"
+    "shas": "5f76f266d80a0de28bb0535282f740664c37c11d..a5d5c3de64d875d0222b5a597e8e2c92d5c1b797"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-insert-test",
@@ -153,66 +126,6 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'j[k]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'l' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm[n]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'o' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 5,
                                 1
                             ],
@@ -238,6 +151,40 @@
                         }
                     },
                     "summary": "Added the '([]a.b)(c.d)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j.k(l)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(m.n)(o)' at line 4, column 2 - line 4, column 10"
                 },
                 {
                     "span": {
@@ -248,60 +195,29 @@
                             ],
                             "end": [
                                 7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
                                 8
-                            ],
-                            "end": [
-                                8,
-                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'g' identifier"
+                    "summary": "Added the 'e.f(g)' at line 7, column 2 - line 7, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(e.f)(g)' at line 8, column 2 - line 8, column 10"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "type-conversion-expressions.go"
@@ -325,7 +241,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8999cf52532f6141a6d4ca3a248c8847a3083262..3ac3dbfbe3b39fb3fc5606ebd725f3f5b224597c"
+    "shas": "a5d5c3de64d875d0222b5a597e8e2c92d5c1b797..dc70dc6ccde1a13f0ccbf025729857f7aa42e5ff"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -736,7 +652,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3ac3dbfbe3b39fb3fc5606ebd725f3f5b224597c..8a62c2dc833e466f861fd81a774541bca4032051"
+    "shas": "dc70dc6ccde1a13f0ccbf025729857f7aa42e5ff..13fe07e08beef38430c64c8b6fae670e03bf209c"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -1147,7 +1063,7 @@
         "  e.f(g)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8a62c2dc833e466f861fd81a774541bca4032051..21ecb227c0df30064fc3de67ad4b1cc3727413b4"
+    "shas": "13fe07e08beef38430c64c8b6fae670e03bf209c..2e6a0bb8b7564e2524ad96989dfb27ab349bcd34"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -1188,66 +1104,6 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'j[k]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'l' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm[n]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'o' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 5,
                                 1
                             ],
@@ -1273,66 +1129,6 @@
                         }
                     },
                     "summary": "Deleted the '([]a.b)(c.d)' type conversion expression"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                2
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
                 },
                 {
                     "span": {
@@ -1363,6 +1159,70 @@
                         }
                     },
                     "summary": "Added the '([]f.g)(h.i)' type conversion expression"
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j.k(l)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(m.n)(o)' at line 4, column 2 - line 4, column 10"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e.f(g)' at line 7, column 2 - line 7, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(e.f)(g)' at line 8, column 2 - line 8, column 10"
                 },
                 {
                     "span": {
@@ -1373,60 +1233,29 @@
                             ],
                             "end": [
                                 7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'j[k]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'l' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                3
-                            ],
-                            "end": [
-                                8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm[n]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
                                 8
-                            ],
-                            "end": [
-                                8,
-                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'o' identifier"
+                    "summary": "Added the 'j.k(l)' at line 7, column 2 - line 7, column 8"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '(m.n)(o)' at line 8, column 2 - line 8, column 10"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "type-conversion-expressions.go"
@@ -1455,7 +1284,7 @@
         "+ (m.n)(o)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "21ecb227c0df30064fc3de67ad4b1cc3727413b4..b65795f22fbe000e1cc16b999e5dcbee6964d42a"
+    "shas": "2e6a0bb8b7564e2524ad96989dfb27ab349bcd34..02d798ecf15d1825d00d0f8f9261c9c6fe89a836"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-test",
@@ -1491,7 +1320,11 @@
                         }
                     },
                     "summary": "Deleted the '([]a.b)(c.d)' type conversion expression"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
                 {
                     "span": {
                         "delete": {
@@ -1501,60 +1334,29 @@
                             ],
                             "end": [
                                 3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e[f]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
                                 8
-                            ],
-                            "end": [
-                                4,
-                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'g' identifier"
+                    "summary": "Deleted the 'e.f(g)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(e.f)(g)' at line 4, column 2 - line 4, column 10"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "type-conversion-expressions.go"
@@ -1574,7 +1376,7 @@
         "  j.k(l)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b65795f22fbe000e1cc16b999e5dcbee6964d42a..cc74909169678cd5933e0366e58e25af31a5430a"
+    "shas": "02d798ecf15d1825d00d0f8f9261c9c6fe89a836..958f40e15fc2c02a629b7ad096c573da07e5ffc3"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-rest-test",
@@ -1610,7 +1412,11 @@
                         }
                     },
                     "summary": "Deleted the '([]f.g)(h.i)' type conversion expression"
-                },
+                }
+            ]
+        },
+        "errors": {
+            "type-conversion-expressions.go": [
                 {
                     "span": {
                         "delete": {
@@ -1620,60 +1426,29 @@
                             ],
                             "end": [
                                 3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'j[k]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'l' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                3
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm[n]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
                                 8
-                            ],
-                            "end": [
-                                4,
-                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'o' identifier"
+                    "summary": "Deleted the 'j.k(l)' at line 3, column 2 - line 3, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                2
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '(m.n)(o)' at line 4, column 2 - line 4, column 10"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "type-conversion-expressions.go"
@@ -1690,5 +1465,5 @@
         "- (m.n)(o)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cc74909169678cd5933e0366e58e25af31a5430a..bb72eac862023a89f38dae6d74bff7f8f685bb29"
+    "shas": "958f40e15fc2c02a629b7ad096c573da07e5ffc3..3403cd75b5874d1bc6c4c3c737525b7bd1271113"
 }]
