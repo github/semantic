@@ -34,6 +34,7 @@ library
                      , Language.C
                      , Language.JavaScript
                      , Language.Markdown
+                     , Language.Go
                      , Language.Ruby
                      , Parse
                      , Parser
@@ -56,6 +57,9 @@ library
                      , Term
                      , Term.Arbitrary
                      , TreeSitter
+                     , FDoc.Term
+                     , FDoc.RecursionSchemes
+                     , FDoc.NatExample
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , aeson-pretty
@@ -197,6 +201,7 @@ test-suite integration-test
                      , hspec >= 2.1.10
                      , hspec-expectations-pretty-diff
                      , semantic-diff
+                     , split
                      , MissingH
                      , unordered-containers
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++

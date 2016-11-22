@@ -232,9 +232,16 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "4993de9ab311936d640089fb8e5490f393d0e49d",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index e69de29..72531d8 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -0,0 +1 @@",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9753abca71c13d50fead82ef59ae4427fc8b837a"
+    "shas": "790f317cf635d64f5798d63a5b58483fd6bad99f..583329489c6f6b0bffd28c0ba69c284b7f1b811b"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
@@ -1071,9 +1078,18 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "9753abca71c13d50fead82ef59ae4427fc8b837a",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 72531d8..c960aae 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1 +1,3 @@",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "94e1b740c83bde392a241dc82a439af9f2676955"
+    "shas": "583329489c6f6b0bffd28c0ba69c284b7f1b811b..5e0f442eda3b1d8f963cc7e248c5630420b5cff5"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-insert-test",
@@ -2298,9 +2314,19 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "94e1b740c83bde392a241dc82a439af9f2676955",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index c960aae..1b9b61a 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,3 +1,3 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d0fda84f6c55ed52a041aa88ecf37f2f403d8395"
+    "shas": "5e0f442eda3b1d8f963cc7e248c5630420b5cff5..4ce43f40272580f43a9fb8e2b7cdaf164023371b"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-test",
@@ -3525,9 +3551,19 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "d0fda84f6c55ed52a041aa88ecf37f2f403d8395",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 1b9b61a..c960aae 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,3 +1,3 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3a5fa6c6690acc4d5adee977f537e5f98adf843b"
+    "shas": "4ce43f40272580f43a9fb8e2b7cdaf164023371b..66f83c285b323ea127caf0550c0dc30e999711af"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
@@ -4560,9 +4596,19 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "3a5fa6c6690acc4d5adee977f537e5f98adf843b",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index c960aae..81522c7 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,3 +1,2 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        "+function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f1787fc0b4b16d740902259de6a4563d983bf03a"
+    "shas": "66f83c285b323ea127caf0550c0dc30e999711af..f73fd1833e4219f46c9fbf2a4b40b819b299f142"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-test",
@@ -5203,9 +5249,17 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "f1787fc0b4b16d740902259de6a4563d983bf03a",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 81522c7..3056480 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1,2 +1 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg3); console.log(arg4); } }",
+        " function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a528a6232664e98a3ae81ddbdac951543658779e"
+    "shas": "f73fd1833e4219f46c9fbf2a4b40b819b299f142..eef7c0a54cfb951da941ad6f8697f41ee7eabc07"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-rest-test",
@@ -5441,7 +5495,14 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "a528a6232664e98a3ae81ddbdac951543658779e",
+    "patch": [
+        "diff --git a/nested-functions.js b/nested-functions.js",
+        "index 3056480..e69de29 100644",
+        "--- a/nested-functions.js",
+        "+++ b/nested-functions.js",
+        "@@ -1 +0,0 @@",
+        "-function parent (arg1, arg2) { function child (arg3, arg4) { console.log(arg1); console.log(arg2); } }"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "010fc7622a9bf32b411ac3d47a2d5570285347a6"
+    "shas": "eef7c0a54cfb951da941ad6f8697f41ee7eabc07..1eaceb51f0254fd4621ddd6e017876ef398d5d8e"
 }]

@@ -10,20 +10,21 @@ import Data.Record
 import Data.These
 import Syntax
 
--- | An annotated node (Syntax) in an abstract syntax tree.
+-- | A Term with an abstract syntax tree and an annotation.
+type Term f annotation = Cofree f annotation
 type TermF = CofreeF
-type Term f = Cofree f
 
-type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
+-- | A Term with a Syntax leaf and a record of fields.
 type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
+type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
 
+-- Term has a Base functor TermF which gives it Recursive and Corecursive instances.
 type instance Base (Term f a) = TermF f a
 instance Functor f => Recursive (Term f a) where project = runCofree
 instance Functor f => Corecursive (Term f a) where embed = cofree
 
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.
-
 zipTerms :: (Traversable f, GAlign f) => Term f annotation -> Term f annotation -> Maybe (Term f (Both annotation))
 zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 t2))
   where go (a :< s) = cofree . (a :<) <$> sequenceA s

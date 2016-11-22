@@ -1,0 +1,585 @@
+[{
+    "testCaseDescription": "go-map-literals-insert-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index e69de29..16fb3cf 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -0,0 +1,4 @@",
+        "+const s = map[string]string{",
+        "+\"hi\": \"hello\",",
+        "+\"bye\": \"goodbye\",",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f366494a187af73e7fcf6d60c2aa3bb503543f80..e925ebba0abf3bdf2a84d3a66d52bd0380796809"
+}
+,{
+    "testCaseDescription": "go-map-literals-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index 16fb3cf..b3c30ca 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -1,3 +1,11 @@",
+        "+const s = map[string]int{",
+        "+\"foo\": \"bar\",",
+        "+\"baz\": \"hello\",",
+        "+}",
+        "+const s = map[string]string{",
+        "+\"hi\": \"hello\",",
+        "+\"bye\": \"goodbye\",",
+        "+}",
+        " const s = map[string]string{",
+        " \"hi\": \"hello\",",
+        " \"bye\": \"goodbye\","
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e925ebba0abf3bdf2a84d3a66d52bd0380796809..de28fc5f9c2b25ec7ae4a2a30d8a7edc342a76bb"
+}
+,{
+    "testCaseDescription": "go-map-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    22
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the s variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    7
+                                ],
+                                "end": [
+                                    2,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    8
+                                ],
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the s variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index b3c30ca..72c2e91 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -1,6 +1,6 @@",
+        "-const s = map[string]int{",
+        "-\"foo\": \"bar\",",
+        "-\"baz\": \"hello\",",
+        "+const s = map[string]string{",
+        "+\"hi\": \"hello\",",
+        "+\"bye\": \"goodbye\",",
+        " }",
+        " const s = map[string]string{",
+        " \"hi\": \"hello\","
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "de28fc5f9c2b25ec7ae4a2a30d8a7edc342a76bb..db595e9471ff2fef089dc2aa7f502568d1502a6a"
+}
+,{
+    "testCaseDescription": "go-map-literals-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'string' identifier in the s variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                22
+                            ],
+                            "end": [
+                                1,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the s variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"foo\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"bar\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"bye\" string in the s variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                8
+                            ],
+                            "end": [
+                                3,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"goodbye\" string in the s variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index 72c2e91..b3c30ca 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -1,6 +1,6 @@",
+        "-const s = map[string]string{",
+        "-\"hi\": \"hello\",",
+        "-\"bye\": \"goodbye\",",
+        "+const s = map[string]int{",
+        "+\"foo\": \"bar\",",
+        "+\"baz\": \"hello\",",
+        " }",
+        " const s = map[string]string{",
+        " \"hi\": \"hello\","
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "db595e9471ff2fef089dc2aa7f502568d1502a6a..a7fd4cda280bf4ae44d7ada58ada52f350017735"
+}
+,{
+    "testCaseDescription": "go-map-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index b3c30ca..6d5f577 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -1,12 +1,8 @@",
+        "-const s = map[string]int{",
+        "-\"foo\": \"bar\",",
+        "-\"baz\": \"hello\",",
+        "-}",
+        " const s = map[string]string{",
+        " \"hi\": \"hello\",",
+        " \"bye\": \"goodbye\",",
+        " }",
+        "-const s = map[string]string{",
+        "-\"hi\": \"hello\",",
+        "-\"bye\": \"goodbye\",",
+        "+const s = map[string]int{",
+        "+\"foo\": \"bar\",",
+        "+\"baz\": \"hello\",",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a7fd4cda280bf4ae44d7ada58ada52f350017735..c67615be6903f594bbda655de325f090b44a779e"
+}
+,{
+    "testCaseDescription": "go-map-literals-delete-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index 6d5f577..7f8e649 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -1,7 +1,3 @@",
+        "-const s = map[string]string{",
+        "-\"hi\": \"hello\",",
+        "-\"bye\": \"goodbye\",",
+        "-}",
+        " const s = map[string]int{",
+        " \"foo\": \"bar\",",
+        " \"baz\": \"hello\","
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c67615be6903f594bbda655de325f090b44a779e..1c5da0b334e2c57d642798de8f4554d4e5d7e8b9"
+}
+,{
+    "testCaseDescription": "go-map-literals-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "map-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-literals.go"
+    ],
+    "patch": [
+        "diff --git a/map-literals.go b/map-literals.go",
+        "index 7f8e649..e69de29 100644",
+        "--- a/map-literals.go",
+        "+++ b/map-literals.go",
+        "@@ -1,4 +0,0 @@",
+        "-const s = map[string]int{",
+        "-\"foo\": \"bar\",",
+        "-\"baz\": \"hello\",",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1c5da0b334e2c57d642798de8f4554d4e5d7e8b9..821d52811675ea17dd00d79b0f4e082376b97afc"
+}]

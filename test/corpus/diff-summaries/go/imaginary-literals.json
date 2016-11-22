@@ -1,0 +1,560 @@
+[{
+    "testCaseDescription": "go-imaginary-literals-insert-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index e69de29..aca2d55 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -0,0 +1,4 @@",
+        "+const (",
+        "+a = 01i",
+        "+b = 1.e+100i",
+        "+)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "9fd880a1842d8c0b0096899be831486a006f50e4..1dfc4de50a79b596b883a8c32478aed48332a96b"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index aca2d55..6983988 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,4 +1,12 @@",
+        " const (",
+        "+a = 02i",
+        "+b = 1.e+103i",
+        "+)",
+        "+const (",
+        "+a = 01i",
+        "+b = 1.e+100i",
+        "+)",
+        "+const (",
+        " a = 01i",
+        " b = 1.e+100i",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1dfc4de50a79b596b883a8c32478aed48332a96b..22a5dcc7eb910c4be07e0d79c4010014c87b9a45"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the a variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the b variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 6983988..a7e36a5 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,6 +1,6 @@",
+        " const (",
+        "-a = 02i",
+        "-b = 1.e+103i",
+        "+a = 01i",
+        "+b = 1.e+100i",
+        " )",
+        " const (",
+        " a = 01i"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "22a5dcc7eb910c4be07e0d79c4010014c87b9a45..c8e821fccc1a9384008640b22a57896832df548d"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    5
+                                ],
+                                "end": [
+                                    2,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the a variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the b variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index a7e36a5..6983988 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,6 +1,6 @@",
+        " const (",
+        "-a = 01i",
+        "-b = 1.e+100i",
+        "+a = 02i",
+        "+b = 1.e+103i",
+        " )",
+        " const (",
+        " a = 01i"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c8e821fccc1a9384008640b22a57896832df548d..d7c0cbbf7c636589fb8707bd044efc2a9c74ac77"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 6983988..02cff8d 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,12 +1,8 @@",
+        " const (",
+        "-a = 02i",
+        "-b = 1.e+103i",
+        "-)",
+        "-const (",
+        " a = 01i",
+        " b = 1.e+100i",
+        " )",
+        " const (",
+        "-a = 01i",
+        "-b = 1.e+100i",
+        "+a = 02i",
+        "+b = 1.e+103i",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d7c0cbbf7c636589fb8707bd044efc2a9c74ac77..693f96d6dd713a80868ba814289fcf23a9542611"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-delete-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 02cff8d..6d8ec55 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,8 +1,4 @@",
+        " const (",
+        "-a = 01i",
+        "-b = 1.e+100i",
+        "-)",
+        "-const (",
+        " a = 02i",
+        " b = 1.e+103i",
+        " )"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "693f96d6dd713a80868ba814289fcf23a9542611..ea50813182b228c1202b76c8c102a8156732e30a"
+}
+,{
+    "testCaseDescription": "go-imaginary-literals-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "imaginary-literals.go"
+    ],
+    "patch": [
+        "diff --git a/imaginary-literals.go b/imaginary-literals.go",
+        "index 6d8ec55..e69de29 100644",
+        "--- a/imaginary-literals.go",
+        "+++ b/imaginary-literals.go",
+        "@@ -1,4 +0,0 @@",
+        "-const (",
+        "-a = 02i",
+        "-b = 1.e+103i",
+        "-)"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "ea50813182b228c1202b76c8c102a8156732e30a..740c6c6b1390c86d2f179d9d31f010916292861a"
+}]

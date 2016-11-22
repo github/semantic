@@ -25,9 +25,16 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "d969215f4dc1f8fcdb7936be60bd0ac51877cea9",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index e69de29..f8f538b 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -0,0 +1 @@",
+        "+x ||= 5"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e7df092e38108876d5bbd8167ff092d1e5bcef0c"
+    "shas": "6564c9c8832540d910a4118a6130305613ef9772..737bffe1cb105e55eb30dcb5e66499a162216c4d"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "e7df092e38108876d5bbd8167ff092d1e5bcef0c",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index f8f538b..6c10ae5 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1 +1,3 @@",
+        "+x &&= 7",
+        "+x ||= 5",
+        " x ||= 5"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a3c46cd5e4d07efa83e2bba95552b06a2e270550"
+    "shas": "737bffe1cb105e55eb30dcb5e66499a162216c4d..b4680d4032610561ef31cbb0508bfc9573be0d0c"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "a3c46cd5e4d07efa83e2bba95552b06a2e270550",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index 6c10ae5..a333810 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x &&= 7",
+        "+x ||= 5",
+        " x ||= 5",
+        " x ||= 5"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d69c2aeeb2f5662a480fc0a5863c0e37957defe5"
+    "shas": "b4680d4032610561ef31cbb0508bfc9573be0d0c..cce1693dd4e7b6101f7cbcc9100b4c3276194fa2"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "d69c2aeeb2f5662a480fc0a5863c0e37957defe5",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index a333810..6c10ae5 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x ||= 5",
+        "+x &&= 7",
+        " x ||= 5",
+        " x ||= 5"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d3af4b3df061945f9a28f9b5994dbdbba51f1531"
+    "shas": "cce1693dd4e7b6101f7cbcc9100b4c3276194fa2..8bd810b4f976b9701ff7a0ceb9d018bfeac4780e"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "d3af4b3df061945f9a28f9b5994dbdbba51f1531",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index 6c10ae5..a56ffee 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,3 +1,2 @@",
+        "-x &&= 7",
+        "-x ||= 5",
+        " x ||= 5",
+        "+x &&= 7"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3a293566ed56e21f15702c3ac7daa8eed77f2e4c"
+    "shas": "8bd810b4f976b9701ff7a0ceb9d018bfeac4780e..ddc2e0154b1f8cbb3c3e3800549d0c5126c7ff52"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "3a293566ed56e21f15702c3ac7daa8eed77f2e4c",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index a56ffee..1abca02 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1,2 +1 @@",
+        "-x ||= 5",
+        " x &&= 7"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2f43f8e7b848807903813396b3be87f10f632f57"
+    "shas": "ddc2e0154b1f8cbb3c3e3800549d0c5126c7ff52..4f41d6075e03521d205fb38e22fe31e8f89ffcd9"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "conditional-assignment.rb"
     ],
-    "sha1": "2f43f8e7b848807903813396b3be87f10f632f57",
+    "patch": [
+        "diff --git a/conditional-assignment.rb b/conditional-assignment.rb",
+        "index 1abca02..e69de29 100644",
+        "--- a/conditional-assignment.rb",
+        "+++ b/conditional-assignment.rb",
+        "@@ -1 +0,0 @@",
+        "-x &&= 7"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "65cdd278c64ea23aacd3c8cf11e6f52864fa66ff"
+    "shas": "4f41d6075e03521d205fb38e22fe31e8f89ffcd9..78a9116b77a62e27008d72a5a1f2b1b9bec795bd"
 }]

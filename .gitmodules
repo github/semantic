@@ -22,9 +22,12 @@
 [submodule "vendor/hspec-expectations-pretty-diff"]
 	path = vendor/hspec-expectations-pretty-diff
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
+[submodule "test/corpus/repos/go"]
+	path = test/corpus/repos/go
+	url = https://github.com/diff-fixtures/go.git
 [submodule "test/corpus/repos/ruby"]
 	path = test/corpus/repos/ruby
 	url = https://github.com/diff-fixtures/ruby.git
 [submodule "vendor/effects"]
 	path = vendor/effects
-	url = git@github.com:joshvera/effects.git
+	url = https://github.com/joshvera/effects.git

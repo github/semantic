@@ -12,6 +12,7 @@ import qualified Data.Aeson as A
 import Test.QuickCheck
 import Data.These
 import Data.Text.Arbitrary()
+import Data.Semigroup
 
 -- |
 -- Source position information
@@ -53,6 +54,24 @@ data SourceSpan = SourceSpan
 displayStartEndPos :: SourceSpan -> Text
 displayStartEndPos sp =
   displaySourcePos (spanStart sp) <> " - " <> displaySourcePos (spanEnd sp)
+
+unionSourceSpansFrom :: Foldable f => SourceSpan -> f SourceSpan -> SourceSpan
+unionSourceSpansFrom sourceSpan = fromMaybe sourceSpan . maybeConcat
+
+maybeConcat :: (Foldable f, Semigroup a) => f a -> Maybe a
+maybeConcat = getOption . foldMap (Option . Just)
+
+unionSourceSpans :: Foldable f => f SourceSpan -> SourceSpan
+unionSourceSpans = unionSourceSpansFrom emptySourceSpan
+
+unionSourceSpan :: SourceSpan -> SourceSpan -> SourceSpan
+unionSourceSpan (SourceSpan start1 end1) (SourceSpan start2 end2) = SourceSpan (min start1 start2) (max end1 end2)
+
+emptySourceSpan :: SourceSpan
+emptySourceSpan = SourceSpan (SourcePos 1 1) (SourcePos 1 1)
+
+instance Semigroup SourceSpan where
+  a <> b = unionSourceSpan a b
 
 instance A.ToJSON SourceSpan where
   toJSON SourceSpan{..} =

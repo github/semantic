@@ -1,0 +1,323 @@
+[{
+    "testCaseDescription": "ruby-method-calls-keyword-args-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index e69de29..3f6eb85 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -0,0 +1 @@",
+        "+foo(bar: true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "0651effd0edd3aa8236a13e8055ccdb61e376131..56719719ba8f3aaf1b6c9cc0caa0d8e44a8b7e3c"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-keyword-args-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true, baz: 1)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index 3f6eb85..2ceed79 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -1 +1,3 @@",
+        "+foo(bar: true, baz: 1)",
+        "+foo(bar: true)",
+        " foo(bar: true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "56719719ba8f3aaf1b6c9cc0caa0d8e44a8b7e3c..b139da0f753052390f6adc2b640a1afb05b5c476"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-keyword-args-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz: 1' argument in the foo(bar: true) function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index 2ceed79..515a317 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo(bar: true, baz: 1)",
+        "+foo(bar: true)",
+        " foo(bar: true)",
+        " foo(bar: true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "b139da0f753052390f6adc2b640a1afb05b5c476..2f1f54a8fc3fc6c782164a655d44301022cd1696"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-keyword-args-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz: 1' argument in the foo(bar: true, baz: 1) function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index 515a317..2ceed79 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -1,3 +1,3 @@",
+        "-foo(bar: true)",
+        "+foo(bar: true, baz: 1)",
+        " foo(bar: true)",
+        " foo(bar: true)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "2f1f54a8fc3fc6c782164a655d44301022cd1696..2dd2410e9edd9ad49ea2e990aab44fc4becd053b"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-keyword-args-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true, baz: 1)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(bar: true, baz: 1)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index 2ceed79..47d70d1 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -1,3 +1,2 @@",
+        "-foo(bar: true, baz: 1)",
+        "-foo(bar: true)",
+        " foo(bar: true)",
+        "+foo(bar: true, baz: 1)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "2dd2410e9edd9ad49ea2e990aab44fc4becd053b..52d301081db424529069b6e773de3e8977fff9f2"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-keyword-args-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index 47d70d1..2977518 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -1,2 +1 @@",
+        "-foo(bar: true)",
+        " foo(bar: true, baz: 1)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "52d301081db424529069b6e773de3e8977fff9f2..a2ff4c6ff0d3abb9b94c9369286cd74e20f26673"
+}
+,{
+    "testCaseDescription": "ruby-method-calls-keyword-args-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-calls-keyword-args.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(bar: true, baz: 1)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-calls-keyword-args.rb"
+    ],
+    "patch": [
+        "diff --git a/method-calls-keyword-args.rb b/method-calls-keyword-args.rb",
+        "index 2977518..e69de29 100644",
+        "--- a/method-calls-keyword-args.rb",
+        "+++ b/method-calls-keyword-args.rb",
+        "@@ -1 +0,0 @@",
+        "-foo(bar: true, baz: 1)"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "a2ff4c6ff0d3abb9b94c9369286cd74e20f26673..0b8859a7463c7f7199a43896da33717a33adb581"
+}]

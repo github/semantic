@@ -1,0 +1,335 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-param-default-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index e69de29..439647e 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo()",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "938fb81e6b5297c94aadee8461ad3865bb339a0b..948b510af8ca32d31fa2cd7297873c21c4293912"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-param-default-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name: nil)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index 439647e..b0c2a93 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -1,2 +1,6 @@",
+        "+def foo(name = nil)",
+        "+end",
+        "+def foo()",
+        "+end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "948b510af8ca32d31fa2cd7297873c21c4293912..2b02e88e16ec50494edff125de7d16af87ed8043"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-param-default-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name: nil' parameter in the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index b0c2a93..e856a7a 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo(name = nil)",
+        "+def foo()",
+        " end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "2b02e88e16ec50494edff125de7d16af87ed8043..c77fe0f8270d9d4535af506826b3266b2e363677"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-param-default-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'name: nil' parameter in the 'foo(name: nil)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index e856a7a..b0c2a93 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo()",
+        "+def foo(name = nil)",
+        " end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c77fe0f8270d9d4535af506826b3266b2e363677..586202de2bc56e65a3f24f0fd533d9758b09df9b"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-param-default-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name: nil)' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name: nil)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index b0c2a93..6f207f9 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -1,6 +1,4 @@",
+        "-def foo(name = nil)",
+        "-end",
+        " def foo()",
+        " end",
+        "-def foo()",
+        "+def foo(name = nil)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "586202de2bc56e65a3f24f0fd533d9758b09df9b..e6b2d95dfc0d76bad56db6ad26c2df6e72f6e840"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-param-default-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index 6f207f9..ec9b373 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -1,4 +1,2 @@",
+        "-def foo()",
+        "-end",
+        " def foo(name = nil)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e6b2d95dfc0d76bad56db6ad26c2df6e72f6e840..46fb7103f253c1cce02d27305a2d0305f1275990"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-param-default-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-param-default.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name: nil)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-param-default.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-param-default.rb b/method-declaration-param-default.rb",
+        "index ec9b373..e69de29 100644",
+        "--- a/method-declaration-param-default.rb",
+        "+++ b/method-declaration-param-default.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo(name = nil)",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "46fb7103f253c1cce02d27305a2d0305f1275990..3bb1c281d994cc6dc7ae3b4123ecfe7bc4e9a4ad"
+}]

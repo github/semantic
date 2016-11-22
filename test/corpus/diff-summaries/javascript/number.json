@@ -25,9 +25,16 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "616022d16e903375ee8cb705926e3130e700baa1",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index e69de29..398050c 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -0,0 +1 @@",
+        "+101"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5d899482e4a1b162833c0beff2017cd5f954d9af"
+    "shas": "aa6143f1a8ae9ca9b1ee3577121858208df3cce0..3838259f90e9c1e4e6ce33e99b8d9a0fbcd9e616"
 }
 ,{
     "testCaseDescription": "javascript-number-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "5d899482e4a1b162833c0beff2017cd5f954d9af",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 398050c..16da476 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1 +1,3 @@",
+        "+102",
+        "+101",
+        " 101"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fb905efd1a20da0aa16df3079a05d5a0d2cdf4df"
+    "shas": "3838259f90e9c1e4e6ce33e99b8d9a0fbcd9e616..6e18d86d44c74acdcea5dc6ea75a8169152e0dd2"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "fb905efd1a20da0aa16df3079a05d5a0d2cdf4df",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 16da476..252b3e8 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,3 +1,3 @@",
+        "-102",
+        "+101",
+        " 101",
+        " 101"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5ec23b61593f8f846be54c2626003199f8ba8f31"
+    "shas": "6e18d86d44c74acdcea5dc6ea75a8169152e0dd2..b40e32fd74e885cdf5d9617ef37150ec3d414177"
 }
 ,{
     "testCaseDescription": "javascript-number-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "5ec23b61593f8f846be54c2626003199f8ba8f31",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 252b3e8..16da476 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,3 +1,3 @@",
+        "-101",
+        "+102",
+        " 101",
+        " 101"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "352335d1de8f6aa743824442906f595f413cf3a9"
+    "shas": "b40e32fd74e885cdf5d9617ef37150ec3d414177..85a591e8bebf6a7b8b9adfdebebfb4b8776ab809"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "352335d1de8f6aa743824442906f595f413cf3a9",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 16da476..bb77dfb 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,3 +1,2 @@",
+        "-102",
+        "-101",
+        " 101",
+        "+102"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a4653469e371e09fd2e5dd000025dd361d9a8b4b"
+    "shas": "85a591e8bebf6a7b8b9adfdebebfb4b8776ab809..3e5ee4738617f0b4536cee654c79c7c71e8d7e7b"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "a4653469e371e09fd2e5dd000025dd361d9a8b4b",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index bb77dfb..257e563 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1,2 +1 @@",
+        "-101",
+        " 102"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3327da820137920926a11e97959cad0e88da996f"
+    "shas": "3e5ee4738617f0b4536cee654c79c7c71e8d7e7b..15bf3e42bb84c62933b0d29e0b675bca24cc66b2"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "3327da820137920926a11e97959cad0e88da996f",
+    "patch": [
+        "diff --git a/number.js b/number.js",
+        "index 257e563..e69de29 100644",
+        "--- a/number.js",
+        "+++ b/number.js",
+        "@@ -1 +0,0 @@",
+        "-102"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e3169a584f82eaedeb405338ea6175466369ab58"
+    "shas": "15bf3e42bb84c62933b0d29e0b675bca24cc66b2..2e348ee88f62c0857d6f6ce2ab3ee0d46f12afeb"
 }]

@@ -55,9 +55,18 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "6bef099d2af7b41f171358e66662163cdf0bc96e",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index e69de29..f088562 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -0,0 +1,3 @@",
+        "+foo[bar]",
+        "+foo[:bar]",
+        "+foo[bar] = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8bc26414118839cc62822f791546a858daf7463d"
+    "shas": "72f935172c31da7ddd21bf1a12c7baeb4fdb3419..1b88f5fd6eaa6af48eef0522c818919cc89fe0f3"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-replacement-insert-test",
@@ -146,9 +155,23 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "8bc26414118839cc62822f791546a858daf7463d",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index f088562..7c45cae 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -1,3 +1,8 @@",
+        "+x[\"b\"]",
+        "+x[:\"c\"]",
+        "+foo[bar]",
+        "+foo[:bar]",
+        "+foo[bar] = 1",
+        " foo[bar]",
+        " foo[:bar]",
+        " foo[bar] = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5bf31b94df885fc6aeef3d941a276275a1b54539"
+    "shas": "1b88f5fd6eaa6af48eef0522c818919cc89fe0f3..3114590b91f23ee9d8e9656e3c597b7710c5f08a"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-insert-test",
@@ -258,9 +281,23 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "5bf31b94df885fc6aeef3d941a276275a1b54539",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index 7c45cae..8e3c23d 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -1,5 +1,6 @@",
+        "-x[\"b\"]",
+        "-x[:\"c\"]",
+        "+foo[bar]",
+        "+foo[:bar]",
+        "+foo[bar] = 1",
+        " foo[bar]",
+        " foo[:bar]",
+        " foo[bar] = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2772d28a1314eea9589d8248bfaacaac641d78fd"
+    "shas": "3114590b91f23ee9d8e9656e3c597b7710c5f08a..470abdcd5adc26a44bbd001539d731e36d417046"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-replacement-test",
@@ -370,9 +407,23 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "2772d28a1314eea9589d8248bfaacaac641d78fd",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index 8e3c23d..7c45cae 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -1,6 +1,5 @@",
+        "-foo[bar]",
+        "-foo[:bar]",
+        "-foo[bar] = 1",
+        "+x[\"b\"]",
+        "+x[:\"c\"]",
+        " foo[bar]",
+        " foo[:bar]",
+        " foo[bar] = 1"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6bd4d2e07d73b6bf4d52cff5ec3990c18e04da38"
+    "shas": "470abdcd5adc26a44bbd001539d731e36d417046..ee5fbeec520aa431dcf290c4a7eb220d2bb2b674"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-replacement-test",
@@ -491,9 +542,25 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "6bd4d2e07d73b6bf4d52cff5ec3990c18e04da38",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index 7c45cae..165629c 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -1,8 +1,5 @@",
+        "-x[\"b\"]",
+        "-x[:\"c\"]",
+        "-foo[bar]",
+        "-foo[:bar]",
+        "-foo[bar] = 1",
+        " foo[bar]",
+        " foo[:bar]",
+        " foo[bar] = 1",
+        "+x[\"b\"]",
+        "+x[:\"c\"]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "69629c98667b474becb7b596dedd4133cd703449"
+    "shas": "ee5fbeec520aa431dcf290c4a7eb220d2bb2b674..3fb44d52e9f12fd560773298d89b1721698f358a"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-test",
@@ -552,9 +619,20 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "69629c98667b474becb7b596dedd4133cd703449",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index 165629c..d1fa515 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -1,5 +1,2 @@",
+        "-foo[bar]",
+        "-foo[:bar]",
+        "-foo[bar] = 1",
+        " x[\"b\"]",
+        " x[:\"c\"]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "65dc4b08527a43bdf462865885355973c8154460"
+    "shas": "3fb44d52e9f12fd560773298d89b1721698f358a..0207d27c72e4662c924f3f408396247dbc990739"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-rest-test",
@@ -598,7 +676,15 @@
     "filePaths": [
         "element-reference.rb"
     ],
-    "sha1": "65dc4b08527a43bdf462865885355973c8154460",
+    "patch": [
+        "diff --git a/element-reference.rb b/element-reference.rb",
+        "index d1fa515..e69de29 100644",
+        "--- a/element-reference.rb",
+        "+++ b/element-reference.rb",
+        "@@ -1,2 +0,0 @@",
+        "-x[\"b\"]",
+        "-x[:\"c\"]"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0afd2cfcf489061cc131d9970716bb04bb5cb203"
+    "shas": "0207d27c72e4662c924f3f408396247dbc990739..72e1f4912f54a936266422abbb53a9c2fc864992"
 }]

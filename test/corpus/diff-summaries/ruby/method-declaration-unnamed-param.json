@@ -1,0 +1,335 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index e69de29..57ad017 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo(name)",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "9f2d8fc6ee3c92f30342ba8559ef474000b30bb6..423d992fcf33054fbbbc62439de5d0c8d6a5b0f7"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name, **)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index 57ad017..72a69f5 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -1,2 +1,6 @@",
+        "+def foo(name, **)",
+        "+end",
+        "+def foo(name)",
+        "+end",
+        " def foo(name)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "423d992fcf33054fbbbc62439de5d0c8d6a5b0f7..69b2240f14ddbc4eeae2ebda5a0690d384fceeb3"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '**' parameter in the 'foo(name)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index 72a69f5..e797dda 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo(name, **)",
+        "+def foo(name)",
+        " end",
+        " def foo(name)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "69b2240f14ddbc4eeae2ebda5a0690d384fceeb3..f1ab92cf4a9b91d92cdf15b32252d188bf84f676"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                15
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the '**' parameter in the 'foo(name, **)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index e797dda..72a69f5 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo(name)",
+        "+def foo(name, **)",
+        " end",
+        " def foo(name)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f1ab92cf4a9b91d92cdf15b32252d188bf84f676..5de28e51bb7545c5b2a1b91d6ac71af0a279922a"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name, **)' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name, **)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index 72a69f5..4bd7804 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -1,6 +1,4 @@",
+        "-def foo(name, **)",
+        "-end",
+        " def foo(name)",
+        " end",
+        "-def foo(name)",
+        "+def foo(name, **)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "5de28e51bb7545c5b2a1b91d6ac71af0a279922a..942d44496592797a0be0032a699ba61853b59bbf"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index 4bd7804..b790bfb 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -1,4 +1,2 @@",
+        "-def foo(name)",
+        "-end",
+        " def foo(name, **)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "942d44496592797a0be0032a699ba61853b59bbf..ec3ffc75521d6c39fbe217abbf519d9e0307f5c4"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-unnamed-param-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-unnamed-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name, **)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-unnamed-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-unnamed-param.rb b/method-declaration-unnamed-param.rb",
+        "index b790bfb..e69de29 100644",
+        "--- a/method-declaration-unnamed-param.rb",
+        "+++ b/method-declaration-unnamed-param.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo(name, **)",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "ec3ffc75521d6c39fbe217abbf519d9e0307f5c4..1348e47cfcd21ebc8f7693453b14835daf726244"
+}]

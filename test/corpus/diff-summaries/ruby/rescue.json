@@ -1,0 +1,246 @@
+[{
+    "testCaseDescription": "ruby-rescue-setup-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue.rb b/rescue.rb",
+        "index e69de29..dbcd28c 100644",
+        "--- a/rescue.rb",
+        "+++ b/rescue.rb",
+        "@@ -0,0 +1,3 @@",
+        "+begin",
+        "+  foo",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "7d242e1a703020b3d44a44dfca02698401fd5888..c1c1d85a11ab375b2a5cecfa753ce55794695893"
+}
+,{
+    "testCaseDescription": "ruby-rescue-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' rescue block in a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue.rb b/rescue.rb",
+        "index dbcd28c..fd1f6b9 100644",
+        "--- a/rescue.rb",
+        "+++ b/rescue.rb",
+        "@@ -1,3 +1,4 @@",
+        " begin",
+        "   foo",
+        "+rescue x",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "c1c1d85a11ab375b2a5cecfa753ce55794695893..d2e5d09c09142af88df3e14e001d4f8b3c50400b"
+}
+,{
+    "testCaseDescription": "ruby-rescue-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier in the 'x' rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue.rb b/rescue.rb",
+        "index fd1f6b9..e83ea4c 100644",
+        "--- a/rescue.rb",
+        "+++ b/rescue.rb",
+        "@@ -1,4 +1,5 @@",
+        " begin",
+        "   foo",
+        " rescue x",
+        "+  bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d2e5d09c09142af88df3e14e001d4f8b3c50400b..29ff959d72ec67c93481eb566a450a91a5fdb5e3"
+}
+,{
+    "testCaseDescription": "ruby-rescue-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier in the 'x' rescue block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue.rb b/rescue.rb",
+        "index e83ea4c..fd1f6b9 100644",
+        "--- a/rescue.rb",
+        "+++ b/rescue.rb",
+        "@@ -1,5 +1,4 @@",
+        " begin",
+        "   foo",
+        " rescue x",
+        "-  bar",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "29ff959d72ec67c93481eb566a450a91a5fdb5e3..1e5060ad564b33df252b8ebe36db76da23c71d11"
+}
+,{
+    "testCaseDescription": "ruby-rescue-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' rescue block in a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue.rb b/rescue.rb",
+        "index fd1f6b9..dbcd28c 100644",
+        "--- a/rescue.rb",
+        "+++ b/rescue.rb",
+        "@@ -1,4 +1,3 @@",
+        " begin",
+        "   foo",
+        "-rescue x",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1e5060ad564b33df252b8ebe36db76da23c71d11..742f43f551628274941ad509b4d47a9467022038"
+}
+,{
+    "testCaseDescription": "ruby-rescue-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "rescue.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted a begin statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "rescue.rb"
+    ],
+    "patch": [
+        "diff --git a/rescue.rb b/rescue.rb",
+        "index dbcd28c..e69de29 100644",
+        "--- a/rescue.rb",
+        "+++ b/rescue.rb",
+        "@@ -1,3 +0,0 @@",
+        "-begin",
+        "-  foo",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "742f43f551628274941ad509b4d47a9467022038..759d04410984c3b7b0c25212ef74986fba96a76f"
+}]

@@ -66,6 +66,7 @@ parserForType mediaType = case languageForType mediaType of
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
   Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby ts_language_ruby
+  Just Language.Go -> treeSitterParser Language.Go ts_language_go
   _ -> lineByLineParser
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
@@ -96,6 +97,10 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
+
+-- | Return the parser that should be used for a given path.
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
+parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Read the file and convert it to Unicode.
 readAndTranscodeFile :: FilePath -> IO (Source Char)

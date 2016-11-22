@@ -1,0 +1,794 @@
+[{
+    "testCaseDescription": "go-if-statements-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index e69de29..2266b8b 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -0,0 +1,11 @@",
+        "+if a() {",
+        "+b()",
+        "+}",
+        "+if a := b(); c {",
+        "+d()",
+        "+}",
+        "+if a() {",
+        "+b()",
+        "+} else {",
+        "+c()",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4f9b8528a927a98cae35aa92a05bab432d2cf451..75f23c99193596d8ea69b9866cd03216408717d4"
+}
+,{
+    "testCaseDescription": "go-if-statements-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a()' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index 2266b8b..abacd6e 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,3 +1,25 @@",
+        "+if x() {",
+        "+b()",
+        "+}",
+        "+if y := b(); c {",
+        "+d()",
+        "+}",
+        "+if z() {",
+        "+b()",
+        "+} else {",
+        "+c()",
+        "+}",
+        "+if a() {",
+        "+b()",
+        "+}",
+        "+if a := b(); c {",
+        "+d()",
+        "+}",
+        "+if a() {",
+        "+b()",
+        "+} else {",
+        "+c()",
+        "+}",
+        " if a() {",
+        " b()",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "75f23c99193596d8ea69b9866cd03216408717d4..669deded061b62b8d693268ec8535244bc3aeed8"
+}
+,{
+    "testCaseDescription": "go-if-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a() function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'a' identifier in the a variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    4
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    4
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'a' identifier in the a() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index abacd6e..b5fd21a 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,10 +1,10 @@",
+        "-if x() {",
+        "+if a() {",
+        " b()",
+        " }",
+        "-if y := b(); c {",
+        "+if a := b(); c {",
+        " d()",
+        " }",
+        "-if z() {",
+        "+if a() {",
+        " b()",
+        " } else {",
+        " c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "669deded061b62b8d693268ec8535244bc3aeed8..0ab3ed7afc3476fc761770f35bf7697971a2f839"
+}
+,{
+    "testCaseDescription": "go-if-statements-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    4
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x() function call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'y' identifier in the y variable"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    4
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    4
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'z' identifier in the z() function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index b5fd21a..abacd6e 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,10 +1,10 @@",
+        "-if a() {",
+        "+if x() {",
+        " b()",
+        " }",
+        "-if a := b(); c {",
+        "+if y := b(); c {",
+        " d()",
+        " }",
+        "-if a() {",
+        "+if z() {",
+        " b()",
+        " } else {",
+        " c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0ab3ed7afc3476fc761770f35bf7697971a2f839..2f24dc9616440294210032ea90d1869e7b39cc8c"
+}
+,{
+    "testCaseDescription": "go-if-statements-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x()' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z()' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x()' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "end": [
+                                17,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "end": [
+                                22,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z()' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index abacd6e..ccb09fd 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,14 +1,3 @@",
+        "-if x() {",
+        "-b()",
+        "-}",
+        "-if y := b(); c {",
+        "-d()",
+        "-}",
+        "-if z() {",
+        "-b()",
+        "-} else {",
+        "-c()",
+        "-}",
+        " if a() {",
+        " b()",
+        " }",
+        "@@ -20,13 +9,13 @@ b()",
+        " } else {",
+        " c()",
+        " }",
+        "-if a() {",
+        "+if x() {",
+        " b()",
+        " }",
+        "-if a := b(); c {",
+        "+if y := b(); c {",
+        " d()",
+        " }",
+        "-if a() {",
+        "+if z() {",
+        " b()",
+        " } else {",
+        " c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2f24dc9616440294210032ea90d1869e7b39cc8c..dd27d3e8d9917d7970125a0e771840a3a352768d"
+}
+,{
+    "testCaseDescription": "go-if-statements-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a()' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index ccb09fd..2e63573 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,14 +1,3 @@",
+        "-if a() {",
+        "-b()",
+        "-}",
+        "-if a := b(); c {",
+        "-d()",
+        "-}",
+        "-if a() {",
+        "-b()",
+        "-} else {",
+        "-c()",
+        "-}",
+        " if x() {",
+        " b()",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "dd27d3e8d9917d7970125a0e771840a3a352768d..1559b8975147717c1d7eb9ae330d6bd4dbc18702"
+}
+,{
+    "testCaseDescription": "go-if-statements-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x()' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y := b(); c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z()' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-statements.go"
+    ],
+    "patch": [
+        "diff --git a/if-statements.go b/if-statements.go",
+        "index 2e63573..e69de29 100644",
+        "--- a/if-statements.go",
+        "+++ b/if-statements.go",
+        "@@ -1,11 +0,0 @@",
+        "-if x() {",
+        "-b()",
+        "-}",
+        "-if y := b(); c {",
+        "-d()",
+        "-}",
+        "-if z() {",
+        "-b()",
+        "-} else {",
+        "-c()",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1559b8975147717c1d7eb9ae330d6bd4dbc18702..d77b70cb3981afaf807f3e56652ecd386101cb2b"
+}]

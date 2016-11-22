@@ -1,0 +1,695 @@
+[{
+    "testCaseDescription": "go-qualified-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index e69de29..7840cac 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -0,0 +1 @@",
+        "+type a b.c"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a5b8a6804181af3a1387f9a23e3f85c44ddb6082..1534853219b560e38a40a23b1f54b3791e78a6a8"
+}
+,{
+    "testCaseDescription": "go-qualified-types-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                6
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                10
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 7840cac..0256b29 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1 +1,3 @@",
+        "+type x y.z",
+        "+type a b.c",
+        " type a b.c"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1534853219b560e38a40a23b1f54b3791e78a6a8..9a0469bb91c527b8c2d07f8ec53ab8cdfcf7bd9f"
+}
+,{
+    "testCaseDescription": "go-qualified-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 0256b29..e963dfd 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type x y.z",
+        "+type a b.c",
+        " type a b.c",
+        " type a b.c"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "9a0469bb91c527b8c2d07f8ec53ab8cdfcf7bd9f..da94ab3ccc5de8e4a034254dbe2909d2b8fa9626"
+}
+,{
+    "testCaseDescription": "go-qualified-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index e963dfd..0256b29 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,3 +1,3 @@",
+        "-type a b.c",
+        "+type x y.z",
+        " type a b.c",
+        " type a b.c"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "da94ab3ccc5de8e4a034254dbe2909d2b8fa9626..d75d90717c183e1beaefacd4e4531d6d7da64316"
+}
+,{
+    "testCaseDescription": "go-qualified-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                6
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                10
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                6
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                10
+                            ],
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 0256b29..4525e0a 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,3 +1,2 @@",
+        "-type x y.z",
+        "-type a b.c",
+        " type a b.c",
+        "+type x y.z"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d75d90717c183e1beaefacd4e4531d6d7da64316..40fe32e2e038391f91cb6a8e14ac554e222e1465"
+}
+,{
+    "testCaseDescription": "go-qualified-types-delete-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index 4525e0a..f31a963 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1,2 +1 @@",
+        "-type a b.c",
+        " type x y.z"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "40fe32e2e038391f91cb6a8e14ac554e222e1465..3cd11bed0abcaeb3d4ce762dc40ef452183e6768"
+}
+,{
+    "testCaseDescription": "go-qualified-types-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "qualified-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "qualified-types.go"
+    ],
+    "patch": [
+        "diff --git a/qualified-types.go b/qualified-types.go",
+        "index f31a963..e69de29 100644",
+        "--- a/qualified-types.go",
+        "+++ b/qualified-types.go",
+        "@@ -1 +0,0 @@",
+        "-type x y.z"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3cd11bed0abcaeb3d4ce762dc40ef452183e6768..4605c9308ffc84f9d63dc5e62562b0461d53d5b9"
+}]

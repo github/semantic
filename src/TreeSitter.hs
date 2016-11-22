@@ -5,8 +5,9 @@ import Prologue hiding (Constructor)
 import Category
 import Data.Record
 import Language
-import qualified Language.JavaScript as JS
 import qualified Language.C as C
+import qualified Language.Go as Go
+import qualified Language.JavaScript as JS
 import qualified Language.Ruby as Ruby
 import Parser
 import Range
@@ -58,6 +59,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         termConstructor = case language of
           JavaScript -> JS.termConstructor
           C -> C.termConstructor
+          Language.Go -> Go.termConstructor
           Ruby -> Ruby.termConstructor
           _ -> Language.termConstructor
         isNonEmpty child = category (extract child) /= Empty

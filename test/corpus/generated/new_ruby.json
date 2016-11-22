@@ -1,0 +1,14 @@
+[
+  {
+    "language": "ruby",
+    "fileExt": ".rb",
+    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
+    "syntaxes": [
+      {
+        "syntax": "hash",
+        "insert": "{ :key1 => \"value\", :key2 => 1, \"key3\" => false, :\"symbol_key\" => 10 }",
+        "replacement": "{ key1: \"changed value\", key2: 2, key3: true }"
+      }
+    ]
+  }
+]

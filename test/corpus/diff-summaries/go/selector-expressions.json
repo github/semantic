@@ -1,0 +1,455 @@
+[{
+    "testCaseDescription": "go-selector-expressions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a[b][c]()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index e69de29..7be43f2 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -0,0 +1 @@",
+        "+a.b.c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b8520b47d7e23a8b805613ba5e28d123748a7e86..53e9575bb4a95b6a13a9289b3cb198389c3c5018"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y][z]()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a[b][c]()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 7be43f2..4fa8605 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1 +1,3 @@",
+        "+x.y.z()",
+        "+a.b.c()",
+        " a.b.c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "53e9575bb4a95b6a13a9289b3cb198389c3c5018..05337c7344ffd11906be9b6603043c1bcf0f7dff"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a[b] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the a[b] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the a[b][c] subscript access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 4fa8605..2a586da 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,3 +1,3 @@",
+        "-x.y.z()",
+        "+a.b.c()",
+        " a.b.c()",
+        " a.b.c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "05337c7344ffd11906be9b6603043c1bcf0f7dff..4bcafdd401ffbfb0e29802793ed59f20908986a6"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    2
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x[y] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "end": [
+                                    1,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the x[y] subscript access"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the x[y][z] subscript access"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 2a586da..4fa8605 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,3 +1,3 @@",
+        "-a.b.c()",
+        "+x.y.z()",
+        " a.b.c()",
+        " a.b.c()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "4bcafdd401ffbfb0e29802793ed59f20908986a6..1763e869f9b7050dc5703f293808233c46910062"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y][z]()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[b][c]()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y][z]()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 4fa8605..3e2d0bd 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,3 +1,2 @@",
+        "-x.y.z()",
+        "-a.b.c()",
+        " a.b.c()",
+        "+x.y.z()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1763e869f9b7050dc5703f293808233c46910062..562bbf82089ed1bc7d77c4698451746939455f51"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-delete-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[b][c]()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 3e2d0bd..00b9e7c 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1,2 +1 @@",
+        "-a.b.c()",
+        " x.y.z()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "562bbf82089ed1bc7d77c4698451746939455f51..3ea379fb7d49d67e17b2bd53b58af0298c055ccc"
+}
+,{
+    "testCaseDescription": "go-selector-expressions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "selector-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y][z]()' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "selector-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/selector-expressions.go b/selector-expressions.go",
+        "index 00b9e7c..e69de29 100644",
+        "--- a/selector-expressions.go",
+        "+++ b/selector-expressions.go",
+        "@@ -1 +0,0 @@",
+        "-x.y.z()"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3ea379fb7d49d67e17b2bd53b58af0298c055ccc..bef4b21e0fe9824b79e8b12bfa32867c8a4433a7"
+}]

@@ -2,7 +2,7 @@
     "testCaseDescription": "ruby-interpolation-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "insert": {
@@ -38,17 +38,25 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "27c8bb9ed1adb160824505aa87bcb49fd2bd0606",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index e69de29..a37ad45 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -0,0 +1,2 @@",
+        "+:\"foo #{bar}\"",
+        "+\"foo #{bar}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7012caec8c5c7e9162e2fb6ca8e3a56137424389"
+    "shas": "2505617f30ca311da1378227cbf6a13d83647b91..ba6045bb44bd3872e04f0e0c67e330b73429defa"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "insert": {
@@ -114,17 +122,29 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "7012caec8c5c7e9162e2fb6ca8e3a56137424389",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index a37ad45..c024bd6 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -1,2 +1,6 @@",
+        "+:\"bar #{foo}\"",
+        "+\"bar #{foo}\"",
+        "+:\"foo #{bar}\"",
+        "+\"foo #{bar}\"",
+        " :\"foo #{bar}\"",
+        " \"foo #{bar}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "cdde49454606b1e206ac682ad6401813ec06216e"
+    "shas": "ba6045bb44bd3872e04f0e0c67e330b73429defa..9eab77466f1fc1d8a2ceaed51eab7b16159d2c4c"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "replace": [
@@ -184,17 +204,30 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "cdde49454606b1e206ac682ad6401813ec06216e",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index c024bd6..ce70dd5 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -1,5 +1,5 @@",
+        "-:\"bar #{foo}\"",
+        "-\"bar #{foo}\"",
+        "+:\"foo #{bar}\"",
+        "+\"foo #{bar}\"",
+        " :\"foo #{bar}\"",
+        " \"foo #{bar}\"",
+        " :\"foo #{bar}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "45a81347385633df6b063567d6971c6035ad1184"
+    "shas": "9eab77466f1fc1d8a2ceaed51eab7b16159d2c4c..c23529986ecc8afd8cc26b6e54dc68f203488cd0"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-replacement-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "replace": [
@@ -254,17 +287,30 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "45a81347385633df6b063567d6971c6035ad1184",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index ce70dd5..c024bd6 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -1,5 +1,5 @@",
+        "-:\"foo #{bar}\"",
+        "-\"foo #{bar}\"",
+        "+:\"bar #{foo}\"",
+        "+\"bar #{foo}\"",
+        " :\"foo #{bar}\"",
+        " \"foo #{bar}\"",
+        " :\"foo #{bar}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "06b627b15c97b775ba5734a23c018630fb959cb4"
+    "shas": "c23529986ecc8afd8cc26b6e54dc68f203488cd0..477f525a5dd8fecc22f1eaaa4e77419e0255d2a9"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "delete": {
@@ -360,17 +406,31 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "06b627b15c97b775ba5734a23c018630fb959cb4",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index c024bd6..f56366a 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -1,6 +1,4 @@",
+        "-:\"bar #{foo}\"",
+        "-\"bar #{foo}\"",
+        "-:\"foo #{bar}\"",
+        "-\"foo #{bar}\"",
+        " :\"foo #{bar}\"",
+        " \"foo #{bar}\"",
+        "+:\"bar #{foo}\"",
+        "+\"bar #{foo}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e8c88d21818c95eb56330219a546fe2b7d948709"
+    "shas": "477f525a5dd8fecc22f1eaaa4e77419e0255d2a9..c84f76f558cce919ec1935a75ad1b830b4511ff8"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "delete": {
@@ -406,17 +466,27 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "e8c88d21818c95eb56330219a546fe2b7d948709",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index f56366a..9b7bb17 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -1,4 +1,2 @@",
+        "-:\"foo #{bar}\"",
+        "-\"foo #{bar}\"",
+        " :\"bar #{foo}\"",
+        " \"bar #{foo}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a259650f6a8aefbbd8f41e70c0e12b13c19c9e1b"
+    "shas": "c84f76f558cce919ec1935a75ad1b830b4511ff8..cf1a6e3114fde76b4c1d6ad65ac4c2c10f3a2b3a"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "interpolation.rb": [
                 {
                     "span": {
                         "delete": {
@@ -452,9 +522,17 @@
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "interpolation.rb"
     ],
-    "sha1": "a259650f6a8aefbbd8f41e70c0e12b13c19c9e1b",
+    "patch": [
+        "diff --git a/interpolation.rb b/interpolation.rb",
+        "index 9b7bb17..e69de29 100644",
+        "--- a/interpolation.rb",
+        "+++ b/interpolation.rb",
+        "@@ -1,2 +0,0 @@",
+        "-:\"bar #{foo}\"",
+        "-\"bar #{foo}\""
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0de5663fae24bc6af3327776d01518ef6a240ed6"
+    "shas": "cf1a6e3114fde76b4c1d6ad65ac4c2c10f3a2b3a..ef8d34476c23317120bf744df9d41b9110a04c03"
 }]

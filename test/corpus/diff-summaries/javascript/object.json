@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\" }' object"
                 }
             ]
         },
@@ -25,9 +25,16 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "00efe14aec8ad3006518ee149f738adee0aeba5d",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index e69de29..fe17bb2 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -0,0 +1 @@",
+        "+{ \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9503250634810e806419552ad9ad18891bbc219e"
+    "shas": "5dede241573c8e353a4d8c662194e8e3b750e01a..45f29912e03b7de277df4c10ad238121235b6ed7"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-insert-test",
@@ -47,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 },
                 {
                     "span": {
@@ -62,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\" }' object"
                 }
             ]
         },
@@ -71,9 +78,18 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "9503250634810e806419552ad9ad18891bbc219e",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index fe17bb2..741c3dc 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1 +1,3 @@",
+        "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        "+{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6f5f810bf7512233cd31d12a0324e3fee4a476d2"
+    "shas": "45f29912e03b7de277df4c10ad238121235b6ed7..4e17781769a2098bcce839e1282b1fa0d1df7821"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-insert-test",
@@ -93,7 +109,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key2\": …' pair"
+                    "summary": "Deleted the '\"key2\": \"value2\"' pair"
                 },
                 {
                     "span": {
@@ -108,7 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key3\": …' pair"
+                    "summary": "Deleted the '\"key3\": \"3.0\"' pair"
                 }
             ]
         },
@@ -117,9 +133,19 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "6f5f810bf7512233cd31d12a0324e3fee4a476d2",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 741c3dc..701239d 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        "+{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b4c00c718fe8766bce38b8c8bb263a6a24b4f29e"
+    "shas": "4e17781769a2098bcce839e1282b1fa0d1df7821..d035734af1172dab5eb30ad01fe898f5d850606c"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-test",
@@ -139,7 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"key2\": …' pair"
+                    "summary": "Added the '\"key2\": \"value2\"' pair"
                 },
                 {
                     "span": {
@@ -154,7 +180,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"key3\": …' pair"
+                    "summary": "Added the '\"key3\": \"3.0\"' pair"
                 }
             ]
         },
@@ -163,9 +189,19 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "b4c00c718fe8766bce38b8c8bb263a6a24b4f29e",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 701239d..741c3dc 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,3 +1,3 @@",
+        "-{ \"key1\": \"value1\" };",
+        "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        " { \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9a21cddbf2e326d66db1d30048a505c7b4114a17"
+    "shas": "d035734af1172dab5eb30ad01fe898f5d850606c..d172e093c2f663040bb8d2c429564a4d273753d3"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-replacement-test",
@@ -185,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 },
                 {
                     "span": {
@@ -200,7 +236,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\" }' object"
                 },
                 {
                     "span": {
@@ -215,7 +251,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Added the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 }
             ]
         },
@@ -224,9 +260,19 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "9a21cddbf2e326d66db1d30048a505c7b4114a17",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 741c3dc..9e48273 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,3 +1,2 @@",
+        "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };",
+        "-{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\" };",
+        "+{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c67dbc109159cb73130a14bff8efb22969fa3e7d"
+    "shas": "d172e093c2f663040bb8d2c429564a4d273753d3..337ff59260d3eed7762de977645c68224ea4d46c"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-test",
@@ -246,7 +292,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\" }' object"
                 }
             ]
         },
@@ -255,9 +301,17 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "c67dbc109159cb73130a14bff8efb22969fa3e7d",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 9e48273..12d063a 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1,2 +1 @@",
+        "-{ \"key1\": \"value1\" };",
+        " { \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "575cfe90651d66ddda91b0764d9107f1718c1bfb"
+    "shas": "337ff59260d3eed7762de977645c68224ea4d46c..9d30494c528991b340e861222f5a6276e874a964"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-rest-test",
@@ -277,7 +331,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                    "summary": "Deleted the '{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" }' object"
                 }
             ]
         },
@@ -286,7 +340,14 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "575cfe90651d66ddda91b0764d9107f1718c1bfb",
+    "patch": [
+        "diff --git a/object.js b/object.js",
+        "index 12d063a..e69de29 100644",
+        "--- a/object.js",
+        "+++ b/object.js",
+        "@@ -1 +0,0 @@",
+        "-{ \"key1\": \"value1\", \"key2\": \"value2\", \"key3\": \"3.0\" };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c3ba4a1505773022c8c9750803b2f78c821f80a1"
+    "shas": "9d30494c528991b340e861222f5a6276e874a964..ba01e3794a8efa31353fd2d5726c70bb2ad8c6a8"
 }]

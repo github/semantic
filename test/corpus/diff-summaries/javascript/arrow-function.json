@@ -25,9 +25,16 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "1a65f6b31571ca180a7067af4efe0b804b5bd17f",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index e69de29..9ef167c 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -0,0 +1 @@",
+        "+(f, g) => { return h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d8b95c6c259bbc1031068e76b71ee165a32fcc90"
+    "shas": "d700dc51fee7a3dd557906dcdf46d426285d7955..edda3c60ac532d534d84539648fa827ff18a6c59"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-replacement-insert-test",
@@ -71,9 +78,18 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "d8b95c6c259bbc1031068e76b71ee165a32fcc90",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index 9ef167c..92dea6f 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -1 +1,3 @@",
+        "+(f, g) => { return g; };",
+        "+(f, g) => { return h; };",
+        " (f, g) => { return h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "38971f3bb12072ce71a8af2e61b40128e2e04335"
+    "shas": "edda3c60ac532d534d84539648fa827ff18a6c59..63fd87f8cafc4a46f2927f9825cc20e5f116a093"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-insert-test",
@@ -114,9 +130,19 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "38971f3bb12072ce71a8af2e61b40128e2e04335",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index 92dea6f..8f5bb51 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-(f, g) => { return g; };",
+        "+(f, g) => { return h; };",
+        " (f, g) => { return h; };",
+        " (f, g) => { return h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0bad91b1393996893c42c7ca6cea6b485ed79f3d"
+    "shas": "63fd87f8cafc4a46f2927f9825cc20e5f116a093..29b18be738dde19aa61343c5f4e54bf83f4b30ea"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-replacement-test",
@@ -157,9 +183,19 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "0bad91b1393996893c42c7ca6cea6b485ed79f3d",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index 8f5bb51..92dea6f 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -1,3 +1,3 @@",
+        "-(f, g) => { return h; };",
+        "+(f, g) => { return g; };",
+        " (f, g) => { return h; };",
+        " (f, g) => { return h; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "22eb88fd92a0f54db863a2c99e7f6cefd573d70c"
+    "shas": "29b18be738dde19aa61343c5f4e54bf83f4b30ea..d92f900ef9873f273da632ea9c54adcd7acc7961"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-replacement-test",
@@ -218,9 +254,19 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "22eb88fd92a0f54db863a2c99e7f6cefd573d70c",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index 92dea6f..acab9a9 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -1,3 +1,2 @@",
+        "-(f, g) => { return g; };",
+        "-(f, g) => { return h; };",
+        " (f, g) => { return h; };",
+        "+(f, g) => { return g; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ce32c18979a6f118f1a64d68058aea090fbd6ffa"
+    "shas": "d92f900ef9873f273da632ea9c54adcd7acc7961..243f2be7291992566bd0ab2c2caef9e7ac13e02d"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-test",
@@ -249,9 +295,17 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "ce32c18979a6f118f1a64d68058aea090fbd6ffa",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index acab9a9..ef1be25 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -1,2 +1 @@",
+        "-(f, g) => { return h; };",
+        " (f, g) => { return g; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "555a09419c1aeebf5676d25753625cc4a6558f9b"
+    "shas": "243f2be7291992566bd0ab2c2caef9e7ac13e02d..3128237c6d11459cf7d3e9add902e7be8d38710b"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-rest-test",
@@ -280,7 +334,14 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "555a09419c1aeebf5676d25753625cc4a6558f9b",
+    "patch": [
+        "diff --git a/arrow-function.js b/arrow-function.js",
+        "index ef1be25..e69de29 100644",
+        "--- a/arrow-function.js",
+        "+++ b/arrow-function.js",
+        "@@ -1 +0,0 @@",
+        "-(f, g) => { return g; };"
+    ],
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "843b9d83e2acc3f1bf014abc4e2402e1a783d3f6"
+    "shas": "3128237c6d11459cf7d3e9add902e7be8d38710b..5cab8720cde055f6d78f5c5deaf8980b89a434e1"
 }]

@@ -100,9 +100,21 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "0de5663fae24bc6af3327776d01518ef6a240ed6",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index e69de29..8ec39b8 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -0,0 +1,6 @@",
+        "+%q#a#",
+        "+%q<a<b>c>",
+        "+%#a#",
+        "+%Q#a#",
+        "+%<a<b>c>",
+        "+%Q<a<b>c>"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f0bcca3b78103200fb1d40626eacace4e8b877ec"
+    "shas": "ef8d34476c23317120bf744df9d41b9110a04c03..1b0f7afd8b56c527a93bcf77cd130a197736aae8"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-replacement-insert-test",
@@ -296,9 +308,30 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "f0bcca3b78103200fb1d40626eacace4e8b877ec",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index 8ec39b8..5b0f7ec 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -1,3 +1,15 @@",
+        "+%q/b/",
+        "+%q{d{e}f}",
+        "+%/b/",
+        "+%Q/b/",
+        "+%{d{e}f}",
+        "+%Q{d{e}f}",
+        "+%q#a#",
+        "+%q<a<b>c>",
+        "+%#a#",
+        "+%Q#a#",
+        "+%<a<b>c>",
+        "+%Q<a<b>c>",
+        " %q#a#",
+        " %q<a<b>c>",
+        " %#a#"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b0992b622b59aa994f8d0548e9dd527f13c0e03f"
+    "shas": "1b0f7afd8b56c527a93bcf77cd130a197736aae8..4e8d0a2cbe3dfca073f23bbb72b1461e5963338e"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-insert-test",
@@ -489,9 +522,30 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "b0992b622b59aa994f8d0548e9dd527f13c0e03f",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index 5b0f7ec..64d6df4 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -1,9 +1,9 @@",
+        "-%q/b/",
+        "-%q{d{e}f}",
+        "-%/b/",
+        "-%Q/b/",
+        "-%{d{e}f}",
+        "-%Q{d{e}f}",
+        "+%q#a#",
+        "+%q<a<b>c>",
+        "+%#a#",
+        "+%Q#a#",
+        "+%<a<b>c>",
+        "+%Q<a<b>c>",
+        " %q#a#",
+        " %q<a<b>c>",
+        " %#a#"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4b10babb959cbc872eba8ed8cd0691dbed4d419b"
+    "shas": "4e8d0a2cbe3dfca073f23bbb72b1461e5963338e..413fa9f465cd1591ad3c753e6d5d160ac0503019"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-replacement-test",
@@ -676,9 +730,30 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "4b10babb959cbc872eba8ed8cd0691dbed4d419b",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index 64d6df4..5b0f7ec 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -1,9 +1,9 @@",
+        "-%q#a#",
+        "-%q<a<b>c>",
+        "-%#a#",
+        "-%Q#a#",
+        "-%<a<b>c>",
+        "-%Q<a<b>c>",
+        "+%q/b/",
+        "+%q{d{e}f}",
+        "+%/b/",
+        "+%Q/b/",
+        "+%{d{e}f}",
+        "+%Q{d{e}f}",
+        " %q#a#",
+        " %q<a<b>c>",
+        " %#a#"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c410440c4904ca7b9e06a9e4db52140b5c4f3efa"
+    "shas": "413fa9f465cd1591ad3c753e6d5d160ac0503019..2a8902902ea697fda4a67838615f8b6a8e108353"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-replacement-test",
@@ -962,9 +1037,39 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "c410440c4904ca7b9e06a9e4db52140b5c4f3efa",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index 5b0f7ec..2095136 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -1,18 +1,12 @@",
+        "-%q/b/",
+        "-%q{d{e}f}",
+        "-%/b/",
+        "-%Q/b/",
+        "-%{d{e}f}",
+        "-%Q{d{e}f}",
+        "-%q#a#",
+        "-%q<a<b>c>",
+        "-%#a#",
+        "-%Q#a#",
+        "-%<a<b>c>",
+        "-%Q<a<b>c>",
+        " %q#a#",
+        " %q<a<b>c>",
+        " %#a#",
+        " %Q#a#",
+        " %<a<b>c>",
+        " %Q<a<b>c>",
+        "+%q/b/",
+        "+%q{d{e}f}",
+        "+%/b/",
+        "+%Q/b/",
+        "+%{d{e}f}",
+        "+%Q{d{e}f}"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5d0108e6748974cdac94c56a1fba8c9a85776e4a"
+    "shas": "2a8902902ea697fda4a67838615f8b6a8e108353..c03569b5f580bc90dc6d65cdd1ec2c719444ce89"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-test",
@@ -1068,9 +1173,24 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "5d0108e6748974cdac94c56a1fba8c9a85776e4a",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index 2095136..3843090 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -1,9 +1,3 @@",
+        "-%q#a#",
+        "-%q<a<b>c>",
+        "-%#a#",
+        "-%Q#a#",
+        "-%<a<b>c>",
+        "-%Q<a<b>c>",
+        " %q/b/",
+        " %q{d{e}f}",
+        " %/b/"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2951208459503219639748c4432005ad8fb2cec7"
+    "shas": "c03569b5f580bc90dc6d65cdd1ec2c719444ce89..e9178c14220997160dfe6c89506972e0b7e1f258"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-rest-test",
@@ -1174,7 +1294,19 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "2951208459503219639748c4432005ad8fb2cec7",
+    "patch": [
+        "diff --git a/delimiter.rb b/delimiter.rb",
+        "index 3843090..e69de29 100644",
+        "--- a/delimiter.rb",
+        "+++ b/delimiter.rb",
+        "@@ -1,6 +0,0 @@",
+        "-%q/b/",
+        "-%q{d{e}f}",
+        "-%/b/",
+        "-%Q/b/",
+        "-%{d{e}f}",
+        "-%Q{d{e}f}"
+    ],
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "744a2cfc2e71f66e365ea3929763711025960196"
+    "shas": "e9178c14220997160dfe6c89506972e0b7e1f258..b8a1e5f549bc1fa5a1424093d499d32fa0987cee"
 }]
