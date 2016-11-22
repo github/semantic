@@ -17,17 +17,19 @@ termConstructor
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children = case (name, children) of
-  ("return_statement", _) -> withDefaultInfo $ S.Return (listToMaybe children)
-  ("source_file", packageName : rest)
-    | category (extract packageName) == Other "package_clause" ->
+termConstructor source sourceSpan name range children = case name of
+  "return_statement" -> withDefaultInfo $ S.Return (listToMaybe children)
+  "source_file" -> case children of
+    packageName : rest | category (extract packageName) == Other "package_clause" ->
       case unwrap packageName of
         S.Indexed [id] -> withCategory Module (S.Module id rest)
         _ -> withCategory Error (S.Error children)
-  ("import_declaration", imports) -> toImports imports
-  ("function_declaration", [id, params, block]) ->
-    withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
-  ("for_statement", children) ->
+    _ -> withCategory Error (S.Error children)
+  "import_declaration" -> toImports children
+  "function_declaration" -> withDefaultInfo $ case children of
+    [id, params, block] -> S.Function id (toList $ unwrap params) (toList $ unwrap block)
+    rest -> S.Error rest
+  "for_statement" ->
     withDefaultInfo $ case children of
       [body] | category (extract body) == Other "block" ->
         S.For [] (toList $ unwrap body)
@@ -36,41 +38,46 @@ termConstructor source sourceSpan name range children = case (name, children) of
       [rangeClause, body] | category (extract rangeClause) == Other "range_clause" ->
         S.For (toList $ unwrap rangeClause) (toList $ unwrap body)
       other -> S.Error other
-  ("expression_switch_statement", children) ->
+  "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
         clauses' <- withDefaultInfo $ S.Indexed clauses
         withDefaultInfo $ S.Switch clauses' cases
       where isCaseClause = (== Case) . category . extract
-  ("type_switch_statement", children) ->
+  "type_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
         withDefaultInfo $ case clauses of
           [id] -> S.Switch id cases
           _ -> S.Error children
       where isCaseClause = (== Case) . category . extract
-  ("select_statement", children) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
+  "select_statement" -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
-  ("go_statement", children) -> withDefaultInfo $ toExpression S.Go children
-  ("defer_statement", children) -> withDefaultInfo $ toExpression S.Defer children
-  ("selector_expression", children) -> withDefaultInfo $ toSubscriptAccess children
-  ("index_expression", children) -> withDefaultInfo $ toSubscriptAccess children
-  ("slice_expression", children) -> sliceToSubscriptAccess children
-  ("type_assertion_expression", children) -> withDefaultInfo $ case children of
+  "go_statement" -> withDefaultInfo $ toExpression S.Go children
+  "defer_statement" -> withDefaultInfo $ toExpression S.Defer children
+  "selector_expression" -> withDefaultInfo $ toSubscriptAccess children
+  "index_expression" -> withDefaultInfo $ toSubscriptAccess children
+  "slice_expression" -> sliceToSubscriptAccess children
+  "type_assertion_expression" -> withDefaultInfo $ case children of
     [a, b] -> S.TypeAssertion a b
     rest -> S.Error rest
-  ("type_conversion_expression", children) -> withDefaultInfo $ case children of
+  "type_conversion_expression" -> withDefaultInfo $ case children of
     [a, b] -> S.TypeConversion a b
     rest -> S.Error rest
   -- TODO: Handle multiple var specs
-  ("var_declaration", varSpecs) -> withDefaultInfo . S.Indexed =<< mapM toVarDecl varSpecs
-  ("short_var_declaration", children) -> listToVarDecls children
-  ("if_statement", children) -> toIfStatement children
-  ("call_expression", [id]) -> withDefaultInfo $ S.FunctionCall id []
-  ("const_declaration", constSpecs) -> toConsts constSpecs
-  ("func_literal", [params, _, body]) -> withDefaultInfo $ S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
-  (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
-  _  -> withDefaultInfo $ S.Indexed children
+  "var_declaration" -> withDefaultInfo . S.Indexed =<< mapM toVarDecl children
+  "short_var_declaration" -> listToVarDecls children
+  "if_statement" -> toIfStatement children
+  "call_expression" -> withDefaultInfo $ case children of
+    [id] -> S.FunctionCall id []
+    rest -> S.Error rest
+  "const_declaration" -> toConsts children
+  "func_literal" -> withDefaultInfo $ case children of
+    [params, _, body] -> S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
+    rest -> S.Error rest
+  _ -> withDefaultInfo $ case children of
+    [] -> S.Leaf . toText $ slice range source
+    _ -> S.Indexed children
   where
     toExpression f = \case
       [expr] -> f expr
