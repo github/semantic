@@ -134,8 +134,9 @@ data Category
   | Ensure
   | Rescue
   | RescueModifier
-  | When
   | RescuedException
+  | RescueArgs
+  | When
   | Negate
   -- | A select expression in Go.
   | Select
@@ -144,6 +145,18 @@ data Category
   | Slice
   | TypeAssertion
   | TypeConversion
+  -- | An argument pair, e.g. foo(run: true) or foo(:run => true) in Ruby.
+  | ArgumentPair
+  -- | A keyword parameter, e.g. def foo(name:) or def foo(name:false) in Ruby.
+  | KeywordParameter
+  -- | An optional/default parameter, e.g. def foo(name = nil) in Ruby.
+  | OptionalParameter
+  -- | A splat parameter, e.g. def foo(*array) in Ruby.
+  | SplatParameter
+  -- | A hash splat parameter, e.g. def foo(**option) in Ruby.
+  | HashSplatParameter
+  -- | A block parameter, e.g. def foo(&block) in Ruby.
+  | BlockParameter
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -210,8 +223,9 @@ instance Arbitrary Category where
     , pure Ensure
     , pure Rescue
     , pure RescueModifier
-    , pure When
     , pure RescuedException
+    , pure RescueArgs
+    , pure When
     , pure Negate
     , pure Select
     , pure Defer
@@ -219,6 +233,12 @@ instance Arbitrary Category where
     , pure Slice
     , pure TypeAssertion
     , pure TypeConversion
+    , pure ArgumentPair
+    , pure KeywordParameter
+    , pure OptionalParameter
+    , pure SplatParameter
+    , pure HashSplatParameter
+    , pure BlockParameter
     , Other <$> arbitrary
     ]
 

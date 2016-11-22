@@ -1,0 +1,335 @@
+[{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index e69de29..439647e 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -0,0 +1,2 @@",
+        "+def foo()",
+        "+end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "437e6574dec68736434b48abcb9528f40c43beaf..27094bfe6d75b44ade44fdb8eff16d2ab65c1596"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name: nil)' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index 439647e..758e8ad 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -1,2 +1,6 @@",
+        "+def foo(name: nil)",
+        "+end",
+        "+def foo()",
+        "+end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "27094bfe6d75b44ade44fdb8eff16d2ab65c1596..e996c0960b54b737330760deb07c1b3f8d61e71f"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'name: nil' parameter in the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index 758e8ad..e856a7a 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo(name: nil)",
+        "+def foo()",
+        " end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e996c0960b54b737330760deb07c1b3f8d61e71f..f803a8f6472ac578c23c4911fd467e15ab1d4fba"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'name: nil' parameter in the 'foo(name: nil)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index e856a7a..758e8ad 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -1,4 +1,4 @@",
+        "-def foo()",
+        "+def foo(name: nil)",
+        " end",
+        " def foo()",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f803a8f6472ac578c23c4911fd467e15ab1d4fba..5fbd7ee48b8fd4d8ec416605b2f03170d9971b67"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name: nil)' method"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo(name: nil)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index 758e8ad..2edfe49 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -1,6 +1,4 @@",
+        "-def foo(name: nil)",
+        "-end",
+        " def foo()",
+        " end",
+        "-def foo()",
+        "+def foo(name: nil)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "5fbd7ee48b8fd4d8ec416605b2f03170d9971b67..77064c7fdc9d2e27840dd3b6e8e4cb180e5e7a52"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo()' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index 2edfe49..ba716d6 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -1,4 +1,2 @@",
+        "-def foo()",
+        "-end",
+        " def foo(name: nil)",
+        " end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "77064c7fdc9d2e27840dd3b6e8e4cb180e5e7a52..341c920b20a69533d26933c5d9ee7d1b678e32d8"
+}
+,{
+    "testCaseDescription": "ruby-method-declaration-keyword-param-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-declaration-keyword-param.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo(name: nil)' method"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-declaration-keyword-param.rb"
+    ],
+    "patch": [
+        "diff --git a/method-declaration-keyword-param.rb b/method-declaration-keyword-param.rb",
+        "index ba716d6..e69de29 100644",
+        "--- a/method-declaration-keyword-param.rb",
+        "+++ b/method-declaration-keyword-param.rb",
+        "@@ -1,2 +0,0 @@",
+        "-def foo(name: nil)",
+        "-end"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "341c920b20a69533d26933c5d9ee7d1b678e32d8..2e5ef49d470de6e07c6fe7214b247889376f1d36"
+}]

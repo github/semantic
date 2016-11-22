@@ -46,6 +46,14 @@ termConstructor source sourceSpan name range children
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
   | otherwise = withDefaultInfo $ case (name, children) of
+    ("argument_pair", [ k, v ] ) -> S.Pair k v
+    ("argument_pair", _ ) -> S.Error children
+    ("keyword_parameter", [ k, v ] ) -> S.Pair k v
+    -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g.:
+    --    def foo(name:); end
+    -- Let it fall through to generate an Indexed syntax.
+    ("optional_parameter", [ k, v ] ) -> S.Pair k v
+    ("optional_parameter", _ ) -> S.Error children
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
@@ -74,7 +82,7 @@ termConstructor source sourceSpan name range children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
     ("function_call", _ ) -> case children of
-      member : args | category (extract member) == MemberAccess -> case toList (unwrap member) of
+      member : args | MemberAccess <- category (extract member) -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
         _ -> S.Error children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
@@ -102,10 +110,10 @@ termConstructor source sourceSpan name range children
     ("module_declaration", _ ) -> S.Error children
     ("rescue_block", _ ) -> case children of
       args : lastException : rest
-        | Args <- category (extract args)
+        | RescueArgs <- category (extract args)
         , RescuedException <- category (extract lastException) -> S.Rescue (toList (unwrap args) <> [lastException]) rest
       lastException : rest | RescuedException <- category (extract lastException) -> S.Rescue [lastException] rest
-      args : body | Args <- category (extract args) -> S.Rescue (toList (unwrap args)) body
+      args : body | RescueArgs <- category (extract args) -> S.Rescue (toList (unwrap args)) body
       body -> S.Rescue [] body
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
@@ -135,11 +143,13 @@ categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "and" -> BooleanOperator
   "argument_list" -> Args
+  "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
   "begin_statement" -> Begin
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
   "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
+  "block_parameter" -> BlockParameter
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
   "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
@@ -159,26 +169,31 @@ categoryForRubyName = \case
   "formal_parameters" -> Params
   "function_call" -> FunctionCall
   "function" -> Function
+  "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
   "if_modifier" -> If
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
-  "rescued_exception" -> RescuedException
+  "keyword_parameter" -> KeywordParameter
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method
   "module_declaration"  -> Module
   "nil" -> Identifier
+  "optional_parameter" -> OptionalParameter
   "or" -> BooleanOperator
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
+  "rescue_arguments" -> RescueArgs
   "rescue_block" -> Rescue
   "rescue_modifier" -> RescueModifier
+  "rescued_exception" -> RescuedException
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
+  "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral

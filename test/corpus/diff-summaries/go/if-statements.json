@@ -74,7 +74,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8f1df053dc65d8af74f2d04d4da1364fc2acf9b3..4f4faa859091ae8f90f860dab9bb337bc0be5f36"
+    "shas": "e5f2f2236940b08d388cf2d1ceb0263e263190a0..8af7b7bb32976bb915495bddf809687e35e64a62"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-insert-test",
@@ -211,7 +211,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4f4faa859091ae8f90f860dab9bb337bc0be5f36..2be9869f41109370c9eaa0feccf68ed1c9864b6a"
+    "shas": "8af7b7bb32976bb915495bddf809687e35e64a62..ee43d0d931d3d732acc57c108486fb92ce7751c9"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -327,7 +327,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2be9869f41109370c9eaa0feccf68ed1c9864b6a..1448204c14a3154cead026d3deae74d27bc03675"
+    "shas": "ee43d0d931d3d732acc57c108486fb92ce7751c9..1d69053490ba50069abc622702098b527a893249"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -443,7 +443,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1448204c14a3154cead026d3deae74d27bc03675..404b2c4aee8a4a3c179afe629cd2b68d0c877910"
+    "shas": "1d69053490ba50069abc622702098b527a893249..d9e3f39d9aef15166414e52b90e3460d4e2861e6"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -631,7 +631,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "404b2c4aee8a4a3c179afe629cd2b68d0c877910..3f472c8aec702c615b21ca089e40e18a998bc244"
+    "shas": "d9e3f39d9aef15166414e52b90e3460d4e2861e6..e526833ebbe2fdfddd44ff296aa341c62fa1a40c"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-test",
@@ -712,7 +712,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3f472c8aec702c615b21ca089e40e18a998bc244..1cff79ac340c03fe054b522d68580567504c3d08"
+    "shas": "e526833ebbe2fdfddd44ff296aa341c62fa1a40c..da3e038ea5de3df0e12be8da86fc27d03b9b9a78"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-rest-test",
@@ -790,5 +790,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1cff79ac340c03fe054b522d68580567504c3d08..ab08008ff7371b63c09e12670ff74bac74bfad96"
+    "shas": "da3e038ea5de3df0e12be8da86fc27d03b9b9a78..5b0d0fcabc4550b5ca54d8c47fbe0708b1f4d029"
 }]

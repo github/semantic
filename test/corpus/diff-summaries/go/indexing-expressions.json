@@ -114,7 +114,7 @@
         "+ f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "999d15df65983b86f7bc6b324c54681e9c6ea97e..31283dbcb4e307bf01123dbe69835dc3207b34bd"
+    "shas": "90946cc17dc1cb231424285c1dceb47e245b4d32..6c386ab5ae9d3f9da97688d20373748cb4becf6f"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-insert-test",
@@ -331,7 +331,7 @@
         "  c[1:]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "31283dbcb4e307bf01123dbe69835dc3207b34bd..a94685b9313d6f7616ab3ccdf5b5a57e8065418c"
+    "shas": "6c386ab5ae9d3f9da97688d20373748cb4becf6f..c611ee2aa26066ad9818fbbb049f9dbddf9025be"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -355,63 +355,72 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'b[b[:]]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c[1]' subscript access"
+                    "summary": "Replaced the 'z' identifier with the 'b' identifier in the b[b[:]] subscript access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                1
+                                4
                             ],
                             "end": [
                                 1,
-                                6
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z[2]' subscript access"
+                    "summary": "Deleted '2' in the b[b[:]] subscript access"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'y[1]' subscript access"
+                    "summary": "Replaced the 'y' identifier with the 'c' identifier in the c[1] subscript access"
                 },
                 {
                     "span": {
@@ -452,7 +461,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a94685b9313d6f7616ab3ccdf5b5a57e8065418c..0397a8bdb05e8646a3f42371719396422d222f2a"
+    "shas": "c611ee2aa26066ad9818fbbb049f9dbddf9025be..f02279be0acbedf59ddce9fd0e2e4c3ce29dae77"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -461,18 +470,30 @@
             "indexing-expressions.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'z[2]' subscript access"
+                    "summary": "Replaced the 'a[1]' subscript access with the 'z[2]' subscript access"
                 },
                 {
                     "span": {
@@ -491,30 +512,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                2
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'a[1]' subscript access with the 'x[1]' subscript access"
+                    "summary": "Added the 'x[1]' subscript access"
                 },
                 {
                     "span": {
@@ -570,7 +579,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0397a8bdb05e8646a3f42371719396422d222f2a..fbabd12611177f804fdd2d1cd64f4b49f8de414b"
+    "shas": "f02279be0acbedf59ddce9fd0e2e4c3ce29dae77..27335a46631e0c966d650bab1a36eaa08b8ec274"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -793,7 +802,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fbabd12611177f804fdd2d1cd64f4b49f8de414b..7d401aa1f781534ae4fa417bc33f73233111de0e"
+    "shas": "27335a46631e0c966d650bab1a36eaa08b8ec274..33fa0008d82f2ffea8d3050789920fd2e9405ce7"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-test",
@@ -914,7 +923,7 @@
         "  x[1:]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d401aa1f781534ae4fa417bc33f73233111de0e..abb6af986130cabe503c8873295be05790383525"
+    "shas": "33fa0008d82f2ffea8d3050789920fd2e9405ce7..794499a21a7ed916a84f76c331eac1ee7e70fd0d"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-rest-test",
@@ -1032,5 +1041,5 @@
         "- f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "abb6af986130cabe503c8873295be05790383525..edec8719680eac8a1808e80e267f45e0c7dcc7f5"
+    "shas": "794499a21a7ed916a84f76c331eac1ee7e70fd0d..249a12978e1b6b4172e7c40ef388694f586abca8"
 }]

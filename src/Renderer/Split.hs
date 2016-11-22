@@ -98,6 +98,7 @@ styleName category = "category-" <> case category of
   C.RescueModifier -> "rescue_modifier"
   C.When -> "when_block"
   C.RescuedException -> "last_exception"
+  C.RescueArgs -> "rescue_args"
   C.Negate -> "negate"
   C.Select -> "select_statement"
   C.Go -> "go_statement"
@@ -105,6 +106,12 @@ styleName category = "category-" <> case category of
   C.Slice -> "slice_expression"
   C.TypeAssertion -> "type_assertion"
   C.TypeConversion -> "type_conversion"
+  C.ArgumentPair -> "argument_pair"
+  C.KeywordParameter -> "keyword_param"
+  C.OptionalParameter -> "optional_param"
+  C.SplatParameter -> "splat_param"
+  C.HashSplatParameter -> "hash_splat_param"
+  C.BlockParameter -> "block_param"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

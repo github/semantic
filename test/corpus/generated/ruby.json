@@ -106,6 +106,26 @@
         "replacement": "(a, b, c)"
       },
       {
+        "syntax": "method-declaration-required-keyword-param",
+        "insert": "def foo()\nend",
+        "replacement": "def foo(name:)\nend"
+      },
+      {
+        "syntax": "method-declaration-keyword-param",
+        "insert": "def foo()\nend",
+        "replacement": "def foo(name: nil)\nend"
+      },
+      {
+        "syntax": "method-declaration-param-default",
+        "insert": "def foo()\nend",
+        "replacement": "def foo(name = nil)\nend"
+      },
+      {
+        "syntax": "method-declaration-unnamed-param",
+        "insert": "def foo(name)\nend",
+        "replacement": "def foo(name, **)\nend"
+      },
+      {
         "syntax": "method-invocation",
         "insert": "print\nfoo.bar\nbar",
         "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)"
@@ -114,6 +134,16 @@
         "syntax": "method-calls",
         "insert": "x.foo()",
         "replacement": "bar()"
+      },
+      {
+        "syntax": "method-calls-keyword-args",
+        "insert": "foo(bar: true)",
+        "replacement": "foo(bar: true, baz: 1)"
+      },
+      {
+        "syntax": "method-calls-hash-args",
+        "insert": "foo(:bar => true)",
+        "replacement": "foo(:bar => true, :baz => 1)"
       },
       {
         "syntax": "class",
