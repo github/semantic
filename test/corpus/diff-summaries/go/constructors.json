@@ -217,7 +217,7 @@
         "+ new(map[string]string)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "946c8d25e99dd3906b926f08c9e1eeb61ddc4f45..bd46084fa26466add5847744f4ac5dca14a7ed3e"
+    "shas": "dc39e98992ec9d58ba710b6d872ff773cb679ef8..cd9415d95c7a37d7aaeb955f47ce9658766a785b"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-insert-test",
@@ -640,7 +640,7 @@
         " make(chan<- int, 5, 10)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bd46084fa26466add5847744f4ac5dca14a7ed3e..d19af4cc41ff3c132c55398661bcb03ab791ceb3"
+    "shas": "cd9415d95c7a37d7aaeb955f47ce9658766a785b..0467ab021bda08b834716fdd366af7f5885ad03f"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -862,7 +862,7 @@
         " make(chan<- int, 5, 10)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d19af4cc41ff3c132c55398661bcb03ab791ceb3..2bac804c50a1bd92cd6ca73e6e2eb6e12e267680"
+    "shas": "0467ab021bda08b834716fdd366af7f5885ad03f..f06b0c56aa9f802c0149a6e9bb913c5d04f53942"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -1084,7 +1084,7 @@
         " make(chan<- int, 5, 10)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2bac804c50a1bd92cd6ca73e6e2eb6e12e267680..a022617ab497f59f220b1282f6036468d38da2e1"
+    "shas": "f06b0c56aa9f802c0149a6e9bb913c5d04f53942..b98dd3b3857e0239ffcfd11b60284ae4ddc5ca93"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -1707,7 +1707,7 @@
         "+ new(map[int]int)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a022617ab497f59f220b1282f6036468d38da2e1..f892e2cbececd0b18f829fa55e1942288e2e6ecb"
+    "shas": "b98dd3b3857e0239ffcfd11b60284ae4ddc5ca93..9e0f1d83e049ce02fecb03aad28ee19d66239614"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-test",
@@ -1931,7 +1931,7 @@
         " make(chan<- string, 7, 11)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f892e2cbececd0b18f829fa55e1942288e2e6ecb..710ca2075e22c45f1c7ad3a2d0e28cf7cb4e981d"
+    "shas": "9e0f1d83e049ce02fecb03aad28ee19d66239614..e2ac65cf9c4dd1126883554f6f285e01ac7a249b"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-rest-test",
@@ -2152,5 +2152,5 @@
         "- new(map[int]int)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "710ca2075e22c45f1c7ad3a2d0e28cf7cb4e981d..a942838d4ef16b119a0248842210cc8b4ae6c93f"
+    "shas": "e2ac65cf9c4dd1126883554f6f285e01ac7a249b..a2fa061ac8d6c5ec251f24a3f21b2bccebff8c70"
 }]

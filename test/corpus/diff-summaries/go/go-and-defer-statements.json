@@ -50,7 +50,7 @@
         "+go x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "869638edeb99d0d8b3272767460e1f2a83cead8d..7b1d7508d87a7e9e124d88d08449a5fc9851ee6c"
+    "shas": "bd288a39a4f01be88792d3bd0473c889c26477cc..c6bd4ec165cb62b49173bd1bdd523d782d5bc908"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-insert-test",
@@ -138,7 +138,7 @@
         " go x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b1d7508d87a7e9e124d88d08449a5fc9851ee6c..65202504265bcc4608d4f0826489c8dfa12d7401"
+    "shas": "c6bd4ec165cb62b49173bd1bdd523d782d5bc908..444e3c9aeb0012146a224338b40e47b06220c12e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -275,7 +275,7 @@
         " defer x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65202504265bcc4608d4f0826489c8dfa12d7401..48f1f1dd4a0649de94363920cc2270d8ee3e8597"
+    "shas": "444e3c9aeb0012146a224338b40e47b06220c12e..867f83e35da89428cc9361db7b0f1788f2d39443"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -412,7 +412,7 @@
         " defer x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "48f1f1dd4a0649de94363920cc2270d8ee3e8597..f32d6ed21a6c4baf397050ca25a7fa6c81de870b"
+    "shas": "867f83e35da89428cc9361db7b0f1788f2d39443..7a4adf1e67764b15d275ff82a561b72b8c3272ed"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -532,7 +532,7 @@
         "+go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f32d6ed21a6c4baf397050ca25a7fa6c81de870b..00d614f9ca3158bce4250ae75754d42d50ac71c1"
+    "shas": "7a4adf1e67764b15d275ff82a561b72b8c3272ed..b6985a629025d812520bf9da14a4cc94f4034a68"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-test",
@@ -588,7 +588,7 @@
         " go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "00d614f9ca3158bce4250ae75754d42d50ac71c1..2aef71f995089e1a380b7892be8160657f11bcf7"
+    "shas": "b6985a629025d812520bf9da14a4cc94f4034a68..ba5a930e4f0319d5a23662db2ca3c64c0ed4c966"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-rest-test",
@@ -642,5 +642,5 @@
         "-go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2aef71f995089e1a380b7892be8160657f11bcf7..c4e6795cad01ceb96441009c3d1712d64702bdad"
+    "shas": "ba5a930e4f0319d5a23662db2ca3c64c0ed4c966..bf8eb18f74cdcc98a1f59e95ff6b10f032b070db"
 }]
