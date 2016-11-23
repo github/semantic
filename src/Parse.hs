@@ -6,6 +6,7 @@ import Category
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty
 import qualified Data.ByteString.Char8 as B1
+import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Data.Record
@@ -35,6 +36,7 @@ run Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
+  writeToOutput output (cata algebra <$> terms)
 
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
@@ -48,6 +50,12 @@ run Arguments{..} = do
         category' = toS . Info.category
         range' = characterRange
         text' = Info.sourceText
+
+    writeToOutput :: Maybe FilePath -> [ParseJSON] -> IO ()
+    writeToOutput output parseJSON =
+      case output of
+        Nothing -> for_ parseJSON (putStrLn . encodePretty)
+        Just path -> for_ parseJSON (BL.writeFile path . encodePretty)
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
