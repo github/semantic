@@ -8,7 +8,6 @@ import Term
 import Syntax
 import Prologue
 import Prelude
-import Data.Functor.Foldable hiding (ListF)
 import FDoc.Term
 
 data NewField = NewField deriving (Show)
