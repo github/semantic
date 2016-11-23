@@ -39,7 +39,15 @@ run Arguments{..} = do
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
     parsers = parserWithSource <$> filePaths
+
+    algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) ParseJSON -> ParseJSON
     algebra term = case term of
+      (annotation :< Leaf _) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) []
+      (annotation :< syntax) -> ParseJSON (category' annotation) (range' annotation) (text' annotation) (toList syntax)
+      where
+        category' = toS . Info.category
+        range' = characterRange
+        text' = Info.sourceText
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
