@@ -35,24 +35,11 @@ run Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
-  let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
-  let parsers = parserWithSource <$> filePaths
 
-  terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers sourceBlobs
-
-  let termsWithParseJSON = (cata algebra <$> terms)
-
-  traverse_ (\ (annotation :< syntax) -> putStrLn annotation) (head $ runCofree <$> termsWithParseJSON)
-
-  pure ()
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
     parsers = parserWithSource <$> filePaths
     algebra term = case term of
-      (annotation :< syntax) -> cofree $ (ParseJSON category' range' sourceText') :< syntax
-        where category' = toS $ Info.category annotation
-              range' = characterRange annotation
-              sourceText' = Info.sourceText annotation
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
