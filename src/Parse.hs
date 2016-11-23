@@ -46,7 +46,7 @@ run Arguments{..} = do
   pure ()
   where
     algebra term = case term of
-      (annotation :< syntax) -> cofree $ encodePretty (ParseJSON category' range' sourceText') :< syntax
+      (annotation :< syntax) -> cofree $ (ParseJSON category' range' sourceText') :< syntax
         where category' = toS $ Info.category annotation
               range' = characterRange annotation
               sourceText' = Info.sourceText annotation
