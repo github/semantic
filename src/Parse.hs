@@ -23,12 +23,12 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import Renderer.JSON()
 
-data ParseJSON f a =
+data ParseJSON =
   ParseJSON
     { category :: Text
     , range :: Range
     , sourceText :: SourceText
-    } deriving (Show, Generic, ToJSON, Functor)
+    } deriving (Show, Generic, ToJSON)
 
 run :: Arguments -> IO ()
 run Arguments{..} = do
