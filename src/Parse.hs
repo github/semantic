@@ -33,6 +33,7 @@ data ParseJSON = ParseJSON
 run :: Arguments -> IO ()
 run Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
+  terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
   let parsers = parserWithSource <$> filePaths
@@ -45,6 +46,8 @@ run Arguments{..} = do
 
   pure ()
   where
+    sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
+    parsers = parserWithSource <$> filePaths
     algebra term = case term of
       (annotation :< syntax) -> cofree $ (ParseJSON category' range' sourceText') :< syntax
         where category' = toS $ Info.category annotation
