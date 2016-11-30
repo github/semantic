@@ -10,7 +10,7 @@ import Test.QuickCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: Int, end :: Int }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 -- | Make a range at a given index.
 rangeAt :: Int -> Range

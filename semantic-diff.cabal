@@ -36,6 +36,7 @@ library
                      , Language.Markdown
                      , Language.Go
                      , Language.Ruby
+                     , Parse
                      , Parser
                      , Patch
                      , Patch.Arbitrary
@@ -55,13 +56,13 @@ library
                      , Syntax
                      , Term
                      , Term.Arbitrary
-                     , Term.Instances
                      , TreeSitter
                      , FDoc.Term
                      , FDoc.RecursionSchemes
                      , FDoc.NatExample
   build-depends:       base >= 4.8 && < 5
                      , aeson
+                     , aeson-pretty
                      , async-pool
                      , bifunctors
                      , blaze-html

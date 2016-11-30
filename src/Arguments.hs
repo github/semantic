@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), programArguments, args) where
+module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), RunMode(..), programArguments, args) where
 
 import Data.Functor.Both
 import Data.Maybe
@@ -20,6 +20,10 @@ data DiffMode = PathDiff (Both FilePath)
               | CommitDiff
               deriving (Show)
 
+data RunMode = Diff
+             | Parse
+             deriving (Show)
+
 -- | The command line options to the application (arguments for optparse-applicative).
 data CmdLineOptions = CmdLineOptions
   { outputFormat :: R.Format
@@ -28,6 +32,7 @@ data CmdLineOptions = CmdLineOptions
   , noIndex :: Bool
   , extraArgs :: [ExtraArg]
   , developmentMode' :: Bool
+  , runMode' :: RunMode
   }
 
 -- | Arguments for the program (includes command line, environment, and defaults).
@@ -38,6 +43,7 @@ data Arguments = Arguments
   , timeoutInMicroseconds :: Int
   , output :: Maybe FilePath
   , diffMode :: DiffMode
+  , runMode :: RunMode
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
   , developmentMode :: Bool
@@ -63,6 +69,7 @@ programArguments CmdLineOptions{..} = do
     , diffMode = case (noIndex, filePaths) of
       (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
       (_, _) -> CommitDiff
+    , runMode = runMode'
     , shaRange = fetchShas extraArgs
     , filePaths = filePaths
     , developmentMode = developmentMode'
@@ -87,6 +94,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , timeoutInMicroseconds = defaultTimeout
   , output = Nothing
   , diffMode = CommitDiff
+  , runMode = Diff
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
   , developmentMode = False
