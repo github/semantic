@@ -102,6 +102,7 @@ termConstructor source sourceSpan name range children
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
+    ("break_statement", [ expr ] ) -> S.Break expr
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]
           _ -> S.Error children
@@ -193,4 +194,5 @@ categoryForJavaScriptProductionName name = case name of
   "rel_op" -> RelationalOperator
   "import_statement" -> Import
   "export_statement" -> Export
+  "break_statement" -> Break
   _ -> Other name
