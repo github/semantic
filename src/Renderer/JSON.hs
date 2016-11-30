@@ -27,7 +27,8 @@ json blobs diff = JSONOutput $ Map.fromList [
   ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
   ("oids", toJSON (oid <$> blobs)),
   ("paths", toJSON (path <$> blobs)) ]
-  where annotateRows = fmap (fmap NumberedLine) . numberedRows
+  where annotateRows :: [Join These a] -> [Join These (NumberedLine a)]
+        annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 -- | A numbered 'a'.
 newtype NumberedLine a = NumberedLine (Int, a)

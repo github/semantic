@@ -25,11 +25,17 @@ import qualified Source
 import qualified Control.Concurrent.Async.Pool as Async
 import GHC.Conc (numCapabilities)
 import Development.GitRev
+import Parse
 
 main :: IO ()
 main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
-  case diffMode of
+  case runMode of
+    Diff -> runDiff args
+    Parse -> Parse.run args
+
+runDiff :: Arguments -> IO ()
+runDiff args@Arguments{..} = case diffMode of
     PathDiff paths -> diffPaths args paths
     CommitDiff -> diffCommits args
 
@@ -50,6 +56,7 @@ argumentsParser = info (version <*> helper <*> argumentsP)
       <*> switch (long "no-index" <> help "compare two paths on the filesystem")
       <*> some (argument (eitherReader parseShasAndFiles) (metavar "SHA_A..SHAB FILES..."))
       <*> switch (long "development" <> short 'd' <> help "set development mode which prevents timeout behavior by default")
+      <*> flag Diff Parse (long "parse" <> short 'p' <> help "parses a source file without diffing")
       where
         parseShasAndFiles :: String -> Either String ExtraArg
         parseShasAndFiles s = case matchRegex regex s of
@@ -79,7 +86,7 @@ diffPaths :: Arguments -> Both FilePath -> IO ()
 diffPaths args@Arguments{..} paths = do
   sources <- sequence $ readAndTranscodeFile <$> paths
   let sourceBlobs = Source.SourceBlob <$> sources <*> pure mempty <*> paths <*> pure (Just Source.defaultPlainBlob)
-  D.printDiff (parserForFilepath (fst paths)) (diffArgs args) sourceBlobs
+  D.printDiff (parserWithCost (fst paths)) (diffArgs args) sourceBlobs
   where
     diffArgs Arguments{..} = R.DiffArguments { format = format, output = output }
 
@@ -104,7 +111,7 @@ fetchDiff' Arguments{..} filepath = do
 
   let sources = fromMaybe (Source.emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = Source.idOrEmptySourceBlob <$> sources
-  let textDiff = D.textDiff (parserForFilepath filepath) diffArguments sourceBlobs
+  let textDiff = D.textDiff (parserWithCost filepath) diffArguments sourceBlobs
 
   text <- fetchText textDiff
   truncatedPatch <- liftIO $ D.truncatedDiff diffArguments sourceBlobs
