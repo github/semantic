@@ -113,6 +113,7 @@ styleName category = "category-" <> case category of
   C.HashSplatParameter -> "hash_splat_param"
   C.BlockParameter -> "block_param"
   C.Break -> "break_statement"
+  C.Continue -> "continue_statement"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

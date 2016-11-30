@@ -89,6 +89,7 @@ data Syntax a f
   | TypeAssertion f f
   | TypeConversion f f
   | Break f
+  | Continue f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

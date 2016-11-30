@@ -159,6 +159,8 @@ data Category
   | BlockParameter
   -- | A break statement, e.g. break; in JavaScript.
   | Break
+  -- | A continue statement, e.g. continue; in JavaScript.
+  | Continue
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -242,6 +244,7 @@ instance Arbitrary Category where
     , pure HashSplatParameter
     , pure BlockParameter
     , pure Break
+    , pure Continue
     , Other <$> arbitrary
     ]
 

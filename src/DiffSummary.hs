@@ -155,6 +155,7 @@ determiner (LeafInfo "ensure block" _ _) = "an"
 determiner (LeafInfo "when block" _ _) = "a"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (LeafInfo "break statement" _ _) = "a"
+determiner (LeafInfo "continue statement" _ _) = "a"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
 
@@ -177,6 +178,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"subshell command" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"break statement" _ _) -> toDoc cName
+  (LeafInfo cName@"continue statement" _ _) -> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
   node -> panic $ "Expected a leaf info but got a: " <> show node
 
@@ -252,6 +254,7 @@ toTermName source term = case unwrap term of
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr
+  S.Continue expr -> toTermName' expr
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -420,6 +423,7 @@ instance HasCategory Category where
     C.HashSplatParameter -> "parameter"
     C.BlockParameter -> "parameter"
     C.Break -> "break statement"
+    C.Continue -> "continue statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

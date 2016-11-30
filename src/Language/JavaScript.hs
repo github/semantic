@@ -195,4 +195,5 @@ categoryForJavaScriptProductionName name = case name of
   "import_statement" -> Import
   "export_statement" -> Export
   "break_statement" -> Break
+  "continue_statement" -> Continue
   _ -> Other name
