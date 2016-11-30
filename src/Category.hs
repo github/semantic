@@ -157,6 +157,8 @@ data Category
   | HashSplatParameter
   -- | A block parameter, e.g. def foo(&block) in Ruby.
   | BlockParameter
+  -- | A break statement, e.g. break; in JavaScript.
+  | Break
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -239,6 +241,7 @@ instance Arbitrary Category where
     , pure SplatParameter
     , pure HashSplatParameter
     , pure BlockParameter
+    , pure Break
     , Other <$> arbitrary
     ]
 
