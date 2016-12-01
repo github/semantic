@@ -140,6 +140,7 @@ categoryForJavaScriptProductionName name = case name of
   "string" -> StringLiteral
   "integer" -> IntegerLiteral
   "number" -> NumberLiteral
+  "float" -> FloatLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
   "function" -> Function

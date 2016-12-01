@@ -164,7 +164,7 @@ categoryForRubyName = \case
   "elsif_block" -> Elsif
   "ensure_block" -> Ensure
   "ERROR" -> Error
-  "float" -> NumberLiteral
+  "float" -> FloatLiteral
   "for_statement" -> For
   "formal_parameters" -> Params
   "function_call" -> FunctionCall

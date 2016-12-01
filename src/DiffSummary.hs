@@ -147,6 +147,7 @@ prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
 determiner :: DiffInfo -> Doc
 determiner (LeafInfo "number" _ _) = ""
 determiner (LeafInfo "integer" _ _) = ""
+determiner (LeafInfo "float" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "begin statement" _ _) = "a"
 determiner (LeafInfo "select statement" _ _) = "a"
@@ -163,6 +164,7 @@ toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
 toLeafInfos HideInfo = []
 toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "number" termName _) -> squotes $ toDoc termName
+  (LeafInfo "float" termName _) -> squotes $ toDoc termName
   (LeafInfo "integer" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
@@ -361,6 +363,7 @@ instance HasCategory Category where
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     NumberLiteral -> "number"
+    FloatLiteral -> "float"
     Other s -> s
     C.Pair -> "pair"
     C.Params -> "params"

@@ -159,6 +159,8 @@ data Category
   | HashSplatParameter
   -- | A block parameter, e.g. def foo(&block) in Ruby.
   | BlockParameter
+  -- | A float literal.
+  | FloatLiteral
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -187,6 +189,7 @@ instance Arbitrary Category where
     , pure StringLiteral
     , pure IntegerLiteral
     , pure NumberLiteral
+    , pure FloatLiteral
     , pure Regex
     , pure Return
     , pure SymbolLiteral

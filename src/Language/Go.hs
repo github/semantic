@@ -44,6 +44,7 @@ termConstructor source sourceSpan name range children = case name of
         clauses' <- withDefaultInfo $ S.Indexed clauses
         withDefaultInfo $ S.Switch clauses' cases
       where isCaseClause = (== Case) . category . extract
+  "assignment_statement" -> toVarAssignment children
   "type_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
@@ -72,6 +73,7 @@ termConstructor source sourceSpan name range children = case name of
     [id] -> S.FunctionCall id []
     rest -> S.Error rest
   "const_declaration" -> toConsts children
+  "const_spec" -> toConsts children
   "func_literal" -> withDefaultInfo $ case children of
     [params, _, body] -> S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
     rest -> S.Error rest
@@ -124,15 +126,18 @@ termConstructor source sourceSpan name range children = case name of
       _ -> withCategory Error (S.Error list)
 
     toConsts constSpecs = do
-      assignments' <- sequenceA $ toVarAssignment <$> constSpecs
+      assignments' <- sequenceA $ constSpecToVarAssignment <$> constSpecs
       withDefaultInfo (S.Indexed assignments')
-    toVarAssignment constSpec =
-      case toList (unwrap constSpec) of
+    constSpecToVarAssignment = toVarAssignment . toList . unwrap
+    toVarAssignment = \case
         [idList, expressionList] -> do
-          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+          assignments' <- sequenceA $ zipWith (\id expr ->
+            withDefaultInfo $ S.VarAssignment id expr)
+            (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
         [idList, _, expressionList] -> do
-          assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+          assignments' <- sequenceA $ zipWith (\id expr ->
+            withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
         [idList] -> do
            varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
@@ -155,6 +160,7 @@ categoryForGoName :: Text -> Category
 categoryForGoName = \case
   "identifier" -> Identifier
   "int_literal" -> NumberLiteral
+  "float_literal" -> FloatLiteral
   "comment" -> Comment
   "return_statement" -> Return
   "interpreted_string_literal" -> StringLiteral
