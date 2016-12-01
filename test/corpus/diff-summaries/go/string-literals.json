@@ -1,40 +1,49 @@
 [{
+    "testCaseDescription": "go-string-literals-setup-test",
+    "expectedResult": {
+        "changes": {
+            "string-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string-literals.go"
+    ],
+    "patch": [
+        "diff --git a/string-literals.go b/string-literals.go",
+        "index e69de29..7905807 100644",
+        "--- a/string-literals.go",
+        "+++ b/string-literals.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "7313c98bc1dadd02edefed0e5dac5b0a8d79ae27..217252e5d50d5f8ea963a59d6921f21d8354eabd"
+}
+,{
     "testCaseDescription": "go-string-literals-insert-test",
     "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -42,257 +51,27 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index e69de29..90ac543 100644",
+        "index 7905807..9a69966 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -0,0 +1,4 @@",
-        "+const (",
-        "+a = \"0\"",
-        "+b = \"hello world\"",
-        "+)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "740c6c6b1390c86d2f179d9d31f010916292861a..9698847d1ada590968dad5fc427c1758590173f2"
-}
-,{
-    "testCaseDescription": "go-string-literals-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string-literals.go"
-    ],
-    "patch": [
-        "diff --git a/string-literals.go b/string-literals.go",
-        "index 90ac543..a781ce7 100644",
-        "--- a/string-literals.go",
-        "+++ b/string-literals.go",
-        "@@ -1,4 +1,12 @@",
-        " const (",
-        "+a = \"2\"",
-        "+b = \"hi\"",
-        "+)",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const (",
         "+a = \"0\"",
         "+b = \"hello world\"",
         "+)",
-        "+const (",
-        " a = \"0\"",
-        " b = \"hello world\"",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9698847d1ada590968dad5fc427c1758590173f2..e8867a66d6757f4af01fd07689f3c8a879acdc80"
-}
-,{
-    "testCaseDescription": "go-string-literals-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"2\" string with the \"0\" string in the a variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    5
-                                ],
-                                "end": [
-                                    3,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    5
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the b variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string-literals.go"
-    ],
-    "patch": [
-        "diff --git a/string-literals.go b/string-literals.go",
-        "index a781ce7..e7b83ba 100644",
-        "--- a/string-literals.go",
-        "+++ b/string-literals.go",
-        "@@ -1,6 +1,6 @@",
-        " const (",
-        "-a = \"2\"",
-        "-b = \"hi\"",
-        "+a = \"0\"",
-        "+b = \"hello world\"",
-        " )",
-        " const (",
-        " a = \"0\""
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "e8867a66d6757f4af01fd07689f3c8a879acdc80..afb562067673bb91dc8df3e801ccb22827b8061e"
+    "shas": "217252e5d50d5f8ea963a59d6921f21d8354eabd..b88c5f59726b5d8aaa473e9aab7b4cafe821e264"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-test",
     "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"0\" string with the \"2\" string in the a variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    5
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    5
-                                ],
-                                "end": [
-                                    3,
-                                    9
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the b variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -300,119 +79,27 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index e7b83ba..a781ce7 100644",
+        "index 9a69966..fbbdb93 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,6 +1,6 @@",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "-a = \"0\"",
         "-b = \"hello world\"",
         "+a = \"2\"",
         "+b = \"hi\"",
         " )",
-        " const (",
-        " a = \"0\""
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "afb562067673bb91dc8df3e801ccb22827b8061e..5345aa6a6eba226eb0cc8bce11c1073b3afea305"
+    "shas": "b88c5f59726b5d8aaa473e9aab7b4cafe821e264..e961cdb966e795008b52148f8199dafffcdd3d15"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -420,65 +107,27 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index a781ce7..38c651f 100644",
+        "index fbbdb93..9a69966 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,12 +1,8 @@",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "-a = \"2\"",
         "-b = \"hi\"",
-        "-)",
-        "-const (",
-        " a = \"0\"",
-        " b = \"hello world\"",
+        "+a = \"0\"",
+        "+b = \"hello world\"",
         " )",
-        " const (",
-        "-a = \"0\"",
-        "-b = \"hello world\"",
-        "+a = \"2\"",
-        "+b = \"hi\"",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5345aa6a6eba226eb0cc8bce11c1073b3afea305..38c2ea7acc57af4f85190210c284999e77853ab5"
+    "shas": "e961cdb966e795008b52148f8199dafffcdd3d15..78cf53ac0bcb364ce7640123057d0ac1a7c01d90"
 }
 ,{
-    "testCaseDescription": "go-string-literals-delete-test",
+    "testCaseDescription": "go-string-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -486,24 +135,25 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 38c651f..f70bc80 100644",
+        "index 9a69966..7905807 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,8 +1,4 @@",
-        " const (",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const (",
         "-a = \"0\"",
         "-b = \"hello world\"",
         "-)",
-        "-const (",
-        " a = \"2\"",
-        " b = \"hi\"",
-        " )"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38c2ea7acc57af4f85190210c284999e77853ab5..4fb5f349e5afea8321390fc01cd64c5e894a987c"
+    "shas": "78cf53ac0bcb364ce7640123057d0ac1a7c01d90..4b6d4aef29dba70649dd25f6f537f1364c853464"
 }
 ,{
-    "testCaseDescription": "go-string-literals-delete-rest-test",
+    "testCaseDescription": "go-string-literals-teardown-test",
     "expectedResult": {
         "changes": {
             "string-literals.go": [
@@ -515,27 +165,12 @@
                                 1
                             ],
                             "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                4,
-                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -546,15 +181,16 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index f70bc80..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,4 +0,0 @@",
-        "-const (",
-        "-a = \"2\"",
-        "-b = \"hi\"",
-        "-)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4fb5f349e5afea8321390fc01cd64c5e894a987c..d7c85b9aedcbd3af69fdfe6a30e249364113d5e2"
+    "shas": "4b6d4aef29dba70649dd25f6f537f1364c853464..34ccf43e44945249f16f0e99225d6cea00213df7"
 }]

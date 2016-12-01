@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-short-var-declarations-setup-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index e69de29..7905807 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "c15f3eb2a6003ef78012d02db50d2926c02e07b0..a42c9334ed4b470f101430a74cd8e9c5b9328486"
+}
+,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,31 +49,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'a' variable in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable"
+                    "summary": "Added the 'b' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -42,233 +84,19 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index e69de29..99b7041 100644",
+        "index 7905807..4ca1ce3 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
-        "@@ -0,0 +1 @@",
-        "+a, b := 1, 2"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "d77b70cb3981afaf807f3e56652ecd386101cb2b..923c4c5fcf1002927a78d428eefab190c7e2c730"
-}
-,{
-    "testCaseDescription": "go-short-var-declarations-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "short-var-declarations.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "short-var-declarations.go"
-    ],
-    "patch": [
-        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 99b7041..220aab8 100644",
-        "--- a/short-var-declarations.go",
-        "+++ b/short-var-declarations.go",
-        "@@ -1 +1,3 @@",
-        "+x, y := 3, 4",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+a, b := 1, 2",
-        " a, b := 1, 2"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "923c4c5fcf1002927a78d428eefab190c7e2c730..62e0fff2590e53bca217d3b3fb46c7f6f86822c1"
-}
-,{
-    "testCaseDescription": "go-short-var-declarations-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "short-var-declarations.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '3' with '1' in the a variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    4
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    4
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    12
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    12
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '4' with '2' in the b variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "short-var-declarations.go"
-    ],
-    "patch": [
-        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 220aab8..96ba966 100644",
-        "--- a/short-var-declarations.go",
-        "+++ b/short-var-declarations.go",
-        "@@ -1,3 +1,3 @@",
-        "-x, y := 3, 4",
-        "+a, b := 1, 2",
-        " a, b := 1, 2",
-        " a, b := 1, 2"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "62e0fff2590e53bca217d3b3fb46c7f6f86822c1..ca28a3beeb3b19e152ad702d5c8ba7d4abcb87e2"
+    "shas": "a42c9334ed4b470f101430a74cd8e9c5b9328486..aade853eedaea06249909ca54b03636ca7b5b300"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -280,108 +108,108 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x variable"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x variable of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     9
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     9
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     10
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '3' in the x variable"
+                    "summary": "Replaced '1' with '3' in the x variable of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y variable"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y variable of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     12
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     12
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '4' in the y variable"
+                    "summary": "Replaced '2' with '4' in the y variable of the 'main' function"
                 }
             ]
         },
@@ -392,17 +220,19 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 96ba966..220aab8 100644",
+        "index 4ca1ce3..bbbf937 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
-        "@@ -1,3 +1,3 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-a, b := 1, 2",
         "+x, y := 3, 4",
-        " a, b := 1, 2",
-        " a, b := 1, 2"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca28a3beeb3b19e152ad702d5c8ba7d4abcb87e2..601d4dd43130450c08e7e7b34bc3b35cd6df83cc"
+    "shas": "aade853eedaea06249909ca54b03636ca7b5b300..5d8b88fca1d2453ad1963ee85307c551473067aa"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -411,93 +241,111 @@
             "short-var-declarations.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'x' variable"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a variable of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'y' variable"
+                    "summary": "Replaced '3' with '1' in the a variable of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b variable of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    13
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' variable"
+                    "summary": "Replaced '4' with '2' in the b variable of the 'main' function"
                 }
             ]
         },
@@ -508,20 +356,80 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 220aab8..53cb4ed 100644",
+        "index bbbf937..4ca1ce3 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
-        "@@ -1,3 +1,2 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-x, y := 3, 4",
-        "-a, b := 1, 2",
-        " a, b := 1, 2",
-        "+x, y := 3, 4"
+        "+a, b := 1, 2",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "601d4dd43130450c08e7e7b34bc3b35cd6df83cc..b494ce9f37460cdcc5f62dbf78571c0e1134ce60"
+    "shas": "5d8b88fca1d2453ad1963ee85307c551473067aa..90aac53398e5b0945c3259a22778594e8d84e730"
 }
 ,{
-    "testCaseDescription": "go-short-var-declarations-delete-test",
+    "testCaseDescription": "go-short-var-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "short-var-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "short-var-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
+        "index 4ca1ce3..7905807 100644",
+        "--- a/short-var-declarations.go",
+        "+++ b/short-var-declarations.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-a, b := 1, 2",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "90aac53398e5b0945c3259a22778594e8d84e730..b499362813a66a7a5a362740fa195dbbd1876f8c"
+}
+,{
+    "testCaseDescription": "go-short-var-declarations-teardown-test",
     "expectedResult": {
         "changes": {
             "short-var-declarations.go": [
@@ -533,27 +441,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                1,
-                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -564,66 +457,16 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 53cb4ed..9209ec7 100644",
+        "index 7905807..e69de29 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
-        "@@ -1,2 +1 @@",
-        "-a, b := 1, 2",
-        " x, y := 3, 4"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b494ce9f37460cdcc5f62dbf78571c0e1134ce60..6943eb4765b07143acf4bead143f4e9927d67e74"
-}
-,{
-    "testCaseDescription": "go-short-var-declarations-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "short-var-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "short-var-declarations.go"
-    ],
-    "patch": [
-        "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 9209ec7..e69de29 100644",
-        "--- a/short-var-declarations.go",
-        "+++ b/short-var-declarations.go",
-        "@@ -1 +0,0 @@",
-        "-x, y := 3, 4"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "6943eb4765b07143acf4bead143f4e9927d67e74..b47f159a4e69c481019748b1b4451ca5480b48ac"
+    "shas": "b499362813a66a7a5a362740fa195dbbd1876f8c..85cf38beee139dd151b7dd8f50060f85e916fd8d"
 }]

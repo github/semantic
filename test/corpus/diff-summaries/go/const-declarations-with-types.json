@@ -1,25 +1,49 @@
 [{
+    "testCaseDescription": "go-const-declarations-with-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "const-declarations-with-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index e69de29..7905807 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e09098a4b342e0742ced34883192d2d98564b43e..c6ba63a095a2dbca66c90db30c0fd910a81063a5"
+}
+,{
     "testCaseDescription": "go-const-declarations-with-types-insert-test",
     "expectedResult": {
-        "changes": {
-            "const-declarations-with-types.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'zero' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -27,256 +51,24 @@
     ],
     "patch": [
         "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index e69de29..da3bfc4 100644",
+        "index 7905807..0adafad 100644",
         "--- a/const-declarations-with-types.go",
         "+++ b/const-declarations-with-types.go",
-        "@@ -0,0 +1 @@",
-        "+const zero int = 0"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "32b315c37909ee768458a4eb9ea7845a06769621..961d92cdc9ebd9a80f0727b86581998c21fda958"
-}
-,{
-    "testCaseDescription": "go-const-declarations-with-types-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "const-declarations-with-types.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'one' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'zero' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "const-declarations-with-types.go"
-    ],
-    "patch": [
-        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index da3bfc4..86f010e 100644",
-        "--- a/const-declarations-with-types.go",
-        "+++ b/const-declarations-with-types.go",
-        "@@ -1 +1,3 @@",
-        "+const one, two uiint64 = 1, 2",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const zero int = 0",
-        " const zero int = 0"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "961d92cdc9ebd9a80f0727b86581998c21fda958..779569ab17705797005da9a929df5042304d6020"
-}
-,{
-    "testCaseDescription": "go-const-declarations-with-types-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "const-declarations-with-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    26
-                                ],
-                                "end": [
-                                    1,
-                                    27
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    18
-                                ],
-                                "end": [
-                                    1,
-                                    19
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '0' in the zero variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "const-declarations-with-types.go"
-    ],
-    "patch": [
-        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index 86f010e..049ca7f 100644",
-        "--- a/const-declarations-with-types.go",
-        "+++ b/const-declarations-with-types.go",
-        "@@ -1,3 +1,3 @@",
-        "-const one, two uiint64 = 1, 2",
-        "+const zero int = 0",
-        " const zero int = 0",
-        " const zero int = 0"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "779569ab17705797005da9a929df5042304d6020..f37b24c77b0054da8b553755c7729956dab62808"
+    "shas": "c6ba63a095a2dbca66c90db30c0fd910a81063a5..30d044efa007c3850fba1feef3fa90cd21fea6e2"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-replacement-test",
     "expectedResult": {
-        "changes": {
-            "const-declarations-with-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    18
-                                ],
-                                "end": [
-                                    1,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    26
-                                ],
-                                "end": [
-                                    1,
-                                    27
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '0' with '1' in the one variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -284,100 +76,24 @@
     ],
     "patch": [
         "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index 049ca7f..86f010e 100644",
+        "index 0adafad..901589b 100644",
         "--- a/const-declarations-with-types.go",
         "+++ b/const-declarations-with-types.go",
-        "@@ -1,3 +1,3 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const zero int = 0",
         "+const one, two uiint64 = 1, 2",
-        " const zero int = 0",
-        " const zero int = 0"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f37b24c77b0054da8b553755c7729956dab62808..6294219449121c8cbd20d3ba524890dceb6e138e"
+    "shas": "30d044efa007c3850fba1feef3fa90cd21fea6e2..0f5966e43c4f55673326feaaca4bef56873ebff1"
 }
 ,{
     "testCaseDescription": "go-const-declarations-with-types-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "const-declarations-with-types.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'one' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'one' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -385,20 +101,47 @@
     ],
     "patch": [
         "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index 86f010e..f035105 100644",
+        "index 901589b..0adafad 100644",
         "--- a/const-declarations-with-types.go",
         "+++ b/const-declarations-with-types.go",
-        "@@ -1,3 +1,2 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const one, two uiint64 = 1, 2",
-        "-const zero int = 0",
-        " const zero int = 0",
-        "+const one, two uiint64 = 1, 2"
+        "+const zero int = 0",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6294219449121c8cbd20d3ba524890dceb6e138e..7310b361570cf43ce24c55caf717fc64069a2d3b"
+    "shas": "0f5966e43c4f55673326feaaca4bef56873ebff1..0ebfa3dc11804a03fac5ea89aaf6082de146b5ff"
 }
 ,{
-    "testCaseDescription": "go-const-declarations-with-types-delete-test",
+    "testCaseDescription": "go-const-declarations-with-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "const-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
+        "index 0adafad..7905807 100644",
+        "--- a/const-declarations-with-types.go",
+        "+++ b/const-declarations-with-types.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const zero int = 0",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0ebfa3dc11804a03fac5ea89aaf6082de146b5ff..a7c8ef9b0ab5a63ae3cd0f1b9b1c69777d970dca"
+}
+,{
+    "testCaseDescription": "go-const-declarations-with-types-teardown-test",
     "expectedResult": {
         "changes": {
             "const-declarations-with-types.go": [
@@ -410,12 +153,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                19
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -426,66 +169,16 @@
     ],
     "patch": [
         "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index f035105..716746a 100644",
+        "index 7905807..e69de29 100644",
         "--- a/const-declarations-with-types.go",
         "+++ b/const-declarations-with-types.go",
-        "@@ -1,2 +1 @@",
-        "-const zero int = 0",
-        " const one, two uiint64 = 1, 2"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7310b361570cf43ce24c55caf717fc64069a2d3b..c3d27a164e9197991bd4390391a3699327e8e1b0"
-}
-,{
-    "testCaseDescription": "go-const-declarations-with-types-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "const-declarations-with-types.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'one' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "const-declarations-with-types.go"
-    ],
-    "patch": [
-        "diff --git a/const-declarations-with-types.go b/const-declarations-with-types.go",
-        "index 716746a..e69de29 100644",
-        "--- a/const-declarations-with-types.go",
-        "+++ b/const-declarations-with-types.go",
-        "@@ -1 +0,0 @@",
-        "-const one, two uiint64 = 1, 2"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "c3d27a164e9197991bd4390391a3699327e8e1b0..5352a466a13a8f3f02aa66c9a40c94ce75e0e613"
+    "shas": "a7c8ef9b0ab5a63ae3cd0f1b9b1c69777d970dca..880d1356428938ef5f360e9367e76e80a3642744"
 }]

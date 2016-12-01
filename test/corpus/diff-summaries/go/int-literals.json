@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-int-literals-setup-test",
+    "expectedResult": {
+        "changes": {
+            "int-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "int-literals.go"
+    ],
+    "patch": [
+        "diff --git a/int-literals.go b/int-literals.go",
+        "index e69de29..7905807 100644",
+        "--- a/int-literals.go",
+        "+++ b/int-literals.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f3e05e09e3d530af1ff259250ef56340ddb2a62b..bde332c82df9dc7660c847943b9d80b24c3e5586"
+}
+,{
     "testCaseDescription": "go-int-literals-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,91 +49,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                2,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                8
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                15
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'branch' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -102,348 +69,21 @@
     ],
     "patch": [
         "diff --git a/int-literals.go b/int-literals.go",
-        "index e69de29..11caaee 100644",
+        "index 7905807..38d36ec 100644",
         "--- a/int-literals.go",
         "+++ b/int-literals.go",
-        "@@ -0,0 +1,3 @@",
-        "+const (",
-        "+a = 1, b = 2, c = 3",
-        "+)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "f506441da93c9b84b48df54338a1c9a9314a3f6b..9d5ff0437bec316dc6fb0b635399fc0eeb773fd1"
-}
-,{
-    "testCaseDescription": "go-int-literals-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "int-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '4'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '3' with '6'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                15
-                            ],
-                            "end": [
-                                5,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                19
-                            ],
-                            "end": [
-                                5,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "int-literals.go"
-    ],
-    "patch": [
-        "diff --git a/int-literals.go b/int-literals.go",
-        "index 11caaee..c8fc4e8 100644",
-        "--- a/int-literals.go",
-        "+++ b/int-literals.go",
-        "@@ -1,3 +1,9 @@",
-        " const (",
-        "+a = 4, b = 5, c = 6",
-        "+)",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const (",
         "+a = 1, b = 2, c = 3",
         "+)",
-        "+const (",
-        " a = 1, b = 2, c = 3",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9d5ff0437bec316dc6fb0b635399fc0eeb773fd1..e8c883af60295fc66c20e1b28e145c9004c4cc8c"
-}
-,{
-    "testCaseDescription": "go-int-literals-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "int-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '4' with '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '5'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '6' with '3'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "int-literals.go"
-    ],
-    "patch": [
-        "diff --git a/int-literals.go b/int-literals.go",
-        "index c8fc4e8..5e0181f 100644",
-        "--- a/int-literals.go",
-        "+++ b/int-literals.go",
-        "@@ -1,5 +1,5 @@",
-        " const (",
-        "-a = 4, b = 5, c = 6",
-        "+a = 1, b = 2, c = 3",
-        " )",
-        " const (",
-        " a = 1, b = 2, c = 3"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "e8c883af60295fc66c20e1b28e145c9004c4cc8c..3772ecf68cb0d358dbdeb9461a4f6af3f3262819"
+    "shas": "bde332c82df9dc7660c847943b9d80b24c3e5586..24618289b5edae432452a2cc4f6a494c026f1710"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
@@ -455,84 +95,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    2,
-                                    5
+                                    5,
+                                    12
                                 ],
                                 "end": [
-                                    2,
-                                    6
+                                    5,
+                                    13
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
-                                    5
+                                    5,
+                                    12
                                 ],
                                 "end": [
-                                    2,
-                                    6
+                                    5,
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '4'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
+                    "summary": "Replaced '2' with '5' in an assignment to 5 of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     19
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     20
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     19
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     20
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6'"
+                    "summary": "Replaced '3' with '6' in an assignment to 5 of the 'main' function"
                 }
             ]
         },
@@ -543,19 +153,20 @@
     ],
     "patch": [
         "diff --git a/int-literals.go b/int-literals.go",
-        "index 5e0181f..c8fc4e8 100644",
+        "index 38d36ec..4f07c13 100644",
         "--- a/int-literals.go",
         "+++ b/int-literals.go",
-        "@@ -1,5 +1,5 @@",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "-a = 1, b = 2, c = 3",
         "+a = 4, b = 5, c = 6",
         " )",
-        " const (",
-        " a = 1, b = 2, c = 3"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3772ecf68cb0d358dbdeb9461a4f6af3f3262819..990a480122b9d1d215e11f57438e2d71b26327f9"
+    "shas": "24618289b5edae432452a2cc4f6a494c026f1710..22249e32f52ac07e2104770e7d899c7ce27a11cd"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
@@ -567,117 +178,6 @@
                         "replace": [
                             {
                                 "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '4' with '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '5'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '6' with '3'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    5
-                                ],
-                                "end": [
-                                    5,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    5
-                                ],
-                                "end": [
-                                    5,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '4'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
                                     5,
                                     12
                                 ],
@@ -698,7 +198,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5'"
+                    "summary": "Replaced '5' with '2' in an assignment to 2 of the 'main' function"
                 },
                 {
                     "span": {
@@ -725,22 +225,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Replaced '6' with '3' in an assignment to 2 of the 'main' function"
                 }
             ]
         },
@@ -751,202 +236,40 @@
     ],
     "patch": [
         "diff --git a/int-literals.go b/int-literals.go",
-        "index c8fc4e8..44afd3b 100644",
+        "index 4f07c13..38d36ec 100644",
         "--- a/int-literals.go",
         "+++ b/int-literals.go",
-        "@@ -1,9 +1,6 @@",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "-a = 4, b = 5, c = 6",
-        "-)",
-        "-const (",
-        " a = 1, b = 2, c = 3",
+        "+a = 1, b = 2, c = 3",
         " )",
-        " const (",
-        "-a = 1, b = 2, c = 3",
-        "+a = 4, b = 5, c = 6",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "990a480122b9d1d215e11f57438e2d71b26327f9..ba3be016a8741ede842a3f0a22ab888a13245afa"
+    "shas": "22249e32f52ac07e2104770e7d899c7ce27a11cd..e655b311adcd9af0ac8afdd80184dabae640f0ee"
 }
 ,{
-    "testCaseDescription": "go-int-literals-delete-test",
+    "testCaseDescription": "go-int-literals-delete-insert-test",
     "expectedResult": {
         "changes": {
             "int-literals.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '4'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '5'"
-                },
-                {
-                    "span": {
                         "delete": {
                             "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    19
-                                ],
-                                "end": [
-                                    2,
-                                    20
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '3' with '6'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
+                                4,
                                 1
                             ],
                             "end": [
-                                5,
+                                6,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '4'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                15
-                            ],
-                            "end": [
-                                5,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                19
-                            ],
-                            "end": [
-                                5,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '6'"
+                    "summary": "Deleted the 'branch' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -957,22 +280,24 @@
     ],
     "patch": [
         "diff --git a/int-literals.go b/int-literals.go",
-        "index 44afd3b..0e70b15 100644",
+        "index 38d36ec..7905807 100644",
         "--- a/int-literals.go",
         "+++ b/int-literals.go",
-        "@@ -1,6 +1,3 @@",
-        " const (",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const (",
         "-a = 1, b = 2, c = 3",
         "-)",
-        "-const (",
-        " a = 4, b = 5, c = 6",
-        " )"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ba3be016a8741ede842a3f0a22ab888a13245afa..b9766bf0963750d39e8d8979650adf6588d1a273"
+    "shas": "e655b311adcd9af0ac8afdd80184dabae640f0ee..734d06c9ac549382251e48b4b35c79d116815e96"
 }
 ,{
-    "testCaseDescription": "go-int-literals-delete-rest-test",
+    "testCaseDescription": "go-int-literals-teardown-test",
     "expectedResult": {
         "changes": {
             "int-literals.go": [
@@ -980,91 +305,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                1,
                                 1
                             ],
                             "end": [
-                                2,
-                                2
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '4'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                8
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '5'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                15
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '6'"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -1075,14 +325,16 @@
     ],
     "patch": [
         "diff --git a/int-literals.go b/int-literals.go",
-        "index 0e70b15..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/int-literals.go",
         "+++ b/int-literals.go",
-        "@@ -1,3 +0,0 @@",
-        "-const (",
-        "-a = 4, b = 5, c = 6",
-        "-)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b9766bf0963750d39e8d8979650adf6588d1a273..8169b76dce111ce0792b3533976dadc693b590b7"
+    "shas": "734d06c9ac549382251e48b4b35c79d116815e96..7cd1bf5d5180a287a62fb85bc8e7b34cfc132159"
 }]

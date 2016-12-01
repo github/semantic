@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-indexing-expressions-setup-test",
+    "expectedResult": {
+        "changes": {
+            "indexing-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "indexing-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/indexing-expressions.go b/indexing-expressions.go",
+        "index e69de29..7905807 100644",
+        "--- a/indexing-expressions.go",
+        "+++ b/indexing-expressions.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "512f678e80270a7b8c148ffbf16d83ef76c20e46..b7f33fe57b2843f65d9a5bf09b212e11b79fc64c"
+}
+,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,224 +49,61 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 5
                             ]
                         }
                     },
-                    "summary": "Added the 'a[1]' subscript access"
+                    "summary": "Added the 'a[1]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 2
                             ],
                             "end": [
-                                2,
+                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added the 'b[b[:]]' subscript access"
+                    "summary": "Added the 'b[b[:]]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                6,
                                 2
                             ],
                             "end": [
-                                3,
+                                6,
                                 7
                             ]
                         }
                     },
-                    "summary": "Added the 'c[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd[1:2]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e[2:3]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f[1:2:3]' subscript access"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "indexing-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index e69de29..7e17ae1 100644",
-        "--- a/indexing-expressions.go",
-        "+++ b/indexing-expressions.go",
-        "@@ -0,0 +1,6 @@",
-        "+a[1]",
-        "+ b[:]",
-        "+ c[1:]",
-        "+ d[1:2]",
-        "+ e[:2:3]",
-        "+ f[1:2:3]"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "bef4b21e0fe9824b79e8b12bfa32867c8a4433a7..5e7291ca5734c392ca6fcb91affac41ee09b9fdb"
-}
-,{
-    "testCaseDescription": "go-indexing-expressions-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "indexing-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z[2]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd[1:2]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e[2:3]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f[1:2:3]' subscript access"
+                    "summary": "Added the 'c[1]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 7,
-                                1
+                                2
                             ],
                             "end": [
                                 7,
-                                5
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'a[1]' subscript access"
+                    "summary": "Added the 'd[1:2]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -235,71 +114,26 @@
                             ],
                             "end": [
                                 8,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b[b[:]]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                2
-                            ],
-                            "end": [
-                                9,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                2
-                            ],
-                            "end": [
-                                10,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'd[1:2]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                2
-                            ],
-                            "end": [
-                                11,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added the 'e[2:3]' subscript access"
+                    "summary": "Added the 'e[2:3]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                12,
+                                9,
                                 2
                             ],
                             "end": [
-                                12,
+                                9,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the 'f[1:2:3]' subscript access"
+                    "summary": "Added the 'f[1:2:3]' subscript access in the main function of the 'main' module"
                 }
             ]
         },
@@ -310,158 +144,24 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 7e17ae1..4b30922 100644",
+        "index 7905807..c2c7693 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
-        "@@ -1,3 +1,15 @@",
-        "+z[:2]",
-        "+ y[:1]",
-        "+ x[1:]",
-        "+ d[1:2]",
-        "+ e[:2:3]",
-        "+ f[1:2:3]",
+        "@@ -1,5 +1,10 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+a[1]",
         "+ b[:]",
         "+ c[1:]",
         "+ d[1:2]",
         "+ e[:2:3]",
         "+ f[1:2:3]",
-        " a[1]",
-        "  b[:]",
-        "  c[1:]"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5e7291ca5734c392ca6fcb91affac41ee09b9fdb..3c8fa3af2840693a46343d813503faf6af81f9bd"
-}
-,{
-    "testCaseDescription": "go-indexing-expressions-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "indexing-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'z' identifier with the 'b' identifier in the b[b[:]] subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2' in the b[b[:]] subscript access"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'c' identifier in the c[1] subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x[1]' subscript access"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "indexing-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 4b30922..f5fa086 100644",
-        "--- a/indexing-expressions.go",
-        "+++ b/indexing-expressions.go",
-        "@@ -1,6 +1,6 @@",
-        "-z[:2]",
-        "- y[:1]",
-        "- x[1:]",
-        "+a[1]",
-        "+ b[:]",
-        "+ c[1:]",
-        "  d[1:2]",
-        "  e[:2:3]",
-        "  f[1:2:3]"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "3c8fa3af2840693a46343d813503faf6af81f9bd..a3a79c59817d668d35e8ec88c792d4873d2a8a3f"
+    "shas": "b7f33fe57b2843f65d9a5bf09b212e11b79fc64c..f1fa7489c4ce69342b25c4e99405810edb6a557a"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -473,87 +173,96 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     5
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a[1]' subscript access with the 'z[2]' subscript access"
+                    "summary": "Replaced the 'a[1]' subscript access with the 'z[2]' subscript access in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y[1] subscript access of the 'main' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                2
+                                5,
+                                5
                             ],
                             "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
+                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b[b[:]]' subscript access"
+                    "summary": "Added '1' in the y[1] subscript access of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'c[1]' subscript access"
+                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the x[1] subscript access of the 'main' function"
                 }
             ]
         },
@@ -564,10 +273,13 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index f5fa086..4b30922 100644",
+        "index c2c7693..68a7634 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
-        "@@ -1,6 +1,6 @@",
+        "@@ -1,9 +1,9 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-a[1]",
         "- b[:]",
         "- c[1:]",
@@ -579,7 +291,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a3a79c59817d668d35e8ec88c792d4873d2a8a3f..dc236572b5ccdd76b52fb233f568447dbd968f96"
+    "shas": "f1fa7489c4ce69342b25c4e99405810edb6a557a..1519cd9ebd082bd97ef7661a7ff7d4ab8f2dd0aa"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -588,183 +300,99 @@
             "indexing-expressions.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    5
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'z[2]' subscript access"
+                    "summary": "Replaced the 'z[2]' subscript access with the 'a[1]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'y[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'd[1:2]' subscript access"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b[b[:]] subscript access of the 'main' function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e[2:3]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f[1:2:3]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z[2]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                2
-                            ],
-                            "end": [
-                                9,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                1
-                            ],
-                            "end": [
-                                13,
                                 5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                14,
-                                2
                             ],
                             "end": [
-                                14,
+                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b[b[:]]' subscript access"
+                    "summary": "Deleted '1' in the b[b[:]] subscript access of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                2
-                            ],
-                            "end": [
-                                15,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'c[1]' subscript access"
+                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the c[1] subscript access of the 'main' function"
                 }
             ]
         },
@@ -775,37 +403,28 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 4b30922..06ae51b 100644",
+        "index 68a7634..c2c7693 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
-        "@@ -1,18 +1,12 @@",
+        "@@ -1,9 +1,9 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-z[:2]",
         "- y[:1]",
         "- x[1:]",
-        "- d[1:2]",
-        "- e[:2:3]",
-        "- f[1:2:3]",
-        " a[1]",
-        "  b[:]",
-        "  c[1:]",
-        "  d[1:2]",
-        "  e[:2:3]",
-        "  f[1:2:3]",
-        "-a[1]",
-        "- b[:]",
-        "- c[1:]",
-        "+z[:2]",
-        "+ y[:1]",
-        "+ x[1:]",
+        "+a[1]",
+        "+ b[:]",
+        "+ c[1:]",
         "  d[1:2]",
         "  e[:2:3]",
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc236572b5ccdd76b52fb233f568447dbd968f96..6d08592be4d68c184299952ad89b6821c7f908fa"
+    "shas": "1519cd9ebd082bd97ef7661a7ff7d4ab8f2dd0aa..e6c6a419dc0bfbea00409f46746afdfe8e03d207"
 }
 ,{
-    "testCaseDescription": "go-indexing-expressions-delete-test",
+    "testCaseDescription": "go-indexing-expressions-delete-insert-test",
     "expectedResult": {
         "changes": {
             "indexing-expressions.go": [
@@ -813,91 +432,91 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 5
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a[1]' subscript access"
+                    "summary": "Deleted the 'a[1]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 2
                             ],
                             "end": [
-                                2,
+                                5,
                                 6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b[b[:]]' subscript access"
+                    "summary": "Deleted the 'b[b[:]]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                6,
                                 2
                             ],
                             "end": [
-                                3,
+                                6,
                                 7
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c[1]' subscript access"
+                    "summary": "Deleted the 'c[1]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                7,
                                 2
                             ],
                             "end": [
-                                4,
+                                7,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd[1:2]' subscript access"
+                    "summary": "Deleted the 'd[1:2]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                8,
                                 2
                             ],
                             "end": [
-                                5,
+                                8,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e[2:3]' subscript access"
+                    "summary": "Deleted the 'e[2:3]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                9,
                                 2
                             ],
                             "end": [
-                                6,
+                                9,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f[1:2:3]' subscript access"
+                    "summary": "Deleted the 'f[1:2:3]' subscript access in the main function of the 'main' module"
                 }
             ]
         },
@@ -908,25 +527,27 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 06ae51b..920a809 100644",
+        "index c2c7693..7905807 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
-        "@@ -1,9 +1,3 @@",
+        "@@ -1,10 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-a[1]",
         "- b[:]",
         "- c[1:]",
         "- d[1:2]",
         "- e[:2:3]",
         "- f[1:2:3]",
-        " z[:2]",
-        "  y[:1]",
-        "  x[1:]"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6d08592be4d68c184299952ad89b6821c7f908fa..c07e030b729c2ee13dbb2afd885a05677daf655e"
+    "shas": "e6c6a419dc0bfbea00409f46746afdfe8e03d207..4044902333655e29933b3f406c2c24c673e17834"
 }
 ,{
-    "testCaseDescription": "go-indexing-expressions-delete-rest-test",
+    "testCaseDescription": "go-indexing-expressions-teardown-test",
     "expectedResult": {
         "changes": {
             "indexing-expressions.go": [
@@ -938,87 +559,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z[2]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                2
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x[1]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'd[1:2]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                2
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e[2:3]' subscript access"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 6,
-                                2
-                            ],
-                            "end": [
-                                6,
-                                10
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f[1:2:3]' subscript access"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -1029,17 +575,16 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 920a809..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
-        "@@ -1,6 +0,0 @@",
-        "-z[:2]",
-        "- y[:1]",
-        "- x[1:]",
-        "- d[1:2]",
-        "- e[:2:3]",
-        "- f[1:2:3]"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c07e030b729c2ee13dbb2afd885a05677daf655e..fff4b5e3aa207b2f8d5dc8ddb03b550f79baec95"
+    "shas": "4044902333655e29933b3f406c2c24c673e17834..4787ffbe0a99ff9ebdab0557183ad6663dd746cb"
 }]

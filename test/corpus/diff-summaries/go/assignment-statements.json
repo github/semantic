@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-assignment-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "assignment-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment-statements.go"
+    ],
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index e69de29..7905807 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "7cd1bf5d5180a287a62fb85bc8e7b34cfc132159..338293e927456ff10caaeccf35e1da6e9074966b"
+}
+,{
     "testCaseDescription": "go-assignment-statements-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,151 +49,76 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
+                                4,
                                 6
                             ]
                         }
                     },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'a' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
+                                5,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'b' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                5,
                                 1
                             ],
                             "end": [
-                                3,
-                                2
+                                5,
+                                13
                             ]
                         }
                     },
-                    "summary": "Added 'd' identifier"
+                    "summary": "Added the 'c' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                6
+                                6,
+                                1
                             ],
                             "end": [
-                                3,
+                                6,
                                 7
                             ]
                         }
                     },
-                    "summary": "Added '3'"
+                    "summary": "Added the 'd' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                7,
                                 1
                             ],
                             "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
+                                7,
                                 7
                             ]
                         }
                     },
-                    "summary": "Added '1'"
+                    "summary": "Added the 'e' assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -162,524 +129,22 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index e69de29..91be59d 100644",
+        "index 7905807..072782b 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
-        "@@ -0,0 +1,4 @@",
-        "+a = 1",
-        "+b, c += 2, 3",
-        "+d *= 3",
-        "+e += 1"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "8169b76dce111ce0792b3533976dadc693b590b7..4cc844d77d721fe208040c51ede6572da49b0792"
-}
-,{
-    "testCaseDescription": "go-assignment-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "assignment-statements.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'b' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                12
-                            ],
-                            "end": [
-                                6,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment-statements.go"
-    ],
-    "patch": [
-        "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 91be59d..9d7456f 100644",
-        "--- a/assignment-statements.go",
-        "+++ b/assignment-statements.go",
-        "@@ -1,3 +1,11 @@",
-        "+x = 1",
-        "+y, c += 2, 3",
-        "+z *= 3",
-        "+h += 1",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+a = 1",
         "+b, c += 2, 3",
         "+d *= 3",
         "+e += 1",
-        " a = 1",
-        " b, c += 2, 3",
-        " d *= 3"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4cc844d77d721fe208040c51ede6572da49b0792..eb8b58722095916baae119b9a829137f9d91aa3f"
-}
-,{
-    "testCaseDescription": "go-assignment-statements-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "assignment-statements.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'z' identifier with the 'd' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'e' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment-statements.go"
-    ],
-    "patch": [
-        "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 9d7456f..87b0c42 100644",
-        "--- a/assignment-statements.go",
-        "+++ b/assignment-statements.go",
-        "@@ -1,7 +1,7 @@",
-        "-x = 1",
-        "-y, c += 2, 3",
-        "-z *= 3",
-        "-h += 1",
-        "+a = 1",
-        "+b, c += 2, 3",
-        "+d *= 3",
-        "+e += 1",
-        " a = 1",
-        " b, c += 2, 3",
-        " d *= 3"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "eb8b58722095916baae119b9a829137f9d91aa3f..eaec5133e11d27fe07c0366dc7ec970578b90202"
+    "shas": "338293e927456ff10caaeccf35e1da6e9074966b..9adf4eb965fc5a4f839a575dec0c698c9478dae2"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -691,141 +156,108 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in an assignment to x of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     1
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     1
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in an assignment to y of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'd' identifier with the 'z' identifier"
+                    "summary": "Replaced the 'd' identifier with the 'z' identifier in an assignment to z of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Replaced the 'e' identifier with the 'h' identifier in an assignment to h of the 'main' function"
                 }
             ]
         },
@@ -836,10 +268,13 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 87b0c42..9d7456f 100644",
+        "index 072782b..2e6b444 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
-        "@@ -1,7 +1,7 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-a = 1",
         "-b, c += 2, 3",
         "-d *= 3",
@@ -848,12 +283,10 @@
         "+y, c += 2, 3",
         "+z *= 3",
         "+h += 1",
-        " a = 1",
-        " b, c += 2, 3",
-        " d *= 3"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eaec5133e11d27fe07c0366dc7ec970578b90202..6e2c8089dae866b00e20a309929ddcadeb8dec42"
+    "shas": "9adf4eb965fc5a4f839a575dec0c698c9478dae2..1a92a7229a36cf36fd22f02dc5d2dd0613aa495d"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -862,453 +295,111 @@
             "assignment-statements.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted 'x' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in an assignment to a of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted '1'"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in an assignment to b of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted 'y' identifier"
+                    "summary": "Replaced the 'z' identifier with the 'd' identifier in an assignment to d of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                12
-                            ],
-                            "end": [
-                                6,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                5
-                            ],
-                            "end": [
-                                5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                4
-                            ],
-                            "end": [
-                                6,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'c' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                9
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                12
-                            ],
-                            "end": [
-                                6,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '3'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added '1'"
+                    "summary": "Replaced the 'h' identifier with the 'e' identifier in an assignment to e of the 'main' function"
                 }
             ]
         },
@@ -1319,32 +410,134 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 9d7456f..d51ed96 100644",
+        "index 2e6b444..072782b 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
-        "@@ -1,12 +1,8 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-x = 1",
         "-y, c += 2, 3",
         "-z *= 3",
         "-h += 1",
+        "+a = 1",
+        "+b, c += 2, 3",
+        "+d *= 3",
+        "+e += 1",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1a92a7229a36cf36fd22f02dc5d2dd0613aa495d..0435629b1eadc082e6980d10a4300a4dcf6248b7"
+}
+,{
+    "testCaseDescription": "go-assignment-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' assignment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment-statements.go"
+    ],
+    "patch": [
+        "diff --git a/assignment-statements.go b/assignment-statements.go",
+        "index 072782b..7905807 100644",
+        "--- a/assignment-statements.go",
+        "+++ b/assignment-statements.go",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-a = 1",
         "-b, c += 2, 3",
         "-d *= 3",
         "-e += 1",
-        " a = 1",
-        " b, c += 2, 3",
-        " d *= 3",
-        " e += 1",
-        "+x = 1",
-        "+y, c += 2, 3",
-        "+z *= 3",
-        "+h += 1"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e2c8089dae866b00e20a309929ddcadeb8dec42..33aed800d764c2abe2b13f286d94db1bf992b632"
+    "shas": "0435629b1eadc082e6980d10a4300a4dcf6248b7..954867170f8a700b8867e0ee9ab363da87855b64"
 }
 ,{
-    "testCaseDescription": "go-assignment-statements-delete-test",
+    "testCaseDescription": "go-assignment-statements-teardown-test",
     "expectedResult": {
         "changes": {
             "assignment-statements.go": [
@@ -1356,147 +549,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                2
                             ]
                         }
                     },
-                    "summary": "Deleted 'b' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'd' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'e' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -1507,194 +565,16 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index d51ed96..5f3e29f 100644",
+        "index 7905807..e69de29 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
-        "@@ -1,7 +1,3 @@",
-        "-a = 1",
-        "-b, c += 2, 3",
-        "-d *= 3",
-        "-e += 1",
-        " x = 1",
-        " y, c += 2, 3",
-        " z *= 3"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "33aed800d764c2abe2b13f286d94db1bf992b632..66fff4be883aeb2f14bbb87c9f3d28dd394f7fdd"
-}
-,{
-    "testCaseDescription": "go-assignment-statements-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "assignment-statements.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'c' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                12
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'z' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '1'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment-statements.go"
-    ],
-    "patch": [
-        "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 5f3e29f..e69de29 100644",
-        "--- a/assignment-statements.go",
-        "+++ b/assignment-statements.go",
-        "@@ -1,4 +0,0 @@",
-        "-x = 1",
-        "-y, c += 2, 3",
-        "-z *= 3",
-        "-h += 1"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "66fff4be883aeb2f14bbb87c9f3d28dd394f7fdd..4f9b8528a927a98cae35aa92a05bab432d2cf451"
+    "shas": "954867170f8a700b8867e0ee9ab363da87855b64..98a6dc74cc5a66c1d0c8f0d36bd0e08d21121e35"
 }]

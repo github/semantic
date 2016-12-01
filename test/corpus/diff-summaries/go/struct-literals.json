@@ -1,55 +1,49 @@
 [{
+    "testCaseDescription": "go-struct-literals-setup-test",
+    "expectedResult": {
+        "changes": {
+            "struct-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-literals.go"
+    ],
+    "patch": [
+        "diff --git a/struct-literals.go b/struct-literals.go",
+        "index e69de29..7905807 100644",
+        "--- a/struct-literals.go",
+        "+++ b/struct-literals.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b92b7fa71587a369b3db2ed6695f7537c36a4729..b7aa559dab86c329ab14bbb2eafe55e9441616c9"
+}
+,{
     "testCaseDescription": "go-struct-literals-insert-test",
     "expectedResult": {
-        "changes": {
-            "struct-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's2' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -57,458 +51,29 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index e69de29..f949dbb 100644",
+        "index 7905807..e6fd4f1 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
-        "@@ -0,0 +1,6 @@",
-        "+const s1 = Person{",
-        "+name: \"Frank\",",
-        "+Age: \"5 months\",",
-        "+}",
-        "+const s2 = struct{i int;}{i: 5}",
-        "+const s3 = time.Time{}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "821d52811675ea17dd00d79b0f4e082376b97afc..f95070fc9ad568a31f1f26f714fca1b38e518d0f"
-}
-,{
-    "testCaseDescription": "go-struct-literals-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "struct-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's2' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's2' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "struct-literals.go"
-    ],
-    "patch": [
-        "diff --git a/struct-literals.go b/struct-literals.go",
-        "index f949dbb..c6a242e 100644",
-        "--- a/struct-literals.go",
-        "+++ b/struct-literals.go",
-        "@@ -1,3 +1,15 @@",
-        "+const s1 = Dog{",
-        "+name: \"Frank\",",
-        "+Age: \"5 months\",",
-        "+}",
-        "+const s2 = struct{i float;}{j: 6}",
-        "+const s3 = time.Month{}",
+        "@@ -1,5 +1,10 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const s1 = Person{",
         "+name: \"Frank\",",
         "+Age: \"5 months\",",
         "+}",
         "+const s2 = struct{i int;}{i: 5}",
         "+const s3 = time.Time{}",
-        " const s1 = Person{",
-        " name: \"Frank\",",
-        " Age: \"5 months\","
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f95070fc9ad568a31f1f26f714fca1b38e518d0f..69ccd2c4c78c59c85cec84a8f602af771f81b441"
-}
-,{
-    "testCaseDescription": "go-struct-literals-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "struct-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    12
-                                ],
-                                "end": [
-                                    1,
-                                    15
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    12
-                                ],
-                                "end": [
-                                    1,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the s1 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    21
-                                ],
-                                "end": [
-                                    5,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    21
-                                ],
-                                "end": [
-                                    5,
-                                    24
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the s2 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    29
-                                ],
-                                "end": [
-                                    5,
-                                    30
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    27
-                                ],
-                                "end": [
-                                    5,
-                                    28
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the s2 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    32
-                                ],
-                                "end": [
-                                    5,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    30
-                                ],
-                                "end": [
-                                    5,
-                                    31
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '6' with '5' in the s2 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    17
-                                ],
-                                "end": [
-                                    6,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    17
-                                ],
-                                "end": [
-                                    6,
-                                    21
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the s3 variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "struct-literals.go"
-    ],
-    "patch": [
-        "diff --git a/struct-literals.go b/struct-literals.go",
-        "index c6a242e..680652e 100644",
-        "--- a/struct-literals.go",
-        "+++ b/struct-literals.go",
-        "@@ -1,9 +1,9 @@",
-        "-const s1 = Dog{",
-        "+const s1 = Person{",
-        " name: \"Frank\",",
-        " Age: \"5 months\",",
-        " }",
-        "-const s2 = struct{i float;}{j: 6}",
-        "-const s3 = time.Month{}",
-        "+const s2 = struct{i int;}{i: 5}",
-        "+const s3 = time.Time{}",
-        " const s1 = Person{",
-        " name: \"Frank\",",
-        " Age: \"5 months\","
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "69ccd2c4c78c59c85cec84a8f602af771f81b441..18672cd492f61710467d45f0a0404eda67ef786f"
+    "shas": "b7aa559dab86c329ab14bbb2eafe55e9441616c9..d9ade99deb5308b89c0e181dde0456d599f990c6"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
     "expectedResult": {
-        "changes": {
-            "struct-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    12
-                                ],
-                                "end": [
-                                    1,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    12
-                                ],
-                                "end": [
-                                    1,
-                                    15
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the s1 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    21
-                                ],
-                                "end": [
-                                    5,
-                                    24
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    21
-                                ],
-                                "end": [
-                                    5,
-                                    26
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the s2 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    27
-                                ],
-                                "end": [
-                                    5,
-                                    28
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    29
-                                ],
-                                "end": [
-                                    5,
-                                    30
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the s2 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    30
-                                ],
-                                "end": [
-                                    5,
-                                    31
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    32
-                                ],
-                                "end": [
-                                    5,
-                                    33
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '6' in the s2 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    17
-                                ],
-                                "end": [
-                                    6,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    17
-                                ],
-                                "end": [
-                                    6,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the s3 variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -516,10 +81,13 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 680652e..c6a242e 100644",
+        "index e6fd4f1..06724a4 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
-        "@@ -1,9 +1,9 @@",
+        "@@ -1,10 +1,10 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const s1 = Person{",
         "+const s1 = Dog{",
         " name: \"Frank\",",
@@ -529,155 +97,15 @@
         "-const s3 = time.Time{}",
         "+const s2 = struct{i float;}{j: 6}",
         "+const s3 = time.Month{}",
-        " const s1 = Person{",
-        " name: \"Frank\",",
-        " Age: \"5 months\","
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "18672cd492f61710467d45f0a0404eda67ef786f..3a6f5dd454cb71872be3981556590819ca08e4cd"
+    "shas": "d9ade99deb5308b89c0e181dde0456d599f990c6..f9cb6224ec86263e0a869784a0318adbcaedfded"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "struct-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's2' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's2' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's2' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -685,37 +113,59 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index c6a242e..5aaf236 100644",
+        "index 06724a4..e6fd4f1 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
-        "@@ -1,18 +1,12 @@",
+        "@@ -1,10 +1,10 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const s1 = Dog{",
-        "-name: \"Frank\",",
-        "-Age: \"5 months\",",
-        "-}",
+        "+const s1 = Person{",
+        " name: \"Frank\",",
+        " Age: \"5 months\",",
+        " }",
         "-const s2 = struct{i float;}{j: 6}",
         "-const s3 = time.Month{}",
-        " const s1 = Person{",
-        " name: \"Frank\",",
-        " Age: \"5 months\",",
-        " }",
-        " const s2 = struct{i int;}{i: 5}",
-        " const s3 = time.Time{}",
-        "-const s1 = Person{",
-        "+const s1 = Dog{",
-        " name: \"Frank\",",
-        " Age: \"5 months\",",
-        " }",
-        "-const s2 = struct{i int;}{i: 5}",
-        "-const s3 = time.Time{}",
-        "+const s2 = struct{i float;}{j: 6}",
-        "+const s3 = time.Month{}"
+        "+const s2 = struct{i int;}{i: 5}",
+        "+const s3 = time.Time{}",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a6f5dd454cb71872be3981556590819ca08e4cd..3b3bf2627d244b37a62ebdc901f39bccb4fa1a8d"
+    "shas": "f9cb6224ec86263e0a869784a0318adbcaedfded..1c1fd89d40ff03a1eb8812937a6e77a17594e44b"
 }
 ,{
-    "testCaseDescription": "go-struct-literals-delete-test",
+    "testCaseDescription": "go-struct-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-literals.go"
+    ],
+    "patch": [
+        "diff --git a/struct-literals.go b/struct-literals.go",
+        "index e6fd4f1..7905807 100644",
+        "--- a/struct-literals.go",
+        "+++ b/struct-literals.go",
+        "@@ -1,10 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const s1 = Person{",
+        "-name: \"Frank\",",
+        "-Age: \"5 months\",",
+        "-}",
+        "-const s2 = struct{i int;}{i: 5}",
+        "-const s3 = time.Time{}",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1c1fd89d40ff03a1eb8812937a6e77a17594e44b..e63f149e0a9fea7a3995c7230537150196232bc0"
+}
+,{
+    "testCaseDescription": "go-struct-literals-teardown-test",
     "expectedResult": {
         "changes": {
             "struct-literals.go": [
@@ -727,42 +177,12 @@
                                 1
                             ],
                             "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's2' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 6,
                                 1
-                            ],
-                            "end": [
-                                6,
-                                23
                             ]
                         }
                     },
-                    "summary": "Deleted the 's3' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -773,93 +193,16 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 5aaf236..9f5ac64 100644",
+        "index 7905807..e69de29 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
-        "@@ -1,9 +1,3 @@",
-        "-const s1 = Person{",
-        "-name: \"Frank\",",
-        "-Age: \"5 months\",",
-        "-}",
-        "-const s2 = struct{i int;}{i: 5}",
-        "-const s3 = time.Time{}",
-        " const s1 = Dog{",
-        " name: \"Frank\",",
-        " Age: \"5 months\","
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3b3bf2627d244b37a62ebdc901f39bccb4fa1a8d..444283cd200e082d9380eae6c996da8d96be594d"
-}
-,{
-    "testCaseDescription": "go-struct-literals-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "struct-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's2' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "struct-literals.go"
-    ],
-    "patch": [
-        "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 9f5ac64..e69de29 100644",
-        "--- a/struct-literals.go",
-        "+++ b/struct-literals.go",
-        "@@ -1,6 +0,0 @@",
-        "-const s1 = Dog{",
-        "-name: \"Frank\",",
-        "-Age: \"5 months\",",
-        "-}",
-        "-const s2 = struct{i float;}{j: 6}",
-        "-const s3 = time.Month{}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "444283cd200e082d9380eae6c996da8d96be594d..7fd6dea031e26a02c1743a205dc1489a7e050468"
+    "shas": "e63f149e0a9fea7a3995c7230537150196232bc0..1c84cb51e325b0263f1b4b1aab41ebbacf00be1c"
 }]

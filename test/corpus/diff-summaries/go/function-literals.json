@@ -1,5 +1,5 @@
 [{
-    "testCaseDescription": "go-function-literals-insert-test",
+    "testCaseDescription": "go-function-literals-setup-test",
     "expectedResult": {
         "changes": {
             "function-literals.go": [
@@ -8,70 +8,15 @@
                         "insert": {
                             "start": [
                                 1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-literals.go"
-    ],
-    "patch": [
-        "diff --git a/function-literals.go b/function-literals.go",
-        "index e69de29..49cbe77 100644",
-        "--- a/function-literals.go",
-        "+++ b/function-literals.go",
-        "@@ -0,0 +1,3 @@",
-        "+const s1 = func(s string) (int, int) {",
-        "+return 1, 2",
-        "+}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "8cef11ced56e7aed74af10acde19377ccfe0b6af..1dc216376d4051127f8fc7833470538864904865"
-}
-,{
-    "testCaseDescription": "go-function-literals-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "function-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
                                 6,
-                                2
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 's1' variable"
+                    "summary": "Added the 'main' module"
                 }
             ]
         },
@@ -82,165 +27,50 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 49cbe77..913c35a 100644",
+        "index e69de29..7905807 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
-        "@@ -1,3 +1,9 @@",
-        "+const s1 = func(b int) (string, string) {",
-        "+return 1, 2",
-        "+}",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a56878818f64edc11a87fbd108cfc010fc9bad79..40be0fe205af6e46aa65d6676e3eb04c110faf5f"
+}
+,{
+    "testCaseDescription": "go-function-literals-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literals.go"
+    ],
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 7905807..1f4ead9 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const s1 = func(s string) (int, int) {",
         "+return 1, 2",
         "+}",
-        " const s1 = func(s string) (int, int) {",
-        " return 1, 2",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1dc216376d4051127f8fc7833470538864904865..0a1fc24e689a77c0b136e4702b5328ccfac82601"
-}
-,{
-    "testCaseDescription": "go-function-literals-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "function-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    17
-                                ],
-                                "end": [
-                                    1,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    17
-                                ],
-                                "end": [
-                                    1,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the s1 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    25
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the s1 variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-literals.go"
-    ],
-    "patch": [
-        "diff --git a/function-literals.go b/function-literals.go",
-        "index 913c35a..731e2c6 100644",
-        "--- a/function-literals.go",
-        "+++ b/function-literals.go",
-        "@@ -1,4 +1,4 @@",
-        "-const s1 = func(b int) (string, string) {",
-        "+const s1 = func(s string) (int, int) {",
-        " return 1, 2",
-        " }",
-        " const s1 = func(s string) (int, int) {"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "0a1fc24e689a77c0b136e4702b5328ccfac82601..a91d7138a089662fc0100619eaeff8fd15c4fbed"
+    "shas": "40be0fe205af6e46aa65d6676e3eb04c110faf5f..41cf3216e3aa0fc5606f5853721df0d41d716134"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
     "expectedResult": {
-        "changes": {
-            "function-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    17
-                                ],
-                                "end": [
-                                    1,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    17
-                                ],
-                                "end": [
-                                    1,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the s1 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the s1 variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -248,71 +78,26 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 731e2c6..913c35a 100644",
+        "index 1f4ead9..7b03466 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
-        "@@ -1,4 +1,4 @@",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const s1 = func(s string) (int, int) {",
         "+const s1 = func(b int) (string, string) {",
         " return 1, 2",
         " }",
-        " const s1 = func(s string) (int, int) {"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a91d7138a089662fc0100619eaeff8fd15c4fbed..ad88b2ad21c0631a650d20f3b876ef0db92ec589"
+    "shas": "41cf3216e3aa0fc5606f5853721df0d41d716134..dc16488c6cd6213bb57bd44df53548c81dfb8881"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "function-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -320,46 +105,26 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 913c35a..51820bc 100644",
+        "index 7b03466..1f4ead9 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
-        "@@ -1,9 +1,6 @@",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const s1 = func(b int) (string, string) {",
-        "-return 1, 2",
-        "-}",
-        " const s1 = func(s string) (int, int) {",
+        "+const s1 = func(s string) (int, int) {",
         " return 1, 2",
         " }",
-        "-const s1 = func(s string) (int, int) {",
-        "+const s1 = func(b int) (string, string) {",
-        " return 1, 2",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad88b2ad21c0631a650d20f3b876ef0db92ec589..54387de238ddc7806f785f4b874a5fcf20c70808"
+    "shas": "dc16488c6cd6213bb57bd44df53548c81dfb8881..8bfb3e0f5ba991d28b19484790114836ad254898"
 }
 ,{
-    "testCaseDescription": "go-function-literals-delete-test",
+    "testCaseDescription": "go-function-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "function-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -367,22 +132,24 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 51820bc..d21dc2d 100644",
+        "index 1f4ead9..7905807 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
-        "@@ -1,6 +1,3 @@",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const s1 = func(s string) (int, int) {",
         "-return 1, 2",
         "-}",
-        " const s1 = func(b int) (string, string) {",
-        " return 1, 2",
+        "+",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "54387de238ddc7806f785f4b874a5fcf20c70808..68548df887acedb0540ef6087756db5c6a0a5c47"
+    "shas": "8bfb3e0f5ba991d28b19484790114836ad254898..2581e4cad574fe5cf4303b2f372c4377f20c7209"
 }
 ,{
-    "testCaseDescription": "go-function-literals-delete-rest-test",
+    "testCaseDescription": "go-function-literals-teardown-test",
     "expectedResult": {
         "changes": {
             "function-literals.go": [
@@ -394,12 +161,12 @@
                                 1
                             ],
                             "end": [
-                                3,
-                                2
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 's1' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -410,14 +177,16 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index d21dc2d..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
-        "@@ -1,3 +0,0 @@",
-        "-const s1 = func(b int) (string, string) {",
-        "-return 1, 2",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68548df887acedb0540ef6087756db5c6a0a5c47..e3cc7c05800e63045739cf83cc9bed769e582946"
+    "shas": "2581e4cad574fe5cf4303b2f372c4377f20c7209..730825bc7c52e6181896716064368b31590acc24"
 }]

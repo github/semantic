@@ -1,25 +1,49 @@
 [{
+    "testCaseDescription": "go-array-with-implicit-length-setup-test",
+    "expectedResult": {
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index e69de29..7905807 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "388f63ca683f5d2b478586fd640d5ca33433dc98..6b507d231ab9b25b483dacbc55958c08a047da71"
+}
+,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
     "expectedResult": {
-        "changes": {
-            "array-with-implicit-length.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a1' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -27,271 +51,24 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index e69de29..96bef76 100644",
+        "index 7905807..a53dc8c 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
-        "@@ -0,0 +1 @@",
-        "+const a1 = [...]int{1, 2, 3}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "0fff314fad0973ea89120a1ae3b7940e0f7866d2..d047fe40a9c741f62abe5a1313da6f36caca7979"
-}
-,{
-    "testCaseDescription": "go-array-with-implicit-length-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "array-with-implicit-length.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a1' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "array-with-implicit-length.go"
-    ],
-    "patch": [
-        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index 96bef76..f49bee5 100644",
-        "--- a/array-with-implicit-length.go",
-        "+++ b/array-with-implicit-length.go",
-        "@@ -1 +1,3 @@",
-        "+const a1 = [...]int{4,5,6}",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const a1 = [...]int{1, 2, 3}",
-        " const a1 = [...]int{1, 2, 3}"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d047fe40a9c741f62abe5a1313da6f36caca7979..2fcb5b095ac3ea0981a515c3dd0f52c9212611d5"
-}
-,{
-    "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "array-with-implicit-length.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    21
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    21
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '4' with '1' in the a1 variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                24
-                            ],
-                            "end": [
-                                1,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Added '2' in the a1 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    23
-                                ],
-                                "end": [
-                                    1,
-                                    24
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    27
-                                ],
-                                "end": [
-                                    1,
-                                    28
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '3' in the a1 variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                25
-                            ],
-                            "end": [
-                                1,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '6' in the a1 variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "array-with-implicit-length.go"
-    ],
-    "patch": [
-        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index f49bee5..9dcd627 100644",
-        "--- a/array-with-implicit-length.go",
-        "+++ b/array-with-implicit-length.go",
-        "@@ -1,3 +1,3 @@",
-        "-const a1 = [...]int{4,5,6}",
-        "+const a1 = [...]int{1, 2, 3}",
-        " const a1 = [...]int{1, 2, 3}",
-        " const a1 = [...]int{1, 2, 3}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "2fcb5b095ac3ea0981a515c3dd0f52c9212611d5..f07306969d190ef934d9e77f78c1af6e6aeb0d63"
+    "shas": "6b507d231ab9b25b483dacbc55958c08a047da71..c789d6ee9a40ab9103db744988cc59d9f7a31da9"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
     "expectedResult": {
-        "changes": {
-            "array-with-implicit-length.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    21
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    21
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '4' in the a1 variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                23
-                            ],
-                            "end": [
-                                1,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added '5' in the a1 variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    24
-                                ],
-                                "end": [
-                                    1,
-                                    25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    25
-                                ],
-                                "end": [
-                                    1,
-                                    26
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '2' with '6' in the a1 variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                27
-                            ],
-                            "end": [
-                                1,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '3' in the a1 variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -299,70 +76,24 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index 9dcd627..f49bee5 100644",
+        "index a53dc8c..e9e3d08 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
-        "@@ -1,3 +1,3 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const a1 = [...]int{1, 2, 3}",
         "+const a1 = [...]int{4,5,6}",
-        " const a1 = [...]int{1, 2, 3}",
-        " const a1 = [...]int{1, 2, 3}"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f07306969d190ef934d9e77f78c1af6e6aeb0d63..c40f719c69cda9a21d80cdc1f985fd913875eb7e"
+    "shas": "c789d6ee9a40ab9103db744988cc59d9f7a31da9..b4ccaa5f1e132e2c68f4a965ef3265b8e9b280b4"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "array-with-implicit-length.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a1' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a1' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a1' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -370,20 +101,47 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index f49bee5..47b9eed 100644",
+        "index e9e3d08..a53dc8c 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
-        "@@ -1,3 +1,2 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-const a1 = [...]int{4,5,6}",
-        "-const a1 = [...]int{1, 2, 3}",
-        " const a1 = [...]int{1, 2, 3}",
-        "+const a1 = [...]int{4,5,6}"
+        "+const a1 = [...]int{1, 2, 3}",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c40f719c69cda9a21d80cdc1f985fd913875eb7e..6871f75087736569e032a112eaec06d72af2c580"
+    "shas": "b4ccaa5f1e132e2c68f4a965ef3265b8e9b280b4..0a61a5c2c9776f01fa6caccb481dbbcc41c6bae3"
 }
 ,{
-    "testCaseDescription": "go-array-with-implicit-length-delete-test",
+    "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "array-with-implicit-length.go"
+    ],
+    "patch": [
+        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
+        "index a53dc8c..7905807 100644",
+        "--- a/array-with-implicit-length.go",
+        "+++ b/array-with-implicit-length.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const a1 = [...]int{1, 2, 3}",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "0a61a5c2c9776f01fa6caccb481dbbcc41c6bae3..c74e6058164aba2f6ac6e202ec081bd99b46a646"
+}
+,{
+    "testCaseDescription": "go-array-with-implicit-length-teardown-test",
     "expectedResult": {
         "changes": {
             "array-with-implicit-length.go": [
@@ -395,51 +153,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a1' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "array-with-implicit-length.go"
-    ],
-    "patch": [
-        "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index 47b9eed..4a8295f 100644",
-        "--- a/array-with-implicit-length.go",
-        "+++ b/array-with-implicit-length.go",
-        "@@ -1,2 +1 @@",
-        "-const a1 = [...]int{1, 2, 3}",
-        " const a1 = [...]int{4,5,6}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "6871f75087736569e032a112eaec06d72af2c580..c4b7115fd6f988b0de691ac1ef1a25066093bfb3"
-}
-,{
-    "testCaseDescription": "go-array-with-implicit-length-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "array-with-implicit-length.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                1,
-                                27
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a1' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -450,12 +169,16 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index 4a8295f..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
-        "@@ -1 +0,0 @@",
-        "-const a1 = [...]int{4,5,6}"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c4b7115fd6f988b0de691ac1ef1a25066093bfb3..f366494a187af73e7fcf6d60c2aa3bb503543f80"
+    "shas": "c74e6058164aba2f6ac6e202ec081bd99b46a646..1c340f41729820f4163b3ed6143addb772139b7f"
 }]

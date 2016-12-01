@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-float-literals-setup-test",
+    "expectedResult": {
+        "changes": {
+            "float-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "float-literals.go"
+    ],
+    "patch": [
+        "diff --git a/float-literals.go b/float-literals.go",
+        "index e69de29..7905807 100644",
+        "--- a/float-literals.go",
+        "+++ b/float-literals.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "607cba0a92277692cac7fa2ddfebb5c9723e8d03..3e6d5e1d25a18edd6105f3d924110d3656c2ce96"
+}
+,{
     "testCaseDescription": "go-float-literals-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,151 +49,76 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
+                                4,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added the '1.5' float_literal"
+                    "summary": "Added the 'f1' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
+                                5,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e100' float_literal"
+                    "summary": "Added the 'f2' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                6,
                                 1
                             ],
                             "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
+                                6,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e+50' float_literal"
+                    "summary": "Added the 'f3' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                7,
                                 1
                             ],
                             "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
+                                7,
                                 12
                             ]
                         }
                     },
-                    "summary": "Added the '1.5e-5' float_literal"
+                    "summary": "Added the 'f4' assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                8,
                                 1
                             ],
                             "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
+                                8,
                                 12
                             ]
                         }
                     },
-                    "summary": "Added the '.5e-50' float_literal"
+                    "summary": "Added the 'f5' assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -162,622 +129,23 @@
     ],
     "patch": [
         "diff --git a/float-literals.go b/float-literals.go",
-        "index e69de29..60df0eb 100644",
+        "index 7905807..772bdb0 100644",
         "--- a/float-literals.go",
         "+++ b/float-literals.go",
-        "@@ -0,0 +1,5 @@",
-        "+f1 = 1.5",
-        "+f2 = 1.5e100",
-        "+f3 = 1.5e+50",
-        "+f4 = 1.5e-5",
-        "+f5 = .5e-50"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "ecfd8333e0e37929a8029b0c03cec13c31e0f692..f6d58160ae67acb20e90db1cac219879a70700b0"
-}
-,{
-    "testCaseDescription": "go-float-literals-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "float-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                6
-                            ],
-                            "end": [
-                                9,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "float-literals.go"
-    ],
-    "patch": [
-        "diff --git a/float-literals.go b/float-literals.go",
-        "index 60df0eb..c0dd078 100644",
-        "--- a/float-literals.go",
-        "+++ b/float-literals.go",
-        "@@ -1,3 +1,13 @@",
-        "+f2 = 1.5",
-        "+f3 = 1.5e100",
-        "+f4 = 1.5e+50",
-        "+f5 = 1.5e-5",
-        "+f6 = .5e-50",
+        "@@ -1,5 +1,9 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+f1 = 1.5",
         "+f2 = 1.5e100",
         "+f3 = 1.5e+50",
         "+f4 = 1.5e-5",
         "+f5 = .5e-50",
-        " f1 = 1.5",
-        " f2 = 1.5e100",
-        " f3 = 1.5e+50"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f6d58160ae67acb20e90db1cac219879a70700b0..12e427bcb6fca5faaad164c85e9b1e430c4caa6e"
-}
-,{
-    "testCaseDescription": "go-float-literals-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "float-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '1.5' float_literal with the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '1.5e100' float_literal with the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "float-literals.go"
-    ],
-    "patch": [
-        "diff --git a/float-literals.go b/float-literals.go",
-        "index c0dd078..1d76e74 100644",
-        "--- a/float-literals.go",
-        "+++ b/float-literals.go",
-        "@@ -1,8 +1,8 @@",
-        "-f2 = 1.5",
-        "-f3 = 1.5e100",
-        "-f4 = 1.5e+50",
-        "-f5 = 1.5e-5",
-        "-f6 = .5e-50",
-        "+f1 = 1.5",
-        "+f2 = 1.5e100",
-        "+f3 = 1.5e+50",
-        "+f4 = 1.5e-5",
-        "+f5 = .5e-50",
-        " f1 = 1.5",
-        " f2 = 1.5e100",
-        " f3 = 1.5e+50"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "12e427bcb6fca5faaad164c85e9b1e430c4caa6e..dbce9e8d28e03c7b0a8060f99e52f199b92566b7"
+    "shas": "3e6d5e1d25a18edd6105f3d924110d3656c2ce96..ceb1779b9bb7067e09c622ccff4e3ca6561c677b"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-test",
@@ -786,303 +154,138 @@
             "float-literals.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f2' identifier"
+                    "summary": "Replaced '1.5' with '2.6' in an assignment to f1 of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the '1.5' float_literal"
+                    "summary": "Replaced '1.5e100' with '2.6e211' in an assignment to f2 of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f3' identifier"
+                    "summary": "Replaced '1.5e+50' with '2.6e+60' in an assignment to f3 of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    12
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the '1.5e100' float_literal"
+                    "summary": "Replaced '1.5e-5' with '2.6e-7' in an assignment to f4 of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    6
+                                ],
+                                "end": [
+                                    8,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    6
+                                ],
+                                "end": [
+                                    8,
+                                    12
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
+                    "summary": "Replaced '.5e-50' with '.6e-60' in an assignment to f5 of the 'main' function"
                 }
             ]
         },
@@ -1093,26 +296,27 @@
     ],
     "patch": [
         "diff --git a/float-literals.go b/float-literals.go",
-        "index 1d76e74..c0dd078 100644",
+        "index 772bdb0..0818628 100644",
         "--- a/float-literals.go",
         "+++ b/float-literals.go",
-        "@@ -1,8 +1,8 @@",
+        "@@ -1,9 +1,9 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-f1 = 1.5",
         "-f2 = 1.5e100",
         "-f3 = 1.5e+50",
         "-f4 = 1.5e-5",
         "-f5 = .5e-50",
-        "+f2 = 1.5",
-        "+f3 = 1.5e100",
-        "+f4 = 1.5e+50",
-        "+f5 = 1.5e-5",
-        "+f6 = .5e-50",
-        " f1 = 1.5",
-        " f2 = 1.5e100",
-        " f3 = 1.5e+50"
+        "+f1 = 2.6",
+        "+f2 = 2.6e211",
+        "+f3 = 2.6e+60",
+        "+f4 = 2.6e-7",
+        "+f5 = .6e-60",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbce9e8d28e03c7b0a8060f99e52f199b92566b7..502d05c04326170e1010dfd50a6da8451670feab"
+    "shas": "ceb1779b9bb7067e09c622ccff4e3ca6561c677b..3c000112daa21a76a3b443fe72d7476c6b756617"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-replacement-test",
@@ -1121,453 +325,138 @@
             "float-literals.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'f2' identifier"
+                    "summary": "Replaced '2.6' with '1.5' in an assignment to f1 of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the '1.5' float_literal"
+                    "summary": "Replaced '2.6e211' with '1.5e100' in an assignment to f2 of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'f3' identifier"
+                    "summary": "Replaced '2.6e+60' with '1.5e+50' in an assignment to f3 of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    12
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the '1.5e100' float_literal"
+                    "summary": "Replaced '2.6e-7' with '1.5e-5' in an assignment to f4 of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    6
+                                ],
+                                "end": [
+                                    8,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    6
+                                ],
+                                "end": [
+                                    8,
+                                    12
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                6
-                            ],
-                            "end": [
-                                9,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                6
-                            ],
-                            "end": [
-                                8,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                6
-                            ],
-                            "end": [
-                                9,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '.5e-50' float_literal"
+                    "summary": "Replaced '.6e-60' with '.5e-50' in an assignment to f5 of the 'main' function"
                 }
             ]
         },
@@ -1578,36 +467,137 @@
     ],
     "patch": [
         "diff --git a/float-literals.go b/float-literals.go",
-        "index c0dd078..2fc4057 100644",
+        "index 0818628..772bdb0 100644",
         "--- a/float-literals.go",
         "+++ b/float-literals.go",
-        "@@ -1,15 +1,10 @@",
-        "-f2 = 1.5",
-        "-f3 = 1.5e100",
-        "-f4 = 1.5e+50",
-        "-f5 = 1.5e-5",
-        "-f6 = .5e-50",
+        "@@ -1,9 +1,9 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-f1 = 2.6",
+        "-f2 = 2.6e211",
+        "-f3 = 2.6e+60",
+        "-f4 = 2.6e-7",
+        "-f5 = .6e-60",
+        "+f1 = 1.5",
+        "+f2 = 1.5e100",
+        "+f3 = 1.5e+50",
+        "+f4 = 1.5e-5",
+        "+f5 = .5e-50",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3c000112daa21a76a3b443fe72d7476c6b756617..8c79aa38199afffe7affb3390738fd4794f8b576"
+}
+,{
+    "testCaseDescription": "go-float-literals-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "float-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f1' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f3' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f4' assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f5' assignment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "float-literals.go"
+    ],
+    "patch": [
+        "diff --git a/float-literals.go b/float-literals.go",
+        "index 772bdb0..7905807 100644",
+        "--- a/float-literals.go",
+        "+++ b/float-literals.go",
+        "@@ -1,9 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-f1 = 1.5",
         "-f2 = 1.5e100",
         "-f3 = 1.5e+50",
         "-f4 = 1.5e-5",
         "-f5 = .5e-50",
-        " f1 = 1.5",
-        " f2 = 1.5e100",
-        " f3 = 1.5e+50",
-        " f4 = 1.5e-5",
-        " f5 = .5e-50",
-        "+f2 = 1.5",
-        "+f3 = 1.5e100",
-        "+f4 = 1.5e+50",
-        "+f5 = 1.5e-5",
-        "+f6 = .5e-50"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "502d05c04326170e1010dfd50a6da8451670feab..9d5fec4f967c14d6cba8afd78f3c0ac11cea2364"
+    "shas": "8c79aa38199afffe7affb3390738fd4794f8b576..101dcea77ef152f987d5e43bd63d8d1a051a9158"
 }
 ,{
-    "testCaseDescription": "go-float-literals-delete-test",
+    "testCaseDescription": "go-float-literals-teardown-test",
     "expectedResult": {
         "changes": {
             "float-literals.go": [
@@ -1619,147 +609,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -1770,196 +625,16 @@
     ],
     "patch": [
         "diff --git a/float-literals.go b/float-literals.go",
-        "index 2fc4057..c99af8e 100644",
-        "--- a/float-literals.go",
-        "+++ b/float-literals.go",
-        "@@ -1,8 +1,3 @@",
-        "-f1 = 1.5",
-        "-f2 = 1.5e100",
-        "-f3 = 1.5e+50",
-        "-f4 = 1.5e-5",
-        "-f5 = .5e-50",
-        " f2 = 1.5",
-        " f3 = 1.5e100",
-        " f4 = 1.5e+50"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "9d5fec4f967c14d6cba8afd78f3c0ac11cea2364..79975a62b167d26e6f92bcabb4e6b285a8cc6629"
-}
-,{
-    "testCaseDescription": "go-float-literals-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "float-literals.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e100' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e+50' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f5' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1.5e-5' float_literal"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f6' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '.5e-50' float_literal"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "float-literals.go"
-    ],
-    "patch": [
-        "diff --git a/float-literals.go b/float-literals.go",
-        "index c99af8e..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/float-literals.go",
         "+++ b/float-literals.go",
         "@@ -1,5 +0,0 @@",
-        "-f2 = 1.5",
-        "-f3 = 1.5e100",
-        "-f4 = 1.5e+50",
-        "-f5 = 1.5e-5",
-        "-f6 = .5e-50"
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "79975a62b167d26e6f92bcabb4e6b285a8cc6629..e0ff1ca780da8b1dd3e0f875dca5f6a36ab6c163"
+    "shas": "101dcea77ef152f987d5e43bd63d8d1a051a9158..f0afd7f09e1a0b288b00fe672286c43ab9b21ef4"
 }]

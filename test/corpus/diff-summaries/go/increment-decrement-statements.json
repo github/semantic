@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-increment-decrement-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index e69de29..7905807 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2b1d8061a7e48430bdcb277b2424bdefa6e67cf6..c989a88b1dc14fd54cd47d6d5318ada6b5b3f836"
+}
+,{
     "testCaseDescription": "go-increment-decrement-statements-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,105 +49,6 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'j' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "increment-decrement-statements.go"
-    ],
-    "patch": [
-        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index e69de29..c118f41 100644",
-        "--- a/increment-decrement-statements.go",
-        "+++ b/increment-decrement-statements.go",
-        "@@ -0,0 +1,2 @@",
-        "+i++",
-        "+j--"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "927f995f9a27002e1694b5d3ce66a7dbbfda6720..08e1c1af15a7a2e6b3905900905a1fd79d6f1c43"
-}
-,{
-    "testCaseDescription": "go-increment-decrement-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "increment-decrement-statements.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 4,
                                 1
                             ],
@@ -115,92 +58,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'j' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "increment-decrement-statements.go"
-    ],
-    "patch": [
-        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index c118f41..d617bc4 100644",
-        "--- a/increment-decrement-statements.go",
-        "+++ b/increment-decrement-statements.go",
-        "@@ -1,2 +1,6 @@",
-        "+foo++",
-        "+x++",
-        "+i++",
-        "+j--",
-        " i++",
-        " j--"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "08e1c1af15a7a2e6b3905900905a1fd79d6f1c43..ce7abe0a0dbc3a4f0c453bba572432d0ed745d36"
-}
-,{
-    "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "increment-decrement-statements.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    4
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'foo' identifier with the 'i' identifier"
+                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
+                                5,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'j' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
+                    "summary": "Added the 'j' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -211,20 +84,20 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index d617bc4..15214d0 100644",
+        "index 7905807..18bf03a 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
-        "@@ -1,5 +1,5 @@",
-        "-foo++",
-        "-x++",
+        "@@ -1,5 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+i++",
         "+j--",
-        " i++",
-        " j--",
-        " i++"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ce7abe0a0dbc3a4f0c453bba572432d0ed745d36..0fd355f46a4c9aec73e9874645e7a89d920e58e3"
+    "shas": "c989a88b1dc14fd54cd47d6d5318ada6b5b3f836..e3d6902e40ddbab185000f9fbfc03017693dc60e"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-replacement-test",
@@ -236,57 +109,27 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    6,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    3,
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    4
+                                    6,
+                                    2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i' identifier with the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'j' identifier"
+                    "summary": "Replaced the 'main' function with the 'main' function in the main module"
                 }
             ]
         },
@@ -297,20 +140,21 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 15214d0..d617bc4 100644",
+        "index 18bf03a..08611ad 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
-        "@@ -1,5 +1,5 @@",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-i++",
         "-j--",
         "+foo++",
         "+x++",
-        " i++",
-        " j--",
-        " i++"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0fd355f46a4c9aec73e9874645e7a89d920e58e3..628555688b52d8b03b5a7efa9fd07954f93c04fd"
+    "shas": "e3d6902e40ddbab185000f9fbfc03017693dc60e..33bb5d66b7e5b5e0dbf0af75d5359b0a363a3f70"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
@@ -319,93 +163,30 @@
             "increment-decrement-statements.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'j' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
+                    "summary": "Replaced the 'main' function with the 'main' function in the main module"
                 }
             ]
         },
@@ -416,24 +197,83 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index d617bc4..640bbf1 100644",
+        "index 08611ad..18bf03a 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
-        "@@ -1,6 +1,4 @@",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-foo++",
         "-x++",
-        "-i++",
-        "-j--",
-        " i++",
-        " j--",
-        "+foo++",
-        "+x++"
+        "+i++",
+        "+j--",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "628555688b52d8b03b5a7efa9fd07954f93c04fd..4df0db28123dab35f85c9f8c5f3f6045a9913354"
+    "shas": "33bb5d66b7e5b5e0dbf0af75d5359b0a363a3f70..d349600e254f9ae44be9841d3b410122f2b68aab"
 }
 ,{
-    "testCaseDescription": "go-increment-decrement-statements-delete-test",
+    "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "increment-decrement-statements.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j' identifier in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "increment-decrement-statements.go"
+    ],
+    "patch": [
+        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
+        "index 18bf03a..7905807 100644",
+        "--- a/increment-decrement-statements.go",
+        "+++ b/increment-decrement-statements.go",
+        "@@ -1,6 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-i++",
+        "-j--",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d349600e254f9ae44be9841d3b410122f2b68aab..295c41f2df73ea54dbb3b3d901f986a484eb1b30"
+}
+,{
+    "testCaseDescription": "go-increment-decrement-statements-teardown-test",
     "expectedResult": {
         "changes": {
             "increment-decrement-statements.go": [
@@ -445,27 +285,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'j' identifier"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -476,69 +301,16 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 640bbf1..b7c351d 100644",
+        "index 7905807..e69de29 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
-        "@@ -1,4 +1,2 @@",
-        "-i++",
-        "-j--",
-        " foo++",
-        " x++"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4df0db28123dab35f85c9f8c5f3f6045a9913354..f328fdb9b4ab03a8667cbcafaaf2ef18c667ac57"
-}
-,{
-    "testCaseDescription": "go-increment-decrement-statements-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "increment-decrement-statements.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "increment-decrement-statements.go"
-    ],
-    "patch": [
-        "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index b7c351d..e69de29 100644",
-        "--- a/increment-decrement-statements.go",
-        "+++ b/increment-decrement-statements.go",
-        "@@ -1,2 +0,0 @@",
-        "-foo++",
-        "-x++"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "f328fdb9b4ab03a8667cbcafaaf2ef18c667ac57..a5b8a6804181af3a1387f9a23e3f85c44ddb6082"
+    "shas": "295c41f2df73ea54dbb3b3d901f986a484eb1b30..a2ecc6ebae77d3db68e1aa65cbddf0b97039bb48"
 }]

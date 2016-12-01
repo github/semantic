@@ -1,5 +1,5 @@
 [{
-    "testCaseDescription": "go-const-with-implicit-values-insert-test",
+    "testCaseDescription": "go-const-with-implicit-values-setup-test",
     "expectedResult": {
         "changes": {
             "const-with-implicit-values.go": [
@@ -11,42 +11,12 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                5,
-                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'one' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
+                    "summary": "Added the 'main' module"
                 }
             ]
         },
@@ -57,116 +27,23 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index e69de29..938a571 100644",
+        "index e69de29..7905807 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -0,0 +1,5 @@",
-        "+const (",
-        "+ zero = iota",
-        "+ one",
-        "+ two",
-        "+ )"
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eab68be4fe73c7ea63793058e38316a7eab75064..9c08f71afc4f67ed8399c2904fa3c511085e32fa"
+    "shas": "32ce16d6a75fdcdcea285470d9f16f60e6b267f1..18a80de724515a05321e035438e68394e0d9f108"
 }
 ,{
-    "testCaseDescription": "go-const-with-implicit-values-replacement-insert-test",
+    "testCaseDescription": "go-const-with-implicit-values-insert-test",
     "expectedResult": {
-        "changes": {
-            "const-with-implicit-values.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'one' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -174,229 +51,28 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index 938a571..071b359 100644",
+        "index 7905807..d98ee4c 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
-        "@@ -1,4 +1,14 @@",
-        " const (",
-        "+ a = iota",
-        "+ b",
-        "+ c",
-        "+ )",
+        "@@ -1,5 +1,9 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const (",
         "+ zero = iota",
         "+ one",
         "+ two",
         "+ )",
-        "+const (",
-        "  zero = iota",
-        "  one",
-        "  two"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c08f71afc4f67ed8399c2904fa3c511085e32fa..a3fffc055f14421a39ce87b49fc3ac583af306f1"
-}
-,{
-    "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "const-with-implicit-values.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "const-with-implicit-values.go"
-    ],
-    "patch": [
-        "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index 071b359..8a6d638 100644",
-        "--- a/const-with-implicit-values.go",
-        "+++ b/const-with-implicit-values.go",
-        "@@ -1,7 +1,7 @@",
-        " const (",
-        "- a = iota",
-        "- b",
-        "- c",
-        "+ zero = iota",
-        "+ one",
-        "+ two",
-        "  )",
-        " const (",
-        "  zero = iota"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "a3fffc055f14421a39ce87b49fc3ac583af306f1..2c83dd0ff7ac9b61cd2d2155917f60c1578bd472"
+    "shas": "18a80de724515a05321e035438e68394e0d9f108..b4d6ea1f398cf574380f35d7869571760e11c05a"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
     "expectedResult": {
-        "changes": {
-            "const-with-implicit-values.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    2
-                                ],
-                                "end": [
-                                    2,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    2
-                                ],
-                                "end": [
-                                    3,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    2
-                                ],
-                                "end": [
-                                    4,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -404,10 +80,12 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index 8a6d638..071b359 100644",
+        "index d98ee4c..c4c9127 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
-        "@@ -1,7 +1,7 @@",
+        "@@ -2,8 +2,8 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "- zero = iota",
         "- one",
@@ -416,154 +94,15 @@
         "+ b",
         "+ c",
         "  )",
-        " const (",
-        "  zero = iota"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2c83dd0ff7ac9b61cd2d2155917f60c1578bd472..eaa7f3281ecec5fa706b862a28ae1cfbcdac382d"
+    "shas": "b4d6ea1f398cf574380f35d7869571760e11c05a..a95f4d707dc2e723ba604d87779b7adac90ee7cc"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "const-with-implicit-values.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'one' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -571,84 +110,29 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index 071b359..ae8b277 100644",
+        "index c4c9127..d98ee4c 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
-        "@@ -1,15 +1,10 @@",
+        "@@ -2,8 +2,8 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "- a = iota",
         "- b",
         "- c",
-        "- )",
-        "-const (",
-        "  zero = iota",
-        "  one",
-        "  two",
+        "+ zero = iota",
+        "+ one",
+        "+ two",
         "  )",
-        " const (",
-        "- zero = iota",
-        "- one",
-        "- two",
-        "+ a = iota",
-        "+ b",
-        "+ c",
-        "  )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eaa7f3281ecec5fa706b862a28ae1cfbcdac382d..697b694fcc19b4223284ab44c961bd9544dcdaa3"
+    "shas": "a95f4d707dc2e723ba604d87779b7adac90ee7cc..4d7927d922ad2fa5e453759d13ec37cb8d322b66"
 }
 ,{
-    "testCaseDescription": "go-const-with-implicit-values-delete-test",
+    "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "const-with-implicit-values.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'one' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -656,25 +140,26 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index ae8b277..dfb4fad 100644",
+        "index d98ee4c..7905807 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
-        "@@ -1,9 +1,4 @@",
-        " const (",
+        "@@ -1,9 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const (",
         "- zero = iota",
         "- one",
         "- two",
         "- )",
-        "-const (",
-        "  a = iota",
-        "  b",
-        "  c"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "697b694fcc19b4223284ab44c961bd9544dcdaa3..512cbb151aefa21474c28b2baae09a6eee09bcf5"
+    "shas": "4d7927d922ad2fa5e453759d13ec37cb8d322b66..aac4afa577603bf906a4d3e1e77e0fd4bfe6b774"
 }
 ,{
-    "testCaseDescription": "go-const-with-implicit-values-delete-rest-test",
+    "testCaseDescription": "go-const-with-implicit-values-teardown-test",
     "expectedResult": {
         "changes": {
             "const-with-implicit-values.go": [
@@ -686,42 +171,12 @@
                                 1
                             ],
                             "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                5,
-                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -732,16 +187,16 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index dfb4fad..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -1,5 +0,0 @@",
-        "-const (",
-        "- a = iota",
-        "- b",
-        "- c",
-        "- )"
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "512cbb151aefa21474c28b2baae09a6eee09bcf5..966bee07072f36b83494af4ac7d3c83673e1f3f8"
+    "shas": "aac4afa577603bf906a4d3e1e77e0fd4bfe6b774..21e727f376a9c78c9ad9d0828abd21c3361ca339"
 }]

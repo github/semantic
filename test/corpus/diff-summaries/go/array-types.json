@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-array-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "array-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array-types.go"
+    ],
+    "patch": [
+        "diff --git a/array-types.go b/array-types.go",
+        "index e69de29..7905807 100644",
+        "--- a/array-types.go",
+        "+++ b/array-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b2decfa67a83e49a4d1eded0e91148f44e6530f5..aadcbafbdc1859ede94b134df7cb87c45f59ee5e"
+}
+,{
     "testCaseDescription": "go-array-types-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,61 +49,61 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 6
                             ],
                             "end": [
-                                1,
+                                4,
                                 7
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier"
+                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 9
                             ],
                             "end": [
-                                1,
+                                4,
                                 10
                             ]
                         }
                     },
-                    "summary": "Added the '2'"
+                    "summary": "Added the '2' in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 11
                             ],
                             "end": [
-                                1,
+                                4,
                                 12
                             ]
                         }
                     },
-                    "summary": "Added the '2'"
+                    "summary": "Added the '2' in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 13
                             ],
                             "end": [
-                                1,
+                                4,
                                 14
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier"
+                    "summary": "Added the 'x' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -72,266 +114,19 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index e69de29..f9c11b8 100644",
+        "index 7905807..3f73aea 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
-        "@@ -0,0 +1 @@",
-        "+type a [2+2]x"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "4605c9308ffc84f9d63dc5e62562b0461d53d5b9..e72a08882ea7900f125d452420494cdf0f9dd5e4"
-}
-,{
-    "testCaseDescription": "go-array-types-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "array-types.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                11
-                            ],
-                            "end": [
-                                1,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '2'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "array-types.go"
-    ],
-    "patch": [
-        "diff --git a/array-types.go b/array-types.go",
-        "index f9c11b8..d2b8166 100644",
-        "--- a/array-types.go",
-        "+++ b/array-types.go",
-        "@@ -1 +1,3 @@",
-        "+type a [1+1]y",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+type a [2+2]x",
-        " type a [2+2]x"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e72a08882ea7900f125d452420494cdf0f9dd5e4..aa6f10e79008f9c024ed3883cec3d84f74157628"
-}
-,{
-    "testCaseDescription": "go-array-types-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "array-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    1,
-                                    10
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '2'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    11
-                                ],
-                                "end": [
-                                    1,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    11
-                                ],
-                                "end": [
-                                    1,
-                                    12
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '2'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    13
-                                ],
-                                "end": [
-                                    1,
-                                    14
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    13
-                                ],
-                                "end": [
-                                    1,
-                                    14
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'x' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "array-types.go"
-    ],
-    "patch": [
-        "diff --git a/array-types.go b/array-types.go",
-        "index d2b8166..823c5f1 100644",
-        "--- a/array-types.go",
-        "+++ b/array-types.go",
-        "@@ -1,3 +1,3 @@",
-        "-type a [1+1]y",
-        "+type a [2+2]x",
-        " type a [2+2]x",
-        " type a [2+2]x"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "aa6f10e79008f9c024ed3883cec3d84f74157628..e89c6cb69bfb749d230d2d02cb2f121098bb9ca7"
+    "shas": "aadcbafbdc1859ede94b134df7cb87c45f59ee5e..dd35d7d52c01a8b3df78f38cf75309766b3c421f"
 }
 ,{
     "testCaseDescription": "go-array-types-replacement-test",
@@ -343,81 +138,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     9
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     10
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     9
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     10
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1'"
+                    "summary": "Replaced '2' with '1' in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     11
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     12
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     11
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     12
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1'"
+                    "summary": "Replaced '2' with '1' in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     13
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     14
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     13
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     14
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'y' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'y' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -428,17 +223,19 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 823c5f1..d2b8166 100644",
+        "index 3f73aea..4978312 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
-        "@@ -1,3 +1,3 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type a [2+2]x",
         "+type a [1+1]y",
-        " type a [2+2]x",
-        " type a [2+2]x"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e89c6cb69bfb749d230d2d02cb2f121098bb9ca7..cb40195715b97fd727f39a658f90da91280dfeb3"
+    "shas": "dd35d7d52c01a8b3df78f38cf75309766b3c421f..d19efb30e61f5764be7e4dd87d74ae8f11b54e3e"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-replacement-test",
@@ -447,183 +244,84 @@
             "array-types.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Replaced '1' with '2' in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    11
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    11
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the '1'"
+                    "summary": "Replaced '1' with '2' in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                11
-                            ],
-                            "end": [
-                                1,
-                                12
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    14
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '2'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                9
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                11
-                            ],
-                            "end": [
-                                2,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the '1'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
+                    "summary": "Replaced the 'y' identifier with the 'x' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -634,20 +332,22 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index d2b8166..5b93d14 100644",
+        "index 4978312..3f73aea 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
-        "@@ -1,3 +1,2 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type a [1+1]y",
-        "-type a [2+2]x",
-        " type a [2+2]x",
-        "+type a [1+1]y"
+        "+type a [2+2]x",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb40195715b97fd727f39a658f90da91280dfeb3..9629b178034aa4530628081bc407e1c9009fe13d"
+    "shas": "d19efb30e61f5764be7e4dd87d74ae8f11b54e3e..9d4c1ab36fe8a26bd0928e10597616244b16848a"
 }
 ,{
-    "testCaseDescription": "go-array-types-delete-test",
+    "testCaseDescription": "go-array-types-delete-insert-test",
     "expectedResult": {
         "changes": {
             "array-types.go": [
@@ -655,61 +355,61 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 6
                             ],
                             "end": [
-                                1,
+                                4,
                                 7
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
+                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 9
                             ],
                             "end": [
-                                1,
+                                4,
                                 10
                             ]
                         }
                     },
-                    "summary": "Deleted the '2'"
+                    "summary": "Deleted the '2' in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 11
                             ],
                             "end": [
-                                1,
+                                4,
                                 12
                             ]
                         }
                     },
-                    "summary": "Deleted the '2'"
+                    "summary": "Deleted the '2' in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 13
                             ],
                             "end": [
-                                1,
+                                4,
                                 14
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier"
+                    "summary": "Deleted the 'x' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -720,18 +420,22 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 5b93d14..967447e 100644",
+        "index 3f73aea..7905807 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
-        "@@ -1,2 +1 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type a [2+2]x",
-        " type a [1+1]y"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9629b178034aa4530628081bc407e1c9009fe13d..d9b4ebb8d64c12b8efbc1fbdcc2c31bf584a17c2"
+    "shas": "9d4c1ab36fe8a26bd0928e10597616244b16848a..7a95a7047b9cfa2fd5db439524bc6f27fcbac273"
 }
 ,{
-    "testCaseDescription": "go-array-types-delete-rest-test",
+    "testCaseDescription": "go-array-types-teardown-test",
     "expectedResult": {
         "changes": {
             "array-types.go": [
@@ -740,60 +444,15 @@
                         "delete": {
                             "start": [
                                 1,
-                                6
+                                1
                             ],
                             "end": [
-                                1,
-                                7
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                11
-                            ],
-                            "end": [
-                                1,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '1'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -804,12 +463,16 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 967447e..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
-        "@@ -1 +0,0 @@",
-        "-type a [1+1]y"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d9b4ebb8d64c12b8efbc1fbdcc2c31bf584a17c2..ecbb5b13e89407c4e715ccf67e358e5fc18fbfe6"
+    "shas": "7a95a7047b9cfa2fd5db439524bc6f27fcbac273..b2613e72526211d331fe3ee187e2503ae23f1b36"
 }]

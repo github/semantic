@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-map-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "map-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "map-types.go"
+    ],
+    "patch": [
+        "diff --git a/map-types.go b/map-types.go",
+        "index e69de29..7905807 100644",
+        "--- a/map-types.go",
+        "+++ b/map-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "be8ea48174a3742d19cc12045e33e627afe88369..677e156d5d7c2467e820724b4433a6e0823baee8"
+}
+,{
     "testCaseDescription": "go-map-types-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,46 +49,46 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 6
                             ],
                             "end": [
-                                1,
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added the 'm1' identifier"
+                    "summary": "Added the 'm1' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 13
                             ],
                             "end": [
-                                1,
+                                4,
                                 19
                             ]
                         }
                     },
-                    "summary": "Added the 'string' identifier"
+                    "summary": "Added the 'string' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 20
                             ],
                             "end": [
-                                1,
+                                4,
                                 25
                             ]
                         }
                     },
-                    "summary": "Added the 'error' identifier"
+                    "summary": "Added the 'error' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -57,182 +99,19 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index e69de29..c86220d 100644",
+        "index 7905807..01004b3 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
-        "@@ -0,0 +1 @@",
-        "+type m1 map[string]error"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "26e4335c9f693f66513cac8f6c4399a4fc45ad1b..728bb866043561cbbdc1e2b9db04ac55e14bd2fe"
-}
-,{
-    "testCaseDescription": "go-map-types-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "map-types.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                17
-                            ],
-                            "end": [
-                                1,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                20
-                            ],
-                            "end": [
-                                2,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "map-types.go"
-    ],
-    "patch": [
-        "diff --git a/map-types.go b/map-types.go",
-        "index c86220d..9cc2e8b 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
-        "@@ -1 +1,3 @@",
-        "+type m1 map[int]error",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+type m1 map[string]error",
-        " type m1 map[string]error"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "728bb866043561cbbdc1e2b9db04ac55e14bd2fe..354b111d5e50ea7cca50e6dd82d6a096bb4dc043"
-}
-,{
-    "testCaseDescription": "go-map-types-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "map-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    13
-                                ],
-                                "end": [
-                                    1,
-                                    16
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    13
-                                ],
-                                "end": [
-                                    1,
-                                    19
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "map-types.go"
-    ],
-    "patch": [
-        "diff --git a/map-types.go b/map-types.go",
-        "index 9cc2e8b..ee1d5a0 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
-        "@@ -1,3 +1,3 @@",
-        "-type m1 map[int]error",
-        "+type m1 map[string]error",
-        " type m1 map[string]error",
-        " type m1 map[string]error"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "354b111d5e50ea7cca50e6dd82d6a096bb4dc043..8d18ca22d7735a4d4ec15aaa47bb3f6f3cc31d43"
+    "shas": "677e156d5d7c2467e820724b4433a6e0823baee8..8507b15f51f55c5905fff30d46b49e9a5220feeb"
 }
 ,{
     "testCaseDescription": "go-map-types-replacement-test",
@@ -244,27 +123,27 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     13
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     19
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     13
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     16
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -275,17 +154,19 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index ee1d5a0..9cc2e8b 100644",
+        "index 01004b3..a118e92 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
-        "@@ -1,3 +1,3 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type m1 map[string]error",
         "+type m1 map[int]error",
-        " type m1 map[string]error",
-        " type m1 map[string]error"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8d18ca22d7735a4d4ec15aaa47bb3f6f3cc31d43..f39a4aa0643801fca32ef454238ad77644439dab"
+    "shas": "8507b15f51f55c5905fff30d46b49e9a5220feeb..8b9e0c6187abe2c4ec7a31062111368b2ce8c702"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-replacement-test",
@@ -294,138 +175,30 @@
             "map-types.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    19
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'm1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                17
-                            ],
-                            "end": [
-                                1,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                20
-                            ],
-                            "end": [
-                                2,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                13
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                17
-                            ],
-                            "end": [
-                                2,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -436,20 +209,22 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index 9cc2e8b..a863ca9 100644",
+        "index a118e92..01004b3 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
-        "@@ -1,3 +1,2 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type m1 map[int]error",
-        "-type m1 map[string]error",
-        " type m1 map[string]error",
-        "+type m1 map[int]error"
+        "+type m1 map[string]error",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f39a4aa0643801fca32ef454238ad77644439dab..103b721414de3bbad2adbe781738973424c8e468"
+    "shas": "8b9e0c6187abe2c4ec7a31062111368b2ce8c702..492144a34769e3ad6c958a86eeaacde01a27ddd5"
 }
 ,{
-    "testCaseDescription": "go-map-types-delete-test",
+    "testCaseDescription": "go-map-types-delete-insert-test",
     "expectedResult": {
         "changes": {
             "map-types.go": [
@@ -457,46 +232,46 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 6
                             ],
                             "end": [
-                                1,
+                                4,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'm1' identifier"
+                    "summary": "Deleted the 'm1' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 13
                             ],
                             "end": [
-                                1,
+                                4,
                                 19
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Deleted the 'string' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 20
                             ],
                             "end": [
-                                1,
+                                4,
                                 25
                             ]
                         }
                     },
-                    "summary": "Deleted the 'error' identifier"
+                    "summary": "Deleted the 'error' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -507,18 +282,22 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index a863ca9..d7e6949 100644",
+        "index 01004b3..7905807 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
-        "@@ -1,2 +1 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type m1 map[string]error",
-        " type m1 map[int]error"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "103b721414de3bbad2adbe781738973424c8e468..ac2d072f1c3048451e824aaf604dcda59c62c4a3"
+    "shas": "492144a34769e3ad6c958a86eeaacde01a27ddd5..2ebf8efc0c1ed8caa4e454e12c9dab197e1c61ae"
 }
 ,{
-    "testCaseDescription": "go-map-types-delete-rest-test",
+    "testCaseDescription": "go-map-types-teardown-test",
     "expectedResult": {
         "changes": {
             "map-types.go": [
@@ -527,45 +306,15 @@
                         "delete": {
                             "start": [
                                 1,
-                                6
+                                1
                             ],
                             "end": [
-                                1,
-                                8
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'm1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                13
-                            ],
-                            "end": [
-                                1,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                17
-                            ],
-                            "end": [
-                                1,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -576,12 +325,16 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index d7e6949..e69de29 100644",
+        "index 7905807..e69de29 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
-        "@@ -1 +0,0 @@",
-        "-type m1 map[int]error"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac2d072f1c3048451e824aaf604dcda59c62c4a3..3cf1fd2c498440d58dd5df34a4f217c00efa71b1"
+    "shas": "2ebf8efc0c1ed8caa4e454e12c9dab197e1c61ae..059dead0d1b7de6823b26dc703fbeffd26fcc38c"
 }]
