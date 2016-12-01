@@ -71,6 +71,7 @@ termConstructor source sourceSpan name range children = case name of
   "if_statement" -> toIfStatement children
   "call_expression" -> withDefaultInfo $ case children of
     [id] -> S.FunctionCall id []
+    id : rest -> S.FunctionCall id rest
     rest -> S.Error rest
   "const_declaration" -> toConsts children
   "const_spec" -> toConsts children
