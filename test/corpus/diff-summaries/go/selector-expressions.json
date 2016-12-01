@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e3fdc3dffa62a0c8db531accad41fd5b55963868..2002d828a1380988508edd537ca3864e1ef48aa0"
+    "shas": "7afb15bdf81ab082216644f3284be16ec2946905..2ae5101955c35f37f86d370cc30ba8d35505d730"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2002d828a1380988508edd537ca3864e1ef48aa0..f884237bce6d0fa844361b817c5bc81f29562335"
+    "shas": "2ae5101955c35f37f86d370cc30ba8d35505d730..a2573be5126bb2ba4f11569458c2ffe040764b25"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f884237bce6d0fa844361b817c5bc81f29562335..f4045ad90b4842beaa301d815a34815f5de52729"
+    "shas": "a2573be5126bb2ba4f11569458c2ffe040764b25..5a3a64e456c6ccac02062b7f44808003831ea29d"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f4045ad90b4842beaa301d815a34815f5de52729..773acf00766032b8d8322f504b4e4747c395d066"
+    "shas": "5a3a64e456c6ccac02062b7f44808003831ea29d..fc19d24e6b301306c547004d2cb7ea1ff0ceadb1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "773acf00766032b8d8322f504b4e4747c395d066..f88c2c26129640ca4a0aa573fef59f03439a2a2a"
+    "shas": "fc19d24e6b301306c547004d2cb7ea1ff0ceadb1..581e8fde25f87a2c4ddb9c8a84c5e21fa108ccce"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f88c2c26129640ca4a0aa573fef59f03439a2a2a..512f678e80270a7b8c148ffbf16d83ef76c20e46"
+    "shas": "581e8fde25f87a2c4ddb9c8a84c5e21fa108ccce..1930237e0450a07c1c906994e7f1cafa0f936ba1"
 }]

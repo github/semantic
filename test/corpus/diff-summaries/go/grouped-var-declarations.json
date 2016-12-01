@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53a6ccc76bdca521d59dba54f74e108a96e2ec04..86f93da269d32d85d2f9b108c34b163fbbbf9839"
+    "shas": "0118ce48ca851422782cc7ea2fb71688c259b82d..57dbacd2d2afc63241f0dae02a116c494d751d42"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "86f93da269d32d85d2f9b108c34b163fbbbf9839..0874c2a15a17dcec19ca343525d086fa9bba3fcc"
+    "shas": "57dbacd2d2afc63241f0dae02a116c494d751d42..958605d76a79b3907b2afadc8a8f8b089611ad74"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0874c2a15a17dcec19ca343525d086fa9bba3fcc..8073880fd2d7831dc3dbbeb9db623a0bfcf0549b"
+    "shas": "958605d76a79b3907b2afadc8a8f8b089611ad74..57f8ddc0ddc00160126f2ebead2033b8aed97fb2"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8073880fd2d7831dc3dbbeb9db623a0bfcf0549b..68021e5d1ff636493c41230156f7a09a3e23bd71"
+    "shas": "57f8ddc0ddc00160126f2ebead2033b8aed97fb2..d67780b3bbfa35cfa1996652db006bc2d4622a90"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68021e5d1ff636493c41230156f7a09a3e23bd71..7f7f027be1bfb00c50d36a923d85c2db5c7f2400"
+    "shas": "d67780b3bbfa35cfa1996652db006bc2d4622a90..f62209de0245fa41529dc709f691021c2d1ec430"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7f7f027be1bfb00c50d36a923d85c2db5c7f2400..4366e644d8418699b83785526961663dccfe411a"
+    "shas": "f62209de0245fa41529dc709f691021c2d1ec430..d2e1a6ae892f759aae12fe788f47d9908e1640f8"
 }]

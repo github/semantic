@@ -38,13 +38,12 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "21e727f376a9c78c9ad9d0828abd21c3361ca339..c6cbd6861b982731b97f7a277261893ba9672182"
+    "shas": "1cb23d52d8208de28f1fcfb3bf5a63547473d6ed..5eee0925860b1acb674b3a0364126cdce4a10382"
 }
 ,{
     "testCaseDescription": "go-constructors-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "constructors.go": [
                 {
                     "span": {
@@ -59,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(chan<- int)' at line 4, column 1 - line 4, column 17 in the main function of the 'main' module"
+                    "summary": "Added the 'make(…)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -74,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(chan<- int, (new - old))' at line 5, column 1 - line 5, column 30 in the main function of the 'main' module"
+                    "summary": "Added the 'make(…, …)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -89,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(chan<- int, 5, 10)' at line 6, column 1 - line 6, column 24 in the main function of the 'main' module"
+                    "summary": "Added the 'make(…, 5, 10)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -104,10 +103,11 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'new(map[string]string)' at line 7, column 2 - line 7, column 24 in the main function of the 'main' module"
+                    "summary": "Added the 'new(…)' function call in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "constructors.go"
@@ -129,7 +129,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c6cbd6861b982731b97f7a277261893ba9672182..129f4848b7f01bbb8345b0c292de53bf2768f845"
+    "shas": "5eee0925860b1acb674b3a0364126cdce4a10382..43179ee244759df33a5c40b8dfa624d1ca748179"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -161,7 +161,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the make(…) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -188,7 +188,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the make(…, …) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -215,7 +215,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the make(…, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -242,7 +242,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '7' in the main function of the 'main' module"
+                    "summary": "Replaced '5' with '7' in the make(…, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -269,7 +269,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '10' with '11' in the main function of the 'main' module"
+                    "summary": "Replaced '10' with '11' in the make(…, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -296,7 +296,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the new(…) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -323,7 +323,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the new(…) function call of the 'main' function"
                 }
             ]
         },
@@ -352,7 +352,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "129f4848b7f01bbb8345b0c292de53bf2768f845..dcfd4dc038c351edbad4dacca2cea5616d17bf6e"
+    "shas": "43179ee244759df33a5c40b8dfa624d1ca748179..3dc9d98a33249fed41c2f99b1b7aa91f02c2d152"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -384,7 +384,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the make(…) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -411,7 +411,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the make(…, …) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -438,7 +438,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the make(…, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -465,7 +465,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '7' with '5' in the main function of the 'main' module"
+                    "summary": "Replaced '7' with '5' in the make(…, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -492,7 +492,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '11' with '10' in the main function of the 'main' module"
+                    "summary": "Replaced '11' with '10' in the make(…, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -519,7 +519,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the new(…) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -546,7 +546,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the new(…) function call of the 'main' function"
                 }
             ]
         },
@@ -575,13 +575,12 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dcfd4dc038c351edbad4dacca2cea5616d17bf6e..a4c42877e9dfd541fcde44659a4140139b16216f"
+    "shas": "3dc9d98a33249fed41c2f99b1b7aa91f02c2d152..9cc2be513d22b3fe802bd63590fae7f8d5860335"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "constructors.go": [
                 {
                     "span": {
@@ -596,7 +595,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int)' at line 4, column 1 - line 4, column 17 in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(…)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -611,7 +610,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int, (new - old))' at line 5, column 1 - line 5, column 30 in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(…, …)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -626,7 +625,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int, 5, 10)' at line 6, column 1 - line 6, column 24 in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(…, 5, 10)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -641,10 +640,11 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new(map[string]string)' at line 7, column 2 - line 7, column 24 in the main function of the 'main' module"
+                    "summary": "Deleted the 'new(…)' function call in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "constructors.go"
@@ -666,7 +666,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a4c42877e9dfd541fcde44659a4140139b16216f..ce8fcfc4cec00f77323276fcc4530ab4cf230a86"
+    "shas": "9cc2be513d22b3fe802bd63590fae7f8d5860335..a3ca0a5ab36fa7549733d6d958580e4cd03b82ed"
 }
 ,{
     "testCaseDescription": "go-constructors-teardown-test",
@@ -708,5 +708,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ce8fcfc4cec00f77323276fcc4530ab4cf230a86..e3fdc3dffa62a0c8db531accad41fd5b55963868"
+    "shas": "a3ca0a5ab36fa7549733d6d958580e4cd03b82ed..7afb15bdf81ab082216644f3284be16ec2946905"
 }]

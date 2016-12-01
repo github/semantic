@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "79f70af3f3639a6acdcc05908977f8245ca64389..2c1aa53c12019c7cb9703306ec6ae36d1e48fc49"
+    "shas": "f7314a39c28dfa8d01e76f5cca826d40971d91e3..2c2ed727360a09291c683f58205e9cef4e315217"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -114,7 +114,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2c1aa53c12019c7cb9703306ec6ae36d1e48fc49..f276c66d018034538145fdd0c2018d1d7e1d01ec"
+    "shas": "2c2ed727360a09291c683f58205e9cef4e315217..86f37c126d371b10a20f6f1dd37bf5bb55e9aad6"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -196,7 +196,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f276c66d018034538145fdd0c2018d1d7e1d01ec..a66675da57b8aafdd281a61a1108fb98cda7682f"
+    "shas": "86f37c126d371b10a20f6f1dd37bf5bb55e9aad6..3587fe32cd362e467e00b9663ba376ebe3d47d21"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -278,7 +278,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a66675da57b8aafdd281a61a1108fb98cda7682f..a8cb7f112b997c7a4368f0946c13512ff03477ef"
+    "shas": "3587fe32cd362e467e00b9663ba376ebe3d47d21..b0c325d1be5d7ec74cd18b46aadb32f19e9aea00"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -354,7 +354,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a8cb7f112b997c7a4368f0946c13512ff03477ef..f852c3c98a4dd70f24ce7bda1c591e993f65197b"
+    "shas": "b0c325d1be5d7ec74cd18b46aadb32f19e9aea00..be583818264bcee80d0715c43ae582b94e41db57"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -396,5 +396,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f852c3c98a4dd70f24ce7bda1c591e993f65197b..60e4eed89b32928f8afe34309e46a3072d0ae3a2"
+    "shas": "be583818264bcee80d0715c43ae582b94e41db57..67a6dc5e7422cb3fedf2a2379ebff5b53592c751"
 }]

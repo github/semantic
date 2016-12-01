@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7cd1bf5d5180a287a62fb85bc8e7b34cfc132159..338293e927456ff10caaeccf35e1da6e9074966b"
+    "shas": "16190ab69475d6ae624dc520a6ef79c204577e31..b946bbf4b8fa77ad9ded388e4c5e679c36919a47"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "338293e927456ff10caaeccf35e1da6e9074966b..9adf4eb965fc5a4f839a575dec0c698c9478dae2"
+    "shas": "b946bbf4b8fa77ad9ded388e4c5e679c36919a47..dcb40c88ecd8b7b0a8d7c5e098d454e3bb29df73"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9adf4eb965fc5a4f839a575dec0c698c9478dae2..1a92a7229a36cf36fd22f02dc5d2dd0613aa495d"
+    "shas": "dcb40c88ecd8b7b0a8d7c5e098d454e3bb29df73..3a3a640ae410c7e3103ffb1ab21adb990c65193a"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a92a7229a36cf36fd22f02dc5d2dd0613aa495d..0435629b1eadc082e6980d10a4300a4dcf6248b7"
+    "shas": "3a3a640ae410c7e3103ffb1ab21adb990c65193a..7f338cb90ee12c326b9d803d8381bf33984058a6"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0435629b1eadc082e6980d10a4300a4dcf6248b7..954867170f8a700b8867e0ee9ab363da87855b64"
+    "shas": "7f338cb90ee12c326b9d803d8381bf33984058a6..8e333e1809f91d03db51c0aa982e7d90ea8325d6"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "954867170f8a700b8867e0ee9ab363da87855b64..98a6dc74cc5a66c1d0c8f0d36bd0e08d21121e35"
+    "shas": "8e333e1809f91d03db51c0aa982e7d90ea8325d6..87ee1bdc92f2b20dab9d70248dbc977d19b31eba"
 }]
