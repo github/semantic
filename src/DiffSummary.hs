@@ -155,7 +155,7 @@ determiner (LeafInfo "else block" _ _) = "an"
 determiner (LeafInfo "ensure block" _ _) = "an"
 determiner (LeafInfo "when block" _ _) = "a"
 determiner (LeafInfo "anonymous function" _ _) = "an"
-determiner (BranchInfo bs _ _) = determiner (last bs)
+determiner (BranchInfo bs _ _) = maybe "" determiner (snd <$> unsnoc bs)
 determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [JSONSummary Doc SourceSpan]
