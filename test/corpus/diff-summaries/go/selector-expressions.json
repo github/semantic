@@ -34,7 +34,7 @@
         "+a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b8520b47d7e23a8b805613ba5e28d123748a7e86..53e9575bb4a95b6a13a9289b3cb198389c3c5018"
+    "shas": "1b6e0feb56e5cdb7ad291617f2f0435417e65665..1cabbfb616bb7f16666511f145e8709354b162c1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-insert-test",
@@ -70,6 +70,36 @@
                         }
                     },
                     "summary": "Added the 'a[b][c]()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a[b][c]()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[b][c]()' function call"
                 }
             ]
         },
@@ -89,7 +119,7 @@
         " a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53e9575bb4a95b6a13a9289b3cb198389c3c5018..05337c7344ffd11906be9b6603043c1bcf0f7dff"
+    "shas": "1cabbfb616bb7f16666511f145e8709354b162c1..9cd2e1fa67eaf8b7701eb693cbde0abf05a9acf2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -196,7 +226,7 @@
         " a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05337c7344ffd11906be9b6603043c1bcf0f7dff..4bcafdd401ffbfb0e29802793ed59f20908986a6"
+    "shas": "9cd2e1fa67eaf8b7701eb693cbde0abf05a9acf2..87e2a67ff089313ce73948c33f5fed26678e69e6"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -303,7 +333,7 @@
         " a.b.c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4bcafdd401ffbfb0e29802793ed59f20908986a6..1763e869f9b7050dc5703f293808233c46910062"
+    "shas": "87e2a67ff089313ce73948c33f5fed26678e69e6..8288366db7745d5e945597239e1e3e9e7384f986"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -374,13 +404,28 @@
         "+x.y.z()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1763e869f9b7050dc5703f293808233c46910062..562bbf82089ed1bc7d77c4698451746939455f51"
+    "shas": "8288366db7745d5e945597239e1e3e9e7384f986..6320cb015ad06170d57469ad6117980fcf530917"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-test",
     "expectedResult": {
         "changes": {
             "selector-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y][z]()' function call"
+                },
                 {
                     "span": {
                         "delete": {
@@ -395,6 +440,21 @@
                         }
                     },
                     "summary": "Deleted the 'a[b][c]()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y][z]()' function call"
                 }
             ]
         },
@@ -413,7 +473,7 @@
         " x.y.z()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "562bbf82089ed1bc7d77c4698451746939455f51..3ea379fb7d49d67e17b2bd53b58af0298c055ccc"
+    "shas": "6320cb015ad06170d57469ad6117980fcf530917..64072b885bd8b401823412418b0a634151fb012c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-rest-test",
@@ -451,5 +511,5 @@
         "-x.y.z()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3ea379fb7d49d67e17b2bd53b58af0298c055ccc..bef4b21e0fe9824b79e8b12bfa32867c8a4433a7"
+    "shas": "64072b885bd8b401823412418b0a634151fb012c..5e49cf8bc49a6acceee67258f44392614d3e2807"
 }]

@@ -23,7 +23,7 @@
                         "insert": {
                             "start": [
                                 2,
-                                1
+                                2
                             ],
                             "end": [
                                 2,
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'foo()' function call"
                 }
             ]
         },
@@ -50,7 +50,7 @@
         "+*foo()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3403cd75b5874d1bc6c4c3c737525b7bd1271113..25caa48897bbba94e3ebd10df0cab8c1af27c26d"
+    "shas": "0c22b7aa63a02fe2ddea7a2e3531e1bf778729a1..a853d892401554051aac78581481f205834001a0"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-insert-test",
@@ -77,7 +77,7 @@
                         "insert": {
                             "start": [
                                 2,
-                                1
+                                2
                             ],
                             "end": [
                                 2,
@@ -85,7 +85,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'bar()' function call"
                 },
                 {
                     "span": {
@@ -104,10 +104,25 @@
                 },
                 {
                     "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
+                },
+                {
+                    "span": {
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                2
                             ],
                             "end": [
                                 4,
@@ -115,7 +130,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'foo()' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                4
+                            ],
+                            "end": [
+                                5,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier"
                 }
             ]
         },
@@ -138,7 +168,7 @@
         " *foo()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "25caa48897bbba94e3ebd10df0cab8c1af27c26d..75a33545386bf76a55b02340bd336b00602e323e"
+    "shas": "a853d892401554051aac78581481f205834001a0..bad62bb53ba866eebb82de0daba4d2af96bada50"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -197,7 +227,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the identifier() function call"
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier in the foo() function call"
                 }
             ]
         },
@@ -221,7 +251,7 @@
         " !<-a"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "75a33545386bf76a55b02340bd336b00602e323e..32474c2bac0758793a5ff0f2139cab878545163a"
+    "shas": "bad62bb53ba866eebb82de0daba4d2af96bada50..b3d8517142703695ff4ae6bbbfdae7a8131d62e3"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -280,7 +310,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the identifier() function call"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in the bar() function call"
                 }
             ]
         },
@@ -304,7 +334,7 @@
         " !<-a"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "32474c2bac0758793a5ff0f2139cab878545163a..36454e266744a461ca2dd6934a061dc63a7c7a63"
+    "shas": "b3d8517142703695ff4ae6bbbfdae7a8131d62e3..851012d113a37b9c98e94b82cd1e32ebdc8be638"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -331,7 +361,7 @@
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                2
                             ],
                             "end": [
                                 2,
@@ -339,7 +369,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'bar()' function call"
                 },
                 {
                     "span": {
@@ -361,7 +391,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                2
                             ],
                             "end": [
                                 4,
@@ -369,7 +399,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'foo()' function call"
                 },
                 {
                     "span": {
@@ -391,7 +421,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                2
                             ],
                             "end": [
                                 4,
@@ -399,7 +429,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'identifier()' function call"
+                    "summary": "Added the 'bar()' function call"
                 }
             ]
         },
@@ -424,13 +454,28 @@
         "+*bar()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "36454e266744a461ca2dd6934a061dc63a7c7a63..2c0c14abd00ce4615876508894c87c15ad9f49e3"
+    "shas": "851012d113a37b9c98e94b82cd1e32ebdc8be638..163450da5968971b4c4d6ee24b6ffc76e87ff860"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-test",
     "expectedResult": {
         "changes": {
             "unary-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
                 {
                     "span": {
                         "delete": {
@@ -451,7 +496,7 @@
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                2
                             ],
                             "end": [
                                 2,
@@ -459,7 +504,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'foo()' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                4
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
                 }
             ]
         },
@@ -480,7 +540,7 @@
         " *bar()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2c0c14abd00ce4615876508894c87c15ad9f49e3..742cb3cf4d2b7f71864c7795fd3307b8775538b3"
+    "shas": "163450da5968971b4c4d6ee24b6ffc76e87ff860..f47634134cc46cd539cef45bcf6090feb116ebb9"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-rest-test",
@@ -507,7 +567,7 @@
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                2
                             ],
                             "end": [
                                 2,
@@ -515,7 +575,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'identifier()' function call"
+                    "summary": "Deleted the 'bar()' function call"
                 }
             ]
         },
@@ -534,5 +594,5 @@
         "-*bar()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "742cb3cf4d2b7f71864c7795fd3307b8775538b3..ecfd8333e0e37929a8029b0c03cec13c31e0f692"
+    "shas": "f47634134cc46cd539cef45bcf6090feb116ebb9..e560ba24e6b3318aeaaa38fbba2567add6762706"
 }]

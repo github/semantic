@@ -8,7 +8,7 @@
                         "insert": {
                             "start": [
                                 1,
-                                1
+                                7
                             ],
                             "end": [
                                 1,
@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[y]()' defer statement"
+                    "summary": "Added the 'x[y]()' function call"
                 },
                 {
                     "span": {
@@ -50,7 +50,7 @@
         "+go x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "201c2f06d17d14e12c9861e2a94372fc41441178..4c2c5d9bf86b0e00910db4151d8cb1be6e261245"
+    "shas": "aa6d103c0bde1c5cd7c122b6a597939f9920694d..39d794d96184f5c24d53575d9acf0c1408848019"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-insert-test",
@@ -116,6 +116,36 @@
                         }
                     },
                     "summary": "Added the 'x[y]()' go statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[y]()' defer statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[y]()' function call"
                 }
             ]
         },
@@ -138,7 +168,7 @@
         " go x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4c2c5d9bf86b0e00910db4151d8cb1be6e261245..0af27bad18af4c3f10e18adf6824bc24be7cdf18"
+    "shas": "39d794d96184f5c24d53575d9acf0c1408848019..f00940bceca8647dfc5c03a16d11fa77b65605ab"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -275,7 +305,7 @@
         " defer x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0af27bad18af4c3f10e18adf6824bc24be7cdf18..e8853de747eee3ecdd93e3344be1e54dbc28e8fe"
+    "shas": "f00940bceca8647dfc5c03a16d11fa77b65605ab..a438dd8c1ac73cefd028b38d896c9e7150693fda"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -412,7 +442,7 @@
         " defer x.y()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e8853de747eee3ecdd93e3344be1e54dbc28e8fe..baf0c568b56a2909465365b10b1764e574ffdcbf"
+    "shas": "a438dd8c1ac73cefd028b38d896c9e7150693fda..be9ca54744a56600853a24a3574f6a9372317a4e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -532,13 +562,28 @@
         "+go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "baf0c568b56a2909465365b10b1764e574ffdcbf..8449fd5df5a995e61d8ca8b450f83468e79a5246"
+    "shas": "be9ca54744a56600853a24a3574f6a9372317a4e..8aed3cad89b295cbb44d0af3d14a133805b21092"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-test",
     "expectedResult": {
         "changes": {
             "go-and-defer-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a[b]()' function call"
+                },
                 {
                     "span": {
                         "delete": {
@@ -568,6 +613,21 @@
                         }
                     },
                     "summary": "Deleted the 'x[y]()' go statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[b]()' defer statement"
                 }
             ]
         },
@@ -588,7 +648,7 @@
         " go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8449fd5df5a995e61d8ca8b450f83468e79a5246..129278c1c54e5bcd112a0f7bc5a4876b0890b5a9"
+    "shas": "8aed3cad89b295cbb44d0af3d14a133805b21092..2597c988897b6b96cb121f2abfda7a34f3a2e78a"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-rest-test",
@@ -600,7 +660,7 @@
                         "delete": {
                             "start": [
                                 1,
-                                1
+                                7
                             ],
                             "end": [
                                 1,
@@ -608,7 +668,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a[b]()' defer statement"
+                    "summary": "Deleted the 'a[b]()' function call"
                 },
                 {
                     "span": {
@@ -642,5 +702,5 @@
         "-go c.d()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "129278c1c54e5bcd112a0f7bc5a4876b0890b5a9..13fa148e00739eba43f10562e024e15d2fc7e5d9"
+    "shas": "2597c988897b6b96cb121f2abfda7a34f3a2e78a..1b6e0feb56e5cdb7ad291617f2f0435417e65665"
 }]

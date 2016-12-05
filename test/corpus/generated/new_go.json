@@ -1,0 +1,20 @@
+[
+  {
+    "repoUrl": "https://github.com/joshvera/go.git",
+    "language": "go",
+    "fileExt": ".go",
+    "templateText": "package main\n",
+    "syntaxes": [
+      {
+        "syntax": "go-and-defer-statements",
+        "insert": "defer x.y()\ngo x.y()",
+        "replacement": "defer a.b()\ngo c.d()"
+      },
+      {
+        "syntax": "selector-expressions",
+        "insert": "a.b.c()",
+        "replacement": "x.y.z()"
+      }
+    ]
+  }
+]
