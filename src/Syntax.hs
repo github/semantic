@@ -60,7 +60,7 @@ data Syntax a f
   | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: [f] }
-  | Return (Maybe f)
+  | Return [f]
   | Throw f
   | Constructor f
   -- | TODO: Is it a problem that in Ruby, this pattern can work for method def too?

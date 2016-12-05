@@ -18,7 +18,7 @@ termConstructor
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children = case name of
-  "return_statement" -> withDefaultInfo $ S.Return (listToMaybe children)
+  "return_statement" -> withDefaultInfo $ S.Return children
   "source_file" -> case children of
     packageName : rest | category (extract packageName) == Other "package_clause" ->
       case unwrap packageName of
@@ -186,4 +186,3 @@ categoryForGoName = \case
   "type_assertion_expression" -> TypeAssertion
   "type_conversion_expression" -> TypeConversion
   s -> Other (toS s)
-

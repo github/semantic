@@ -28,8 +28,8 @@ termConstructor
 termConstructor source sourceSpan name range children
   | name == "ERROR" = withDefaultInfo (S.Error children)
   | otherwise = withDefaultInfo $ case (name, children) of
-    ("return_statement", _) -> S.Return (listToMaybe children)
-    ("trailing_return_statement", _) -> S.Return (listToMaybe children)
+    ("return_statement", _) -> S.Return children
+    ("trailing_return_statement", _) -> S.Return children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value

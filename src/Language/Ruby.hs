@@ -117,7 +117,7 @@ termConstructor source sourceSpan name range children
       body -> S.Rescue [] body
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
-    ("return_statement", _ ) -> S.Return (listToMaybe children)
+    ("return", _ ) -> S.Return children
     ("while_modifier", [ lhs, condition ]) -> S.While condition [lhs]
     ("while_modifier", _ ) -> S.Error children
     ("while_statement", expr : rest ) -> S.While expr rest
@@ -192,6 +192,7 @@ categoryForRubyName = \case
   "rescue_modifier" -> RescueModifier
   "rescued_exception" -> RescuedException
   "return_statement" -> Return
+  "return" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
