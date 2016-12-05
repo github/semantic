@@ -30,7 +30,7 @@ termConstructor source sourceSpan name range children
       condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
       withDefaultInfo $ S.If condition [lhs]
     _ -> withDefaultInfo $ S.Error children
-  | name == "unless_statement" = case children of
+  | name == "unless" = case children of
     ( expr : rest ) -> do
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.If condition rest
@@ -40,7 +40,7 @@ termConstructor source sourceSpan name range children
       condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
       withDefaultInfo $ S.While condition [lhs]
     _ -> withDefaultInfo $ S.Error children
-  | name == "until_statement" = case children of
+  | name == "until" = case children of
     ( expr : rest ) -> do
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
@@ -57,7 +57,7 @@ termConstructor source sourceSpan name range children
     ("array", _ ) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
-    ("begin_statement", _ ) -> case partition (\x -> category (extract x) == Rescue) children of
+    ("begin", _ ) -> case partition (\x -> category (extract x) == Rescue) children of
       (rescues, rest) -> case partition (\x -> category (extract x) == Ensure || category (extract x) == Else) rest of
         (ensureElse, body) -> case ensureElse of
           [ elseBlock, ensure ]
@@ -69,19 +69,19 @@ termConstructor source sourceSpan name range children
           [ elseBlock ] | Else <- category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
           [ ensure ] | Ensure <- category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    ("case_statement", expr : body ) -> S.Switch expr body
-    ("case_statement", _ ) -> S.Error children
-    ("when_block", condition : body ) -> S.Case condition body
-    ("when_block", _ ) -> S.Error children
-    ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
-    ("class_declaration", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-    ("class_declaration", _ ) -> S.Error children
+    ("case", expr : body ) -> S.Switch expr body
+    ("case", _ ) -> S.Error children
+    ("when", condition : body ) -> S.Case condition body
+    ("when", _ ) -> S.Error children
+    ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
+    ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+    ("class", _ ) -> S.Error children
     ("comment", _ ) -> S.Comment . toText $ slice range source
     ("conditional_assignment", [ identifier, value ]) -> S.ConditionalAssignment identifier value
     ("conditional_assignment", _ ) -> S.Error children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
-    ("function_call", _ ) -> case children of
+    ("method_call", _ ) -> case children of
       member : args | MemberAccess <- category (extract member) -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
         _ -> S.Error children
@@ -90,25 +90,25 @@ termConstructor source sourceSpan name range children
     ("hash", _ ) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_modifier", _ ) -> S.Error children
-    ("if_statement", condition : body ) -> S.If condition body
-    ("if_statement", _ ) -> S.Error children
-    ("elsif_block", condition : body ) -> S.If condition body
-    ("elsif_block", _ ) -> S.Error children
+    ("if", condition : body ) -> S.If condition body
+    ("if", _ ) -> S.Error children
+    ("elsif", condition : body ) -> S.If condition body
+    ("elsif", _ ) -> S.Error children
     ("element_reference", [ base, element ]) -> S.SubscriptAccess base element
     ("element_reference", _ ) -> S.Error children
-    ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
-    ("for_statement", _ ) -> S.Error children
+    ("for", lhs : expr : rest ) -> S.For [lhs, expr] rest
+    ("for", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("member_access", _ ) -> S.Error children
-    ("method_declaration", _ ) -> case children of
+    ("method", _ ) -> case children of
       identifier : params : body | Params <- category (extract params) -> S.Method identifier (toList (unwrap params)) body
       identifier : body -> S.Method identifier [] body
       _ -> S.Error children
-    ("module_declaration", identifier : body ) -> S.Module identifier body
-    ("module_declaration", _ ) -> S.Error children
-    ("rescue_block", _ ) -> case children of
+    ("module", identifier : body ) -> S.Module identifier body
+    ("module", _ ) -> S.Error children
+    ("rescue", _ ) -> case children of
       args : lastException : rest
         | RescueArgs <- category (extract args)
         , RescuedException <- category (extract lastException) -> S.Rescue (toList (unwrap args) <> [lastException]) rest
@@ -120,8 +120,8 @@ termConstructor source sourceSpan name range children
     ("return", _ ) -> S.Return children
     ("while_modifier", [ lhs, condition ]) -> S.While condition [lhs]
     ("while_modifier", _ ) -> S.Error children
-    ("while_statement", expr : rest ) -> S.While expr rest
-    ("while_statement", _ ) -> S.Error children
+    ("while", expr : rest ) -> S.While expr rest
+    ("while", _ ) -> S.Error children
     ("yield", _ ) -> S.Yield children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
@@ -146,52 +146,51 @@ categoryForRubyName = \case
   "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
-  "begin_statement" -> Begin
+  "begin" -> Begin
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
   "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
   "block_parameter" -> BlockParameter
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
   "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
-  "case_statement" -> Case
-  "class_declaration"  -> Class
+  "case" -> Case
+  "class"  -> Class
   "comment" -> Comment
   "comparison" -> RelationalOperator -- comparison operator, e.g. <, <=, >=, >.
   "conditional_assignment" -> ConditionalAssignment
   "conditional" -> Ternary
   "element_reference" -> SubscriptAccess
-  "else_block" -> Else
-  "elsif_block" -> Elsif
-  "ensure_block" -> Ensure
+  "else" -> Else
+  "elsif" -> Elsif
+  "ensure" -> Ensure
   "ERROR" -> Error
   "float" -> NumberLiteral
-  "for_statement" -> For
+  "for" -> For
   "formal_parameters" -> Params
-  "function_call" -> FunctionCall
+  "method_call" -> FunctionCall
   "function" -> Function
   "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
   "if_modifier" -> If
-  "if_statement" -> If
+  "if" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
-  "method_declaration" -> Method
-  "module_declaration"  -> Module
+  "method" -> Method
+  "module"  -> Module
   "nil" -> Identifier
   "optional_parameter" -> OptionalParameter
   "or" -> BooleanOperator
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
-  "rescue_arguments" -> RescueArgs
-  "rescue_block" -> Rescue
+  "exceptions" -> RescueArgs
+  "rescue" -> Rescue
   "rescue_modifier" -> RescueModifier
-  "rescued_exception" -> RescuedException
-  "return_statement" -> Return
+  "exception_variable" -> RescuedException
   "return" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "splat_parameter" -> SplatParameter
@@ -199,11 +198,11 @@ categoryForRubyName = \case
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
   "unless_modifier" -> Unless
-  "unless_statement" -> Unless
+  "unless" -> Unless
   "until_modifier" -> Until
-  "until_statement" -> Until
-  "when_block" -> When
+  "until" -> Until
+  "when" -> When
   "while_modifier" -> While
-  "while_statement" -> While
+  "while" -> While
   "yield" -> Yield
   s -> Other s
