@@ -40,7 +40,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "51729c359e350d71395532126c23bfed960f2373..eb8e4745aa2692c20519254d7b8d27b3a2c07cac"
+    "shas": "a8b440ad76232e4e95f5a5ed53b9b6604ece8a17..4469095014f7bc3f2ba06bba93197b7113965a36"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-insert-test",
@@ -121,7 +121,7 @@
         " elsif quux"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "eb8e4745aa2692c20519254d7b8d27b3a2c07cac..a0d707f1e50df11d0aa4d3407dfcf79fad65acc6"
+    "shas": "4469095014f7bc3f2ba06bba93197b7113965a36..49f95d96fcf4b3e1ddc5d64c6d19c1f1415aa21f"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-insert-test",
@@ -178,27 +178,12 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                7,
                                 1
                             ]
                         }
                     },
                     "summary": "Added the 'quux' elsif block in the 'foo' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bat' identifier in the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -242,7 +227,7 @@
         "   bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a0d707f1e50df11d0aa4d3407dfcf79fad65acc6..b9ef26ef27b3cf5ad0e522a145ede60f9b4f3dc2"
+    "shas": "49f95d96fcf4b3e1ddc5d64c6d19c1f1415aa21f..69de797721bf90b5e163efddf6c21683973e91e5"
 }
 ,{
     "testCaseDescription": "ruby-if-replacement-test",
@@ -299,27 +284,12 @@
                                 1
                             ],
                             "end": [
-                                5,
+                                7,
                                 1
                             ]
                         }
                     },
                     "summary": "Deleted the 'quux' elsif block in the 'x' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                3
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bat' identifier in the 'x' if statement"
                 },
                 {
                     "span": {
@@ -363,7 +333,7 @@
         "   bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b9ef26ef27b3cf5ad0e522a145ede60f9b4f3dc2..af72ae7656106dce11ffcbd6c2a31e9a756b0342"
+    "shas": "69de797721bf90b5e163efddf6c21683973e91e5..c4dc260bbc97bb7f7c90d41a7ee7418e31529715"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-replacement-test",
@@ -421,7 +391,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "af72ae7656106dce11ffcbd6c2a31e9a756b0342..2aef901d538d790e42fec0a2a6b1522d8b4fce9e"
+    "shas": "c4dc260bbc97bb7f7c90d41a7ee7418e31529715..941d12bbe9281602e9f778ef87716fa0cdc94f6c"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-test",
@@ -468,7 +438,7 @@
         " if y then"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2aef901d538d790e42fec0a2a6b1522d8b4fce9e..bd1fd56e20054df058e8bc8d3e2dd0d523ecce08"
+    "shas": "941d12bbe9281602e9f778ef87716fa0cdc94f6c..79311ce946c9650610644371262924744f9acecc"
 }
 ,{
     "testCaseDescription": "ruby-if-delete-rest-test",
@@ -524,5 +494,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bd1fd56e20054df058e8bc8d3e2dd0d523ecce08..4fed48f0abf8058f93dbb4c7361358c434c9bb6d"
+    "shas": "79311ce946c9650610644371262924744f9acecc..6745758f03dc308eff3e95e8876445225bcdf49e"
 }]
