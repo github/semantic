@@ -103,8 +103,7 @@ termConstructor source sourceSpan name range children
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
     ("break_statement", [ expr ] ) -> S.Break expr
-    ("yield_statement", [ expr ] ) -> S.Yield (Just expr)
-    ("yield_statement", [ ] ) -> S.Yield Nothing
+    ("yield_statement", _ ) -> S.Yield children
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]
           _ -> S.Error children

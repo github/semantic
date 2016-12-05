@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' yield statement"
+                    "summary": "Added a yield statement"
                 },
                 {
                     "span": {
@@ -191,7 +191,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' yield statement"
+                    "summary": "Deleted a yield statement"
                 },
                 {
                     "span": {
@@ -221,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' yield statement"
+                    "summary": "Added a yield statement"
                 }
             ]
         },
@@ -301,7 +301,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' yield statement"
+                    "summary": "Deleted a yield statement"
                 }
             ]
         },

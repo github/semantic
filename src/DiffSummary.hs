@@ -156,6 +156,7 @@ determiner (LeafInfo "when block" _ _) = "a"
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (LeafInfo "break statement" _ _) = "a"
 determiner (LeafInfo "continue statement" _ _) = "a"
+determiner (LeafInfo "yield statement" "" _) = "a"
 determiner (LeafInfo "return statement" "" _) = "a"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
@@ -180,6 +181,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo cName@"subshell command" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"break statement" _ _) -> toDoc cName
   (LeafInfo cName@"continue statement" _ _) -> toDoc cName
+  (LeafInfo cName@"yield statement" "" _) -> toDoc cName
   (LeafInfo cName@"return statement" "" _) -> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
   node -> panic $ "Expected a leaf info but got a: " <> show node
@@ -230,8 +232,8 @@ toTermName source term = case unwrap term of
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair k v -> toKeyName k <> toArgName v
-  S.Yield expr -> maybe "empty" toTermName' expr
   S.Return children -> intercalate ", " (termNameFromSource <$> children)
+  S.Yield children -> intercalate ", " (termNameFromSource <$> children)
   S.Error _ -> termNameFromSource term
   S.If expr _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
