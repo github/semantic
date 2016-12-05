@@ -8,11 +8,11 @@
                         "insert": {
                             "start": [
                                 1,
-                                140309233165401
+                                1
                             ],
                             "end": [
-                                146028888065,
-                                140309233165401
+                                1,
+                                35
                             ]
                         }
                     },
@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/yield.js b/yield.js",
-        "index e69de29..e01b17c 100644",
+        "index e69de29b..e01b17c7 100644",
         "--- a/yield.js",
         "+++ b/yield.js",
         "@@ -0,0 +1 @@",
         "+function* foo(){ var index = 0;  }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b3763c3149f8c1be111030670500c941cc56670a..7cb37fa3eaa135398a8cfcfe6bf281754bfc0968"
+    "shas": "5c6bdce8f72c2d775feff2e1e2bafd6639ec3092..af359d80f0450c0c2196373f3a6135ad69d15448"
 }
 ,{
     "testCaseDescription": "javascript-yield-insert-test",
@@ -45,12 +45,12 @@
                     "span": {
                         "insert": {
                             "start": [
-                                137438953473,
-                                140309233165401
+                                1,
+                                33
                             ],
                             "end": [
-                                171798691841,
-                                140309233165401
+                                1,
+                                41
                             ]
                         }
                     },
@@ -65,7 +65,7 @@
     ],
     "patch": [
         "diff --git a/yield.js b/yield.js",
-        "index e01b17c..e208816 100644",
+        "index e01b17c7..e2088166 100644",
         "--- a/yield.js",
         "+++ b/yield.js",
         "@@ -1 +1 @@",
@@ -73,7 +73,7 @@
         "+function* foo(){ var index = 0; yield i; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7cb37fa3eaa135398a8cfcfe6bf281754bfc0968..2ce8ab9c8f3f1975fd6e15da11be73029b456129"
+    "shas": "af359d80f0450c0c2196373f3a6135ad69d15448..994d3630d7493bcd3de8987ef154ab8791944584"
 }
 ,{
     "testCaseDescription": "javascript-yield-replacement-test",
@@ -85,22 +85,22 @@
                         "replace": [
                             {
                                 "start": [
-                                    137438953473,
-                                    140309233166937
+                                    1,
+                                    33
                                 ],
                                 "end": [
-                                    171798691841,
-                                    140309233166937
+                                    1,
+                                    41
                                 ]
                             },
                             {
                                 "start": [
-                                    137438953473,
-                                    140309233166937
+                                    1,
+                                    33
                                 ],
                                 "end": [
-                                    180388626433,
-                                    140309233166937
+                                    1,
+                                    43
                                 ]
                             }
                         ]
@@ -116,7 +116,7 @@
     ],
     "patch": [
         "diff --git a/yield.js b/yield.js",
-        "index e208816..78ab2ef 100644",
+        "index e2088166..78ab2efe 100644",
         "--- a/yield.js",
         "+++ b/yield.js",
         "@@ -1 +1 @@",
@@ -124,7 +124,7 @@
         "+function* foo(){ var index = 0; yield i++; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2ce8ab9c8f3f1975fd6e15da11be73029b456129..a9f3ad1c74e63fc863dd3661258f1aeb4c2ee0f1"
+    "shas": "994d3630d7493bcd3de8987ef154ab8791944584..04b9b20aaf2b5f555b5223dfba6c303f01450f5e"
 }
 ,{
     "testCaseDescription": "javascript-yield-delete-replacement-test",
@@ -136,22 +136,22 @@
                         "replace": [
                             {
                                 "start": [
-                                    137438953473,
-                                    140309233165401
+                                    1,
+                                    33
                                 ],
                                 "end": [
-                                    180388626433,
-                                    140309233165401
+                                    1,
+                                    43
                                 ]
                             },
                             {
                                 "start": [
-                                    137438953473,
-                                    140309233165401
+                                    1,
+                                    33
                                 ],
                                 "end": [
-                                    171798691841,
-                                    140309233165401
+                                    1,
+                                    41
                                 ]
                             }
                         ]
@@ -167,7 +167,7 @@
     ],
     "patch": [
         "diff --git a/yield.js b/yield.js",
-        "index 78ab2ef..e208816 100644",
+        "index 78ab2efe..e2088166 100644",
         "--- a/yield.js",
         "+++ b/yield.js",
         "@@ -1 +1 @@",
@@ -175,7 +175,7 @@
         "+function* foo(){ var index = 0; yield i; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a9f3ad1c74e63fc863dd3661258f1aeb4c2ee0f1..699cdda771dbc5719b1abd5155622a2520916842"
+    "shas": "04b9b20aaf2b5f555b5223dfba6c303f01450f5e..0f042b1a2b628149d5fe3d38ac22ddb0b1e1fd4a"
 }
 ,{
     "testCaseDescription": "javascript-yield-delete-insert-test",
@@ -186,12 +186,12 @@
                     "span": {
                         "delete": {
                             "start": [
-                                137438953473,
-                                140309233165401
+                                1,
+                                33
                             ],
                             "end": [
-                                171798691841,
-                                140309233165401
+                                1,
+                                41
                             ]
                         }
                     },
@@ -206,7 +206,7 @@
     ],
     "patch": [
         "diff --git a/yield.js b/yield.js",
-        "index e208816..e01b17c 100644",
+        "index e2088166..e01b17c7 100644",
         "--- a/yield.js",
         "+++ b/yield.js",
         "@@ -1 +1 @@",
@@ -214,7 +214,7 @@
         "+function* foo(){ var index = 0;  }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "699cdda771dbc5719b1abd5155622a2520916842..cac9c5a63ec0402053dbf61bb279288fdc73f212"
+    "shas": "0f042b1a2b628149d5fe3d38ac22ddb0b1e1fd4a..2bb888580d4105d265e9137474d813ab92ce6359"
 }
 ,{
     "testCaseDescription": "javascript-yield-teardown-test",
@@ -226,11 +226,11 @@
                         "delete": {
                             "start": [
                                 1,
-                                140309233165401
+                                1
                             ],
                             "end": [
-                                146028888065,
-                                140309233165401
+                                1,
+                                35
                             ]
                         }
                     },
@@ -245,12 +245,12 @@
     ],
     "patch": [
         "diff --git a/yield.js b/yield.js",
-        "index e01b17c..e69de29 100644",
+        "index e01b17c7..e69de29b 100644",
         "--- a/yield.js",
         "+++ b/yield.js",
         "@@ -1 +0,0 @@",
         "-function* foo(){ var index = 0;  }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cac9c5a63ec0402053dbf61bb279288fdc73f212..5c6bdce8f72c2d775feff2e1e2bafd6639ec3092"
+    "shas": "2bb888580d4105d265e9137474d813ab92ce6359..0e81c586bea55e0eeb46e3422b25ccba96c7d9ea"
 }]
