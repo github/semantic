@@ -1,0 +1,14 @@
+[
+  {
+    "language": "javascript",
+    "fileExt": ".js",
+    "repoUrl": "https://github.com/diff-fixtures/javascript.git",
+    "syntaxes": [
+      {
+        "syntax": "try-statement",
+        "insert": "try { f; } catch { g; } finally { h; };",
+        "replacement": "try { f; } catch { h; } finally { g; };"
+      }
+    ]
+  }
+]
