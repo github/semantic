@@ -202,4 +202,7 @@ categoryForRubyName = \case
   "while_modifier" -> While
   "while" -> While
   "yield" -> Yield
+  "true" -> Boolean
+  "false" -> Boolean
+  "self" -> Identifier
   s -> Other s
