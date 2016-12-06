@@ -66,7 +66,7 @@
         "+a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "697f027d6d676fb642c92ddc7ddb8da69e3398cc..03ba7d6abb29b19726ea92f8c40711b5dce2dd77"
+    "shas": "f7475f092fd81593aab4939187efba0e1a894cc6..1fb1f51718a4b8ddf240e498b79dd574de91f7ee"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-replacement-insert-test",
@@ -171,13 +171,28 @@
         " a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "03ba7d6abb29b19726ea92f8c40711b5dce2dd77..958d81ecdccc8dae2c2cd556ae1f0e30f3714b33"
+    "shas": "1fb1f51718a4b8ddf240e498b79dd574de91f7ee..6aedb1ce3a8797ff587dd8ab390fd0ce6aeb0d47"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a | b' binary statement"
+                },
                 {
                     "span": {
                         "replace": [
@@ -193,32 +208,17 @@
                             },
                             {
                                 "start": [
-                                    1,
+                                    2,
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    6
+                                    2,
+                                    7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a & b' binary statement with the 'a | b' binary statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a >> b' binary statement"
+                    "summary": "Replaced the 'a & b' binary statement with the 'a >> b' binary statement"
                 },
                 {
                     "span": {
@@ -270,7 +270,7 @@
         " a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "958d81ecdccc8dae2c2cd556ae1f0e30f3714b33..4dcc3fa0bcda174744b659da9f2473eadf0ecb8e"
+    "shas": "6aedb1ce3a8797ff587dd8ab390fd0ce6aeb0d47..0549c1aa48fc56756472ca67726a9003416f9454"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-replacement-test",
@@ -279,30 +279,18 @@
             "bitwise-operator.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'a | b' binary statement with the 'a & b' binary statement"
+                    "summary": "Added the 'a & b' binary statement"
                 },
                 {
                     "span": {
@@ -318,6 +306,21 @@
                         }
                     },
                     "summary": "Added the 'a << b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a | b' binary statement"
                 },
                 {
                     "span": {
@@ -372,7 +375,7 @@
         " a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4dcc3fa0bcda174744b659da9f2473eadf0ecb8e..1ffc21aa9f343b7a5c6f2afddb3d6ca5de818353"
+    "shas": "0549c1aa48fc56756472ca67726a9003416f9454..8a618461620c18e9ea3a33b5b770de186e326ebc"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-replacement-test",
@@ -509,7 +512,7 @@
         "+a << b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1ffc21aa9f343b7a5c6f2afddb3d6ca5de818353..779c99348624f376770ffb3903898df6706425e0"
+    "shas": "8a618461620c18e9ea3a33b5b770de186e326ebc..a5688f715668b3db076f20ff3399d2bff365d1da"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-test",
@@ -581,7 +584,7 @@
         " a << b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "779c99348624f376770ffb3903898df6706425e0..ba30429e0a93af0dc2ac14735ce98768c82cec41"
+    "shas": "a5688f715668b3db076f20ff3399d2bff365d1da..67a9aacd2e7ce87b09f9e3772b7766c58e875edd"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-rest-test",
@@ -635,5 +638,5 @@
         "-a << b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ba30429e0a93af0dc2ac14735ce98768c82cec41..759c9b6a5afe7116c6111e9e4c7d78f59a1c5477"
+    "shas": "67a9aacd2e7ce87b09f9e3772b7766c58e875edd..1965f9bdeebab8468bebb4f2c29230d3a42c255e"
 }]

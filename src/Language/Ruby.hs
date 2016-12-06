@@ -40,11 +40,9 @@ termConstructor source sourceSpan name range children allChildren
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
-  | name `elem` ["binary", "unary"] = case children of
-    [ _, _ ] -> do
-      allChildren' <- allChildren
-      withDefaultInfo $ S.Operator allChildren'
-    _ -> withDefaultInfo $ S.Error children
+  | name `elem` ["binary", "unary"] = do
+    allChildren' <- allChildren
+    withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
     ("argument_pair", [ k, v ] ) -> S.Pair k v
     ("argument_pair", _ ) -> S.Error children

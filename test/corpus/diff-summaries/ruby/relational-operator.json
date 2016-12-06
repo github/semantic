@@ -66,7 +66,7 @@
         "+x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8df827b37e4782bec6ea1faa62b011508a66bfce..20c863c1c8efc8c63ce9140b96bb3ea8388e6f33"
+    "shas": "7c5058a233fff0a5b08a6fa3752565ecbdde40e5..bd8a856e8f56ace4398ea201818f1d2ba28fe4c8"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-replacement-insert-test",
@@ -187,7 +187,7 @@
         " x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "20c863c1c8efc8c63ce9140b96bb3ea8388e6f33..b72bc96a6ee76dd27ae36edb54c75ac2562be640"
+    "shas": "bd8a856e8f56ace4398ea201818f1d2ba28fe4c8..c68133f93df60e32edbf8f4f54fd5fb233857e17"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-insert-test",
@@ -302,7 +302,7 @@
         " x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b72bc96a6ee76dd27ae36edb54c75ac2562be640..ed02229c217d3defe4884a719bc2f990c434e9d1"
+    "shas": "c68133f93df60e32edbf8f4f54fd5fb233857e17..ad13ab775a8fd37a46de7b08990b8061c84bba67"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-replacement-test",
@@ -326,30 +326,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'x == y' binary statement with the 'x =~ y' binary statement"
+                    "summary": "Added the 'x =~ y' binary statement"
                 },
                 {
                     "span": {
@@ -365,6 +353,21 @@
                         }
                     },
                     "summary": "Added the 'x' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x == y' binary statement"
                 },
                 {
                     "span": {
@@ -420,7 +423,7 @@
         " x === y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ed02229c217d3defe4884a719bc2f990c434e9d1..93fe75a02f05ea9e789c438647f74f2b337bc368"
+    "shas": "ad13ab775a8fd37a46de7b08990b8061c84bba67..c61d17cf7eb2887bbdf676ee6e57ebe1dca60402"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-replacement-test",
@@ -589,7 +592,7 @@
         "+x =! y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "93fe75a02f05ea9e789c438647f74f2b337bc368..18a8c65b72e62e40232f99089fdc14b0bb63c3b0"
+    "shas": "c61d17cf7eb2887bbdf676ee6e57ebe1dca60402..99180bace272ebfed8d920758060fa1b1915e229"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-test",
@@ -662,7 +665,7 @@
         " x =! y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "18a8c65b72e62e40232f99089fdc14b0bb63c3b0..dd39dabe7a3118166c69d84a33bd1a0bc8aecd67"
+    "shas": "99180bace272ebfed8d920758060fa1b1915e229..1326cc387018c547c94716af26d3c421ba8fb0f5"
 }
 ,{
     "testCaseDescription": "ruby-relational-operator-delete-rest-test",
@@ -732,5 +735,5 @@
         "-x =! y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "dd39dabe7a3118166c69d84a33bd1a0bc8aecd67..34030d346875a3ff4ba63b7e41ac3fbd9b01ef10"
+    "shas": "1326cc387018c547c94716af26d3c421ba8fb0f5..90aa585d4ae985a7c45200caf714149779717558"
 }]
