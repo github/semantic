@@ -64,11 +64,15 @@ algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $
   (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
     S.Switch <$> recursively exprA exprB
              <*> bySimilarity casesA casesB
-  (S.Object a, S.Object b) -> Just $ S.Object <$> bySimilarity a b
+  (S.Object tyA a, S.Object tyB b) -> Just $
+    S.Object <$> sequenceA (recursively <$> tyA <*> tyB) 
+             <*> bySimilarity a b
   (Commented commentsA a, Commented commentsB b) -> Just $
     Commented <$> bySimilarity commentsA commentsB
               <*> sequenceA (recursively <$> a <*> b)
-  (Array a, Array b) -> Just $ Array <$> bySimilarity a b
+  (Array tyA a, Array tyB b) -> Just $
+    Array <$> sequenceA (recursively <$> tyA <*> tyB)
+          <*> bySimilarity a b
   (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
     S.Class <$> recursively identifierA identifierB
             <*> sequenceA (recursively <$> paramsA <*> paramsB)

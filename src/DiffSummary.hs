@@ -224,7 +224,7 @@ toTermName source term = case unwrap term of
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
+  S.Object _ kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair k v -> toKeyName k <> toArgName v
   S.Return expr -> maybe "empty" toTermName' expr
   S.Yield expr -> maybe "empty" toTermName' expr
@@ -237,7 +237,7 @@ toTermName source term = case unwrap term of
   S.Constructor expr -> toTermName' expr
   S.Try clauses _ _ _ -> termNameFromChildren term clauses
   S.Select clauses -> termNameFromChildren term clauses
-  S.Array _ -> termNameFromSource term
+  S.Array _ _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toCategoryName a
@@ -251,6 +251,7 @@ toTermName source term = case unwrap term of
   S.ConditionalAssignment id _ -> toTermName' id
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
+  S.Struct _ _ -> termNameFromSource term
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -419,6 +420,10 @@ instance HasCategory Category where
     C.SplatParameter -> "parameter"
     C.HashSplatParameter -> "parameter"
     C.BlockParameter -> "parameter"
+    C.ArrayTy -> "array type"
+    C.DictionaryTy -> "dictionary type"
+    C.StructTy -> "struct type"
+    C.Struct -> "struct"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

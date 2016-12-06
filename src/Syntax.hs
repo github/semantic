@@ -48,7 +48,7 @@ data Syntax a f
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
   | Select { cases :: [f] }
-  | Object { keyValues :: [f] }
+  | Object { objectTy :: Maybe f, keyValues :: [f] }
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
   -- | A comment.
@@ -66,7 +66,7 @@ data Syntax a f
   -- | TODO: Is it a problem that in Ruby, this pattern can work for method def too?
   | Try { tryBegin :: [f], catchRescue :: [f], beginElse :: Maybe f, finallyEnsure :: Maybe f }
   -- | An array literal with list of children.
-  | Array [f]
+  | Array (Maybe f) [f]
   -- | A class with an identifier, superclass, and a list of definitions.
   | Class f (Maybe f) [f]
   -- | A method definition with an identifier, params, and a list of expressions.
@@ -88,6 +88,8 @@ data Syntax a f
   | Defer f
   | TypeAssertion f f
   | TypeConversion f f
+  -- | A struct with an optional type
+  | Struct (Maybe f) [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

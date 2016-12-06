@@ -161,6 +161,10 @@ data Category
   | BlockParameter
   -- | A float literal.
   | FloatLiteral
+  | ArrayTy
+  | DictionaryTy
+  | StructTy
+  | Struct
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -247,6 +251,8 @@ instance Arbitrary Category where
     , pure SplatParameter
     , pure HashSplatParameter
     , pure BlockParameter
+    , pure ArrayTy
+    , pure DictionaryTy
     , Other <$> arbitrary
     ]
 

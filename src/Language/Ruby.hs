@@ -54,7 +54,7 @@ termConstructor source sourceSpan name range children
     -- Let it fall through to generate an Indexed syntax.
     ("optional_parameter", [ k, v ] ) -> S.Pair k v
     ("optional_parameter", _ ) -> S.Error children
-    ("array", _ ) -> S.Array children
+    ("array", _ ) -> S.Array Nothing children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
     ("begin_statement", _ ) -> case partition (\x -> category (extract x) == Rescue) children of
@@ -87,7 +87,7 @@ termConstructor source sourceSpan name range children
         _ -> S.Error children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
-    ("hash", _ ) -> S.Object $ foldMap toTuple children
+    ("hash", _ ) -> S.Object Nothing $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_modifier", _ ) -> S.Error children
     ("if_statement", condition : body ) -> S.If condition body

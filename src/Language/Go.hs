@@ -59,6 +59,7 @@ termConstructor source sourceSpan name range children = case name of
   "selector_expression" -> withDefaultInfo $ toSubscriptAccess children
   "index_expression" -> withDefaultInfo $ toSubscriptAccess children
   "slice_expression" -> sliceToSubscriptAccess children
+  "composite_literal" -> toLiteral children
   "type_assertion_expression" -> withDefaultInfo $ case children of
     [a, b] -> S.TypeAssertion a b
     rest -> S.Error rest
@@ -82,6 +83,23 @@ termConstructor source sourceSpan name range children = case name of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
+    toLiteral = \case
+      children@[ty, _] -> case category (extract ty) of
+        ArrayTy -> toImplicitArray children
+        DictionaryTy -> toMap children
+        _ -> toStruct children
+      rest -> withRanges range Error rest $ S.Error rest
+    toImplicitArray = \case
+      [ty, values] -> withCategory ArrayLiteral (S.Array (Just ty) (toList $ unwrap values))
+      rest -> withRanges range Error rest $ S.Error rest
+    toMap = \case
+      [ty, values] -> withCategory DictionaryLiteral (S.Object (Just ty) (toList $ unwrap values))
+      rest -> withRanges range Error rest $ S.Error rest
+    toStruct = \case
+      [ty, values] -> withCategory Struct (S.Struct (Just ty) (toList $ unwrap values))
+      rest -> withRanges range Error rest $ S.Error rest
+
+
     toExpression f = \case
       [expr] -> f expr
       rest -> S.Error rest

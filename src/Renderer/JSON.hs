@@ -107,7 +107,7 @@ syntaxToTermField syntax = case syntax of
   S.SubscriptAccess identifier property -> [ "identifier" .= identifier ] <> [ "property" .= property ]
   S.Switch expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
   S.Case expression statements -> [ "expression" .= expression ] <> [ "statements" .= statements ]
-  S.Object keyValuePairs -> childrenFields keyValuePairs
+  S.Object ty keyValuePairs -> [ "type" .= ty ] <> childrenFields keyValuePairs
   S.Pair a b -> childrenFields [a, b]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
@@ -119,7 +119,7 @@ syntaxToTermField syntax = case syntax of
   S.Throw c -> [ "expression" .= c ]
   S.Constructor expression -> [ "expression" .= expression ]
   S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
-  S.Array c -> childrenFields c
+  S.Array ty c -> [ "type" .= ty ] <> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier parameters definitions -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
@@ -135,4 +135,5 @@ syntaxToTermField syntax = case syntax of
   S.Defer cases -> childrenFields cases
   S.TypeAssertion a b -> childrenFields [a, b]
   S.TypeConversion a b -> childrenFields [a, b]
+  S.Struct ty fields -> [ "type" .= ty ] <> childrenFields fields
   where childrenFields c = [ "children" .= c ]

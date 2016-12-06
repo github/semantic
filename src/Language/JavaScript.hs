@@ -56,7 +56,7 @@ termConstructor source sourceSpan name range children
     ("switch_statement", _ ) -> S.Error children
     ("case", [ expr, body ]) -> S.Case expr [body]
     ("case", _ ) -> S.Error children
-    ("object", _) -> S.Object $ foldMap toTuple children
+    ("object", _) -> S.Object Nothing $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("if_statement", expr : rest ) -> S.If expr rest
@@ -77,7 +77,7 @@ termConstructor source sourceSpan name range children
         | Catch <- category (extract catch)
         , Finally <- category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
       _ -> S.Error children
-    ("array", _) -> S.Array children
+    ("array", _) -> S.Array Nothing children
     ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("method_definition", _ ) -> S.Error children
