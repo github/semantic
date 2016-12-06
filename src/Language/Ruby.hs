@@ -13,9 +13,6 @@ import Term
 operators :: [Text]
 operators = [ "and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison" ]
 
-functions :: [Text]
-functions = [ "lambda_literal", "lambda_expression" ]
-
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -87,6 +84,10 @@ termConstructor source sourceSpan name range children
         _ -> S.Error children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
+    ("lambda", _) -> case children of
+      [ body ] -> S.AnonymousFunction [] [body]
+      ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
+      _ -> S.Error children
     ("hash", _ ) -> S.Object $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_modifier", _ ) -> S.Error children
@@ -124,10 +125,6 @@ termConstructor source sourceSpan name range children
     ("while", _ ) -> S.Error children
     ("yield", _ ) -> S.Yield children
     _ | name `elem` operators -> S.Operator children
-    _ | name `elem` functions -> case children of
-          [ body ] -> S.AnonymousFunction [] [body]
-          ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
-          _ -> S.Error children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
