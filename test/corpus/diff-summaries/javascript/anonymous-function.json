@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index e69de29..b592868 100644",
+        "index e69de29b..b5928681 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -0,0 +1 @@",
         "+function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5f4dfa791577127cebc7f5fa8c7d94b7427980f3..2e9eda4d95ac6cbdd16de3ad1464523de63ffb44"
+    "shas": "07a785cb4f0cfa49a60fdfbbce7d8ecbfd2a820b..1ecbe6a443a701cf2b90740825d337914c3b01b8"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index b592868..e1de356 100644",
+        "index b5928681..e1de356c 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2e9eda4d95ac6cbdd16de3ad1464523de63ffb44..d6d789dd70b74b099621405aaab5cbb25e1a47eb"
+    "shas": "1ecbe6a443a701cf2b90740825d337914c3b01b8..1e649afd16b0e9145c760bd152b90dbf2eeb1c79"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
@@ -160,7 +160,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    25
+                                    29
                                 ]
                             },
                             {
@@ -170,39 +170,12 @@
                                 ],
                                 "end": [
                                     1,
-                                    25
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    28
-                                ],
-                                "end": [
-                                    1,
-                                    29
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    28
-                                ],
-                                "end": [
-                                    1,
                                     29
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'b' identifier"
+                    "summary": "Replaced the 'b * c' math operator with the 'a + b' math operator"
                 }
             ]
         },
@@ -213,7 +186,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index e1de356..4ca0d4c 100644",
+        "index e1de356c..4ca0d4c7 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -1,3 +1,3 @@",
@@ -223,7 +196,7 @@
         " function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d6d789dd70b74b099621405aaab5cbb25e1a47eb..d40be86ea2ce078c6a426ce0a8c252a71892113a"
+    "shas": "1e649afd16b0e9145c760bd152b90dbf2eeb1c79..7fb344d8f58ce3935df46d0dc70e9f8f1896908f"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-test",
@@ -294,7 +267,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    25
+                                    29
                                 ]
                             },
                             {
@@ -304,39 +277,12 @@
                                 ],
                                 "end": [
                                     1,
-                                    25
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    28
-                                ],
-                                "end": [
-                                    1,
-                                    29
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    28
-                                ],
-                                "end": [
-                                    1,
                                     29
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'c' identifier"
+                    "summary": "Replaced the 'a + b' math operator with the 'b * c' math operator"
                 }
             ]
         },
@@ -347,7 +293,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index 4ca0d4c..e1de356 100644",
+        "index 4ca0d4c7..e1de356c 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -1,3 +1,3 @@",
@@ -357,7 +303,7 @@
         " function(a,b) { return a + b; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d40be86ea2ce078c6a426ce0a8c252a71892113a..fbe8b2947cb17ec793516f3368dd2f787bccfe66"
+    "shas": "7fb344d8f58ce3935df46d0dc70e9f8f1896908f..6d835d52398bfc6715ef4c40d2706dd8c11cb83a"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
@@ -418,7 +364,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index e1de356..afdaccf 100644",
+        "index e1de356c..afdaccf7 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -1,3 +1,2 @@",
@@ -428,7 +374,7 @@
         "+function(b,c) { return b * c; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fbe8b2947cb17ec793516f3368dd2f787bccfe66..260e74caf2632a2de525e1341d76ed31cc8cf2bf"
+    "shas": "6d835d52398bfc6715ef4c40d2706dd8c11cb83a..fa0cd2354feb5199209c9aa13525567951185c88"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-test",
@@ -459,7 +405,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index afdaccf..9f1856f 100644",
+        "index afdaccf7..9f1856f5 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -1,2 +1 @@",
@@ -467,7 +413,7 @@
         " function(b,c) { return b * c; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "260e74caf2632a2de525e1341d76ed31cc8cf2bf..f425fbe0cbbd72279ea1a69e34baa8e341700a09"
+    "shas": "fa0cd2354feb5199209c9aa13525567951185c88..a93d062ea69a6600b3f795d769e2557042925d66"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
@@ -498,12 +444,12 @@
     ],
     "patch": [
         "diff --git a/anonymous-function.js b/anonymous-function.js",
-        "index 9f1856f..e69de29 100644",
+        "index 9f1856f5..e69de29b 100644",
         "--- a/anonymous-function.js",
         "+++ b/anonymous-function.js",
         "@@ -1 +0,0 @@",
         "-function(b,c) { return b * c; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f425fbe0cbbd72279ea1a69e34baa8e341700a09..2a5f85a471c9c83f2e835139afa5eb7bfecd546a"
+    "shas": "a93d062ea69a6600b3f795d769e2557042925d66..80946fe6667b3843c0bd704136ac929ca5f2e3e0"
 }]

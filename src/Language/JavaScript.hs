@@ -26,8 +26,11 @@ termConstructor
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children _
+termConstructor source sourceSpan name range children allChildren
   | name == "ERROR" = withDefaultInfo (S.Error children)
+  | name `elem` operators = do
+    allChildren' <- allChildren
+    withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
     ("return_statement", _) -> S.Return children
     ("trailing_return_statement", _) -> S.Return children
@@ -108,7 +111,6 @@ termConstructor source sourceSpan name range children _
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]
           _ -> S.Error children
-    _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
           [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
