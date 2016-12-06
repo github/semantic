@@ -5,7 +5,6 @@ import Data.Record
 import Info
 import Prologue
 import Source
-import Syntax
 import qualified Syntax as S
 import Term
 
