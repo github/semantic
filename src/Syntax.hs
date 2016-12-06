@@ -60,7 +60,7 @@ data Syntax a f
   | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: [f] }
-  | Return (Maybe f)
+  | Return [f]
   | Throw f
   | Constructor f
   -- | TODO: Is it a problem that in Ruby, this pattern can work for method def too?
@@ -79,7 +79,7 @@ data Syntax a f
   | Export (Maybe f) [f]
   -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
-  | Yield (Maybe f)
+  | Yield [f]
   -- | A negation of a single expression.
   | Negate f
   -- | A rescue block has a list of arguments to rescue and a list of expressions.
@@ -88,6 +88,8 @@ data Syntax a f
   | Defer f
   | TypeAssertion f f
   | TypeConversion f f
+  | Break f
+  | Continue f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

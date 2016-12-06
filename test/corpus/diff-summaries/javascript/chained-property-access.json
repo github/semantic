@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Added the 'returned.promise().done( newDefer.resolve ).fail( newDefer.reject )' return statement"
                 }
             ]
         },
@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index e69de29..5914a55 100644",
+        "index e69de29b..5914a55c 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -0,0 +1 @@",
         "+return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "71feda9fd80ab60adab5cf81748710b2a610173f..02c42e637780aeb5874c5f740ba764a0b606d950"
+    "shas": "b4a1b602905b005b1bfe48d8f78faebd8c9cf016..e4dd7ea96606956464809e9a3bcfdb81f318c39b"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Added the 'returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )' return statement"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Added the 'returned.promise().done( newDefer.resolve ).fail( newDefer.reject )' return statement"
                 }
             ]
         },
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index 5914a55..7095976 100644",
+        "index 5914a55c..70959766 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "02c42e637780aeb5874c5f740ba764a0b606d950..eb64ebf3bc9351da0d4cbb59cdfc44d7152b090e"
+    "shas": "e4dd7ea96606956464809e9a3bcfdb81f318c39b..6365577e012aa898ba1d2cc77d10eec1fb9a016d"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
@@ -159,7 +159,7 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index 7095976..98df938 100644",
+        "index 70959766..98df938b 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -1,3 +1,3 @@",
@@ -169,7 +169,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "eb64ebf3bc9351da0d4cbb59cdfc44d7152b090e..d87ef7df3e23f3b4837c9dd09aeca869774aa731"
+    "shas": "6365577e012aa898ba1d2cc77d10eec1fb9a016d..8ab9cd6c506847581b2fc7f04124803cd344b3ff"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-test",
@@ -239,7 +239,7 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index 98df938..7095976 100644",
+        "index 98df938b..70959766 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -1,3 +1,3 @@",
@@ -249,7 +249,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d87ef7df3e23f3b4837c9dd09aeca869774aa731..2e00036e857c5aa6af0eb4ab23bd4cbb28bd90a2"
+    "shas": "8ab9cd6c506847581b2fc7f04124803cd344b3ff..d535074522aa956a8ea7e8d943227d9d78775725"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
@@ -269,7 +269,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Deleted the 'returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )' return statement"
                 },
                 {
                     "span": {
@@ -284,7 +284,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Deleted the 'returned.promise().done( newDefer.resolve ).fail( newDefer.reject )' return statement"
                 },
                 {
                     "span": {
@@ -299,7 +299,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Added the 'returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )' return statement"
                 }
             ]
         },
@@ -310,7 +310,7 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index 7095976..7b764ca 100644",
+        "index 70959766..7b764ca9 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -1,3 +1,2 @@",
@@ -320,7 +320,7 @@
         "+return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2e00036e857c5aa6af0eb4ab23bd4cbb28bd90a2..5eb335f13f0dea85c75b4d5f174832b08af8a0e6"
+    "shas": "d535074522aa956a8ea7e8d943227d9d78775725..b3f90f50ba0ea4d42e78ba37c176a4d69282fcd7"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-test",
@@ -340,7 +340,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Deleted the 'returned.promise().done( newDefer.resolve ).fail( newDefer.reject )' return statement"
                 }
             ]
         },
@@ -351,7 +351,7 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index 7b764ca..5d6d3a0 100644",
+        "index 7b764ca9..5d6d3a02 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -1,2 +1 @@",
@@ -359,7 +359,7 @@
         " return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5eb335f13f0dea85c75b4d5f174832b08af8a0e6..054acb661f91e8a5b9096d552c5b3410bacc4811"
+    "shas": "b3f90f50ba0ea4d42e78ba37c176a4d69282fcd7..6dd90e85a905d3c205cd42bcbedaa3d50110d426"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
@@ -379,7 +379,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                    "summary": "Deleted the 'returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )' return statement"
                 }
             ]
         },
@@ -390,12 +390,12 @@
     ],
     "patch": [
         "diff --git a/chained-property-access.js b/chained-property-access.js",
-        "index 5d6d3a0..e69de29 100644",
+        "index 5d6d3a02..e69de29b 100644",
         "--- a/chained-property-access.js",
         "+++ b/chained-property-access.js",
         "@@ -1 +0,0 @@",
         "-return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "054acb661f91e8a5b9096d552c5b3410bacc4811..1512ae1cef2a096ce2723ce98334e4ce0e4bc82b"
+    "shas": "6dd90e85a905d3c205cd42bcbedaa3d50110d426..7b26c97829302e6f2c2fc76d9a1e5dc25caf58d9"
 }]

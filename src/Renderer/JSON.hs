@@ -143,4 +143,6 @@ syntaxToTermField syntax = case syntax of
   S.Defer cases -> childrenFields cases
   S.TypeAssertion a b -> childrenFields [a, b]
   S.TypeConversion a b -> childrenFields [a, b]
+  S.Break expr -> [ "expression" .= expr ]
+  S.Continue expr -> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]
