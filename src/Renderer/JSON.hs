@@ -27,7 +27,8 @@ json blobs diff = JSONOutput $ Map.fromList [
   ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
   ("oids", toJSON (oid <$> blobs)),
   ("paths", toJSON (path <$> blobs)) ]
-  where annotateRows = fmap (fmap NumberedLine) . numberedRows
+  where annotateRows :: [Join These a] -> [Join These (NumberedLine a)]
+        annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 -- | A numbered 'a'.
 newtype NumberedLine a = NumberedLine (Int, a)
@@ -65,7 +66,11 @@ instance (ToJSON (Record fields), ToJSON leaf, HasField fields Category, HasFiel
   toEncoding term |
     (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
 
-lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range) => KeyValue kv => Int -> SplitSyntaxDiff leaf fields -> Range -> [kv]
+lineFields :: (ToJSON leaf, ToJSON (Record fields), HasField fields Category, HasField fields Range, KeyValue kv) =>
+  Int ->
+  SplitSyntaxDiff leaf fields ->
+  Range ->
+  [kv]
 lineFields n term range = [ "number" .= n
                           , "terms" .= [ term ]
                           , "range" .= range
@@ -78,7 +83,9 @@ termFields :: (ToJSON recur, KeyValue kv, HasField fields Category, HasField fie
   [kv]
 termFields info syntax = "range" .= characterRange info : "category" .= category info : syntaxToTermField syntax
 
-patchFields :: (ToJSON (Record fields), ToJSON leaf, KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
+patchFields :: (ToJSON (Record fields), ToJSON leaf, KeyValue kv, HasField fields Category, HasField fields Range) =>
+  SplitPatch (SyntaxTerm leaf fields) ->
+  [kv]
 patchFields patch = case patch of
   SplitInsert term -> fields "insert" term
   SplitDelete term -> fields "delete" term
@@ -87,7 +94,9 @@ patchFields patch = case patch of
     fields kind term |
       (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax
 
-syntaxToTermField :: (ToJSON recur, KeyValue kv) => Syntax leaf recur -> [kv]
+syntaxToTermField :: (ToJSON recur, KeyValue kv) =>
+  Syntax leaf recur ->
+  [kv]
 syntaxToTermField syntax = case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
