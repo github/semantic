@@ -258,8 +258,6 @@ toTermName source term = case unwrap term of
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr
   S.Continue expr -> toTermName' expr
-  S.Binary clauses -> termNameFromChildren term clauses
-  S.Unary clauses -> termNameFromChildren term clauses
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)

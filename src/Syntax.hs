@@ -89,10 +89,6 @@ data Syntax a f
   | TypeConversion f f
   | Break f
   | Continue f
-  -- | A binary statement has two terms separated by an unamed operator production.
-  | Binary [f]
-  -- | A unary statement has one term prefixed by an unamed operator production.
-  | Unary [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

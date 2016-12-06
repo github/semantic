@@ -145,6 +145,4 @@ syntaxToTermField syntax = case syntax of
   S.TypeConversion a b -> childrenFields [a, b]
   S.Break expr -> [ "expression" .= expr ]
   S.Continue expr -> [ "expression" .= expr ]
-  S.Binary expressions -> [ "expressions" .= expressions ]
-  S.Unary expr -> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]
