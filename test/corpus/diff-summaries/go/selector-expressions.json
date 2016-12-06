@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7afb15bdf81ab082216644f3284be16ec2946905..2ae5101955c35f37f86d370cc30ba8d35505d730"
+    "shas": "9c569bf10daa31046aed3540fc44a3ed6f5d173f..f45a49e30edbb301f6c19fc61b9ce64dc72746f1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2ae5101955c35f37f86d370cc30ba8d35505d730..a2573be5126bb2ba4f11569458c2ffe040764b25"
+    "shas": "f45a49e30edbb301f6c19fc61b9ce64dc72746f1..883efa85738d836c821d653da8f337342a86af6b"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2573be5126bb2ba4f11569458c2ffe040764b25..5a3a64e456c6ccac02062b7f44808003831ea29d"
+    "shas": "883efa85738d836c821d653da8f337342a86af6b..3f9f3b936e020e197c729d1e3d709a3642c640a2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5a3a64e456c6ccac02062b7f44808003831ea29d..fc19d24e6b301306c547004d2cb7ea1ff0ceadb1"
+    "shas": "3f9f3b936e020e197c729d1e3d709a3642c640a2..689b610fe3d7b789fcb150daa75caee37eea4793"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc19d24e6b301306c547004d2cb7ea1ff0ceadb1..581e8fde25f87a2c4ddb9c8a84c5e21fa108ccce"
+    "shas": "689b610fe3d7b789fcb150daa75caee37eea4793..df2a98d6bbc4e67918cd9e6ca477d598ed90bc9f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "581e8fde25f87a2c4ddb9c8a84c5e21fa108ccce..1930237e0450a07c1c906994e7f1cafa0f936ba1"
+    "shas": "df2a98d6bbc4e67918cd9e6ca477d598ed90bc9f..913e40aab7e003dcf2c1dc11a17e460a0da2585b"
 }]

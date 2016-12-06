@@ -143,7 +143,7 @@
         "replacement": "func g1(a ...*int) {}\nfunc g2(...int) {}\nfunc g3(a, ...bool) {}"
       },
       {
-        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "template": "package main\n\nfunc main() {}\n\n{0}",
         "syntax": "method-declarations",
         "insert": "func (self Person) Equals(other Person) bool {}",
         "replacement": "func (self Num) Equals(other Num) bool {}"

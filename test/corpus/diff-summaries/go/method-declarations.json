@@ -27,18 +27,18 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29..6aaca9e 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -0,0 +1,5 @@",
         "+package main",
         "+",
-        "+func main() {",
+        "+func main() {}",
         "+",
-        "+}"
+        "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f7314a39c28dfa8d01e76f5cca826d40971d91e3..2c2ed727360a09291c683f58205e9cef4e315217"
+    "shas": "75a65d024e28e2ac270fa87a322a96997a129620..d38a5545f5688226f0c93b07f9a39aade9ff7126"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -49,72 +49,128 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                41
+                                5,
+                                7
                             ],
                             "end": [
-                                4,
-                                45
+                                5,
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'bool' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'self' identifier in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                46
+                                5,
+                                12
                             ],
                             "end": [
-                                4,
-                                48
+                                5,
+                                18
                             ]
                         }
                     },
-                    "summary": "Added the '{}' literal_value in the main function of the 'main' module"
-                }
-            ]
-        },
-        "errors": {
-            "method-declarations.go": [
+                    "summary": "Added the 'Person' identifier in the main module"
+                },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                1
+                                5,
+                                20
                             ],
                             "end": [
-                                4,
-                                40
+                                5,
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 'func (self Person) Equals(other Person)' at line 4, column 1 - line 4, column 40 in the main function of the 'main' module"
+                    "summary": "Added the 'Equals' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                27
+                            ],
+                            "end": [
+                                5,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'other' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                33
+                            ],
+                            "end": [
+                                5,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                41
+                            ],
+                            "end": [
+                                5,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bool' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                46
+                            ],
+                            "end": [
+                                5,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{}' block in the main module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "method-declarations.go"
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 7905807..5917528 100644",
+        "index 6aaca9e..e556c01 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
-        "@@ -1,5 +1,5 @@",
-        " package main",
+        "@@ -2,4 +2,4 @@ package main",
         " ",
-        " func main() {",
+        " func main() {}",
+        " ",
         "-",
-        "+func (self Person) Equals(other Person) bool {}",
-        " }"
+        "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2c2ed727360a09291c683f58205e9cef4e315217..86f37c126d371b10a20f6f1dd37bf5bb55e9aad6"
+    "shas": "d38a5545f5688226f0c93b07f9a39aade9ff7126..7c74b8aa80f6713f57b97fe1a9188a339cf2ee00"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -126,54 +182,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     12
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     18
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     12
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     15
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the main module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     33
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     39
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     30
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     33
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'Person' identifier with the 'Num' identifier in the main module"
                 }
             ]
         },
@@ -184,19 +240,18 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 5917528..57f6bd3 100644",
+        "index e556c01..1be6d20 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
-        "@@ -1,5 +1,5 @@",
-        " package main",
+        "@@ -2,4 +2,4 @@ package main",
         " ",
-        " func main() {",
+        " func main() {}",
+        " ",
         "-func (self Person) Equals(other Person) bool {}",
-        "+func (self Num) Equals(other Num) bool {}",
-        " }"
+        "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "86f37c126d371b10a20f6f1dd37bf5bb55e9aad6..3587fe32cd362e467e00b9663ba376ebe3d47d21"
+    "shas": "7c74b8aa80f6713f57b97fe1a9188a339cf2ee00..d91e3b57da9cd9b7bb34e9f4a1e318ccbca1e235"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -208,54 +263,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     12
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     15
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     12
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     18
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the main module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     30
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     33
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    5,
                                     33
                                 ],
                                 "end": [
-                                    4,
+                                    5,
                                     39
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'Num' identifier with the 'Person' identifier in the main module"
                 }
             ]
         },
@@ -266,19 +321,18 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 57f6bd3..5917528 100644",
+        "index 1be6d20..e556c01 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
-        "@@ -1,5 +1,5 @@",
-        " package main",
+        "@@ -2,4 +2,4 @@ package main",
         " ",
-        " func main() {",
+        " func main() {}",
+        " ",
         "-func (self Num) Equals(other Num) bool {}",
-        "+func (self Person) Equals(other Person) bool {}",
-        " }"
+        "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3587fe32cd362e467e00b9663ba376ebe3d47d21..b0c325d1be5d7ec74cd18b46aadb32f19e9aea00"
+    "shas": "d91e3b57da9cd9b7bb34e9f4a1e318ccbca1e235..e02db3583e3839739efc2dc4a323c8e7cb4e7e03"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -289,72 +343,128 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                41
+                                5,
+                                7
                             ],
                             "end": [
-                                4,
-                                45
+                                5,
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bool' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'self' identifier in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                46
+                                5,
+                                12
                             ],
                             "end": [
-                                4,
-                                48
+                                5,
+                                18
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' literal_value in the main function of the 'main' module"
-                }
-            ]
-        },
-        "errors": {
-            "method-declarations.go": [
+                    "summary": "Deleted the 'Person' identifier in the main module"
+                },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
-                                1
+                                5,
+                                20
                             ],
                             "end": [
-                                4,
-                                40
+                                5,
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the 'func (self Person) Equals(other Person)' at line 4, column 1 - line 4, column 40 in the main function of the 'main' module"
+                    "summary": "Deleted the 'Equals' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                27
+                            ],
+                            "end": [
+                                5,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'other' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                33
+                            ],
+                            "end": [
+                                5,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                41
+                            ],
+                            "end": [
+                                5,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bool' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                46
+                            ],
+                            "end": [
+                                5,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{}' block in the main module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "method-declarations.go"
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 5917528..7905807 100644",
+        "index e556c01..6aaca9e 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
-        "@@ -1,5 +1,5 @@",
-        " package main",
+        "@@ -2,4 +2,4 @@ package main",
         " ",
-        " func main() {",
+        " func main() {}",
+        " ",
         "-func (self Person) Equals(other Person) bool {}",
-        "+",
-        " }"
+        "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b0c325d1be5d7ec74cd18b46aadb32f19e9aea00..be583818264bcee80d0715c43ae582b94e41db57"
+    "shas": "e02db3583e3839739efc2dc4a323c8e7cb4e7e03..2591194d26468cbf1c57d1d47466b27467621b0e"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -385,16 +495,16 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 6aaca9e..e69de29 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -1,5 +0,0 @@",
         "-package main",
         "-",
-        "-func main() {",
+        "-func main() {}",
         "-",
-        "-}"
+        "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "be583818264bcee80d0715c43ae582b94e41db57..67a6dc5e7422cb3fedf2a2379ebff5b53592c751"
+    "shas": "2591194d26468cbf1c57d1d47466b27467621b0e..81885792a1345c5526f8ddc2b596f29352cbddb5"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "16190ab69475d6ae624dc520a6ef79c204577e31..b946bbf4b8fa77ad9ded388e4c5e679c36919a47"
+    "shas": "a9b487c56827d8870d5a36e406ffe586d3c09fc7..40ffb58e94a04ccd178df27059d8c7675a047f0e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b946bbf4b8fa77ad9ded388e4c5e679c36919a47..dcb40c88ecd8b7b0a8d7c5e098d454e3bb29df73"
+    "shas": "40ffb58e94a04ccd178df27059d8c7675a047f0e..95a4ab9a667ab64af47313a048f16f1fd59ba80d"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dcb40c88ecd8b7b0a8d7c5e098d454e3bb29df73..3a3a640ae410c7e3103ffb1ab21adb990c65193a"
+    "shas": "95a4ab9a667ab64af47313a048f16f1fd59ba80d..9f59ea03ed9509611a8d5ffd61c9e50ac8f2962e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a3a640ae410c7e3103ffb1ab21adb990c65193a..7f338cb90ee12c326b9d803d8381bf33984058a6"
+    "shas": "9f59ea03ed9509611a8d5ffd61c9e50ac8f2962e..66953a4ed46be2144eb965babf9c1983d9c14bce"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7f338cb90ee12c326b9d803d8381bf33984058a6..8e333e1809f91d03db51c0aa982e7d90ea8325d6"
+    "shas": "66953a4ed46be2144eb965babf9c1983d9c14bce..a2a980aa6716505812424db45efae5cbcfcd3da1"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8e333e1809f91d03db51c0aa982e7d90ea8325d6..87ee1bdc92f2b20dab9d70248dbc977d19b31eba"
+    "shas": "a2a980aa6716505812424db45efae5cbcfcd3da1..1d5fb8aaeebdbe508a91f48e9c9488860579507a"
 }]

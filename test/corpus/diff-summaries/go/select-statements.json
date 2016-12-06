@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a755ebf4299ae3c6e4007bbe1ed66a72657b56de..71cb67be52efa33ac5c01e3dee5c8abc88a123c5"
+    "shas": "131e77178157dea065d5974fef5d6c3e1b446ce9..579b6047e1f3da5b74440e1858d3719fe19ec8c3"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71cb67be52efa33ac5c01e3dee5c8abc88a123c5..a507c0ff95abab5a6560bb3b13362859ba0f0440"
+    "shas": "579b6047e1f3da5b74440e1858d3719fe19ec8c3..2f8e5895d6ea0208882c20011660174228337eb4"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a507c0ff95abab5a6560bb3b13362859ba0f0440..d70e58004ecee668583a499cc69740661545b5c5"
+    "shas": "2f8e5895d6ea0208882c20011660174228337eb4..ab0cdc667db7320b1d72dee65b1d3a86404be689"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d70e58004ecee668583a499cc69740661545b5c5..40e0f91441ccb40b4ec53cab9c47539f6f79825a"
+    "shas": "ab0cdc667db7320b1d72dee65b1d3a86404be689..f8701da89969656cfb894d3d35cea609589f0799"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "40e0f91441ccb40b4ec53cab9c47539f6f79825a..bf60d55e9d73d6333369abfd2e2c448a82ce011d"
+    "shas": "f8701da89969656cfb894d3d35cea609589f0799..dcbbd8ca47c26ca925441500627d16832f19411b"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bf60d55e9d73d6333369abfd2e2c448a82ce011d..a5f852527c8fcb9cba59c33dce09153cbedc2f56"
+    "shas": "dcbbd8ca47c26ca925441500627d16832f19411b..2a49974e78365fa1dfc2e6bba1d6720839e4c990"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5f852527c8fcb9cba59c33dce09153cbedc2f56..e9b0b725f1dc0d05c9314f3d044364c70b3b0be5"
+    "shas": "2a49974e78365fa1dfc2e6bba1d6720839e4c990..2669fae9b8f56a761080d2e74bf8a0cd029af8da"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e9b0b725f1dc0d05c9314f3d044364c70b3b0be5..69ddfae3a22f54d8136d900c93565daffb81253d"
+    "shas": "2669fae9b8f56a761080d2e74bf8a0cd029af8da..d1d7e1378a74801a0577b7101ac2161c10b76963"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "69ddfae3a22f54d8136d900c93565daffb81253d..7e22ba8bc3d3610d6b97204c6fdd6500fd7a51a3"
+    "shas": "d1d7e1378a74801a0577b7101ac2161c10b76963..16bb2c9a4ee64e4a778ff6f2449bf3ce528a122e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e22ba8bc3d3610d6b97204c6fdd6500fd7a51a3..ac429012f46840ca8c09f5d3cf83ae87e8822233"
+    "shas": "16bb2c9a4ee64e4a778ff6f2449bf3ce528a122e..78023c915fc14e08e0357e495e33373b783bf80a"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac429012f46840ca8c09f5d3cf83ae87e8822233..7db729225506b7bf5f31fbd5bacde3d47da70ff4"
+    "shas": "78023c915fc14e08e0357e495e33373b783bf80a..e716518b55c437c3b4c3882502e72a99015e68a3"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7db729225506b7bf5f31fbd5bacde3d47da70ff4..cd26fcae0f7eeb2dd98189ea55832aaa6f16e9e6"
+    "shas": "e716518b55c437c3b4c3882502e72a99015e68a3..e3b540e3fed2032b79e0ff3156cb94e599e52821"
 }]

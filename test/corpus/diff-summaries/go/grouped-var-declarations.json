@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0118ce48ca851422782cc7ea2fb71688c259b82d..57dbacd2d2afc63241f0dae02a116c494d751d42"
+    "shas": "6aabf3c59910b99a8c6d4116c56a1e3ceee84b0d..7622c064cd3a59cc9641540aed49636854f08c84"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57dbacd2d2afc63241f0dae02a116c494d751d42..958605d76a79b3907b2afadc8a8f8b089611ad74"
+    "shas": "7622c064cd3a59cc9641540aed49636854f08c84..1acfd9575926867849648ab0945a6a841795c26a"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "958605d76a79b3907b2afadc8a8f8b089611ad74..57f8ddc0ddc00160126f2ebead2033b8aed97fb2"
+    "shas": "1acfd9575926867849648ab0945a6a841795c26a..cd09153da5ccea87f0f86dbed8ba67dcfc313006"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57f8ddc0ddc00160126f2ebead2033b8aed97fb2..d67780b3bbfa35cfa1996652db006bc2d4622a90"
+    "shas": "cd09153da5ccea87f0f86dbed8ba67dcfc313006..930609ee60ec5e869de99c12091aa312e0e8315d"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d67780b3bbfa35cfa1996652db006bc2d4622a90..f62209de0245fa41529dc709f691021c2d1ec430"
+    "shas": "930609ee60ec5e869de99c12091aa312e0e8315d..cfa2648fd36ea2744e4ca3000fd765814271f679"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f62209de0245fa41529dc709f691021c2d1ec430..d2e1a6ae892f759aae12fe788f47d9908e1640f8"
+    "shas": "cfa2648fd36ea2744e4ca3000fd765814271f679..e4bdeffc4904f1e5baa4767a141341896bad4419"
 }]
