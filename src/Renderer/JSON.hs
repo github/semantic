@@ -106,7 +106,7 @@ syntaxToTermField syntax = case syntax of
   S.AnonymousFunction parameters c -> [ "parameters" .= parameters ] <> childrenFields c
   S.Function identifier parameters c -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> childrenFields c
   S.Assignment assignmentId value -> [ "identifier" .= assignmentId ] <> [ "value" .= value ]
-  S.MathAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
+  S.OperatorAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
@@ -134,7 +134,6 @@ syntaxToTermField syntax = case syntax of
   S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
-  S.OperatorAssignment id value -> [ "identifier" .= id ] <> [ "value" .= value ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Negate expr -> [ "negate" .= expr ]
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions

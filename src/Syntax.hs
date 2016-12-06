@@ -28,8 +28,8 @@ data Syntax a f
   | Function { id :: f, params :: [f], expressions :: [f] }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
-  -- | A math assignment represents expressions whose operator classifies as mathy (e.g. += or *=).
-  | MathAssignment { mathAssignmentId :: f, value :: f }
+  -- | An operator assignment represents expressions with operators like math (e.g x += 1) or conditional (e.g. x ||= 1) assignment.
+  | OperatorAssignment f f
   -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
   -- | e.g. in Javascript x.y represents a member access syntax.
   | MemberAccess { memberId :: f, property :: f }
@@ -77,7 +77,6 @@ data Syntax a f
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
-  | OperatorAssignment f f
   | Yield [f]
   -- | A negation of a single expression.
   | Negate f

@@ -45,7 +45,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.MethodCall{} -> Identifiable
           S.Function{} -> Identifiable
           S.Assignment{} -> Identifiable
-          S.MathAssignment{} -> Identifiable
+          S.OperatorAssignment{} -> Identifiable
           S.VarAssignment{} -> Identifiable
           S.SubscriptAccess{} -> Identifiable
           S.Module{} -> Identifiable
@@ -227,7 +227,7 @@ toTermName source term = case unwrap term of
   S.Case expr _ -> termNameFromSource expr
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
-  S.MathAssignment id _ -> toTermName' id
+  S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair k v -> toKeyName k <> toArgName v
@@ -253,7 +253,6 @@ toTermName source term = case unwrap term of
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
-  S.OperatorAssignment id _ -> toTermName' id
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr

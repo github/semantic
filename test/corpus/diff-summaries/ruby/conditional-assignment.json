@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '7' with '5'"
+                    "summary": "Replaced '7' with '5' in the x operator assignment"
                 }
             ]
         },
@@ -174,7 +174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '7'"
+                    "summary": "Replaced '5' with '7' in the x operator assignment"
                 }
             ]
         },

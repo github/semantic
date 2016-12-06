@@ -36,7 +36,7 @@ termConstructor source sourceSpan name range children allChildren
     ("trailing_return_statement", _) -> S.Return children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
-    ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+    ("math_assignment", [ identifier, value ]) -> S.OperatorAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("member_access", _ ) -> S.Error children
