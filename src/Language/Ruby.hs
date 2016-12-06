@@ -101,8 +101,8 @@ termConstructor source sourceSpan name range children
     ("for", _ ) -> S.Error children
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
-    ("member_access", [ base, property ]) -> S.MemberAccess base property
-    ("member_access", _ ) -> S.Error children
+    ("call", [ base, property ]) -> S.MemberAccess base property
+    ("call", _ ) -> S.Error children
     ("method", _ ) -> case children of
       identifier : params : body | Params <- category (extract params) -> S.Method identifier (toList (unwrap params)) body
       identifier : body -> S.Method identifier [] body
@@ -165,7 +165,6 @@ categoryForRubyName = \case
   "for" -> For
   "formal_parameters" -> Params
   "method_call" -> FunctionCall
-  "function" -> Function
   "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
@@ -175,7 +174,7 @@ categoryForRubyName = \case
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
   "math_assignment" -> MathAssignment
-  "member_access" -> MemberAccess
+  "call" -> MemberAccess
   "method" -> Method
   "module"  -> Module
   "nil" -> Identifier
