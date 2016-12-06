@@ -10,9 +10,6 @@ import Language
 import qualified Syntax as S
 import Term
 
-operators :: [Text]
-operators = [ "and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison" ]
-
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -42,6 +39,16 @@ termConstructor source sourceSpan name range children allChildren
     ( expr : rest ) -> do
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
+    _ -> withDefaultInfo $ S.Error children
+  | name == "binary" = case children of
+    [ _, _ ] -> do
+      allChildren' <- allChildren
+      withDefaultInfo $ S.Binary allChildren'
+    _ -> withDefaultInfo $ S.Error children
+  | name == "unary" = case children of
+    [ _ ] -> do
+      allChildren' <- allChildren
+      withDefaultInfo $ S.Unary allChildren'
     _ -> withDefaultInfo $ S.Error children
   | otherwise = withDefaultInfo $ case (name, children) of
     ("argument_pair", [ k, v ] ) -> S.Pair k v
@@ -75,8 +82,6 @@ termConstructor source sourceSpan name range children allChildren
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
     ("class", _ ) -> S.Error children
     ("comment", _ ) -> S.Comment . toText $ slice range source
-    ("conditional_assignment", [ identifier, value ]) -> S.ConditionalAssignment identifier value
-    ("conditional_assignment", _ ) -> S.Error children
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
     ("method_call", _ ) -> case children of
@@ -100,8 +105,8 @@ termConstructor source sourceSpan name range children allChildren
     ("element_reference", _ ) -> S.Error children
     ("for", lhs : expr : rest ) -> S.For [lhs, expr] rest
     ("for", _ ) -> S.Error children
-    ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
-    ("math_assignment", _ ) -> S.Error children
+    ("operator_assignment", [ identifier, value ]) -> S.OperatorAssignment identifier value
+    ("operator_assignment", _ ) -> S.Error children
     ("call", [ base, property ]) -> S.MemberAccess base property
     ("call", _ ) -> S.Error children
     ("method", _ ) -> case children of
@@ -125,7 +130,6 @@ termConstructor source sourceSpan name range children allChildren
     ("while", expr : rest ) -> S.While expr rest
     ("while", _ ) -> S.Error children
     ("yield", _ ) -> S.Yield children
-    _ | name `elem` operators -> S.Operator children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -139,24 +143,18 @@ termConstructor source sourceSpan name range children allChildren
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
-  "and" -> BooleanOperator
   "argument_list" -> Args
   "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
   "begin" -> Begin
-  "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
-  "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
+  "binary" -> Binary
   "block_parameter" -> BlockParameter
-  "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
-  "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
   "call" -> MemberAccess
   "case" -> Case
   "class"  -> Class
   "comment" -> Comment
-  "comparison" -> RelationalOperator -- comparison operator, e.g. <, <=, >=, >.
-  "conditional_assignment" -> ConditionalAssignment
   "conditional" -> Ternary
   "element_reference" -> SubscriptAccess
   "else" -> Else
@@ -177,26 +175,24 @@ categoryForRubyName = \case
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
-  "math_assignment" -> MathAssignment
   "method_call" -> FunctionCall
   "method" -> Method
   "module"  -> Module
   "nil" -> Identifier
+  "operator_assignment" -> OperatorAssignment
   "optional_parameter" -> OptionalParameter
-  "or" -> BooleanOperator
   "program" -> Program
   "regex" -> Regex
-  "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
   "rescue_modifier" -> RescueModifier
   "rescue" -> Rescue
   "return" -> Return
   "self" -> Identifier
-  "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
   "true" -> Boolean
+  "unary" -> Unary
   "unless_modifier" -> Unless
   "unless" -> Unless
   "until_modifier" -> Until

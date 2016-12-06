@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x < y' relational operator"
+                    "summary": "Added the 'x < y' binary statement"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a > b' relational operator"
+                    "summary": "Added the 'a > b' binary statement"
                 }
             ]
         },
@@ -50,7 +50,7 @@
         "+a > b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cc9a4a6fa2a1c65983250a900daf6501538b4cd8..d0eb4857f83d5eef8c789d9b1800947161d8876d"
+    "shas": "34030d346875a3ff4ba63b7e41ac3fbd9b01ef10..33a97aefb11d5577ac6491fb2f3117d1684b112f"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-replacement-insert-test",
@@ -70,7 +70,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x <= y' relational operator"
+                    "summary": "Added the 'x <= y' binary statement"
                 },
                 {
                     "span": {
@@ -85,7 +85,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a >= b' relational operator"
+                    "summary": "Added the 'a >= b' binary statement"
                 },
                 {
                     "span": {
@@ -100,7 +100,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x < y' relational operator"
+                    "summary": "Added the 'x < y' binary statement"
                 },
                 {
                     "span": {
@@ -115,7 +115,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a > b' relational operator"
+                    "summary": "Added the 'a > b' binary statement"
                 }
             ]
         },
@@ -138,12 +138,69 @@
         " a > b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d0eb4857f83d5eef8c789d9b1800947161d8876d..186f6c1cb9c2260246f3126b1203b54b9670ea09"
+    "shas": "33a97aefb11d5577ac6491fb2f3117d1684b112f..eac60604b744fc7ec95d8df9f69d9fb73e44f19d"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x <= y' binary statement with the 'x < y' binary statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a >= b' binary statement with the 'a > b' binary statement"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -164,12 +221,69 @@
         " x < y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "186f6c1cb9c2260246f3126b1203b54b9670ea09..4e7370cd85c7f324871137855a459a1c583bce75"
+    "shas": "eac60604b744fc7ec95d8df9f69d9fb73e44f19d..0e66531e7171795f02441a62c9ec03485883c293"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x < y' binary statement with the 'x <= y' binary statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a > b' binary statement with the 'a >= b' binary statement"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -190,7 +304,7 @@
         " x < y"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4e7370cd85c7f324871137855a459a1c583bce75..a26bfabeda46c054da38b6aaf5564c5b9e575294"
+    "shas": "0e66531e7171795f02441a62c9ec03485883c293..47a912076fa08895ca739d9524554530fc7104fb"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-replacement-test",
@@ -210,7 +324,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x <= y' relational operator"
+                    "summary": "Deleted the 'x <= y' binary statement"
                 },
                 {
                     "span": {
@@ -225,7 +339,67 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a >= b' relational operator"
+                    "summary": "Deleted the 'a >= b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x < y' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a > b' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x <= y' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a >= b' binary statement"
                 }
             ]
         },
@@ -250,7 +424,7 @@
         "+a >= b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a26bfabeda46c054da38b6aaf5564c5b9e575294..0e4db6b78d0c970ab1b1c30a357997ccd2dd80fa"
+    "shas": "47a912076fa08895ca739d9524554530fc7104fb..e24622e3d9c83bc533b75eadad6a534fbdac081e"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-test",
@@ -270,7 +444,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x < y' relational operator"
+                    "summary": "Deleted the 'x < y' binary statement"
                 },
                 {
                     "span": {
@@ -285,7 +459,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a > b' relational operator"
+                    "summary": "Deleted the 'a > b' binary statement"
                 }
             ]
         },
@@ -306,7 +480,7 @@
         " a >= b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0e4db6b78d0c970ab1b1c30a357997ccd2dd80fa..84a86501aebef11b8627b8524fc8d324665ffc44"
+    "shas": "e24622e3d9c83bc533b75eadad6a534fbdac081e..4bf3c1ad5197957bcf335f12523f1c818c4321d0"
 }
 ,{
     "testCaseDescription": "ruby-comparision-operator-delete-rest-test",
@@ -326,7 +500,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x <= y' relational operator"
+                    "summary": "Deleted the 'x <= y' binary statement"
                 },
                 {
                     "span": {
@@ -341,7 +515,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a >= b' relational operator"
+                    "summary": "Deleted the 'a >= b' binary statement"
                 }
             ]
         },
@@ -360,5 +534,5 @@
         "-a >= b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "84a86501aebef11b8627b8524fc8d324665ffc44..70d36a6a9817b1e91707c1f7f830a0568b959efa"
+    "shas": "4bf3c1ad5197957bcf335f12523f1c818c4321d0..697f027d6d676fb642c92ddc7ddb8da69e3398cc"
 }]

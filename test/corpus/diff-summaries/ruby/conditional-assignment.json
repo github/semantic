@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'x' operator assignment"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+x ||= 5"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6564c9c8832540d910a4118a6130305613ef9772..737bffe1cb105e55eb30dcb5e66499a162216c4d"
+    "shas": "f2764f3c24384919ad4784067bfcc7cb1cd03aea..9f52a57ba1a3826e9ba34d9b90978b1b8448f305"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'x' operator assignment"
                 }
             ]
         },
@@ -89,7 +89,7 @@
         " x ||= 5"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "737bffe1cb105e55eb30dcb5e66499a162216c4d..b4680d4032610561ef31cbb0508bfc9573be0d0c"
+    "shas": "9f52a57ba1a3826e9ba34d9b90978b1b8448f305..14810296b51516e0b2f7465d3ebcf313ebeb8121"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-insert-test",
@@ -142,7 +142,7 @@
         " x ||= 5"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b4680d4032610561ef31cbb0508bfc9573be0d0c..cce1693dd4e7b6101f7cbcc9100b4c3276194fa2"
+    "shas": "14810296b51516e0b2f7465d3ebcf313ebeb8121..6d29d31a956211b3bcba9a892fbb32da12a0919f"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-replacement-test",
@@ -195,7 +195,7 @@
         " x ||= 5"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cce1693dd4e7b6101f7cbcc9100b4c3276194fa2..8bd810b4f976b9701ff7a0ceb9d018bfeac4780e"
+    "shas": "6d29d31a956211b3bcba9a892fbb32da12a0919f..81a2fa39a38b603debbc9ba98a9f3c7e04d84064"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-replacement-test",
@@ -215,7 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -230,7 +230,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -245,7 +245,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'x' operator assignment"
                 }
             ]
         },
@@ -266,7 +266,7 @@
         "+x &&= 7"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8bd810b4f976b9701ff7a0ceb9d018bfeac4780e..ddc2e0154b1f8cbb3c3e3800549d0c5126c7ff52"
+    "shas": "81a2fa39a38b603debbc9ba98a9f3c7e04d84064..32116187c21e6ede5a254591f32347d3d826bb8f"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-test",
@@ -286,7 +286,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 }
             ]
         },
@@ -305,7 +305,7 @@
         " x &&= 7"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ddc2e0154b1f8cbb3c3e3800549d0c5126c7ff52..4f41d6075e03521d205fb38e22fe31e8f89ffcd9"
+    "shas": "32116187c21e6ede5a254591f32347d3d826bb8f..d665026b2102791afb02a90d8a11cb3335bccc51"
 }
 ,{
     "testCaseDescription": "ruby-conditional-assignment-delete-rest-test",
@@ -325,7 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 }
             ]
         },
@@ -343,5 +343,5 @@
         "-x &&= 7"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4f41d6075e03521d205fb38e22fe31e8f89ffcd9..78a9116b77a62e27008d72a5a1f2b1b9bec795bd"
+    "shas": "d665026b2102791afb02a90d8a11cb3335bccc51..48bff6bf54e74bb5709add925c8101431133d29b"
 }]

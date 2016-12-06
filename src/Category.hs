@@ -122,8 +122,6 @@ data Category
   | Interpolation
   -- | A subshell command (e.g. `ls -la` in Ruby)
   | Subshell
-  -- | A conditional assignment expression.
-  | ConditionalAssignment
   -- | A yield statement.
   | Yield
   -- | An until expression.
@@ -163,6 +161,12 @@ data Category
   | Break
   -- | A continue statement, e.g. continue; in JavaScript.
   | Continue
+  -- | A binary statement, e.g. a | b in Ruby.
+  | Binary
+  -- | A unary statement, e.g. !a in Ruby.
+  | Unary
+  -- | Operator assignment, e.g. a ||= b, a += 1 in Ruby.
+  | OperatorAssignment
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -222,7 +226,6 @@ instance Arbitrary Category where
     , pure Export
     , pure Interpolation
     , pure Subshell
-    , pure ConditionalAssignment
     , pure Yield
     , pure Until
     , pure Unless
@@ -250,6 +253,9 @@ instance Arbitrary Category where
     , pure BlockParameter
     , pure Break
     , pure Continue
+    , pure Binary
+    , pure Unary
+    , pure OperatorAssignment
     , Other <$> arbitrary
     ]
 

@@ -253,11 +253,13 @@ toTermName source term = case unwrap term of
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
-  S.ConditionalAssignment id _ -> toTermName' id
+  S.OperatorAssignment id _ -> toTermName' id
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr
   S.Continue expr -> toTermName' expr
+  S.Binary clauses -> termNameFromChildren term clauses
+  S.Unary clauses -> termNameFromChildren term clauses
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -399,7 +401,7 @@ instance HasCategory Category where
     C.AnonymousFunction -> "anonymous function"
     C.Interpolation -> "interpolation"
     C.Subshell -> "subshell command"
-    C.ConditionalAssignment -> "conditional assignment"
+    C.OperatorAssignment -> "operator assignment"
     C.Yield -> "yield statement"
     C.Until -> "until statement"
     C.Unless -> "unless statement"
@@ -427,6 +429,8 @@ instance HasCategory Category where
     C.BlockParameter -> "parameter"
     C.Break -> "break statement"
     C.Continue -> "continue statement"
+    C.Binary -> "binary statement"
+    C.Unary -> "unary statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

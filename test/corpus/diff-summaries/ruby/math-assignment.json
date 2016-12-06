@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -61,7 +61,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -76,7 +76,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 }
             ]
         },
@@ -98,7 +98,7 @@
         "+x **= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b8a1e5f549bc1fa5a1424093d499d32fa0987cee..5438892990d5ecfa57ee99c577aa175b73ffbabe"
+    "shas": "759c9b6a5afe7116c6111e9e4c7d78f59a1c5477..0a231b483f2214b0c0c252cf4b91acf63b12cf84"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-replacement-insert-test",
@@ -118,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -133,7 +133,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -148,7 +148,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -163,7 +163,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -178,7 +178,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -193,7 +193,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -208,7 +208,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -223,7 +223,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -238,7 +238,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -253,7 +253,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 }
             ]
         },
@@ -283,7 +283,7 @@
         " x *= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5438892990d5ecfa57ee99c577aa175b73ffbabe..f70cdf5d64b650094018ccee6d9b42009ad22fde"
+    "shas": "0a231b483f2214b0c0c252cf4b91acf63b12cf84..6e13604bf010d26dcb1c31e2e80e38f540369dc6"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-insert-test",
@@ -315,7 +315,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1' in the x math assignment"
+                    "summary": "Replaced '2' with '1'"
                 }
             ]
         },
@@ -337,7 +337,7 @@
         " x /= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f70cdf5d64b650094018ccee6d9b42009ad22fde..e9c35072aff21a20a3e388f9cf3c172194218160"
+    "shas": "6e13604bf010d26dcb1c31e2e80e38f540369dc6..2df7fab78039530d9e3bb1517c2483cd197100d6"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-replacement-test",
@@ -369,7 +369,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2' in the x math assignment"
+                    "summary": "Replaced '1' with '2'"
                 }
             ]
         },
@@ -391,7 +391,7 @@
         " x /= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e9c35072aff21a20a3e388f9cf3c172194218160..76a45dcf02f834864ade4b2ed1ec5fd0dd0c7f76"
+    "shas": "2df7fab78039530d9e3bb1517c2483cd197100d6..47348c2b7b65214b05f8cb6ed2b315852431762e"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-replacement-test",
@@ -411,7 +411,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -426,7 +426,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -441,7 +441,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -456,7 +456,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -471,7 +471,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -486,7 +486,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -501,7 +501,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'x' operator assignment"
                 }
             ]
         },
@@ -533,7 +533,7 @@
         " x /= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "76a45dcf02f834864ade4b2ed1ec5fd0dd0c7f76..33f478735db5f9a23c2760a55dfc3e4acbdc46f8"
+    "shas": "47348c2b7b65214b05f8cb6ed2b315852431762e..e1059a154b5777bafba9aa2fb5921f516369d6d7"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-test",
@@ -553,7 +553,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -568,7 +568,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -583,7 +583,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -598,7 +598,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -613,7 +613,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 }
             ]
         },
@@ -638,7 +638,7 @@
         " x *= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "33f478735db5f9a23c2760a55dfc3e4acbdc46f8..f81054ebeafb1e11c934903a5f5bc2341f79a500"
+    "shas": "e1059a154b5777bafba9aa2fb5921f516369d6d7..a11f41803e977d9e43f9be55b969ab6e339bd739"
 }
 ,{
     "testCaseDescription": "ruby-math-assignment-delete-rest-test",
@@ -658,7 +658,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -673,7 +673,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -688,7 +688,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -703,7 +703,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 },
                 {
                     "span": {
@@ -718,7 +718,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'x' operator assignment"
                 }
             ]
         },
@@ -740,5 +740,5 @@
         "-x **= 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f81054ebeafb1e11c934903a5f5bc2341f79a500..6564c9c8832540d910a4118a6130305613ef9772"
+    "shas": "a11f41803e977d9e43f9be55b969ab6e339bd739..f2764f3c24384919ad4784067bfcc7cb1cd03aea"
 }]

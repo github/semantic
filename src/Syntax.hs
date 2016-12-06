@@ -77,8 +77,6 @@ data Syntax a f
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
-  -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
-  | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield [f]
   -- | A negation of a single expression.
   | Negate f
@@ -90,6 +88,11 @@ data Syntax a f
   | TypeConversion f f
   | Break f
   | Continue f
+  -- | A binary statement has two terms separated by an unamed operator production.
+  | Binary [f]
+  -- | A unary statement has one term prefixed by an unamed operator production.
+  | Unary [f]
+  | OperatorAssignment f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

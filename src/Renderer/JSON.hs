@@ -134,7 +134,6 @@ syntaxToTermField syntax = case syntax of
   S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
   S.Export identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
-  S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Negate expr -> [ "negate" .= expr ]
   S.Rescue args expressions -> [ "args" .= args ] <> childrenFields expressions
@@ -145,4 +144,7 @@ syntaxToTermField syntax = case syntax of
   S.TypeConversion a b -> childrenFields [a, b]
   S.Break expr -> [ "expression" .= expr ]
   S.Continue expr -> [ "expression" .= expr ]
+  S.Binary expressions -> [ "expressions" .= expressions ]
+  S.Unary expr -> [ "expression" .= expr ]
+  S.OperatorAssignment id value -> [ "identifier" .= id ] <> [ "value" .= value ]
   where childrenFields c = [ "children" .= c ]
