@@ -110,11 +110,11 @@ termConstructor source sourceSpan name range children
     ("module", identifier : body ) -> S.Module identifier body
     ("module", _ ) -> S.Error children
     ("rescue", _ ) -> case children of
-      args : lastException : rest
-        | RescueArgs <- category (extract args)
-        , RescuedException <- category (extract lastException) -> S.Rescue (toList (unwrap args) <> [lastException]) rest
-      lastException : rest | RescuedException <- category (extract lastException) -> S.Rescue [lastException] rest
-      args : body | RescueArgs <- category (extract args) -> S.Rescue (toList (unwrap args)) body
+      exceptions : exceptionVar : rest
+        | RescueArgs <- category (extract exceptions)
+        , RescuedException <- category (extract exceptionVar) -> S.Rescue (toList (unwrap exceptions) <> [exceptionVar]) rest
+      exceptionVar : rest | RescuedException <- category (extract exceptionVar) -> S.Rescue [exceptionVar] rest
+      exceptions : body | RescueArgs <- category (extract exceptions) -> S.Rescue (toList (unwrap exceptions)) body
       body -> S.Rescue [] body
     ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     ("rescue_modifier", _ ) -> S.Error children
@@ -150,6 +150,7 @@ categoryForRubyName = \case
   "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
   "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
+  "call" -> MemberAccess
   "case" -> Case
   "class"  -> Class
   "comment" -> Comment
@@ -161,10 +162,12 @@ categoryForRubyName = \case
   "elsif" -> Elsif
   "ensure" -> Ensure
   "ERROR" -> Error
+  "exception_variable" -> RescuedException
+  "exceptions" -> RescueArgs
+  "false" -> Boolean
   "float" -> NumberLiteral
   "for" -> For
   "formal_parameters" -> Params
-  "method_call" -> FunctionCall
   "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
@@ -174,7 +177,7 @@ categoryForRubyName = \case
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
   "math_assignment" -> MathAssignment
-  "call" -> MemberAccess
+  "method_call" -> FunctionCall
   "method" -> Method
   "module"  -> Module
   "nil" -> Identifier
@@ -183,16 +186,16 @@ categoryForRubyName = \case
   "program" -> Program
   "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
-  "exceptions" -> RescueArgs
-  "rescue" -> Rescue
   "rescue_modifier" -> RescueModifier
-  "exception_variable" -> RescuedException
+  "rescue" -> Rescue
   "return" -> Return
+  "self" -> Identifier
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
+  "true" -> Boolean
   "unless_modifier" -> Unless
   "unless" -> Unless
   "until_modifier" -> Until
@@ -201,7 +204,4 @@ categoryForRubyName = \case
   "while_modifier" -> While
   "while" -> While
   "yield" -> Yield
-  "true" -> Boolean
-  "false" -> Boolean
-  "self" -> Identifier
   s -> Other s
