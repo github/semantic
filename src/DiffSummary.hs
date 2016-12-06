@@ -59,7 +59,6 @@ identifiable term = isIdentifiable (unwrap term) term
           S.If{} -> Identifiable
           S.Try{} -> Identifiable
           S.Switch{} -> Identifiable
-          S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
           _ -> Unidentifiable
