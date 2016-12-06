@@ -77,6 +77,7 @@ data Syntax a f
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
+  | OperatorAssignment f f
   | Yield [f]
   -- | A negation of a single expression.
   | Negate f
@@ -92,7 +93,6 @@ data Syntax a f
   | Binary [f]
   -- | A unary statement has one term prefixed by an unamed operator production.
   | Unary [f]
-  | OperatorAssignment f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
