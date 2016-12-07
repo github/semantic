@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo and bar' boolean operator"
+                    "summary": "Added the 'foo and bar' binary statement"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c7d3f438c72d2ab2a09e3fa47ba1cf9b175d2a9b..0bc5f86f8c781f501003b94889818004364037b9"
+    "shas": "48bff6bf54e74bb5709add925c8101431133d29b..718a1f41b48403cdcb927be311af138014047e2a"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo or bar' boolean operator"
+                    "summary": "Added the 'foo or bar' binary statement"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a or b and c' boolean operator"
+                    "summary": "Added the 'a or b and c' binary statement"
                 },
                 {
                     "span": {
@@ -84,7 +84,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo and bar' boolean operator"
+                    "summary": "Added the 'foo and bar' binary statement"
                 }
             ]
         },
@@ -105,13 +105,40 @@
         " foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0bc5f86f8c781f501003b94889818004364037b9..2c06275827cfa3bbaada5117072cd19574d8d7a9"
+    "shas": "718a1f41b48403cdcb927be311af138014047e2a..b7e04363c991e6a2cd1df38c5f20aa8e9ff7e337"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-insert-test",
     "expectedResult": {
         "changes": {
             "and-or.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo or bar' binary statement with the 'foo and bar' binary statement"
+                },
                 {
                     "span": {
                         "delete": {
@@ -125,7 +152,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a or b and c' boolean operator"
+                    "summary": "Deleted the 'a or b and c' binary statement"
                 }
             ]
         },
@@ -147,13 +174,40 @@
         " foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2c06275827cfa3bbaada5117072cd19574d8d7a9..e800a12b636011a03bc99b86835317cd7ad3ecd1"
+    "shas": "b7e04363c991e6a2cd1df38c5f20aa8e9ff7e337..82a2a103e2f86084de0d80d198270d87f02eda63"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-test",
     "expectedResult": {
         "changes": {
             "and-or.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo and bar' binary statement with the 'foo or bar' binary statement"
+                },
                 {
                     "span": {
                         "insert": {
@@ -167,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a or b and c' boolean operator"
+                    "summary": "Added the 'a or b and c' binary statement"
                 }
             ]
         },
@@ -189,7 +243,7 @@
         " foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e800a12b636011a03bc99b86835317cd7ad3ecd1..c9340cbb8ada35c896fa285761dd0e9dac96fd0b"
+    "shas": "82a2a103e2f86084de0d80d198270d87f02eda63..d10ab6a75880a64eef54c3aa82d677def1938901"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-replacement-test",
@@ -200,46 +254,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
-                                11
+                                4,
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo or bar' boolean operator"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a or b and c' boolean operator"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a or b and c' boolean operator"
+                    "summary": "Deleted the 'foo and bar' binary statement"
                 }
             ]
         },
@@ -261,7 +285,7 @@
         "-foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c9340cbb8ada35c896fa285761dd0e9dac96fd0b..66224b27113350bc8e9d7ffddc2fe22fee05baa2"
+    "shas": "d10ab6a75880a64eef54c3aa82d677def1938901..f4fa4f7622bdfac02faa1feecd7993e7201467b2"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-test",
@@ -281,7 +305,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo and bar' boolean operator"
+                    "summary": "Deleted the 'foo and bar' binary statement"
                 }
             ]
         },
@@ -301,7 +325,7 @@
         " a or b and c"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "66224b27113350bc8e9d7ffddc2fe22fee05baa2..22157102e33b0c6c91eed738c3c7a3ce0edc3fa7"
+    "shas": "f4fa4f7622bdfac02faa1feecd7993e7201467b2..9971253676f78cad3cc69fd652b087501fb4c0bc"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-rest-test",
@@ -321,7 +345,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo or bar' boolean operator"
+                    "summary": "Deleted the 'foo or bar' binary statement"
                 },
                 {
                     "span": {
@@ -336,7 +360,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a or b and c' boolean operator"
+                    "summary": "Deleted the 'a or b and c' binary statement"
                 }
             ]
         },
@@ -355,5 +379,5 @@
         "-a or b and c"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "22157102e33b0c6c91eed738c3c7a3ce0edc3fa7..956b136e24f76c977fefd27d5368ecd527f721ec"
+    "shas": "9971253676f78cad3cc69fd652b087501fb4c0bc..e29d844a20e10103ff1197d78c6639bba8fc6e8a"
 }]

@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index e69de29..7421e18 100644",
+        "index e69de29b..7421e188 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -0,0 +1 @@",
         "+{ add(a, b) { return a + b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e66b1b20abc596d2b560eaa80f1749c79816f9ff..d3b8c609f29da1978a60c14da5d0ca5dfc565eff"
+    "shas": "5fe71a17cc99387501792a564bc50da57decd600..4851c63010b9106484a5f927916b5649e8e51dbd"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index 7421e18..59eb3a3 100644",
+        "index 7421e188..59eb3a3d 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " { add(a, b) { return a + b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d3b8c609f29da1978a60c14da5d0ca5dfc565eff..71f9fe548526a54588efe8ccf43fb16946dde439"
+    "shas": "4851c63010b9106484a5f927916b5649e8e51dbd..ff8a20b8f6098bb77aecc7af4cd21794488b4cda"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
@@ -122,6 +122,33 @@
                         ]
                     },
                     "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the 'add(a, b)' method"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    22
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a - b' math operator with the 'a + b' math operator in the 'add(a, b)' method"
                 }
             ]
         },
@@ -132,7 +159,7 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index 59eb3a3..05689b1 100644",
+        "index 59eb3a3d..05689b17 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +169,7 @@
         " { add(a, b) { return a + b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "71f9fe548526a54588efe8ccf43fb16946dde439..3651aee8e277793117960f9223391b0cfdb1f814"
+    "shas": "ff8a20b8f6098bb77aecc7af4cd21794488b4cda..0eb6d26bdbee9a47efa74182c2dfb9fa3c677c0c"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-test",
@@ -175,6 +202,33 @@
                         ]
                     },
                     "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the 'subtract(a, b)' method"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    22
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a + b' math operator with the 'a - b' math operator in the 'subtract(a, b)' method"
                 }
             ]
         },
@@ -185,7 +239,7 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index 05689b1..59eb3a3 100644",
+        "index 05689b17..59eb3a3d 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +249,7 @@
         " { add(a, b) { return a + b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3651aee8e277793117960f9223391b0cfdb1f814..af0586db52b5b97c1c819ee5e107835fa2299249"
+    "shas": "0eb6d26bdbee9a47efa74182c2dfb9fa3c677c0c..d799c888cbd8b3a2c5fd918488bfdced8c37e3b4"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
@@ -256,7 +310,7 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index 59eb3a3..29d3998 100644",
+        "index 59eb3a3d..29d39987 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +320,7 @@
         "+{ subtract(a, b) { return a - b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "af0586db52b5b97c1c819ee5e107835fa2299249..a1ef0cba5455912ff148f7bf8afbc74061d8de10"
+    "shas": "d799c888cbd8b3a2c5fd918488bfdced8c37e3b4..95338f9afb1060c14d4181bf7fd428d43a7b9f04"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-test",
@@ -297,7 +351,7 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index 29d3998..80ad7f0 100644",
+        "index 29d39987..80ad7f08 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +359,7 @@
         " { subtract(a, b) { return a - b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a1ef0cba5455912ff148f7bf8afbc74061d8de10..896cd9fdc71791d876ea5108de8b34631f284c5a"
+    "shas": "95338f9afb1060c14d4181bf7fd428d43a7b9f04..cc541912a1dea8dbd3e1f25ec14c9de7bc3ecb06"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
@@ -336,12 +390,12 @@
     ],
     "patch": [
         "diff --git a/objects-with-methods.js b/objects-with-methods.js",
-        "index 80ad7f0..e69de29 100644",
+        "index 80ad7f08..e69de29b 100644",
         "--- a/objects-with-methods.js",
         "+++ b/objects-with-methods.js",
         "@@ -1 +0,0 @@",
         "-{ subtract(a, b) { return a - b; } };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "896cd9fdc71791d876ea5108de8b34631f284c5a..c1ec2fd690eae01418882f3dbba8b6a5c0c3c2eb"
+    "shas": "cc541912a1dea8dbd3e1f25ec14c9de7bc3ecb06..07a785cb4f0cfa49a60fdfbbce7d8ecbfd2a820b"
 }]

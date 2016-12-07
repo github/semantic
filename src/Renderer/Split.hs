@@ -86,7 +86,7 @@ styleName category = "category-" <> case category of
   C.AnonymousFunction -> "anonymous_function"
   C.Interpolation -> "interpolation"
   C.Subshell -> "subshell"
-  C.ConditionalAssignment -> "conditional_assignment"
+  C.OperatorAssignment -> "operator_assignment"
   C.Yield -> "yield_statement"
   C.Until -> "until"
   C.Unless -> "unless_statement"
@@ -114,6 +114,10 @@ styleName category = "category-" <> case category of
   C.BlockParameter -> "block_param"
   C.Break -> "break_statement"
   C.Continue -> "continue_statement"
+  C.Binary -> "binary"
+  C.Unary -> "unary"
+  C.Constant -> "constant"
+  C.Superclass -> "superclass"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

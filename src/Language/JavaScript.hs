@@ -23,16 +23,20 @@ termConstructor
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
-  -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children
+  -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
+  -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
+  -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
+termConstructor source sourceSpan name range children allChildren
   | name == "ERROR" = withDefaultInfo (S.Error children)
+  | name `elem` operators = do
+    allChildren' <- allChildren
+    withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
     ("return_statement", _) -> S.Return children
     ("trailing_return_statement", _) -> S.Return children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
-    ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+    ("math_assignment", [ identifier, value ]) -> S.OperatorAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("member_access", _ ) -> S.Error children
@@ -107,7 +111,6 @@ termConstructor source sourceSpan name range children
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]
           _ -> S.Error children
-    _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
           [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]

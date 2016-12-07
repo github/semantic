@@ -51,8 +51,8 @@
       },
       {
         "syntax": "multiple-assignments",
-        "insert": "x, y, z = 10, 20, 30",
-        "replacement": "x, y = aVariable, 40"
+        "insert": "x, y, z = [10, 20, 30]",
+        "replacement": "x, *y = [10, 20, 30]"
       },
       {
         "syntax": "pseudo-variables",

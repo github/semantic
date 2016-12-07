@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a || b' boolean operator"
+                    "summary": "Added the 'a || b' binary statement"
                 }
             ]
         },
@@ -34,7 +34,7 @@
         "+a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5b279526f66afb77b2588f5173ce44d7cc693f97..53ec9b4615b8872e47ba643814f579eb3d74ef32"
+    "shas": "e29d844a20e10103ff1197d78c6639bba8fc6e8a..df14bb28f16cb2a1559a25f79ed0f828988ae3f1"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a && b' boolean operator"
+                    "summary": "Added the 'a && b' binary statement"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a || b' boolean operator"
+                    "summary": "Added the 'a || b' binary statement"
                 }
             ]
         },
@@ -89,12 +89,42 @@
         " a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "53ec9b4615b8872e47ba643814f579eb3d74ef32..02c804c5e37002a6843f3fc329c5db03ad4d51f6"
+    "shas": "df14bb28f16cb2a1559a25f79ed0f828988ae3f1..f5f5bd68d54c7d785cb8be9fa807e45b0edb3e49"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a && b' binary statement with the 'a || b' binary statement"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -112,12 +142,42 @@
         " a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "02c804c5e37002a6843f3fc329c5db03ad4d51f6..144d5b79b707781d8b5d1d56e281bcaa8598ae17"
+    "shas": "f5f5bd68d54c7d785cb8be9fa807e45b0edb3e49..b6258c7694077f26c384afdba0d38ff1c987c01e"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a || b' binary statement with the 'a && b' binary statement"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -135,7 +195,7 @@
         " a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "144d5b79b707781d8b5d1d56e281bcaa8598ae17..000c0198a566086df4d95a1ffd575748b7721552"
+    "shas": "b6258c7694077f26c384afdba0d38ff1c987c01e..53428a8acedfee4c1f2f28b0c8b798fc74d5ae20"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-replacement-test",
@@ -155,7 +215,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a && b' boolean operator"
+                    "summary": "Deleted the 'a && b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a || b' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a && b' binary statement"
                 }
             ]
         },
@@ -176,7 +266,7 @@
         "+a && b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "000c0198a566086df4d95a1ffd575748b7721552..f363216d5459fb0eafeb0168cc3f4af6d11f8cd5"
+    "shas": "53428a8acedfee4c1f2f28b0c8b798fc74d5ae20..11ad3b40423df923fb6260046df3bd83b3b2fc94"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-test",
@@ -196,7 +286,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a || b' boolean operator"
+                    "summary": "Deleted the 'a || b' binary statement"
                 }
             ]
         },
@@ -215,7 +305,7 @@
         " a && b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f363216d5459fb0eafeb0168cc3f4af6d11f8cd5..57a8c0847390f2f78910231321007d7b2c86cc7a"
+    "shas": "11ad3b40423df923fb6260046df3bd83b3b2fc94..1a515a532b8a07afeeedbdd56956bf3e6a4f4f57"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-rest-test",
@@ -235,7 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a && b' boolean operator"
+                    "summary": "Deleted the 'a && b' binary statement"
                 }
             ]
         },
@@ -253,5 +343,5 @@
         "-a && b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "57a8c0847390f2f78910231321007d7b2c86cc7a..0c8195a0d30149b84b53bc2c98687d24a787f4dd"
+    "shas": "1a515a532b8a07afeeedbdd56956bf3e6a4f4f57..7c5058a233fff0a5b08a6fa3752565ecbdde40e5"
 }]

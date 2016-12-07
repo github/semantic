@@ -49,13 +49,18 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           let endPos = SourcePos (1 + (fromIntegral $! ts_node_p_end_point_row node)) (1 + (fromIntegral $! ts_node_p_end_point_column node))
           let sourceSpan = SourceSpan { spanStart = startPos , spanEnd = endPos }
 
+          allChildrenCount <- ts_node_p_child_count node
+          let allChildren = filter isNonEmpty <$> traverse (alloca . getUnnamedChild node) (take (fromIntegral allChildrenCount) [0..])
+
           -- Note: The strict application here is semantically important.
           -- Without it, we may not evaluate the range until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
-          range `seq` termConstructor source (pure $! sourceSpan) (toS name) range children
+          range `seq` termConstructor source (pure $! sourceSpan) (toS name) range children allChildren
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
+        getUnnamedChild node n out = ts_node_p_child node n out >> toTerm out
+        {-# INLINE getUnnamedChild #-}
         termConstructor = case language of
           JavaScript -> JS.termConstructor
           C -> C.termConstructor

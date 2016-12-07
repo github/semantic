@@ -45,7 +45,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.MethodCall{} -> Identifiable
           S.Function{} -> Identifiable
           S.Assignment{} -> Identifiable
-          S.MathAssignment{} -> Identifiable
+          S.OperatorAssignment{} -> Identifiable
           S.VarAssignment{} -> Identifiable
           S.SubscriptAccess{} -> Identifiable
           S.Module{} -> Identifiable
@@ -59,7 +59,6 @@ identifiable term = isIdentifiable (unwrap term) term
           S.If{} -> Identifiable
           S.Try{} -> Identifiable
           S.Switch{} -> Identifiable
-          S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
           _ -> Unidentifiable
@@ -228,7 +227,7 @@ toTermName source term = case unwrap term of
   S.Case expr _ -> termNameFromSource expr
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
-  S.MathAssignment id _ -> toTermName' id
+  S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair k v -> toKeyName k <> toArgName v
@@ -254,7 +253,6 @@ toTermName source term = case unwrap term of
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
-  S.ConditionalAssignment id _ -> toTermName' id
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr
@@ -400,7 +398,7 @@ instance HasCategory Category where
     C.AnonymousFunction -> "anonymous function"
     C.Interpolation -> "interpolation"
     C.Subshell -> "subshell command"
-    C.ConditionalAssignment -> "conditional assignment"
+    C.OperatorAssignment -> "operator assignment"
     C.Yield -> "yield statement"
     C.Until -> "until statement"
     C.Unless -> "unless statement"
@@ -428,6 +426,10 @@ instance HasCategory Category where
     C.BlockParameter -> "parameter"
     C.Break -> "break statement"
     C.Continue -> "continue statement"
+    C.Binary -> "binary statement"
+    C.Unary -> "unary statement"
+    C.Constant -> "constant"
+    C.Superclass -> "superclass"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

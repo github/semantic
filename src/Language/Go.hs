@@ -16,8 +16,9 @@ termConstructor
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
+  -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children = case name of
+termConstructor source sourceSpan name range children _ = case name of
   "return_statement" -> withDefaultInfo $ S.Return children
   "source_file" -> case children of
     packageName : rest | category (extract packageName) == Other "package_clause" ->
