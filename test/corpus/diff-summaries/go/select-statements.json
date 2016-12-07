@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "131e77178157dea065d5974fef5d6c3e1b446ce9..579b6047e1f3da5b74440e1858d3719fe19ec8c3"
+    "shas": "680c2671d86088d9bc9c1a317cd3dd7dcc8036a8..df667a3a6c8e37f01514a493f634193333fb29b7"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "579b6047e1f3da5b74440e1858d3719fe19ec8c3..2f8e5895d6ea0208882c20011660174228337eb4"
+    "shas": "df667a3a6c8e37f01514a493f634193333fb29b7..ad9caf17cefd86902a28c135c34791795ffd715c"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f8e5895d6ea0208882c20011660174228337eb4..ab0cdc667db7320b1d72dee65b1d3a86404be689"
+    "shas": "ad9caf17cefd86902a28c135c34791795ffd715c..4f2b1e57742ceece5b417a62f655c0f04bc440cc"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ab0cdc667db7320b1d72dee65b1d3a86404be689..f8701da89969656cfb894d3d35cea609589f0799"
+    "shas": "4f2b1e57742ceece5b417a62f655c0f04bc440cc..a8aa5e82ff08b73b381985b951bc2ef200297611"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f8701da89969656cfb894d3d35cea609589f0799..dcbbd8ca47c26ca925441500627d16832f19411b"
+    "shas": "a8aa5e82ff08b73b381985b951bc2ef200297611..65f30f120d1319cae951a936563c6749abaef7e1"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dcbbd8ca47c26ca925441500627d16832f19411b..2a49974e78365fa1dfc2e6bba1d6720839e4c990"
+    "shas": "65f30f120d1319cae951a936563c6749abaef7e1..f21ba099d655b37714a236465a82972c65927645"
 }]

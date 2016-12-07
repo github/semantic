@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6aabf3c59910b99a8c6d4116c56a1e3ceee84b0d..7622c064cd3a59cc9641540aed49636854f08c84"
+    "shas": "0ba1fe3c7b17079ddc85588d0275da023af96ea9..fee25fccb01f4d7808b8441393802270321918db"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7622c064cd3a59cc9641540aed49636854f08c84..1acfd9575926867849648ab0945a6a841795c26a"
+    "shas": "fee25fccb01f4d7808b8441393802270321918db..3ed2cb498a58651b365138e4fc917c31f4168680"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1acfd9575926867849648ab0945a6a841795c26a..cd09153da5ccea87f0f86dbed8ba67dcfc313006"
+    "shas": "3ed2cb498a58651b365138e4fc917c31f4168680..204cd72cb81d0bee1e16780980c1bb7b61f3353e"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cd09153da5ccea87f0f86dbed8ba67dcfc313006..930609ee60ec5e869de99c12091aa312e0e8315d"
+    "shas": "204cd72cb81d0bee1e16780980c1bb7b61f3353e..09c01c98f7f4b078824e33567029ba6bf0df239d"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "930609ee60ec5e869de99c12091aa312e0e8315d..cfa2648fd36ea2744e4ca3000fd765814271f679"
+    "shas": "09c01c98f7f4b078824e33567029ba6bf0df239d..9fe6fd35fa79cd59e5497b2ec59f3dd577d38f44"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cfa2648fd36ea2744e4ca3000fd765814271f679..e4bdeffc4904f1e5baa4767a141341896bad4419"
+    "shas": "9fe6fd35fa79cd59e5497b2ec59f3dd577d38f44..0e11990c7fe3829d20d44573e3a2d408bd667cac"
 }]

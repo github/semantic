@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2a49974e78365fa1dfc2e6bba1d6720839e4c990..2669fae9b8f56a761080d2e74bf8a0cd029af8da"
+    "shas": "f21ba099d655b37714a236465a82972c65927645..5a673347de2954526349a14d44172537a229dd96"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2669fae9b8f56a761080d2e74bf8a0cd029af8da..d1d7e1378a74801a0577b7101ac2161c10b76963"
+    "shas": "5a673347de2954526349a14d44172537a229dd96..9c2388fc2fb7a4cd57759617e88b0821b09adf72"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d1d7e1378a74801a0577b7101ac2161c10b76963..16bb2c9a4ee64e4a778ff6f2449bf3ce528a122e"
+    "shas": "9c2388fc2fb7a4cd57759617e88b0821b09adf72..973df49da4619834c51222816b2227217f8cc695"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "16bb2c9a4ee64e4a778ff6f2449bf3ce528a122e..78023c915fc14e08e0357e495e33373b783bf80a"
+    "shas": "973df49da4619834c51222816b2227217f8cc695..509239a14f5808f40254f22c6c97f6a1972801d2"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "78023c915fc14e08e0357e495e33373b783bf80a..e716518b55c437c3b4c3882502e72a99015e68a3"
+    "shas": "509239a14f5808f40254f22c6c97f6a1972801d2..acf918e942d072dfca0874ad062804291c3b3f0a"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e716518b55c437c3b4c3882502e72a99015e68a3..e3b540e3fed2032b79e0ff3156cb94e599e52821"
+    "shas": "acf918e942d072dfca0874ad062804291c3b3f0a..7493fe72a554c0b5c9bc43fb4c4188a18b5b873a"
 }]

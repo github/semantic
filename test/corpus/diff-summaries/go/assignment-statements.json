@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a9b487c56827d8870d5a36e406ffe586d3c09fc7..40ffb58e94a04ccd178df27059d8c7675a047f0e"
+    "shas": "6936256c577720859f72ecfa33fcc2c03f8e1b38..e79f4b305c2dce1225472a5becc556e1d6c48a20"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "40ffb58e94a04ccd178df27059d8c7675a047f0e..95a4ab9a667ab64af47313a048f16f1fd59ba80d"
+    "shas": "e79f4b305c2dce1225472a5becc556e1d6c48a20..4df8adb6ff88d06294ff15efebd8f1ca1da52b8b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95a4ab9a667ab64af47313a048f16f1fd59ba80d..9f59ea03ed9509611a8d5ffd61c9e50ac8f2962e"
+    "shas": "4df8adb6ff88d06294ff15efebd8f1ca1da52b8b..035f19333d60f3d935364ad9c61a4f45ea76b025"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9f59ea03ed9509611a8d5ffd61c9e50ac8f2962e..66953a4ed46be2144eb965babf9c1983d9c14bce"
+    "shas": "035f19333d60f3d935364ad9c61a4f45ea76b025..1f9edc4fe93dcd817809f360d683293095f39edc"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66953a4ed46be2144eb965babf9c1983d9c14bce..a2a980aa6716505812424db45efae5cbcfcd3da1"
+    "shas": "1f9edc4fe93dcd817809f360d683293095f39edc..c8064e0e4a145c84009515b3da315ee515d5ae8d"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2a980aa6716505812424db45efae5cbcfcd3da1..1d5fb8aaeebdbe508a91f48e9c9488860579507a"
+    "shas": "c8064e0e4a145c84009515b3da315ee515d5ae8d..0d7540d9fda0a7a5b10d07a5d91104fdec1cd550"
 }]

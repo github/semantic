@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c569bf10daa31046aed3540fc44a3ed6f5d173f..f45a49e30edbb301f6c19fc61b9ce64dc72746f1"
+    "shas": "055da5b57743a5355719d0c0fbf8e2db94f5ac91..f26cf93921a7cc9f42d5a5d5f8593c9229721fbf"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f45a49e30edbb301f6c19fc61b9ce64dc72746f1..883efa85738d836c821d653da8f337342a86af6b"
+    "shas": "f26cf93921a7cc9f42d5a5d5f8593c9229721fbf..2cc0e24c591429cda484b059dc0f08a379b78b09"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "883efa85738d836c821d653da8f337342a86af6b..3f9f3b936e020e197c729d1e3d709a3642c640a2"
+    "shas": "2cc0e24c591429cda484b059dc0f08a379b78b09..e9b9881759f4015442531886f2a847f8e59b1851"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3f9f3b936e020e197c729d1e3d709a3642c640a2..689b610fe3d7b789fcb150daa75caee37eea4793"
+    "shas": "e9b9881759f4015442531886f2a847f8e59b1851..a0f7ae50f3da0279dea12062e3f7b2a0514c3d5e"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "689b610fe3d7b789fcb150daa75caee37eea4793..df2a98d6bbc4e67918cd9e6ca477d598ed90bc9f"
+    "shas": "a0f7ae50f3da0279dea12062e3f7b2a0514c3d5e..16a9b4f62a29df6e8977c8767ed05f3939bd361d"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "df2a98d6bbc4e67918cd9e6ca477d598ed90bc9f..913e40aab7e003dcf2c1dc11a17e460a0da2585b"
+    "shas": "16a9b4f62a29df6e8977c8767ed05f3939bd361d..54d50ce002201d9b758fcd44c8c0cc7d2df914e0"
 }]
