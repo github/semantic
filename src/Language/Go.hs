@@ -75,7 +75,7 @@ termConstructor source sourceSpan name range children = case name of
     id : rest -> S.FunctionCall id rest
     rest -> S.Error rest
   "const_declaration" -> toConsts children
-  "const_spec" -> toConsts children
+  "const_spec" -> toVarAssignment children
   "func_literal" -> withDefaultInfo $ case children of
     [params, _, body] -> S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
     rest -> S.Error rest
