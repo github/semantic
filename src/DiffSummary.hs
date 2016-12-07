@@ -252,7 +252,7 @@ toTermName source term = case unwrap term of
   S.ConditionalAssignment id _ -> toTermName' id
   S.Negate expr -> toTermName' expr
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
-  S.Struct _ _ -> termNameFromSource term
+  S.Struct ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
