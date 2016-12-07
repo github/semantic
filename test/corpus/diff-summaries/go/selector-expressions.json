@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57d9560deb9f33dd0b67379bbb8c35b4cba3f723..1b42ecce20eec49077eaade7934c36cae96132b6"
+    "shas": "b7cef53a7c59fc2b88ba0a41658125f986c008e2..1d1e76b5a23f52a9d4d9a4e613df63a5a6486883"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1b42ecce20eec49077eaade7934c36cae96132b6..04919483b16b89efdc1c53dd9178039ef4855223"
+    "shas": "1d1e76b5a23f52a9d4d9a4e613df63a5a6486883..2e6df18435a75e078a79a0a5e44339380b354aa1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "04919483b16b89efdc1c53dd9178039ef4855223..9514b19af1cdc25299cb9afc30a0aec7882e33a7"
+    "shas": "2e6df18435a75e078a79a0a5e44339380b354aa1..3fa6d37e446b9ace2aecf8ce7710600a208aa5a5"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9514b19af1cdc25299cb9afc30a0aec7882e33a7..fe7246b07ff7534399715b1ee43818b84eecc76b"
+    "shas": "3fa6d37e446b9ace2aecf8ce7710600a208aa5a5..e2978c38d504eb925e11bad805a12a6303cf218c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fe7246b07ff7534399715b1ee43818b84eecc76b..e96c8bbae1eba778f6a07c73592453900cba9405"
+    "shas": "e2978c38d504eb925e11bad805a12a6303cf218c..73fe621f3b693eca42f7814887f871fbdf691302"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e96c8bbae1eba778f6a07c73592453900cba9405..0547e4f3b783144a6c3127cec4633baec35a668b"
+    "shas": "73fe621f3b693eca42f7814887f871fbdf691302..886b33d41824a470340628cf21c936e1b396a5b9"
 }]

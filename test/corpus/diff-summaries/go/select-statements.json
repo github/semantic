@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "70708fc3335c82a9e42c253b02cf417d95dcc72b..1d04a9bf351ac270d4fc7f3477cc5d393b22c1d6"
+    "shas": "32835c31a64dadd483252a88dd85928f57ce5e44..371509eeeaf98517a2c1d053e31985f66d4089f6"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d04a9bf351ac270d4fc7f3477cc5d393b22c1d6..e650aff3aa2643bd4ec21f3cdd8178945e8d1974"
+    "shas": "371509eeeaf98517a2c1d053e31985f66d4089f6..d67ee5df6cdc71f4e1ae4ccdb61c9e5b83151a87"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e650aff3aa2643bd4ec21f3cdd8178945e8d1974..b1d5932426f808de6a5bdad2dd06689301279080"
+    "shas": "d67ee5df6cdc71f4e1ae4ccdb61c9e5b83151a87..4cac8b5133e4bad9cc0ffa9e7aa30141c8f3d1e0"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1d5932426f808de6a5bdad2dd06689301279080..2867b1323d07795b325e6ab1334ce0496887e5a5"
+    "shas": "4cac8b5133e4bad9cc0ffa9e7aa30141c8f3d1e0..6c3ef8e691ef04703d8716d17ba51278dda106da"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2867b1323d07795b325e6ab1334ce0496887e5a5..81aa1095621c775f7eb0d53731c719fa848ac30c"
+    "shas": "6c3ef8e691ef04703d8716d17ba51278dda106da..a082267b061ee28bbb4f9536e607a138b1b483b6"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "81aa1095621c775f7eb0d53731c719fa848ac30c..4a6aa3c3d96cf2f4bfe079a212f5d7ec37541a02"
+    "shas": "a082267b061ee28bbb4f9536e607a138b1b483b6..9d302626b06231ccfe43953c3a0890225a7b6947"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ef3a752051ce140d3b0949b6e419e87b8d57091..fc1523763b5faa641159cf9396a4b6c03796acd4"
+    "shas": "244fbb4d4eaca93ced3e79bbbddb3d11b85e9c31..d8d3ba18b572f4423d603bfc0f47ae294ead900e"
 }
 ,{
     "testCaseDescription": "go-channel-types-insert-test",
@@ -103,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'struct{}' struct_type in the main function of the 'main' module"
+                    "summary": "Added the 'struct{}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -160,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc1523763b5faa641159cf9396a4b6c03796acd4..d0d6e5aef7e3f10d7e1a3483581c44d3885d0471"
+    "shas": "d8d3ba18b572f4423d603bfc0f47ae294ead900e..f39f4653748071482f4dc5eacc06e2381630d4bc"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-test",
@@ -223,6 +223,36 @@
                 },
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c3' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                18
+                            ],
+                            "end": [
+                                6,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{}' struct type in the main function of the 'main' module"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -236,32 +266,17 @@
                             },
                             {
                                 "start": [
-                                    6,
+                                    7,
                                     1
                                 ],
                                 "end": [
-                                    6,
+                                    7,
                                     3
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c2' identifier with the 'c3' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c4' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'c2' identifier with the 'c4' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -277,6 +292,21 @@
                         }
                     },
                     "summary": "Added the 'string' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                18
+                            ],
+                            "end": [
+                                6,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -334,7 +364,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0d6e5aef7e3f10d7e1a3483581c44d3885d0471..fdbd205d96a62bda2405bf466afb30248057e3a1"
+    "shas": "f39f4653748071482f4dc5eacc06e2381630d4bc..d2a67e4749edb973361f9fc1ee80a030a1a781ff"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-replacement-test",
@@ -384,7 +414,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'struct{}' struct_type in the main function of the 'main' module"
+                    "summary": "Added the 'struct{}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -429,7 +459,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'struct{}' struct_type in the main function of the 'main' module"
+                    "summary": "Deleted the 'struct{}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -487,7 +517,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fdbd205d96a62bda2405bf466afb30248057e3a1..c35ca1abc9b2586f3cd9c912bdf8c3ebad903978"
+    "shas": "d2a67e4749edb973361f9fc1ee80a030a1a781ff..c644f581cf5b78bab79db10be02710aba3824298"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-insert-test",
@@ -552,7 +582,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'struct{}' struct_type in the main function of the 'main' module"
+                    "summary": "Deleted the 'struct{}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -609,7 +639,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c35ca1abc9b2586f3cd9c912bdf8c3ebad903978..ca010bca9a3ce587ed6c303fc80028b33889ee4c"
+    "shas": "c644f581cf5b78bab79db10be02710aba3824298..1351662935a3df8394522e40559536ceefb3418b"
 }
 ,{
     "testCaseDescription": "go-channel-types-teardown-test",
@@ -651,5 +681,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca010bca9a3ce587ed6c303fc80028b33889ee4c..ab428820f0b4f0b59c40ca658f76aff338999d69"
+    "shas": "1351662935a3df8394522e40559536ceefb3418b..77797aa59be812e3c6a7951b5e5c8d91f27ca7a8"
 }]

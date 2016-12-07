@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eeefd1f662b68e999af7c88d01d2a6f992716b98..b03957c337eb44d0e48df68350b81242213efb07"
+    "shas": "6e7cf72f7ca77faa65f54df06a3ed9b0dfb54980..26777dae71ad7b467d17de5dbaef5ebe326a0312"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b03957c337eb44d0e48df68350b81242213efb07..83279736fc27d4d629ed1a98513e9f0890c6912a"
+    "shas": "26777dae71ad7b467d17de5dbaef5ebe326a0312..5805868e9f74a60616d258fa383d51c6cc8b9673"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "83279736fc27d4d629ed1a98513e9f0890c6912a..72b18b5b8ff9b16c02315f341abb3ecafac4a8f5"
+    "shas": "5805868e9f74a60616d258fa383d51c6cc8b9673..e569c9ac78ada85bb58b8550b4fe64269599a686"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "72b18b5b8ff9b16c02315f341abb3ecafac4a8f5..b1da9d4f85daf7c70e213f659d17d6f3580a4703"
+    "shas": "e569c9ac78ada85bb58b8550b4fe64269599a686..ec6e60fbf622a591b104023fac651b731d7721eb"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1da9d4f85daf7c70e213f659d17d6f3580a4703..02dcd9180bc1585e92512f56e247384f4c2ca9e5"
+    "shas": "ec6e60fbf622a591b104023fac651b731d7721eb..e846d0abed7495ca231a79d1ca0259363bca3511"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "02dcd9180bc1585e92512f56e247384f4c2ca9e5..9cddb8e9fccfae3f281ea8483dda6a75ce8138bd"
+    "shas": "e846d0abed7495ca231a79d1ca0259363bca3511..eedd4cea7ca7eda4bc841d6ac361a3d061a0e875"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0df8b387a16f02db264afa899874de65b17f65b7..53affad5b6ba8dd3da81f5c4d20177fefe6de847"
+    "shas": "bed30a9683438e0aa2083ac7a92925222ab22801..60670066b1d7fc6fac892e6b4e7270b52c0166fe"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-insert-test",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53affad5b6ba8dd3da81f5c4d20177fefe6de847..8213e3595910bd42a47aaa760c13973a67c6fc7e"
+    "shas": "60670066b1d7fc6fac892e6b4e7270b52c0166fe..254a5a3778a1406e448de15ae9523e0559c0d012"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -223,7 +223,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8213e3595910bd42a47aaa760c13973a67c6fc7e..b7682c822a25e78f8768863203442c054e09e990"
+    "shas": "254a5a3778a1406e448de15ae9523e0559c0d012..14d56bf384071d086a5071f7098ce67e0b7f9694"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -334,7 +334,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b7682c822a25e78f8768863203442c054e09e990..4963519c076a5555b3796b23d432a8a978977cd2"
+    "shas": "14d56bf384071d086a5071f7098ce67e0b7f9694..610ca0ac9eb1eb33d4208b7781d179dac19b279f"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -408,7 +408,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4963519c076a5555b3796b23d432a8a978977cd2..edf170567d117a8e047d94a2d0aad72b69bcf53c"
+    "shas": "610ca0ac9eb1eb33d4208b7781d179dac19b279f..21c8c3376f9353252578f7981c619af96cf2865d"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-teardown-test",
@@ -450,5 +450,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "edf170567d117a8e047d94a2d0aad72b69bcf53c..9fb0684b7bb7fda2c88d6ed343f225a1fd288943"
+    "shas": "21c8c3376f9353252578f7981c619af96cf2865d..00e135a1a8e4cd0adb7fc184c32c5ed74b72d0cb"
 }]

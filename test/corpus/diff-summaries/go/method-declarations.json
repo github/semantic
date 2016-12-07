@@ -38,7 +38,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05ce9e55f018c3b2a83ab18fc74fca3c5b9a373c..ccfe29d3671c1896bc5d3c1d97b05abc61efdfde"
+    "shas": "fccb257c8f92940c2a2207096f1f4c83b1720e43..2534849e6f99023ae94bb19b648fa79eadf5d6c1"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -170,7 +170,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ccfe29d3671c1896bc5d3c1d97b05abc61efdfde..55578f2a461a3663fb8432dee1edbdb374665495"
+    "shas": "2534849e6f99023ae94bb19b648fa79eadf5d6c1..9b4b4e2750bc1d6bef25d0f694cf0c98bbf1acee"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -251,7 +251,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "55578f2a461a3663fb8432dee1edbdb374665495..d5acfca1e77b6c6d3a903a2c2b14a1af332d4a26"
+    "shas": "9b4b4e2750bc1d6bef25d0f694cf0c98bbf1acee..ad0c18a69f6154b150774f467e92a57a5d2c7d0d"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -332,7 +332,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5acfca1e77b6c6d3a903a2c2b14a1af332d4a26..b4d1e8f62a16048843bc99df3444b134a1380a30"
+    "shas": "ad0c18a69f6154b150774f467e92a57a5d2c7d0d..0c266d2aea3cf20a3268c2d11ba797d33bf60988"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -464,7 +464,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4d1e8f62a16048843bc99df3444b134a1380a30..67f5a7559c1cd45382aceeab1589db0cfc1ea9c8"
+    "shas": "0c266d2aea3cf20a3268c2d11ba797d33bf60988..d41d272273faf22aa70df56098d3ca2550e5013a"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -506,5 +506,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "67f5a7559c1cd45382aceeab1589db0cfc1ea9c8..b40bbe4d579759a5a678d6ecc67c1275d16c5b66"
+    "shas": "d41d272273faf22aa70df56098d3ca2550e5013a..6ac3c2bed5b158c40ccf1f1e9a347a5288538cd0"
 }]

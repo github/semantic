@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "56f685f1fddaf66f27e76988381592eebfc77d6e..bc027eeed7967b96330e21c5c45f02884b9426e1"
+    "shas": "da8bddc263da6c0b32289331a122790ea562912d..ced67241c50bd00d4dd7eb1988d435557e85603d"
 }
 ,{
     "testCaseDescription": "go-struct-types-insert-test",
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'struct {}' struct_type in the main function of the 'main' module"
+                    "summary": "Added the 'struct {}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -284,7 +284,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc027eeed7967b96330e21c5c45f02884b9426e1..abeb294c75928de5803458d9a4f63938a735d1be"
+    "shas": "ced67241c50bd00d4dd7eb1988d435557e85603d..98850420864551c580140cdd1f3e37c9791f9841"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-test",
@@ -430,7 +430,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "abeb294c75928de5803458d9a4f63938a735d1be..1cf37033cd8f2126b8b46f1da6bdb6fb2d956417"
+    "shas": "98850420864551c580140cdd1f3e37c9791f9841..1668dd10bb67855dbddac692a5a30f624170ddd9"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-replacement-test",
@@ -576,7 +576,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1cf37033cd8f2126b8b46f1da6bdb6fb2d956417..499022ef3119334bb85136d0f3ac283973af0aee"
+    "shas": "1668dd10bb67855dbddac692a5a30f624170ddd9..30e2f7c61bfc661380b328cd575f34a63f128b10"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-insert-test",
@@ -611,7 +611,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'struct {}' struct_type in the main function of the 'main' module"
+                    "summary": "Deleted the 'struct {}' struct type in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -822,7 +822,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "499022ef3119334bb85136d0f3ac283973af0aee..aae350a9da404366de4ceda42c01cd18fe688bb9"
+    "shas": "30e2f7c61bfc661380b328cd575f34a63f128b10..1f3ec61d5e979cdfb8f5f8c571f967d377b3279d"
 }
 ,{
     "testCaseDescription": "go-struct-types-teardown-test",
@@ -864,5 +864,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aae350a9da404366de4ceda42c01cd18fe688bb9..22ad1d093078be9e7e38934c3de0f561e4cc3b4d"
+    "shas": "1f3ec61d5e979cdfb8f5f8c571f967d377b3279d..fbe26e2c64c3de9eb14fdaf1467c4035ff37de23"
 }]

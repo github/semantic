@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "16f1a86ce749caa730d487f071173052af2b45b3..bc0fe1daac15124ce6851c5f29dac657cf8ca06b"
+    "shas": "dd4f747c441cd8c29eae4fe14b3d2eaa24f22282..918072c7b7aa52ead70d75087eb745e1371651c4"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc0fe1daac15124ce6851c5f29dac657cf8ca06b..a0b6e3102e7a0f30dc116115612f3a37443fe9ff"
+    "shas": "918072c7b7aa52ead70d75087eb745e1371651c4..d1083a13f50a7b4ff745ef7b5842a67033f8be1c"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a0b6e3102e7a0f30dc116115612f3a37443fe9ff..628c6aa479020e197a38166a4caec47a33f65309"
+    "shas": "d1083a13f50a7b4ff745ef7b5842a67033f8be1c..6c73a3c3f724f717e6f06773067750c45c9ea6ce"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "628c6aa479020e197a38166a4caec47a33f65309..668f209e1248c631116eb807f2c332987a9392bb"
+    "shas": "6c73a3c3f724f717e6f06773067750c45c9ea6ce..7ca42fb5d6f73a816bbcc08fb5c85753fd15b1f0"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "668f209e1248c631116eb807f2c332987a9392bb..bcb72e667206c3db685f2ee0adbc717f437ffba5"
+    "shas": "7ca42fb5d6f73a816bbcc08fb5c85753fd15b1f0..9278ff79d8e62bb92ba8c2c9d726e81d9d78b5f8"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bcb72e667206c3db685f2ee0adbc717f437ffba5..0cf211863f66ea6ccd3b6ad012f79fb3e26e5aef"
+    "shas": "9278ff79d8e62bb92ba8c2c9d726e81d9d78b5f8..cfbc96d8376b4a52edd32a42e42a5bdf761aafd7"
 }]

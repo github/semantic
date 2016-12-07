@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "17d779dbc45e2b0791b1341964f07cecf73cb34a..05d71f9ac4edcfbf80a9f37fd7ed4bb73d68b3c9"
+    "shas": "1d58c4c1e194b7b160874111eee267a32f08fe98..e1dafa000bce58d04020a2828884a3eadd22b316"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05d71f9ac4edcfbf80a9f37fd7ed4bb73d68b3c9..3c044c74b09c3a9f9f48c409155cc40711bbb802"
+    "shas": "e1dafa000bce58d04020a2828884a3eadd22b316..9feefb7af868c589ef7cadcb8cbe5883809e60e9"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c044c74b09c3a9f9f48c409155cc40711bbb802..20b3a926d63a76365065ccc010cfa97b9b76f5ed"
+    "shas": "9feefb7af868c589ef7cadcb8cbe5883809e60e9..2f882100ccd53f6d17b79be46a23d53e433d14fc"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "20b3a926d63a76365065ccc010cfa97b9b76f5ed..80fd9c05717980966cbfac12e53014e9088e2fe3"
+    "shas": "2f882100ccd53f6d17b79be46a23d53e433d14fc..1249f77e1ee2af007e8a692855ddb1c2cf4206e1"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "80fd9c05717980966cbfac12e53014e9088e2fe3..5f085f0b8ba0c98da6a1ef2f7b50fe9e848c99b6"
+    "shas": "1249f77e1ee2af007e8a692855ddb1c2cf4206e1..f6fb5a7514156f69f43a9b5b82cb20f8d5deb2b9"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f085f0b8ba0c98da6a1ef2f7b50fe9e848c99b6..3e1b41d4f939e40479b5b44fd483fb8a4dbac796"
+    "shas": "f6fb5a7514156f69f43a9b5b82cb20f8d5deb2b9..465c0e2e2bcce4e0aa944f72704ec5e00f3fc6c8"
 }]

@@ -5,93 +5,18 @@
             "struct-literals.go": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                4,
+                                1,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                7,
-                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Dog' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's2' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'struct{i float;}' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'time.Month' variable in the main function of the 'main' module"
+                    "summary": "Added the 'main' module"
                 }
             ]
         },
@@ -102,24 +27,18 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 06724a4..7905807 100644",
+        "index e69de29..7905807 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
-        "@@ -1,10 +1,5 @@",
-        " package main",
-        " ",
-        " func main() {",
-        "-const s1 = Dog{",
-        "-name: \"Frank\",",
-        "-Age: \"5 months\",",
-        "-}",
-        "-const s2 = struct{i float;}{j: 6}",
-        "-const s3 = time.Month{}",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
         "+",
-        " }"
+        "+func main() {",
+        "+",
+        "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca01e2361e9b673973b400435a0d289642c8c5ae..e329a4b3767ab24940758e56ce854cd9303e1915"
+    "shas": "3d0dd6ed18ef416d7b9b18bd53203e073c20a14e..08f2c9f8d59efb60ecd0f7488fd7da3d45435961"
 }
 ,{
     "testCaseDescription": "go-struct-literals-insert-test",
@@ -242,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e329a4b3767ab24940758e56ce854cd9303e1915..a1f6e2f22849bdc37435159a65bb1786229d90f0"
+    "shas": "08f2c9f8d59efb60ecd0f7488fd7da3d45435961..53b1c226c59a8edaab7f5cffed468b602ab83a93"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
@@ -412,7 +331,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1f6e2f22849bdc37435159a65bb1786229d90f0..7eea121eac979e1967954378130461e212749421"
+    "shas": "53b1c226c59a8edaab7f5cffed468b602ab83a93..a2d27f9f319a8e62109ca3a10d624b301e988611"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
@@ -582,7 +501,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7eea121eac979e1967954378130461e212749421..96707fd406fe4c11faf18be2431ccdaf6f31f751"
+    "shas": "a2d27f9f319a8e62109ca3a10d624b301e988611..46056980bd007b68e636d7ed83aedf940cf8e060"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
@@ -705,7 +624,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "96707fd406fe4c11faf18be2431ccdaf6f31f751..d0f070d80c2208070215e608f1ef503e4c325d57"
+    "shas": "46056980bd007b68e636d7ed83aedf940cf8e060..14b0f63dbebceac16ba03154705db3deab38c4b0"
 }
 ,{
     "testCaseDescription": "go-struct-literals-teardown-test",
@@ -747,5 +666,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0f070d80c2208070215e608f1ef503e4c325d57..c5e9d28ae04907abe17c555a66bc36dd9bda16cb"
+    "shas": "14b0f63dbebceac16ba03154705db3deab38c4b0..6e5a6185e98c97f96ff4589135ac2170a4c0a147"
 }]
