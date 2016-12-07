@@ -62,6 +62,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Case{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
+          S.Struct{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
