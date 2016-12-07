@@ -210,5 +210,6 @@ categoryForGoName = \case
   "go_statement" -> Go
   "type_assertion_expression" -> TypeAssertion
   "type_conversion_expression" -> TypeConversion
+  "keyed_element" -> Pair
   s -> Other (toS s)
 
