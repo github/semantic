@@ -71,12 +71,14 @@ termConstructor source sourceSpan name range children allChildren
     ("case", _ ) -> S.Error children
     ("when", condition : body ) -> S.Case condition body
     ("when", _ ) -> S.Error children
-    ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
-    ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+    ("class", constant : rest ) -> case rest of
+      ( superclass : body ) | Superclass <- category (extract superclass) -> S.Class constant (Just superclass) body
+      _ -> S.Class constant Nothing rest
     ("class", _ ) -> S.Error children
     ("comment", _ ) -> S.Comment . toText $ slice range source
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
+    ("constant", _ ) -> S.Fixed children
     ("method_call", _ ) -> case children of
       member : args | MemberAccess <- category (extract member) -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
@@ -106,7 +108,7 @@ termConstructor source sourceSpan name range children allChildren
       identifier : params : body | Params <- category (extract params) -> S.Method identifier (toList (unwrap params)) body
       identifier : body -> S.Method identifier [] body
       _ -> S.Error children
-    ("module", identifier : body ) -> S.Module identifier body
+    ("module", constant : body ) -> S.Module constant body
     ("module", _ ) -> S.Error children
     ("rescue", _ ) -> case children of
       exceptions : exceptionVar : rest
@@ -149,6 +151,7 @@ categoryForRubyName = \case
   "class"  -> Class
   "comment" -> Comment
   "conditional" -> Ternary
+  "constant" -> Constant
   "element_reference" -> SubscriptAccess
   "else" -> Else
   "elsif" -> Elsif
@@ -183,6 +186,7 @@ categoryForRubyName = \case
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell
+  "superclass" -> Superclass
   "symbol" -> SymbolLiteral
   "true" -> Boolean
   "unary" -> Unary

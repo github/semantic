@@ -167,6 +167,10 @@ data Category
   | Binary
   -- | A unary statement, e.g. !a in Ruby.
   | Unary
+  -- | A constant, e.g `Foo::Bar` in Ruby.
+  | Constant
+  -- | A superclass, e.g `< Foo` in Ruby.
+  | Superclass
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -256,6 +260,8 @@ instance Arbitrary Category where
     , pure Continue
     , pure Binary
     , pure Unary
+    , pure Constant
+    , pure Superclass
     , Other <$> arbitrary
     ]
 

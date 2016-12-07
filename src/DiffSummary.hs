@@ -428,6 +428,8 @@ instance HasCategory Category where
     C.Continue -> "continue statement"
     C.Binary -> "binary statement"
     C.Unary -> "unary statement"
+    C.Constant -> "constant"
+    C.Superclass -> "superclass"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

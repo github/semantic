@@ -116,6 +116,8 @@ styleName category = "category-" <> case category of
   C.Continue -> "continue_statement"
   C.Binary -> "binary"
   C.Unary -> "unary"
+  C.Constant -> "constant"
+  C.Superclass -> "superclass"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
