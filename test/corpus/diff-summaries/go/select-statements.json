@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "680c2671d86088d9bc9c1a317cd3dd7dcc8036a8..df667a3a6c8e37f01514a493f634193333fb29b7"
+    "shas": "70708fc3335c82a9e42c253b02cf417d95dcc72b..1d04a9bf351ac270d4fc7f3477cc5d393b22c1d6"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "df667a3a6c8e37f01514a493f634193333fb29b7..ad9caf17cefd86902a28c135c34791795ffd715c"
+    "shas": "1d04a9bf351ac270d4fc7f3477cc5d393b22c1d6..e650aff3aa2643bd4ec21f3cdd8178945e8d1974"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad9caf17cefd86902a28c135c34791795ffd715c..4f2b1e57742ceece5b417a62f655c0f04bc440cc"
+    "shas": "e650aff3aa2643bd4ec21f3cdd8178945e8d1974..b1d5932426f808de6a5bdad2dd06689301279080"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4f2b1e57742ceece5b417a62f655c0f04bc440cc..a8aa5e82ff08b73b381985b951bc2ef200297611"
+    "shas": "b1d5932426f808de6a5bdad2dd06689301279080..2867b1323d07795b325e6ab1334ce0496887e5a5"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a8aa5e82ff08b73b381985b951bc2ef200297611..65f30f120d1319cae951a936563c6749abaef7e1"
+    "shas": "2867b1323d07795b325e6ab1334ce0496887e5a5..81aa1095621c775f7eb0d53731c719fa848ac30c"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65f30f120d1319cae951a936563c6749abaef7e1..f21ba099d655b37714a236465a82972c65927645"
+    "shas": "81aa1095621c775f7eb0d53731c719fa848ac30c..4a6aa3c3d96cf2f4bfe079a212f5d7ec37541a02"
 }]

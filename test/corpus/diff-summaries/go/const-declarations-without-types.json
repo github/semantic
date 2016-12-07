@@ -38,12 +38,45 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "675de5524d5d62f395007722aa20f9fb6ee79a5a..7b768d5bca564df989b2d9ae11d6b80e2973626c"
+    "shas": "600da6517caf73c03f5af08490a1c75a8a70e1e7..71f1c547bd7930ac7512e0f23cbe5321684ef87d"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the '0' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -63,12 +96,69 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b768d5bca564df989b2d9ae11d6b80e2973626c..d7927438c3e2d4b89f408507d0a1f30f40bf7cd3"
+    "shas": "71f1c547bd7930ac7512e0f23cbe5321684ef87d..6793d8988b06bc012f842e2626772ab69c5479df"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' variable with the 'one' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '0' variable with the '1' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -88,12 +178,69 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d7927438c3e2d4b89f408507d0a1f30f40bf7cd3..e28e0eb59af5fa2d5a73e5b7e30f507889c733a1"
+    "shas": "6793d8988b06bc012f842e2626772ab69c5479df..c459c8dddd14f39a36482e7fad57097f5830931c"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' variable with the 'zero' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1' variable with the '0' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -113,12 +260,45 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e28e0eb59af5fa2d5a73e5b7e30f507889c733a1..e20986d594e41fb7b2e3bca1b8df80fd45607849"
+    "shas": "c459c8dddd14f39a36482e7fad57097f5830931c..972b3d07161946b7a0cb6241fe895884765d8c95"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-declarations-without-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '0' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -138,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e20986d594e41fb7b2e3bca1b8df80fd45607849..57cb61d53314d2912c9ae2c0c02310b7221940e6"
+    "shas": "972b3d07161946b7a0cb6241fe895884765d8c95..412ab0f998d17235ec5e165988a269f99539ca86"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-teardown-test",
@@ -180,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57cb61d53314d2912c9ae2c0c02310b7221940e6..286096a2d94380e7eed805734d81b294334e1265"
+    "shas": "412ab0f998d17235ec5e165988a269f99539ca86..a6d49f2d0b710fec30ca588ce67fe68aa8375a7e"
 }]

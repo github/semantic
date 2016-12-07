@@ -38,12 +38,45 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d1850e2cc613a054bd9d4f256e1e59f0194e9784..b8de63d71918cc11d3446cf7d12b6146f83d5d4b"
+    "shas": "2c5a9495a39900c87b81fb738ec167f87f874be5..eaef77fe3880df6e72b87244ef4a8190f9cfdccc"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[...]int' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -63,12 +96,96 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b8de63d71918cc11d3446cf7d12b6146f83d5d4b..0ccdfa8446fee234cdb7fd60e945949166cf6bbf"
+    "shas": "eaef77fe3880df6e72b87244ef4a8190f9cfdccc..88db9af842ffe66c6d98d94597a51c3eb9f1f518"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '4' in the [...]int struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    24
+                                ],
+                                "end": [
+                                    4,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    23
+                                ],
+                                "end": [
+                                    4,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '5' in the [...]int struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    27
+                                ],
+                                "end": [
+                                    4,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    25
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '6' in the [...]int struct of the 'main' function"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -88,12 +205,96 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0ccdfa8446fee234cdb7fd60e945949166cf6bbf..d69b71ccb41cd4955b8c5fad11de9e46e440426d"
+    "shas": "88db9af842ffe66c6d98d94597a51c3eb9f1f518..b11993abfd02ee30d18ae474148d0196f044316a"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '1' in the [...]int struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    23
+                                ],
+                                "end": [
+                                    4,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    24
+                                ],
+                                "end": [
+                                    4,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '2' in the [...]int struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    25
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    27
+                                ],
+                                "end": [
+                                    4,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '6' with '3' in the [...]int struct of the 'main' function"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -113,12 +314,45 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d69b71ccb41cd4955b8c5fad11de9e46e440426d..1771e28cec2be2ce0292fc6d9a5e6d7decbf6cb2"
+    "shas": "b11993abfd02ee30d18ae474148d0196f044316a..7d85956c89e79b98291a20e79705e4b6496afa01"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "array-with-implicit-length.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[...]int' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -138,7 +372,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1771e28cec2be2ce0292fc6d9a5e6d7decbf6cb2..be64295ae1d52a1b9c22ebc45f4138e00921a944"
+    "shas": "7d85956c89e79b98291a20e79705e4b6496afa01..14de5399af940a4bf12d6a0b74c88df39ed5b442"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-teardown-test",
@@ -180,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "be64295ae1d52a1b9c22ebc45f4138e00921a944..b8fc38a2567c3bc61d152e63b8a09cd5f44361b4"
+    "shas": "14de5399af940a4bf12d6a0b74c88df39ed5b442..3b9170c77cc9aa221e72b56866d5b07d9d55c2a0"
 }]

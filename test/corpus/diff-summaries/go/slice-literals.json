@@ -38,12 +38,105 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1ae46a81b952e975e412d2cd3292b5a46f2091b1..331881f8491de31cd36a3b8f79d917dc79e42ffd"
+    "shas": "fbd79b664915f7efb56f5a337f98d5d1c0931976..90bd6404dec4480a14c4dee25183c324abf8dcb2"
 }
 ,{
     "testCaseDescription": "go-slice-literals-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "slice-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]string' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's2' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]string' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's3' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[]string' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -68,12 +161,111 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "331881f8491de31cd36a3b8f79d917dc79e42ffd..1f41ca219a88e10e57f03c222e4cd8c4950daffd"
+    "shas": "90bd6404dec4480a14c4dee25183c324abf8dcb2..c3ae4361100ead8ce22b584a0a94c0c100c5d83e"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "slice-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"sup\" string in the []string struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    21
+                                ],
+                                "end": [
+                                    5,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    21
+                                ],
+                                "end": [
+                                    5,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the []string struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the []string struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    2
+                                ],
+                                "end": [
+                                    8,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    2
+                                ],
+                                "end": [
+                                    8,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the []string struct of the 'main' function"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -101,12 +293,111 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f41ca219a88e10e57f03c222e4cd8c4950daffd..e9d83019c5f0a2b031bd469367d3f40e8288f9bf"
+    "shas": "c3ae4361100ead8ce22b584a0a94c0c100c5d83e..71a492a2bf8e8b1706d35498fece1f9500298ff4"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "slice-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"sup\" string in the []string struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    21
+                                ],
+                                "end": [
+                                    5,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    21
+                                ],
+                                "end": [
+                                    5,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the []string struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the []string struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    2
+                                ],
+                                "end": [
+                                    8,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    2
+                                ],
+                                "end": [
+                                    8,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the []string struct of the 'main' function"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -134,12 +425,105 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e9d83019c5f0a2b031bd469367d3f40e8288f9bf..983e2c99c3d61873ff12932738f7caa732c1a39b"
+    "shas": "71a492a2bf8e8b1706d35498fece1f9500298ff4..75d1cd5c2526f4801ae8eb407c2a9bf2269c606d"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "slice-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]string' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's2' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]string' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's3' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[]string' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -164,7 +548,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "983e2c99c3d61873ff12932738f7caa732c1a39b..ba19ccf5b43c3b0db23807d23a813fc95c4db03e"
+    "shas": "75d1cd5c2526f4801ae8eb407c2a9bf2269c606d..3a13236ce5ea2e39cb74ad55b7ce00a8d0601d2c"
 }
 ,{
     "testCaseDescription": "go-slice-literals-teardown-test",
@@ -206,5 +590,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ba19ccf5b43c3b0db23807d23a813fc95c4db03e..d1850e2cc613a054bd9d4f256e1e59f0194e9784"
+    "shas": "3a13236ce5ea2e39cb74ad55b7ce00a8d0601d2c..2c5a9495a39900c87b81fb738ec167f87f874be5"
 }]

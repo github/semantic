@@ -38,12 +38,75 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e28876b3dcee4628412710c24ad66bc0b8aa40e9..47af30949e100e3233a8647eaece76f096bafba8"
+    "shas": "ffd21bdd215ea2b6f01ea6c9dd7a38a3884ea081..c39ca649a47bb4b95e537d1cd44766739cf9567f"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the '01i' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1.e+100i' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -66,12 +129,69 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "47af30949e100e3233a8647eaece76f096bafba8..5b335baa52a5b9c9b2fd2952c0d322c5704a2fbd"
+    "shas": "c39ca649a47bb4b95e537d1cd44766739cf9567f..6646d92174540eaa5ea5a54f8e818366e9d7ff0d"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '01i' imaginary_literal with the '02i' imaginary_literal in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1.e+100i' imaginary_literal with the '1.e+103i' imaginary_literal in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -94,12 +214,69 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b335baa52a5b9c9b2fd2952c0d322c5704a2fbd..8dd6cf07e4509a7358bd3dfd6afd21d2be10d67f"
+    "shas": "6646d92174540eaa5ea5a54f8e818366e9d7ff0d..750950a6b98ac8137423a4e31f5f51deb00494a5"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '02i' imaginary_literal with the '01i' imaginary_literal in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '1.e+103i' imaginary_literal with the '1.e+100i' imaginary_literal in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -122,12 +299,75 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8dd6cf07e4509a7358bd3dfd6afd21d2be10d67f..b92b81bb48a8e98eeb3a5b231160d97d194c9882"
+    "shas": "750950a6b98ac8137423a4e31f5f51deb00494a5..86f3e7ecdb05f2326b21c90a3e0bfa516051d511"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "imaginary-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '01i' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1.e+100i' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -150,7 +390,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b92b81bb48a8e98eeb3a5b231160d97d194c9882..1b55c0d2e585b25b6f169bdeec3490df82090804"
+    "shas": "86f3e7ecdb05f2326b21c90a3e0bfa516051d511..f68aae6c8f955da0c9bdba820f8a47b2520d3a10"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-teardown-test",
@@ -192,5 +432,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1b55c0d2e585b25b6f169bdeec3490df82090804..324e9ec186e26b6fe9ce6dc21296f9c66a4d833b"
+    "shas": "f68aae6c8f955da0c9bdba820f8a47b2520d3a10..ec9a60074a413d2d99f6626cddcc4b661328076d"
 }]

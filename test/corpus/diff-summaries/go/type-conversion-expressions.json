@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff40c38b30544ac9cdbbfb482c225b698a361e03..41e55b8df19fe3dabae1a6c3f60f76ca87765a86"
+    "shas": "85570aec1f717be1628fcdc2999ec5bcffe601fa..af074463f7ab70f9a52b6b167164d9e90ea7e457"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-insert-test",
@@ -129,7 +129,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "41e55b8df19fe3dabae1a6c3f60f76ca87765a86..ecdafb34d3bbef4812f0271f2f80f42858415bdd"
+    "shas": "af074463f7ab70f9a52b6b167164d9e90ea7e457..682b745f6a8550a433e1c1fd19877306e59c6240"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -541,7 +541,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ecdafb34d3bbef4812f0271f2f80f42858415bdd..f8d9f64ab6964b12e19fc95ad798f498137a9c91"
+    "shas": "682b745f6a8550a433e1c1fd19877306e59c6240..85adc82029c58b1feb9ce092171c03de0e92cff5"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -953,7 +953,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f8d9f64ab6964b12e19fc95ad798f498137a9c91..697315903bfefe6fe00f52258faafeb9c2ca6efc"
+    "shas": "85adc82029c58b1feb9ce092171c03de0e92cff5..43cab3cc5c56c0215ad24623261700fbc43da64a"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -1044,7 +1044,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "697315903bfefe6fe00f52258faafeb9c2ca6efc..7a08c65ca60c84c3cecec2a383dba5586fe5b9a4"
+    "shas": "43cab3cc5c56c0215ad24623261700fbc43da64a..aecbec9c343cf72046e3892d1cc3875c2d8e1296"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-teardown-test",
@@ -1086,5 +1086,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a08c65ca60c84c3cecec2a383dba5586fe5b9a4..f657f3c8188de763a43e29ef9c4166b4b90460a6"
+    "shas": "aecbec9c343cf72046e3892d1cc3875c2d8e1296..609a3f75add4b50ef36be9fe1ce8dc9786d67e32"
 }]

@@ -38,12 +38,75 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "324e9ec186e26b6fe9ce6dc21296f9c66a4d833b..6fb67e0e01da39bd2ce05c7067f790213428e4dd"
+    "shas": "ec9a60074a413d2d99f6626cddcc4b661328076d..378caa0c99db4c34da181001391379df5a990276"
 }
 ,{
     "testCaseDescription": "go-string-literals-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "string-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"0\"' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"hello world\"' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -66,12 +129,69 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6fb67e0e01da39bd2ce05c7067f790213428e4dd..10e97a19bb97a4eced1c530453ff54e7bca99ece"
+    "shas": "378caa0c99db4c34da181001391379df5a990276..11d7f4b90ddfec5a5c0118e469c3f54f603f12c6"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "string-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"0\" string with the \"2\" string in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -94,12 +214,69 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "10e97a19bb97a4eced1c530453ff54e7bca99ece..9617576b8b65f80564047056d3f6694ef9ed0ced"
+    "shas": "11d7f4b90ddfec5a5c0118e469c3f54f603f12c6..841734fa9de84f451f5078a7737fcec9a67ddc90"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "string-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"2\" string with the \"0\" string in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -122,12 +299,75 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9617576b8b65f80564047056d3f6694ef9ed0ced..3bc9bc16ef9400e7c8c1e8abfd39cbcc39364d22"
+    "shas": "841734fa9de84f451f5078a7737fcec9a67ddc90..2f57e683be1c47bed137b9804882c07ccd10ff59"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "string-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"0\"' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"hello world\"' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -150,7 +390,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3bc9bc16ef9400e7c8c1e8abfd39cbcc39364d22..6610fbb168549b5fd97a1869c52f658eb40a8d06"
+    "shas": "2f57e683be1c47bed137b9804882c07ccd10ff59..d836adc9735b7a6ea2e15717e60622cd80cfc352"
 }
 ,{
     "testCaseDescription": "go-string-literals-teardown-test",
@@ -192,5 +432,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6610fbb168549b5fd97a1869c52f658eb40a8d06..1ae46a81b952e975e412d2cd3292b5a46f2091b1"
+    "shas": "d836adc9735b7a6ea2e15717e60622cd80cfc352..fbd79b664915f7efb56f5a337f98d5d1c0931976"
 }]

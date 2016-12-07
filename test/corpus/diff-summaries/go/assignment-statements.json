@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6936256c577720859f72ecfa33fcc2c03f8e1b38..e79f4b305c2dce1225472a5becc556e1d6c48a20"
+    "shas": "16f1a86ce749caa730d487f071173052af2b45b3..bc0fe1daac15124ce6851c5f29dac657cf8ca06b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e79f4b305c2dce1225472a5becc556e1d6c48a20..4df8adb6ff88d06294ff15efebd8f1ca1da52b8b"
+    "shas": "bc0fe1daac15124ce6851c5f29dac657cf8ca06b..a0b6e3102e7a0f30dc116115612f3a37443fe9ff"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4df8adb6ff88d06294ff15efebd8f1ca1da52b8b..035f19333d60f3d935364ad9c61a4f45ea76b025"
+    "shas": "a0b6e3102e7a0f30dc116115612f3a37443fe9ff..628c6aa479020e197a38166a4caec47a33f65309"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "035f19333d60f3d935364ad9c61a4f45ea76b025..1f9edc4fe93dcd817809f360d683293095f39edc"
+    "shas": "628c6aa479020e197a38166a4caec47a33f65309..668f209e1248c631116eb807f2c332987a9392bb"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f9edc4fe93dcd817809f360d683293095f39edc..c8064e0e4a145c84009515b3da315ee515d5ae8d"
+    "shas": "668f209e1248c631116eb807f2c332987a9392bb..bcb72e667206c3db685f2ee0adbc717f437ffba5"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c8064e0e4a145c84009515b3da315ee515d5ae8d..0d7540d9fda0a7a5b10d07a5d91104fdec1cd550"
+    "shas": "bcb72e667206c3db685f2ee0adbc717f437ffba5..0cf211863f66ea6ccd3b6ad012f79fb3e26e5aef"
 }]

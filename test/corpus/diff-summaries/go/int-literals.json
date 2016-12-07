@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "23be9d0f0189875de273b393440d609458d9aa42..d417a07eef0ff80baed232fa7feeb3f80b1cd6b7"
+    "shas": "64e66993c5597f3aabc45d1156777f1d6dc78669..6eb6588ec0f5c9dd0a3c1a994679217b27cf34cb"
 }
 ,{
     "testCaseDescription": "go-int-literals-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'branch' variable in the main function of the 'main' module"
+                    "summary": "Added the 'a' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -83,13 +83,40 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d417a07eef0ff80baed232fa7feeb3f80b1cd6b7..17ee23d05034840ee8916df446036c31ee016a14"
+    "shas": "6eb6588ec0f5c9dd0a3c1a994679217b27cf34cb..347b94a8810e942b7d59caff1457c0563866b456"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
     "expectedResult": {
         "changes": {
             "int-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '4' in the a const_spec of the 'main' function"
+                },
                 {
                     "span": {
                         "replace": [
@@ -166,13 +193,40 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "17ee23d05034840ee8916df446036c31ee016a14..e1c12a4493037f3ea9b71bcc0cee9abfaec3ffb8"
+    "shas": "347b94a8810e942b7d59caff1457c0563866b456..47911a7b12e3827642d4c9bdd070828c57d902bb"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "int-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '1' in the a const_spec of the 'main' function"
+                },
                 {
                     "span": {
                         "replace": [
@@ -249,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1c12a4493037f3ea9b71bcc0cee9abfaec3ffb8..2ae548082398af5b87e1d0d7b30ffe466dd5ac5e"
+    "shas": "47911a7b12e3827642d4c9bdd070828c57d902bb..10350769ef3602719e24dc66be7cc246ecab2e53"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-insert-test",
@@ -269,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'branch' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -294,7 +348,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2ae548082398af5b87e1d0d7b30ffe466dd5ac5e..66ee8d3b9c0f2f98b935bd9b0ab880dabb7f8ce1"
+    "shas": "10350769ef3602719e24dc66be7cc246ecab2e53..24ae2eaa0775a5fee250c7256c1582da1fb92a33"
 }
 ,{
     "testCaseDescription": "go-int-literals-teardown-test",
@@ -336,5 +390,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66ee8d3b9c0f2f98b935bd9b0ab880dabb7f8ce1..6936256c577720859f72ecfa33fcc2c03f8e1b38"
+    "shas": "24ae2eaa0775a5fee250c7256c1582da1fb92a33..16f1a86ce749caa730d487f071173052af2b45b3"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "961d0e855795c062606295b14b6bae5aeaca551a..18cbeb52c67db4552eceb978c40790691cb8f3c4"
+    "shas": "eeefd1f662b68e999af7c88d01d2a6f992716b98..b03957c337eb44d0e48df68350b81242213efb07"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "18cbeb52c67db4552eceb978c40790691cb8f3c4..aa0e56e7f93a5d1f7e4f1ae45fbcd77a06cac2f7"
+    "shas": "b03957c337eb44d0e48df68350b81242213efb07..83279736fc27d4d629ed1a98513e9f0890c6912a"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aa0e56e7f93a5d1f7e4f1ae45fbcd77a06cac2f7..63957eb5ffd196703e35f57f2143f8652a95ac6b"
+    "shas": "83279736fc27d4d629ed1a98513e9f0890c6912a..72b18b5b8ff9b16c02315f341abb3ecafac4a8f5"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "63957eb5ffd196703e35f57f2143f8652a95ac6b..c2ec85962fd7ff8c6e14a397b734bcf4ba4d4656"
+    "shas": "72b18b5b8ff9b16c02315f341abb3ecafac4a8f5..b1da9d4f85daf7c70e213f659d17d6f3580a4703"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c2ec85962fd7ff8c6e14a397b734bcf4ba4d4656..44343c3cc41701770ceb34c9e7d931f336551fb4"
+    "shas": "b1da9d4f85daf7c70e213f659d17d6f3580a4703..02dcd9180bc1585e92512f56e247384f4c2ca9e5"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44343c3cc41701770ceb34c9e7d931f336551fb4..78d1891712cfabe7d219bdf8df973c99e9d8a9a2"
+    "shas": "02dcd9180bc1585e92512f56e247384f4c2ca9e5..9cddb8e9fccfae3f281ea8483dda6a75ce8138bd"
 }]

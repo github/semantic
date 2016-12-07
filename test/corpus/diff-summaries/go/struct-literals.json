@@ -5,18 +5,93 @@
             "struct-literals.go": [
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                7,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'main' module"
+                    "summary": "Deleted the 's1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Dog' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's2' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{i float;}' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's3' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'time.Month' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -27,23 +102,122 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index e69de29..7905807 100644",
+        "index 06724a4..7905807 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
-        "@@ -0,0 +1,5 @@",
-        "+package main",
+        "@@ -1,10 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const s1 = Dog{",
+        "-name: \"Frank\",",
+        "-Age: \"5 months\",",
+        "-}",
+        "-const s2 = struct{i float;}{j: 6}",
+        "-const s3 = time.Month{}",
         "+",
-        "+func main() {",
-        "+",
-        "+}"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "59f328f060e69fc8146e0869b98743214acc67a8..6ec149a60b40e357b1341819b21d42cf7c2207de"
+    "shas": "ca01e2361e9b673973b400435a0d289642c8c5ae..e329a4b3767ab24940758e56ce854cd9303e1915"
 }
 ,{
     "testCaseDescription": "go-struct-literals-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "struct-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Person' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's2' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'struct{i int;}' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 's3' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'time.Time' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -68,12 +242,150 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ec149a60b40e357b1341819b21d42cf7c2207de..ad3817d16c8cd0fa6afe8c1a7814258d2d95614d"
+    "shas": "e329a4b3767ab24940758e56ce854cd9303e1915..a1f6e2f22849bdc37435159a65bb1786229d90f0"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "struct-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the Dog struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the struct{i float;} struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    27
+                                ],
+                                "end": [
+                                    8,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    29
+                                ],
+                                "end": [
+                                    8,
+                                    30
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the struct{i float;} struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    30
+                                ],
+                                "end": [
+                                    8,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    32
+                                ],
+                                "end": [
+                                    8,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '6' in the struct{i float;} struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    9,
+                                    17
+                                ],
+                                "end": [
+                                    9,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    17
+                                ],
+                                "end": [
+                                    9,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the time.Month struct of the 'main' function"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -100,12 +412,150 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad3817d16c8cd0fa6afe8c1a7814258d2d95614d..493677830f00bb74d4526451955cf0f0a0b7641e"
+    "shas": "a1f6e2f22849bdc37435159a65bb1786229d90f0..7eea121eac979e1967954378130461e212749421"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "struct-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "end": [
+                                    4,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the Person struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    21
+                                ],
+                                "end": [
+                                    8,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the struct{i int;} struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    29
+                                ],
+                                "end": [
+                                    8,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    27
+                                ],
+                                "end": [
+                                    8,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the struct{i int;} struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    32
+                                ],
+                                "end": [
+                                    8,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    30
+                                ],
+                                "end": [
+                                    8,
+                                    31
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '6' with '5' in the struct{i int;} struct of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    9,
+                                    17
+                                ],
+                                "end": [
+                                    9,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    17
+                                ],
+                                "end": [
+                                    9,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the time.Time struct of the 'main' function"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -132,12 +582,105 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "493677830f00bb74d4526451955cf0f0a0b7641e..df09188d266696b6d780cf96e04d6dd45ceadfb8"
+    "shas": "7eea121eac979e1967954378130461e212749421..96707fd406fe4c11faf18be2431ccdaf6f31f751"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "struct-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's1' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Person' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's2' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'struct{i int;}' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 's3' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "end": [
+                                9,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'time.Time' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -162,7 +705,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "df09188d266696b6d780cf96e04d6dd45ceadfb8..ae3e6644cc269e6a58a7c663575f2ccec79337e0"
+    "shas": "96707fd406fe4c11faf18be2431ccdaf6f31f751..d0f070d80c2208070215e608f1ef503e4c325d57"
 }
 ,{
     "testCaseDescription": "go-struct-literals-teardown-test",
@@ -204,5 +747,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ae3e6644cc269e6a58a7c663575f2ccec79337e0..7553b0a8ce30d85fad48ce7c9c329110f2d32bfa"
+    "shas": "d0f070d80c2208070215e608f1ef503e4c325d57..c5e9d28ae04907abe17c555a66bc36dd9bda16cb"
 }]

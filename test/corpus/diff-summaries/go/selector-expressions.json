@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "055da5b57743a5355719d0c0fbf8e2db94f5ac91..f26cf93921a7cc9f42d5a5d5f8593c9229721fbf"
+    "shas": "57d9560deb9f33dd0b67379bbb8c35b4cba3f723..1b42ecce20eec49077eaade7934c36cae96132b6"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f26cf93921a7cc9f42d5a5d5f8593c9229721fbf..2cc0e24c591429cda484b059dc0f08a379b78b09"
+    "shas": "1b42ecce20eec49077eaade7934c36cae96132b6..04919483b16b89efdc1c53dd9178039ef4855223"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2cc0e24c591429cda484b059dc0f08a379b78b09..e9b9881759f4015442531886f2a847f8e59b1851"
+    "shas": "04919483b16b89efdc1c53dd9178039ef4855223..9514b19af1cdc25299cb9afc30a0aec7882e33a7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e9b9881759f4015442531886f2a847f8e59b1851..a0f7ae50f3da0279dea12062e3f7b2a0514c3d5e"
+    "shas": "9514b19af1cdc25299cb9afc30a0aec7882e33a7..fe7246b07ff7534399715b1ee43818b84eecc76b"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a0f7ae50f3da0279dea12062e3f7b2a0514c3d5e..16a9b4f62a29df6e8977c8767ed05f3939bd361d"
+    "shas": "fe7246b07ff7534399715b1ee43818b84eecc76b..e96c8bbae1eba778f6a07c73592453900cba9405"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "16a9b4f62a29df6e8977c8767ed05f3939bd361d..54d50ce002201d9b758fcd44c8c0cc7d2df914e0"
+    "shas": "e96c8bbae1eba778f6a07c73592453900cba9405..0547e4f3b783144a6c3127cec4633baec35a668b"
 }]

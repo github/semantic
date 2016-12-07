@@ -35,12 +35,135 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "78dcc663e1dee08c956d8fc9c62e3f55a4d8c110..fe07b9a3bf0366c9da1136a6533b442173e4437e"
+    "shas": "de5e6125e430ab28f0696a89345e5e0c9f45394d..35161ee803839541bf4ec109f7643f2eaaa2882b"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''0'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\''' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' variable in the main module"
+                }
+            ]
+        },
         "errors": {
             "rune-literals.go": [
                 {
@@ -56,7 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 }
             ]
         }
@@ -83,13 +206,226 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fe07b9a3bf0366c9da1136a6533b442173e4437e..0f17d608d19bf5da50ea0075d625e08faabd0c4f"
+    "shas": "35161ee803839541bf4ec109f7643f2eaaa2882b..da0ca4919c4449adb02034bd12896842ce0cda57"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {}
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''0'' rune_literal with the ''1'' rune_literal in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0011'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234568'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' variable in the main module"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
@@ -118,13 +454,226 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f17d608d19bf5da50ea0075d625e08faabd0c4f..2354d3a9079243d82a5087087057129127bab3e9"
+    "shas": "da0ca4919c4449adb02034bd12896842ce0cda57..aea1c5e5de2c5f95d50a4868d234b4fc37ef9e3a"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {}
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    5
+                                ],
+                                "end": [
+                                    3,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ''1'' rune_literal with the ''0'' rune_literal in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\''' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\u0000'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\\U01234567'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0011'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234568'' variable in the main module"
+                }
+            ]
+        },
+        "errors": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                }
+            ]
+        }
     },
     "filePaths": [
         "rune-literals.go"
@@ -153,12 +702,135 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2354d3a9079243d82a5087087057129127bab3e9..661a72ee9019c4e1bbb97c65487b0bd7da0e1b45"
+    "shas": "aea1c5e5de2c5f95d50a4868d234b4fc37ef9e3a..b16536d34ec9c3af11e7ecdf2e230508e18ec8f6"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "rune-literals.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''0'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\''' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\u0000'' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' variable in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\\U01234567'' variable in the main module"
+                }
+            ]
+        },
         "errors": {
             "rune-literals.go": [
                 {
@@ -174,7 +846,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 }
             ]
         }
@@ -201,7 +873,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "661a72ee9019c4e1bbb97c65487b0bd7da0e1b45..f11afcbd65d6ff8c295017efa60b94dd61b52af3"
+    "shas": "b16536d34ec9c3af11e7ecdf2e230508e18ec8f6..f38f8b114322c110b65179e40a8c10aa3a5764de"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -240,5 +912,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f11afcbd65d6ff8c295017efa60b94dd61b52af3..e28876b3dcee4628412710c24ad66bc0b8aa40e9"
+    "shas": "f38f8b114322c110b65179e40a8c10aa3a5764de..ffd21bdd215ea2b6f01ea6c9dd7a38a3884ea081"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d458ed87c1f3ee07648598fe75c4d08d930fc3f1..1d3a25eefaea86b64a24b07a6188c9a986300195"
+    "shas": "17d779dbc45e2b0791b1341964f07cecf73cb34a..05d71f9ac4edcfbf80a9f37fd7ed4bb73d68b3c9"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d3a25eefaea86b64a24b07a6188c9a986300195..a1172cd749e514334f906ea7526aa2c1c6e040e0"
+    "shas": "05d71f9ac4edcfbf80a9f37fd7ed4bb73d68b3c9..3c044c74b09c3a9f9f48c409155cc40711bbb802"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1172cd749e514334f906ea7526aa2c1c6e040e0..82a063cf5697b2a4f441c5dedb38c536597f4141"
+    "shas": "3c044c74b09c3a9f9f48c409155cc40711bbb802..20b3a926d63a76365065ccc010cfa97b9b76f5ed"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82a063cf5697b2a4f441c5dedb38c536597f4141..f1647de2c4a1fc7c3cddcba605b6bd7f0fb84234"
+    "shas": "20b3a926d63a76365065ccc010cfa97b9b76f5ed..80fd9c05717980966cbfac12e53014e9088e2fe3"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f1647de2c4a1fc7c3cddcba605b6bd7f0fb84234..16e84933ae077bfe8d477a22f9c65442bf784f74"
+    "shas": "80fd9c05717980966cbfac12e53014e9088e2fe3..5f085f0b8ba0c98da6a1ef2f7b50fe9e848c99b6"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "16e84933ae077bfe8d477a22f9c65442bf784f74..ba23dcb93e29a842356db9f5b346add999f3cdb4"
+    "shas": "5f085f0b8ba0c98da6a1ef2f7b50fe9e848c99b6..3e1b41d4f939e40479b5b44fd483fb8a4dbac796"
 }]

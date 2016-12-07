@@ -38,12 +38,75 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "423f4b778a9930431f0d89e77b6b4b04f01a3381..d90e9928e95c02f595bdf4fd1b8619a64509f4d0"
+    "shas": "846ed3173524819c06f22c2a6c997d8a1a137e2e..015bf2cad5d8bf91d829f66076430680ca9461ba"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-with-implicit-values.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'iota' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'one' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -67,12 +130,96 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d90e9928e95c02f595bdf4fd1b8619a64509f4d0..3aa7e669781c00b4a6c19b22a1318836f0724e12"
+    "shas": "015bf2cad5d8bf91d829f66076430680ca9461ba..11ed532a170a5e67298be9a8357fc1ea3050f725"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-with-implicit-values.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -97,12 +244,96 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3aa7e669781c00b4a6c19b22a1318836f0724e12..bb8d250419da85b4526fd6b702248725b441ceca"
+    "shas": "11ed532a170a5e67298be9a8357fc1ea3050f725..c56390b128feef7791530f330db0d3dbb27c8422"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-with-implicit-values.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    2
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    2
+                                ],
+                                "end": [
+                                    6,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    2
+                                ],
+                                "end": [
+                                    7,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -127,12 +358,75 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bb8d250419da85b4526fd6b702248725b441ceca..a12cc56790540072b8e9745c0b4580e8c0f07cdf"
+    "shas": "c56390b128feef7791530f330db0d3dbb27c8422..f894f8ca2eae94fa27e517c64904a10dc1adcb62"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "const-with-implicit-values.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'iota' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' variable in the main function of the 'main' module"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -156,7 +450,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a12cc56790540072b8e9745c0b4580e8c0f07cdf..c950d1c08785d81a60f55b897f2be0aed22764c8"
+    "shas": "f894f8ca2eae94fa27e517c64904a10dc1adcb62..fd4e4bb7526c0bafb057d013b8bc74b0b7e28da2"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-teardown-test",
@@ -198,5 +492,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c950d1c08785d81a60f55b897f2be0aed22764c8..5712bba0b9e43856a9a0fe4b30d49d61ca3c91fc"
+    "shas": "fd4e4bb7526c0bafb057d013b8bc74b0b7e28da2..eef5bc42343eb960bad38089de69fe60a46d8244"
 }]

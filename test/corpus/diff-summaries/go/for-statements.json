@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ccdfcd699b0b7f784aabb584fafa22532034b988..fb29808fc2e1adbc7cdeb7e427e2fc5877f4f7ff"
+    "shas": "51e9b817e287e460f71718bfe6414f88f2d6b5ee..422f23d20ecb6c6c9fcfdc94e542deb3e064c775"
 }
 ,{
     "testCaseDescription": "go-for-statements-insert-test",
@@ -160,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fb29808fc2e1adbc7cdeb7e427e2fc5877f4f7ff..06298bc2b4716d8ef5879f4d5619bfb4f7bcb97f"
+    "shas": "422f23d20ecb6c6c9fcfdc94e542deb3e064c775..64a93f750415b144156ec76e2bb5940da1eae2ea"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "06298bc2b4716d8ef5879f4d5619bfb4f7bcb97f..7545aeccbd059f4cf6ddf19e0f6bea0083c16a57"
+    "shas": "64a93f750415b144156ec76e2bb5940da1eae2ea..5d31c8dde1c946683f7991e420353e927e4b7c61"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -554,7 +554,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7545aeccbd059f4cf6ddf19e0f6bea0083c16a57..3e639f39d94a7e66fc2f62c6098037ee7830006e"
+    "shas": "5d31c8dde1c946683f7991e420353e927e4b7c61..f165d2f138fd700169ae48bf9c9fd89978918f08"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -676,7 +676,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3e639f39d94a7e66fc2f62c6098037ee7830006e..8d472c4d6d1c6fef406a374b69e70456848b267b"
+    "shas": "f165d2f138fd700169ae48bf9c9fd89978918f08..0190ea8960b8518daa6a1efd6bbb94834418c2bb"
 }
 ,{
     "testCaseDescription": "go-for-statements-teardown-test",
@@ -718,5 +718,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8d472c4d6d1c6fef406a374b69e70456848b267b..d458ed87c1f3ee07648598fe75c4d08d930fc3f1"
+    "shas": "0190ea8960b8518daa6a1efd6bbb94834418c2bb..17d779dbc45e2b0791b1341964f07cecf73cb34a"
 }]
