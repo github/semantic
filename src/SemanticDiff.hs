@@ -32,7 +32,7 @@ main = do
   args@Arguments{..} <- programArguments =<< execParser argumentsParser
   case runMode of
     Diff -> runDiff args
-    Parse -> Parse.run args
+    Parse -> Parse.run2 args
 
 runDiff :: Arguments -> IO ()
 runDiff args@Arguments{..} = case diffMode of
