@@ -1,5 +1,5 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
-module Renderer.SExpression (sExpression) where
+module Renderer.SExpression (sExpression, printTerm) where
 
 import Data.Bifunctor.Join
 import Data.Foldable
@@ -38,7 +38,7 @@ printTerm term level = go term level 0
     pad p n = "\n" <> mconcat (replicate (p + n) "  ")
     go term parentLevel level = case runCofree term of
       (annotation :< Leaf _) -> pad parentLevel level <> "(" <> showAnnotation annotation <> ")"
-      (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\d acc -> go d parentLevel (level + 1) <> acc) "" syntax <> ")"
+      (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
 
 showAnnotation :: (HasField fields Category, HasField fields SourceSpan) => Record fields -> Text
 showAnnotation annotation = categoryName annotation <> " " <> showSourceSpan annotation

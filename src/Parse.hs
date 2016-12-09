@@ -23,7 +23,9 @@ import System.FilePath
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
+import Renderer
 import Renderer.JSON()
+import Renderer.SExpression
 
 data ParseJSON = ParseJSON
   { category :: Text
@@ -32,40 +34,14 @@ data ParseJSON = ParseJSON
   , children :: [ParseJSON]
   } deriving (Show, Generic, ToJSON)
 
-run2 :: Arguments -> IO ()
-run2 Arguments{..} = do
-  sources <- sequence $ readAndTranscodeFile <$> filePaths
-  terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
-
-  writeToOutput output (cata algebra <$> terms)
-
-  where
-    sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
-    parsers = parserWithSource <$> filePaths
-
-    algebra :: TermF (Syntax leaf) (Record '[SourceText, Range, Category, SourceSpan]) Text -> Text
-    algebra term = case term of
-      (annotation :< Leaf _) -> "(" <> category' annotation <> ")"
-      (annotation :< syntax@(Indexed _)) -> "(" <> category' annotation <> toChildList syntax <> ")"
-      (annotation :< syntax) -> "\n(" <> category' annotation <> toChildList syntax <> ")"
-      where
-        category' = toS . Info.category
-        toChildList syntax = case toList syntax of
-          [] -> ""
-          xs ->  " " <> T.unwords xs
-
-    writeToOutput :: Maybe FilePath -> [Text] -> IO ()
-    writeToOutput output text =
-      case output of
-        Nothing -> for_ text putStrLn
-        Just path -> for_ text (T.writeFile path)
-
 run :: Arguments -> IO ()
 run Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
-  writeToOutput output (cata algebra <$> terms)
+  writeToOutput output $ case format of
+    SExpression -> [foldr (\t acc -> printTerm t 0 <> acc) "" terms]
+    _ -> toS . encodePretty . cata algebra <$> terms
 
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
@@ -80,11 +56,11 @@ run Arguments{..} = do
         range' = characterRange
         text' = Info.sourceText
 
-    writeToOutput :: Maybe FilePath -> [ParseJSON] -> IO ()
-    writeToOutput output parseJSON =
+    writeToOutput :: Maybe FilePath -> [Text] -> IO ()
+    writeToOutput output text =
       case output of
-        Nothing -> for_ parseJSON (putStrLn . encodePretty)
-        Just path -> for_ parseJSON (BL.writeFile path . encodePretty)
+        Nothing -> for_ text putStrLn
+        Just path -> for_ text (T.writeFile path)
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
