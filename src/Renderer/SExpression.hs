@@ -29,13 +29,13 @@ printDiff diff level = case runFree diff of
   (Free (Join (_, annotation) :< syntax)) -> pad level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
     pad n | n < 1 = ""
-    pad n = "\n" <> mconcat (replicate n "  ")
+          | otherwise = "\n" <> mconcat (replicate n "  ")
 
 printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> Text
 printTerm term level = go term level 0
   where
-    pad _ 0 = ""
-    pad p n = "\n" <> mconcat (replicate (p + n) "  ")
+    pad p n | n < 1 = ""
+            | otherwise = "\n" <> mconcat (replicate (p + n) "  ")
     go term parentLevel level = case runCofree term of
       (annotation :< Leaf _) -> pad parentLevel level <> "(" <> showAnnotation annotation <> ")"
       (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
