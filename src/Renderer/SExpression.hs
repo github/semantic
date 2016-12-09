@@ -1,5 +1,5 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
-module Renderer.Test (test) where
+module Renderer.SExpression (sExpression) where
 
 import Data.Bifunctor.Join
 import Data.Foldable
@@ -17,8 +17,8 @@ import Info
 import Syntax
 import Term
 
-test :: (HasField fields Category, HasField fields SourceSpan) => Renderer (Record fields)
-test _ diff = TestOutput $ printDiff diff 0
+sExpression :: (HasField fields Category, HasField fields SourceSpan) => Renderer (Record fields)
+sExpression _ diff = SExpressionOutput $ printDiff diff 0
 
 printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> Text
 printDiff diff level = case runFree diff of
