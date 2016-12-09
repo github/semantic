@@ -171,7 +171,7 @@ categoryForRubyName = \case
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
-  "method_call" -> MethodCall
+  "method_call" -> FunctionCall
   "method" -> Method
   "module"  -> Module
   "nil" -> Identifier
