@@ -6,7 +6,7 @@ import Data.Foldable
 import Data.Functor.Foldable
 import Data.Functor.Both
 import Data.Record
-import Data.Text hiding (foldr)
+import Data.Text hiding (foldr, replicate)
 import Prologue hiding (toList, intercalate)
 
 import Category as C
@@ -17,22 +17,39 @@ import Info
 import Syntax
 import Term
 
-test :: HasField fields Category => Renderer (Record fields)
-test _ diff = TestOutput $ printDiff diff
+test :: (HasField fields Category, HasField fields SourceSpan) => Renderer (Record fields)
+test _ diff = TestOutput $ printDiff diff 0
 
-printDiff :: HasField fields Category => Diff (Syntax Text) (Record fields) -> Text
-printDiff diff = case runFree diff of
+printDiff :: (HasField fields Category, HasField fields SourceSpan) => Diff (Syntax Text) (Record fields) -> Int -> Text
+printDiff diff level = case runFree diff of
   (Pure patch) -> case patch of
-    Insert term -> "(+" <> printTerm term <> ")"
-    Delete term -> "(-" <> printTerm term <> ")"
-    Replace a b -> "(" <> printTerm a <> "->" <> printTerm b <> ")"
-  (Free (Join (_, annotation) :< syntax)) -> "(" <> categoryName annotation <> foldr (\a b -> printDiff a <> b) "" syntax <> ")"
+    Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "}"
+    Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "}"
+    Replace a b -> pad (level - 1) <> "{" <> printTerm a level <> "->" <> printTerm b level <> "}"
+  (Free (Join (_, annotation) :< syntax)) -> pad level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
   where
-    printTerm term = case runCofree term of
-      (annotation :< Leaf _) -> categoryName annotation
-      (annotation :< syntax) -> categoryName annotation <> "(" <> foldr (\a b -> printTerm a <> b) "" syntax <> ")"
+    pad n | n < 1 = ""
+    pad n = "\n" <> mconcat (replicate n "  ")
 
+printTerm :: (HasField fields Category, HasField fields SourceSpan) => Term (Syntax t) (Record fields) -> Int -> Text
+printTerm term level = go term level 0
+  where
+    pad _ 0 = ""
+    pad p n = "\n" <> mconcat (replicate (p + n) "  ")
+    go term parentLevel level = case runCofree term of
+      (annotation :< Leaf _) -> pad parentLevel level <> "(" <> showAnnotation annotation <> ")"
+      (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\d acc -> go d parentLevel (level + 1) <> acc) "" syntax <> ")"
 
+showAnnotation :: (HasField fields Category, HasField fields SourceSpan) => Record fields -> Text
+showAnnotation annotation = categoryName annotation <> " " <> showSourceSpan annotation
+  where
+    showSourceSpan a = start a <> " - " <> end a
+    start = showPoint . spanStart . getField
+    end = showPoint . spanEnd . getField
+    showPoint SourcePos{..} = "[" <> show line <> ", " <> show column <> "]"
+
+categoryName :: HasField fields Category => Record fields -> Text
+categoryName = toS . category
 
 
 -- TODO: Move over to FDocs about how to understand structure of Diff as well as
@@ -62,6 +79,3 @@ termFields = cata algebra
     algebra term = case term of
       (annotation :< Leaf _) -> categoryName annotation
       (annotation :< syntax) -> categoryName annotation <> "(" <> unwords (toList syntax) <> ")"
-
-categoryName :: HasField fields Category => Record fields -> Text
-categoryName = toLower . toS . category
