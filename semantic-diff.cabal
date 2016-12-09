@@ -48,6 +48,7 @@ library
                      , Renderer.Patch
                      , Renderer.Split
                      , Renderer.Summary
+                     , Renderer.Test
                      , SemanticDiff
                      , SES
                      , Source

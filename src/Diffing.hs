@@ -17,6 +17,7 @@ import Renderer.JSON
 import Renderer.Patch
 import Renderer.Split
 import Renderer.Summary
+import Renderer.Test
 import Source
 import Syntax
 import System.Directory
@@ -74,6 +75,7 @@ textDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost)
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
+  Test -> test
   JSON -> json
   Summary -> summary
 
@@ -82,6 +84,7 @@ truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Output
 truncatedDiff arguments sources = pure $ case format arguments of
   Split -> SplitOutput mempty
   Patch -> PatchOutput (truncatePatch arguments sources)
+  Test -> TestOutput mempty
   JSON -> JSONOutput mempty
   Summary -> SummaryOutput mempty
 
@@ -93,6 +96,7 @@ printDiff parser arguments sources = do
     case rendered of
       SplitOutput text -> text
       PatchOutput text -> text
+      TestOutput text -> text
       JSONOutput series -> encodingToText (toJSON series)
       SummaryOutput summaries -> encodingToText (toJSON summaries)
   where

@@ -17,10 +17,10 @@ data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath 
  deriving (Show)
 
 -- | The available types of diff rendering.
-data Format = Split | Patch | JSON | Summary
+data Format = Split | Patch | JSON | Summary | Test
   deriving (Show)
 
-data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value]))
+data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value])) | TestOutput Text
   deriving (Show)
 
 -- Returns a key representing the filename. If the filenames are different,
@@ -64,9 +64,11 @@ isSummary _ = False
 isText :: [Output] -> Bool
 isText (SplitOutput _ : _) = True
 isText (PatchOutput _ : _) = True
+isText (TestOutput _ : _) = True
 isText _ = False
 
 toText :: Output -> Text
 toText (SplitOutput text) = text
 toText (PatchOutput text) = text
+toText (TestOutput text) = text
 toText _ = mempty
