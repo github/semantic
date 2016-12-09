@@ -3,8 +3,6 @@ module Renderer.SExpression (sExpression, printTerm) where
 
 import Data.Bifunctor.Join
 import Data.Foldable
-import Data.Functor.Foldable
-import Data.Functor.Both
 import Data.Record
 import Data.Text hiding (foldr, replicate)
 import Prologue hiding (toList, intercalate)
