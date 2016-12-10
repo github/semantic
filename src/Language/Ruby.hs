@@ -179,6 +179,7 @@ categoryForRubyName = \case
   "nil" -> Identifier
   "operator_assignment" -> OperatorAssignment
   "optional_parameter" -> OptionalParameter
+  "pair" -> Pair
   "program" -> Program
   "regex" -> Regex
   "rescue_modifier" -> RescueModifier
