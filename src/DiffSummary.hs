@@ -430,6 +430,7 @@ instance HasCategory Category where
     C.Unary -> "unary statement"
     C.Constant -> "constant"
     C.Superclass -> "superclass"
+    C.SingletonClass -> "singleton class"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

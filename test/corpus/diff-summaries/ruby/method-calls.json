@@ -34,7 +34,7 @@
         "+x.foo()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "17903b081197a8af07c0566effcb951a5c2b4e92..e934fefb49abf087c33e1240f8f6dd8750461981"
+    "shas": "bc06c5994d9bcf120ff71c6dd145f5341d84cec3..9cafd760d2dc4c2a54921571ba6d7cb2fcee8635"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar()' function call"
+                    "summary": "Added the 'bar()' method call"
                 },
                 {
                     "span": {
@@ -89,7 +89,7 @@
         " x.foo()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e934fefb49abf087c33e1240f8f6dd8750461981..aa456894a021e11601d5c5545633e8f9391038a9"
+    "shas": "9cafd760d2dc4c2a54921571ba6d7cb2fcee8635..a7bb32b35cc3fa930f0fb34803d6dbdaa8282d6a"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-delete-insert-test",
@@ -98,33 +98,30 @@
             "method-calls.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'x.foo()' method call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar()' function call"
+                    "summary": "Replaced the 'bar()' method call with the 'x.foo()' method call"
                 }
             ]
         },
@@ -145,7 +142,7 @@
         " x.foo()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "aa456894a021e11601d5c5545633e8f9391038a9..526f90542e5291bf410c4f56e69c47282675bd1c"
+    "shas": "a7bb32b35cc3fa930f0fb34803d6dbdaa8282d6a..85b889092acf870dd2e172e6aea86acc7e84e807"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-replacement-test",
@@ -154,33 +151,30 @@
             "method-calls.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'bar()' function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x.foo()' method call"
+                    "summary": "Replaced the 'x.foo()' method call with the 'bar()' method call"
                 }
             ]
         },
@@ -201,7 +195,7 @@
         " x.foo()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "526f90542e5291bf410c4f56e69c47282675bd1c..7c5ce020e41d5b01f7ea9f88acf3386f426e01e6"
+    "shas": "85b889092acf870dd2e172e6aea86acc7e84e807..5cae15619e9bdf86d95a0d54d3c5e184101e45f9"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-delete-replacement-test",
@@ -221,7 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar()' function call"
+                    "summary": "Deleted the 'bar()' method call"
                 },
                 {
                     "span": {
@@ -251,7 +245,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar()' function call"
+                    "summary": "Added the 'bar()' method call"
                 }
             ]
         },
@@ -272,7 +266,7 @@
         "+bar()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7c5ce020e41d5b01f7ea9f88acf3386f426e01e6..ee7be1e9e40189aa48d053b3891b9f9ad093db4e"
+    "shas": "5cae15619e9bdf86d95a0d54d3c5e184101e45f9..6b6f652b4bd7788b57a21ffd7310343dbf6f8274"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-delete-test",
@@ -311,7 +305,7 @@
         " bar()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ee7be1e9e40189aa48d053b3891b9f9ad093db4e..beafe8aef216cb2b54edb534e94edb3fd5138052"
+    "shas": "6b6f652b4bd7788b57a21ffd7310343dbf6f8274..d65baeb30a8f39878e17e8ed91de19134f60923b"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-delete-rest-test",
@@ -331,7 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar()' function call"
+                    "summary": "Deleted the 'bar()' method call"
                 }
             ]
         },
@@ -349,5 +343,5 @@
         "-bar()"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "beafe8aef216cb2b54edb534e94edb3fd5138052..eb51a430951de620d64e6e92df9603e953708321"
+    "shas": "d65baeb30a8f39878e17e8ed91de19134f60923b..5c66ec3700761ca4868e703f576449f5a190e5a5"
 }]

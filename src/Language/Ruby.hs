@@ -75,6 +75,8 @@ termConstructor source sourceSpan name range children allChildren
       ( superclass : body ) | Superclass <- category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
     ("class", _ ) -> S.Error children
+    ("singleton_class", identifier : rest ) -> S.Class identifier Nothing rest
+    ("singleton_class", _ ) -> S.Error children
     ("comment", _ ) -> S.Comment . toText $ slice range source
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
@@ -183,6 +185,7 @@ categoryForRubyName = \case
   "rescue" -> Rescue
   "return" -> Return
   "self" -> Identifier
+  "singleton_class"  -> SingletonClass
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell

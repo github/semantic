@@ -171,6 +171,7 @@ data Category
   | Constant
   -- | A superclass, e.g `< Foo` in Ruby.
   | Superclass
+  | SingletonClass
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -262,6 +263,7 @@ instance Arbitrary Category where
     , pure Unary
     , pure Constant
     , pure Superclass
+    , pure SingletonClass
     , Other <$> arbitrary
     ]
 
