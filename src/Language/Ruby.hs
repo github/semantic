@@ -40,7 +40,7 @@ termConstructor source sourceSpan name range children allChildren
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
-  | name `elem` ["binary", "unary"] = do
+  | name `elem` ["binary", "unary", "range"] = do
     allChildren' <- allChildren
     withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
@@ -182,6 +182,7 @@ categoryForRubyName = \case
   "optional_parameter" -> OptionalParameter
   "pair" -> Pair
   "program" -> Program
+  "range" -> RangeExpression
   "regex" -> Regex
   "rescue_modifier" -> RescueModifier
   "rescue" -> Rescue

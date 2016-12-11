@@ -119,6 +119,7 @@ styleName category = "category-" <> case category of
   C.Constant -> "constant"
   C.Superclass -> "superclass"
   C.SingletonClass -> "singleton_class"
+  C.RangeExpression -> "range"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

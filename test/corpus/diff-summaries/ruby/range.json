@@ -1,0 +1,347 @@
+[{
+    "testCaseDescription": "ruby-range-insert-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a..b' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index e69de29..82219db 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -0,0 +1 @@",
+        "+a..b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "3b08aca782ea8046a155639d7c198174c1b8f8cc..91fef0f5132018b874c903b9368194ca4c5ef146"
+}
+,{
+    "testCaseDescription": "ruby-range-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x...y' range"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a..b' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index 82219db..173f43e 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -1 +1,3 @@",
+        "+x...y",
+        "+a..b",
+        " a..b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "91fef0f5132018b874c903b9368194ca4c5ef146..dc048976b989b903db3c71b971ae0b512f46ac93"
+}
+,{
+    "testCaseDescription": "ruby-range-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x...y' range with the 'a..b' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index 173f43e..6e4c63b 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x...y",
+        "+a..b",
+        " a..b",
+        " a..b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "dc048976b989b903db3c71b971ae0b512f46ac93..1a2d867c7c34e6772349703a19c761822dfc1fa6"
+}
+,{
+    "testCaseDescription": "ruby-range-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a..b' range with the 'x...y' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index 6e4c63b..173f43e 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -1,3 +1,3 @@",
+        "-a..b",
+        "+x...y",
+        " a..b",
+        " a..b"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1a2d867c7c34e6772349703a19c761822dfc1fa6..cc157ed0c0f7d569a92e11a0cfdc994d88b846c5"
+}
+,{
+    "testCaseDescription": "ruby-range-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x...y' range"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a..b' range"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x...y' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index 173f43e..e4282a4 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -1,3 +1,2 @@",
+        "-x...y",
+        "-a..b",
+        " a..b",
+        "+x...y"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "cc157ed0c0f7d569a92e11a0cfdc994d88b846c5..31f592ffc839bbd435c2a4f524fbcadb3a02a061"
+}
+,{
+    "testCaseDescription": "ruby-range-delete-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a..b' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index e4282a4..b06b198 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -1,2 +1 @@",
+        "-a..b",
+        " x...y"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "31f592ffc839bbd435c2a4f524fbcadb3a02a061..13ea3266404ef3d9fc016b5070c30031a2966143"
+}
+,{
+    "testCaseDescription": "ruby-range-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "range.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x...y' range"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "range.rb"
+    ],
+    "patch": [
+        "diff --git a/range.rb b/range.rb",
+        "index b06b198..e69de29 100644",
+        "--- a/range.rb",
+        "+++ b/range.rb",
+        "@@ -1 +0,0 @@",
+        "-x...y"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "13ea3266404ef3d9fc016b5070c30031a2966143..c15e25e8bbbb6675bbd50cef198ecd45fa1e79d6"
+}]
