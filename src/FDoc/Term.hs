@@ -17,7 +17,10 @@ This is in the TermF shape: CofreeF f a b where
   a is the annotation (Record '[Range, Category])
   b is the same type of functor defined by f
 
-Two common convenience operations when working with CofreeF (for docs, see Control.Comonad.Trans.Cofree.Types.CofreeF) are `headF` and `tailF`. `headF` return the annotation portion of the CofreeF structure, and `tailF` returns the functor portion (Syntax).
+Two common convenience operations when working with CofreeF (for docs, see
+Control.Comonad.Trans.Cofree.Types.CofreeF) are `headF` and `tailF`. `headF`
+return the annotation portion of the CofreeF structure, and `tailF` returns the
+functor portion (Syntax).
 
 Example (from GHCi):
 
@@ -40,7 +43,10 @@ This is in the Term shape: Cofree f a where
   f is the functor (Syntax.Leaf `leaf`)
   a is the annotation (Record '[Range, Category])
 
-Two common convenience operations when working with Cofree (for docs, see Control.Comonad.Trans.Cofree.Types.Cofree) are `extract` and `unwrap`. `extract` returns the annotation portion of the Cofree structure, and `unwrap` returns the functor portion (Syntax).
+Two common convenience operations when working with Cofree (for docs, see
+Control.Comonad.Trans.Cofree.Types.Cofree) are `extract` and `unwrap`. `extract`
+returns the annotation portion of the Cofree structure, and `unwrap` returns the
+functor portion (Syntax).
 
 Example (from GHCi):
 

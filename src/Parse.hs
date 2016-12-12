@@ -6,11 +6,11 @@ import Category
 import Data.Aeson (ToJSON)
 import Data.Aeson.Encode.Pretty
 import qualified Data.ByteString.Char8 as B1
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.Text.ICU.Convert as Convert
 import qualified Data.Text.ICU.Detect as Detect
 import Data.Record
 import qualified Data.Text as T
+import qualified Data.Text.IO as T
 import Info
 import Language
 import Language.Markdown
@@ -22,7 +22,9 @@ import System.FilePath
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
+import Renderer
 import Renderer.JSON()
+import Renderer.SExpression
 
 data ParseJSON = ParseJSON
   { category :: Text
@@ -36,7 +38,9 @@ run Arguments{..} = do
   sources <- sequence $ readAndTranscodeFile <$> filePaths
   terms <- zipWithM (\parser sourceBlob -> parser sourceBlob) parsers (sourceBlobs sources)
 
-  writeToOutput output (cata algebra <$> terms)
+  writeToOutput output $ case format of
+    SExpression -> [foldr (\t acc -> printTerm t 0 <> acc) "" terms]
+    _ -> toS . encodePretty . cata algebra <$> terms
 
   where
     sourceBlobs sources = Source.SourceBlob <$> sources <*> pure mempty <*> filePaths <*> pure (Just Source.defaultPlainBlob)
@@ -51,11 +55,11 @@ run Arguments{..} = do
         range' = characterRange
         text' = Info.sourceText
 
-    writeToOutput :: Maybe FilePath -> [ParseJSON] -> IO ()
-    writeToOutput output parseJSON =
+    writeToOutput :: Maybe FilePath -> [Text] -> IO ()
+    writeToOutput output text =
       case output of
-        Nothing -> for_ parseJSON (putStrLn . encodePretty)
-        Just path -> for_ parseJSON (BL.writeFile path . encodePretty)
+        Nothing -> for_ text putStrLn
+        Just path -> for_ text (T.writeFile path)
 
 -- | Return a parser that decorates with the cost of a term and its children.
 parserWithCost :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])

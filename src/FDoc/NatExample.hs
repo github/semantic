@@ -17,7 +17,8 @@ type Nat = Fix NatF
 zero' :: Nat
 zero' = Fix ZeroF
 
--- This is a partially applied type (has kind * -> *). The recursive bit is used by recursion schemes and is referred to as the "carrier" functor.
+-- This is a partially applied type (has kind * -> *). The recursive bit is used
+-- by recursion schemes and is referred to as the "carrier" functor.
 succ' :: Nat -> Nat
 succ' = Fix . SuccF
 
@@ -37,7 +38,8 @@ intToNatAna num = ana coalgebra num
       0 -> ZeroF
       _ -> SuccF (num - 1)
 
--- Hylomorphism: first apply an anamorphism and then a catamorphism in the shape of Nat.
+-- Hylomorphism: first apply an anamorphism and then a catamorphism in the shape
+-- of Nat.
 natHylo :: Int -> Int
 natHylo num = hylo algebra coalgebra num
   where
@@ -48,7 +50,8 @@ natHylo num = hylo algebra coalgebra num
       0 -> ZeroF
       _ -> SuccF (num - 1)
 
--- Paramorphism: primitive recursion maintaining the original value along with its computed value.
+-- Paramorphism: primitive recursion maintaining the original value along with
+-- its computed value.
 natPara :: Nat -> Int
 natPara nats = para algebra nats
   where
