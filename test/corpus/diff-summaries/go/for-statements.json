@@ -405,7 +405,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a()' function call with the 'a(x)' at line 18, column 1 - line 18, column 5"
+                    "summary": "Replaced the 'a()' function call with 'a(x)' at line 18, column 1 - line 18, column 5"
                 },
                 {
                     "span": {

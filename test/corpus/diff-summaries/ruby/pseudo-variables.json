@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'nil' identifier"
+                    "summary": "Added the 'nil' identifier"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'self' identifier"
+                    "summary": "Added the 'self' identifier"
                 },
                 {
                     "span": {
@@ -769,7 +769,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'self' identifier"
+                    "summary": "Deleted the 'self' identifier"
                 },
                 {
                     "span": {
@@ -784,7 +784,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'NIL' identifier"
+                    "summary": "Deleted the 'NIL' identifier"
                 },
                 {
                     "span": {

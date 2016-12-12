@@ -122,7 +122,7 @@ summaries = \case
   p@(Replace i1 i2) -> zipWith (\a b ->
     JSONSummary
      {
-      summary = summary (prefixWithPatch p This a) <+> "with" <+> determiner i1 <+> summary b
+      summary = summary (prefixWithPatch p This a) <+> "with" <+> summary b
     , span = SourceSpans $ These (span a) (span b)
     }) (toLeafInfos i1) (toLeafInfos i2)
   p@(Insert info) -> prefixWithPatch p That <$> toLeafInfos info
@@ -134,57 +134,63 @@ prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
   where
     prefixWithThe prefix jsonSummary = jsonSummary
       {
-        summary = prefix <+> determiner' patch <+> summary jsonSummary
+        summary = prefix <+> summary jsonSummary
       , span = SourceSpans $ constructor (span jsonSummary)
       }
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
-    determiner' = determiner . these identity identity const . unPatch
 
 -- Optional determiner (e.g. "the") to tie together summary statements.
 determiner :: DiffInfo -> Doc
-determiner (LeafInfo "number" _ _) = ""
-determiner (LeafInfo "integer" _ _) = ""
-determiner (LeafInfo "boolean" _ _) = ""
-determiner (LeafInfo "begin statement" _ _) = "a"
-determiner (LeafInfo "select statement" _ _) = "a"
-determiner (LeafInfo "else block" _ _) = "an"
-determiner (LeafInfo "ensure block" _ _) = "an"
-determiner (LeafInfo "when block" _ _) = "a"
-determiner (LeafInfo "anonymous function" _ _) = "an"
-determiner (LeafInfo "break statement" _ _) = "a"
-determiner (LeafInfo "continue statement" _ _) = "a"
-determiner (LeafInfo "yield statement" "" _) = "a"
-determiner (LeafInfo "return statement" "" _) = "a"
-determiner (BranchInfo bs _ _) = determiner (last bs)
-determiner _ = "the"
+determiner = \case
+  LeafInfo "number" _ _ -> ""
+  LeafInfo "integer" _ _ -> ""
+  LeafInfo "boolean" _ _ -> ""
+  LeafInfo "begin statement" _ _ -> "a"
+  LeafInfo "select statement" _ _ -> "a"
+  LeafInfo "else block" _ _ -> "an"
+  LeafInfo "ensure block" _ _ -> "an"
+  LeafInfo "when block" _ _ -> "a"
+  LeafInfo "anonymous function" _ _ -> "an"
+  LeafInfo "break statement" _ _ -> "a"
+  LeafInfo "continue statement" _ _ -> "a"
+  LeafInfo "yield statement" "" _ -> "a"
+  LeafInfo "return statement" "" _ -> "a"
+  LeafInfo "BEGIN block" _ _ -> "a"
+  LeafInfo "END block" _ _ -> "an"
+  LeafInfo{..} -> "the"
+  info -> panic $ "Expected a leaf info but got a: " <> show info
 
 toLeafInfos :: DiffInfo -> [JSONSummary Doc SourceSpan]
 toLeafInfos err@ErrorInfo{..} = pure $ ErrorSummary (pretty err) errorSpan
 toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
 toLeafInfos HideInfo = []
-toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
-  (LeafInfo "number" termName _) -> squotes $ toDoc termName
-  (LeafInfo "integer" termName _) -> squotes $ toDoc termName
-  (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
-  (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
-  (LeafInfo cName@"begin statement" _ _) -> toDoc cName
-  (LeafInfo cName@"select statement" _ _) -> toDoc cName
-  (LeafInfo cName@"else block" _ _) -> toDoc cName
-  (LeafInfo cName@"ensure block" _ _) -> toDoc cName
-  (LeafInfo cName@"when block" _ _) -> toDoc cName
-  (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
-  (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
-  (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
-  (LeafInfo cName@"subshell command" termName _) -> toDoc termName <+> toDoc cName
-  (LeafInfo cName@"break statement" _ _) -> toDoc cName
-  (LeafInfo cName@"continue statement" _ _) -> toDoc cName
-  (LeafInfo cName@"yield statement" "" _) -> toDoc cName
-  (LeafInfo cName@"return statement" "" _) -> toDoc cName
-  LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
-  node -> panic $ "Expected a leaf info but got a: " <> show node
+toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ leafSummary leaf
+  where
+    leafSummary leaf = determiner leaf <+> case leaf of
+      LeafInfo "number" termName _ -> squotes $ toDoc termName
+      LeafInfo "integer" termName _ -> squotes $ toDoc termName
+      LeafInfo "boolean" termName _ -> squotes $ toDoc termName
+      LeafInfo "anonymous function" termName _ -> toDoc termName <+> "function"
+      LeafInfo cName@"begin statement" _ _ -> toDoc cName
+      LeafInfo cName@"select statement" _ _ -> toDoc cName
+      LeafInfo cName@"else block" _ _ -> toDoc cName
+      LeafInfo cName@"ensure block" _ _ -> toDoc cName
+      LeafInfo cName@"when block" _ _ -> toDoc cName
+      LeafInfo cName@"string" termName _ -> toDoc termName <+> toDoc cName
+      LeafInfo cName@"export statement" termName _ -> toDoc termName <+> toDoc cName
+      LeafInfo cName@"import statement" termName _ -> toDoc termName <+> toDoc cName
+      LeafInfo cName@"subshell command" termName _ -> toDoc termName <+> toDoc cName
+      LeafInfo cName@"break statement" _ _ -> toDoc cName
+      LeafInfo cName@"continue statement" _ _ -> toDoc cName
+      LeafInfo cName@"yield statement" "" _ -> toDoc cName
+      LeafInfo cName@"return statement" "" _ -> toDoc cName
+      LeafInfo cName@"BEGIN block" _ _ -> toDoc cName
+      LeafInfo cName@"END block" _ _ -> toDoc cName
+      LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
+      node -> panic $ "Expected a leaf info but got a: " <> show node
 
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text

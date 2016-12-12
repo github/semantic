@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'foo' identifier"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'bar' identifier"
+                    "summary": "Added the 'bar' identifier"
                 },
                 {
                     "span": {
@@ -99,7 +99,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'foo' identifier"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
@@ -314,7 +314,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'bar' identifier"
+                    "summary": "Deleted the 'bar' identifier"
                 },
                 {
                     "span": {
@@ -344,7 +344,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'foo' identifier"
+                    "summary": "Deleted the 'foo' identifier"
                 },
                 {
                     "span": {
@@ -374,7 +374,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'bar' identifier"
+                    "summary": "Added the 'bar' identifier"
                 },
                 {
                     "span": {
@@ -430,7 +430,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'foo' identifier"
+                    "summary": "Deleted the 'foo' identifier"
                 },
                 {
                     "span": {
@@ -484,7 +484,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'bar' identifier"
+                    "summary": "Deleted the 'bar' identifier"
                 },
                 {
                     "span": {
