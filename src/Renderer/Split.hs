@@ -121,6 +121,8 @@ styleName category = "category-" <> case category of
   C.SingletonClass -> "singleton_class"
   C.RangeExpression -> "range"
   C.ScopeOperator -> "scope_operator"
+  C.BeginBlock -> "begin_block"
+  C.EndBlock -> "end_block"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
