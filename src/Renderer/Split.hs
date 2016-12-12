@@ -120,6 +120,7 @@ styleName category = "category-" <> case category of
   C.Superclass -> "superclass"
   C.SingletonClass -> "singleton_class"
   C.RangeExpression -> "range"
+  C.ScopeOperator -> "scope_operator"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

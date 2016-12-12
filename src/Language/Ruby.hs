@@ -10,6 +10,9 @@ import Language
 import qualified Syntax as S
 import Term
 
+operators :: [Text]
+operators = ["binary", "unary", "range", "scope_resolution"]
+
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -40,7 +43,7 @@ termConstructor source sourceSpan name range children allChildren
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
-  | name `elem` ["binary", "unary", "range"] = do
+  | name `elem` operators = do
     allChildren' <- allChildren
     withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
@@ -187,6 +190,7 @@ categoryForRubyName = \case
   "rescue_modifier" -> RescueModifier
   "rescue" -> Rescue
   "return" -> Return
+  "scope_resolution" -> ScopeOperator
   "self" -> Identifier
   "singleton_class"  -> SingletonClass
   "splat_parameter" -> SplatParameter

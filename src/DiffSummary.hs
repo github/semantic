@@ -432,6 +432,7 @@ instance HasCategory Category where
     C.Superclass -> "superclass"
     C.SingletonClass -> "singleton class"
     C.RangeExpression -> "range"
+    C.ScopeOperator -> "scope operator"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
