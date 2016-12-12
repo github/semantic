@@ -10,6 +10,9 @@ import Language
 import qualified Syntax as S
 import Term
 
+operators :: [Text]
+operators = ["binary", "unary", "range", "scope_resolution"]
+
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -40,7 +43,7 @@ termConstructor source sourceSpan name range children allChildren
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
-  | name `elem` ["binary", "unary"] = do
+  | name `elem` operators = do
     allChildren' <- allChildren
     withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
@@ -75,6 +78,8 @@ termConstructor source sourceSpan name range children allChildren
       ( superclass : body ) | Superclass <- category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
     ("class", _ ) -> S.Error children
+    ("singleton_class", identifier : rest ) -> S.Class identifier Nothing rest
+    ("singleton_class", _ ) -> S.Error children
     ("comment", _ ) -> S.Comment . toText $ slice range source
     ("conditional", condition : cases) -> S.Ternary condition cases
     ("conditional", _ ) -> S.Error children
@@ -168,21 +173,26 @@ categoryForRubyName = \case
   "identifier" -> Identifier
   "if_modifier" -> If
   "if" -> If
+  "instance_variable" -> Identifier
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "keyword_parameter" -> KeywordParameter
-  "method_call" -> FunctionCall
+  "method_call" -> MethodCall
   "method" -> Method
   "module"  -> Module
   "nil" -> Identifier
   "operator_assignment" -> OperatorAssignment
   "optional_parameter" -> OptionalParameter
+  "pair" -> Pair
   "program" -> Program
+  "range" -> RangeExpression
   "regex" -> Regex
   "rescue_modifier" -> RescueModifier
   "rescue" -> Rescue
   "return" -> Return
+  "scope_resolution" -> ScopeOperator
   "self" -> Identifier
+  "singleton_class"  -> SingletonClass
   "splat_parameter" -> SplatParameter
   "string" -> StringLiteral
   "subshell" -> Subshell

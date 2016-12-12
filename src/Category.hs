@@ -171,6 +171,12 @@ data Category
   | Constant
   -- | A superclass, e.g `< Foo` in Ruby.
   | Superclass
+  -- | A singleton class declaration, e.g. `class << self;end` in Ruby
+  | SingletonClass
+  -- | A range expression, e.g. `1..10` in Ruby.
+  | RangeExpression
+  -- | A scope resolution operator, e.g. `Foo::bar` in Ruby.
+  | ScopeOperator
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -262,6 +268,7 @@ instance Arbitrary Category where
     , pure Unary
     , pure Constant
     , pure Superclass
+    , pure SingletonClass
     , Other <$> arbitrary
     ]
 

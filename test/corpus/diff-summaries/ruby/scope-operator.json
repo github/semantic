@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-method-calls-insert-test",
+    "testCaseDescription": "ruby-scope-operator-insert-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,35 +12,35 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'x.foo()' method call"
+                    "summary": "Added the 'Foo::bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index e69de29..5831d31 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index e69de29..4e91ae2 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -0,0 +1 @@",
-        "+x.foo()"
+        "+Foo::bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bc06c5994d9bcf120ff71c6dd145f5341d84cec3..9cafd760d2dc4c2a54921571ba6d7cb2fcee8635"
+    "shas": "726c5239209936067e3f6dffc02450605d2658b4..d090b4ff26e85348c9f78dff449410f6a09f33b1"
 }
 ,{
-    "testCaseDescription": "ruby-method-calls-replacement-insert-test",
+    "testCaseDescription": "ruby-scope-operator-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "insert": {
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar()' method call"
+                    "summary": "Added the '::Bar' scope operator"
                 },
                 {
                     "span": {
@@ -65,37 +65,37 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'x.foo()' method call"
+                    "summary": "Added the 'Foo::bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index 5831d31..ce891a7 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index 4e91ae2..2b0b854 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -1 +1,3 @@",
-        "+bar()",
-        "+x.foo()",
-        " x.foo()"
+        "+::Bar",
+        "+Foo::bar",
+        " Foo::bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9cafd760d2dc4c2a54921571ba6d7cb2fcee8635..a7bb32b35cc3fa930f0fb34803d6dbdaa8282d6a"
+    "shas": "d090b4ff26e85348c9f78dff449410f6a09f33b1..ba0ac82e58709ff07d2644ba9a303fb8081554b0"
 }
 ,{
-    "testCaseDescription": "ruby-method-calls-delete-insert-test",
+    "testCaseDescription": "ruby-scope-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "replace": [
@@ -116,39 +116,39 @@
                                 ],
                                 "end": [
                                     1,
-                                    8
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar()' method call with the 'x.foo()' method call"
+                    "summary": "Replaced the '::Bar' scope operator with the 'Foo::bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index ce891a7..472abf1 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index 2b0b854..1370e7e 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -1,3 +1,3 @@",
-        "-bar()",
-        "+x.foo()",
-        " x.foo()",
-        " x.foo()"
+        "-::Bar",
+        "+Foo::bar",
+        " Foo::bar",
+        " Foo::bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a7bb32b35cc3fa930f0fb34803d6dbdaa8282d6a..85b889092acf870dd2e172e6aea86acc7e84e807"
+    "shas": "ba0ac82e58709ff07d2644ba9a303fb8081554b0..3f5ce37d91641be96445be63e12cf533327beb08"
 }
 ,{
-    "testCaseDescription": "ruby-method-calls-replacement-test",
+    "testCaseDescription": "ruby-scope-operator-replacement-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "replace": [
@@ -159,7 +159,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    8
+                                    9
                                 ]
                             },
                             {
@@ -174,34 +174,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x.foo()' method call with the 'bar()' method call"
+                    "summary": "Replaced the 'Foo::bar' scope operator with the '::Bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index 472abf1..ce891a7 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index 1370e7e..2b0b854 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -1,3 +1,3 @@",
-        "-x.foo()",
-        "+bar()",
-        " x.foo()",
-        " x.foo()"
+        "-Foo::bar",
+        "+::Bar",
+        " Foo::bar",
+        " Foo::bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "85b889092acf870dd2e172e6aea86acc7e84e807..5cae15619e9bdf86d95a0d54d3c5e184101e45f9"
+    "shas": "3f5ce37d91641be96445be63e12cf533327beb08..d435ce09f97187b196c19d0dc0c2528175dc2725"
 }
 ,{
-    "testCaseDescription": "ruby-method-calls-delete-replacement-test",
+    "testCaseDescription": "ruby-scope-operator-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "delete": {
@@ -215,7 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar()' method call"
+                    "summary": "Deleted the '::Bar' scope operator"
                 },
                 {
                     "span": {
@@ -226,11 +226,11 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.foo()' method call"
+                    "summary": "Deleted the 'Foo::bar' scope operator"
                 },
                 {
                     "span": {
@@ -245,34 +245,34 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar()' method call"
+                    "summary": "Added the '::Bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index ce891a7..6c5bbe0 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index 2b0b854..4c887f9 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -1,3 +1,2 @@",
-        "-bar()",
-        "-x.foo()",
-        " x.foo()",
-        "+bar()"
+        "-::Bar",
+        "-Foo::bar",
+        " Foo::bar",
+        "+::Bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5cae15619e9bdf86d95a0d54d3c5e184101e45f9..6b6f652b4bd7788b57a21ffd7310343dbf6f8274"
+    "shas": "d435ce09f97187b196c19d0dc0c2528175dc2725..acce985a4a297612cc03d615ddbc94e108859643"
 }
 ,{
-    "testCaseDescription": "ruby-method-calls-delete-test",
+    "testCaseDescription": "ruby-scope-operator-delete-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "delete": {
@@ -282,36 +282,36 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.foo()' method call"
+                    "summary": "Deleted the 'Foo::bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index 6c5bbe0..4be2e26 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index 4c887f9..2618c39 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -1,2 +1 @@",
-        "-x.foo()",
-        " bar()"
+        "-Foo::bar",
+        " ::Bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6b6f652b4bd7788b57a21ffd7310343dbf6f8274..d65baeb30a8f39878e17e8ed91de19134f60923b"
+    "shas": "acce985a4a297612cc03d615ddbc94e108859643..79ace4201fdcef36b901d38b19348c9b9c623bbd"
 }
 ,{
-    "testCaseDescription": "ruby-method-calls-delete-rest-test",
+    "testCaseDescription": "ruby-scope-operator-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "method-calls.rb": [
+            "scope-operator.rb": [
                 {
                     "span": {
                         "delete": {
@@ -325,23 +325,23 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar()' method call"
+                    "summary": "Deleted the '::Bar' scope operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "method-calls.rb"
+        "scope-operator.rb"
     ],
     "patch": [
-        "diff --git a/method-calls.rb b/method-calls.rb",
-        "index 4be2e26..e69de29 100644",
-        "--- a/method-calls.rb",
-        "+++ b/method-calls.rb",
+        "diff --git a/scope-operator.rb b/scope-operator.rb",
+        "index 2618c39..e69de29 100644",
+        "--- a/scope-operator.rb",
+        "+++ b/scope-operator.rb",
         "@@ -1 +0,0 @@",
-        "-bar()"
+        "-::Bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d65baeb30a8f39878e17e8ed91de19134f60923b..5c66ec3700761ca4868e703f576449f5a190e5a5"
+    "shas": "79ace4201fdcef36b901d38b19348c9b9c623bbd..4be31ef5a0e1e38b38065b07de4afb42010387e1"
 }]

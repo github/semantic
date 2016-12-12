@@ -86,7 +86,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'print(\"hello world\")' function call"
+                    "summary": "Added the 'print(\"hello world\")' method call"
                 },
                 {
                     "span": {
@@ -116,7 +116,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(2, 3)' function call"
+                    "summary": "Added the 'bar(2, 3)' method call"
                 },
                 {
                     "span": {
@@ -131,7 +131,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(2, 3)' function call"
+                    "summary": "Added the 'bar(2, 3)' method call"
                 },
                 {
                     "span": {
@@ -268,7 +268,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'print(\"hello world\")' function call"
+                    "summary": "Deleted the 'print(\"hello world\")' method call"
                 },
                 {
                     "span": {
@@ -298,7 +298,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(2, 3)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' method call"
                 },
                 {
                     "span": {
@@ -313,7 +313,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(2, 3)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' method call"
                 }
             ]
         },
@@ -360,7 +360,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'print(\"hello world\")' function call"
+                    "summary": "Added the 'print(\"hello world\")' method call"
                 },
                 {
                     "span": {
@@ -390,7 +390,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(2, 3)' function call"
+                    "summary": "Added the 'bar(2, 3)' method call"
                 },
                 {
                     "span": {
@@ -405,7 +405,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(2, 3)' function call"
+                    "summary": "Added the 'bar(2, 3)' method call"
                 },
                 {
                     "span": {
@@ -650,7 +650,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'print(\"hello world\")' function call"
+                    "summary": "Deleted the 'print(\"hello world\")' method call"
                 },
                 {
                     "span": {
@@ -680,7 +680,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(2, 3)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' method call"
                 },
                 {
                     "span": {
@@ -695,7 +695,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(2, 3)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' method call"
                 }
             ]
         },

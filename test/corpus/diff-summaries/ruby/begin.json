@@ -96,7 +96,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'puts('hi')' function call in a begin statement of the 'foo()' method"
+                    "summary": "Added the 'puts('hi')' method call in a begin statement of the 'foo()' method"
                 }
             ]
         },
@@ -138,7 +138,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'puts('hi')' function call in a begin statement of the 'foo()' method"
+                    "summary": "Deleted the 'puts('hi')' method call in a begin statement of the 'foo()' method"
                 }
             ]
         },
