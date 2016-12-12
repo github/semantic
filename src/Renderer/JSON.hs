@@ -144,4 +144,5 @@ syntaxToTermField syntax = case syntax of
   S.TypeConversion a b -> childrenFields [a, b]
   S.Break expr -> [ "expression" .= expr ]
   S.Continue expr -> [ "expression" .= expr ]
+  S.BlockStatement c -> childrenFields c
   where childrenFields c = [ "children" .= c ]

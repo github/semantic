@@ -7,16 +7,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                2
+                                1,
+                                1
                             ],
                             "end": [
-                                2,
-                                5
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added a BEGIN block"
                 }
             ]
         },
@@ -36,7 +36,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4d6bab5f42cedc4c3c222fb92aa3b2df6e7d2c74..a7917b3331b14023bcaad2d4ede01f7d8c95749d"
+    "shas": "94ad2a55ec6e672dc0141d4eb140eac51505c3f3..607d6ab0c10829f932b4105f680cf2001e69400f"
 }
 ,{
     "testCaseDescription": "ruby-begin-block-replacement-insert-test",
@@ -62,31 +62,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                2
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier"
+                    "summary": "Added a BEGIN block"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                2
+                                5,
+                                1
                             ],
                             "end": [
-                                6,
-                                5
+                                7,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added a BEGIN block"
                 }
             ]
         },
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a7917b3331b14023bcaad2d4ede01f7d8c95749d..b2b95470fbb1c6c91b9151494c13386f7cd93cbd"
+    "shas": "607d6ab0c10829f932b4105f680cf2001e69400f..64af6701b22116fb4d3f49e6955735b9faccd69b"
 }
 ,{
     "testCaseDescription": "ruby-begin-block-delete-insert-test",
@@ -124,16 +124,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                2
+                                1,
+                                1
                             ],
                             "end": [
-                                2,
-                                5
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added a BEGIN block"
                 },
                 {
                     "span": {
@@ -154,16 +154,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                2
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted a BEGIN block"
                 }
             ]
         },
@@ -187,7 +187,7 @@
         "  foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b2b95470fbb1c6c91b9151494c13386f7cd93cbd..165a084d630ecb68bc6e7074d0695fedc72d7562"
+    "shas": "64af6701b22116fb4d3f49e6955735b9faccd69b..899324a7bdf43e1171bad9545e44238ef55a818f"
 }
 ,{
     "testCaseDescription": "ruby-begin-block-replacement-test",
@@ -234,7 +234,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in a BEGIN block"
                 }
             ]
         },
@@ -258,7 +258,7 @@
         "  foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "165a084d630ecb68bc6e7074d0695fedc72d7562..8f1a41f724060b5d5b6f0e50150b28b0758f44dd"
+    "shas": "899324a7bdf43e1171bad9545e44238ef55a818f..1df129cf1f0fbe27c7d05487a2e141a5b5ad02b4"
 }
 ,{
     "testCaseDescription": "ruby-begin-block-delete-replacement-test",
@@ -269,16 +269,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
-                                2
+                                8,
+                                1
                             ],
                             "end": [
-                                9,
-                                5
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted a BEGIN block"
                 }
             ]
         },
@@ -307,7 +307,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "8f1a41f724060b5d5b6f0e50150b28b0758f44dd..5b412bf54be49dac5e97c8de3a5b595a9ab2e92d"
+    "shas": "1df129cf1f0fbe27c7d05487a2e141a5b5ad02b4..ced5b35982c48d22ba622ed28fc36d14acdc31e2"
 }
 ,{
     "testCaseDescription": "ruby-begin-block-delete-test",
@@ -318,16 +318,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
-                                2
+                                1,
+                                1
                             ],
                             "end": [
-                                2,
-                                5
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted a BEGIN block"
                 }
             ]
         },
@@ -350,7 +350,7 @@
         "  bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5b412bf54be49dac5e97c8de3a5b595a9ab2e92d..79734ccc02456fb6ff54e8e202b7f8d48228a734"
+    "shas": "ced5b35982c48d22ba622ed28fc36d14acdc31e2..dea1fe3882582fbae56c5370051baf5d951ae2c3"
 }
 ,{
     "testCaseDescription": "ruby-begin-block-delete-rest-test",
@@ -376,16 +376,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                2
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted a BEGIN block"
                 }
             ]
         },
@@ -406,5 +406,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "79734ccc02456fb6ff54e8e202b7f8d48228a734..130384923ce3911f879b540bfaa20cda886c7695"
+    "shas": "dea1fe3882582fbae56c5370051baf5d951ae2c3..82c6448a6e4e2d885ac6f12d9f86cdb1d6d1dd2d"
 }]

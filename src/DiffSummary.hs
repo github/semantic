@@ -61,6 +61,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Switch{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
+          S.BlockStatement{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -257,6 +258,7 @@ toTermName source term = case unwrap term of
   S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr
   S.Continue expr -> toTermName' expr
+  S.BlockStatement children -> termNameFromChildren term children
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -291,6 +293,8 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
       C.Switch -> "in the" <+> squotes (termName t) <+> catName c
       C.When -> "in a" <+> catName c
+      C.BeginBlock -> "in a" <+> catName c
+      C.EndBlock -> "in an" <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
@@ -433,8 +437,8 @@ instance HasCategory Category where
     C.SingletonClass -> "singleton class"
     C.RangeExpression -> "range"
     C.ScopeOperator -> "scope operator"
-    C.BeginBlock -> "begin block"
-    C.EndBlock -> "end block"
+    C.BeginBlock -> "BEGIN block"
+    C.EndBlock -> "END block"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

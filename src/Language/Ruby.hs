@@ -130,7 +130,7 @@ termConstructor source sourceSpan name range children allChildren
     ("while", expr : rest ) -> S.While expr rest
     ("while", _ ) -> S.Error children
     ("yield", _ ) -> S.Yield children
-    _ | name `elem` ["begin_block", "end_block"] -> S.Fixed children
+    _ | name `elem` ["begin_block", "end_block"] -> S.BlockStatement children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where

@@ -7,16 +7,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                2
+                                1,
+                                1
                             ],
                             "end": [
-                                2,
-                                5
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added an END block"
                 }
             ]
         },
@@ -36,7 +36,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e03634a7a9783f2d4c173cd95d4bbdf663578e5e..2405ebde243b5e4030fecf085390c7665217729d"
+    "shas": "82c6448a6e4e2d885ac6f12d9f86cdb1d6d1dd2d..d2ed526fb844a051febd47469d494caa75fe91f0"
 }
 ,{
     "testCaseDescription": "ruby-end-block-replacement-insert-test",
@@ -62,31 +62,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                2
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier"
+                    "summary": "Added an END block"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
-                                2
+                                5,
+                                1
                             ],
                             "end": [
-                                6,
-                                5
+                                7,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added an END block"
                 }
             ]
         },
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2405ebde243b5e4030fecf085390c7665217729d..a62e9d899bd4dc2ff6f0ed289371807340b780c8"
+    "shas": "d2ed526fb844a051febd47469d494caa75fe91f0..d63a52f07a0f0bcf858af8cd8be7547da36d07f9"
 }
 ,{
     "testCaseDescription": "ruby-end-block-delete-insert-test",
@@ -124,16 +124,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                2
+                                1,
+                                1
                             ],
                             "end": [
-                                2,
-                                5
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added an END block"
                 },
                 {
                     "span": {
@@ -154,16 +154,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                2
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted an END block"
                 }
             ]
         },
@@ -187,7 +187,7 @@
         "  foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a62e9d899bd4dc2ff6f0ed289371807340b780c8..392f49876cbbdaa2b543ff4f28786c5cfbdb801a"
+    "shas": "d63a52f07a0f0bcf858af8cd8be7547da36d07f9..e81caf1424dc328e8ab385e9c747a63d54698444"
 }
 ,{
     "testCaseDescription": "ruby-end-block-replacement-test",
@@ -234,7 +234,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in an END block"
                 }
             ]
         },
@@ -258,7 +258,7 @@
         "  foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "392f49876cbbdaa2b543ff4f28786c5cfbdb801a..ccb5407967b0e468ec155d6ad7a7583ccb6d4435"
+    "shas": "e81caf1424dc328e8ab385e9c747a63d54698444..e84b2b99dab363e56f8785e8b39c18a71009aa4e"
 }
 ,{
     "testCaseDescription": "ruby-end-block-delete-replacement-test",
@@ -269,16 +269,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                9,
-                                2
+                                8,
+                                1
                             ],
                             "end": [
-                                9,
-                                5
+                                10,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted an END block"
                 }
             ]
         },
@@ -307,7 +307,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ccb5407967b0e468ec155d6ad7a7583ccb6d4435..dcd2f48d79dc2cd642ea60817839a5f842f4e49e"
+    "shas": "e84b2b99dab363e56f8785e8b39c18a71009aa4e..d064522cbf35b19bb71d3999617cd95576ef5d15"
 }
 ,{
     "testCaseDescription": "ruby-end-block-delete-test",
@@ -318,16 +318,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
-                                2
+                                1,
+                                1
                             ],
                             "end": [
-                                2,
-                                5
+                                3,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted an END block"
                 }
             ]
         },
@@ -350,7 +350,7 @@
         "  bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "dcd2f48d79dc2cd642ea60817839a5f842f4e49e..7d43f3a14cb513fd3c1a4f6a60de41989b444655"
+    "shas": "d064522cbf35b19bb71d3999617cd95576ef5d15..f28e52757945cbfc7235452bdfb242f59fe209b6"
 }
 ,{
     "testCaseDescription": "ruby-end-block-delete-rest-test",
@@ -376,16 +376,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                3,
-                                2
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                5
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted an END block"
                 }
             ]
         },
@@ -406,5 +406,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7d43f3a14cb513fd3c1a4f6a60de41989b444655..94ad2a55ec6e672dc0141d4eb140eac51505c3f3"
+    "shas": "f28e52757945cbfc7235452bdfb242f59fe209b6..ad37c6bddef1ebfea76c652b142476e8268b9f9f"
 }]
