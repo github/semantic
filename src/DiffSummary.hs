@@ -175,7 +175,8 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
         categoryName' = case categoryName of
           name | startsWithVowel name -> "an" <+> toDoc name
                | otherwise -> "a" <+> toDoc name
-        startsWithVowel text = getAny $ foldMap (Any . flip isPrefixOf text) ["a","e","i","o","u","A","E","I","O","U"]
+        startsWithVowel text = getAny $ foldMap (Any . flip Text.isPrefixOf text) vowels
+        vowels = Text.singleton <$> ("aeiouAEIOU" :: [Char])
 
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
