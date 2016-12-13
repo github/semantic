@@ -177,6 +177,10 @@ data Category
   | RangeExpression
   -- | A scope resolution operator, e.g. `Foo::bar` in Ruby.
   | ScopeOperator
+  -- | A BEGIN {} block of statements.
+  | BeginBlock
+  -- | An END {} block of statements.
+  | EndBlock
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

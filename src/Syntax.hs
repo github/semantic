@@ -88,6 +88,8 @@ data Syntax a f
   | TypeConversion f f
   | Break f
   | Continue f
+  -- | A block statement has an ordered branch of child nodes, e.g. BEGIN {...} or END {...} in Ruby/Perl.
+  | BlockStatement [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

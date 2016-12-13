@@ -291,6 +291,16 @@
         "template": "case foo\nwhen bar\n  baz\n{0}end",
         "insert": "else\n",
         "replacement": "else\n  qoz\n"
+      },
+      {
+        "syntax": "begin-block",
+        "insert": "BEGIN {\n foo\n}",
+        "replacement": "foo\nBEGIN {\n bar\n}"
+      },
+      {
+        "syntax": "end-block",
+        "insert": "END {\n foo\n}",
+        "replacement": "foo\nEND {\n bar\n}"
       }
     ]
   }

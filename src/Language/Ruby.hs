@@ -130,6 +130,7 @@ termConstructor source sourceSpan name range children allChildren
     ("while", expr : rest ) -> S.While expr rest
     ("while", _ ) -> S.Error children
     ("yield", _ ) -> S.Yield children
+    _ | name `elem` ["begin_block", "end_block"] -> S.BlockStatement children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -147,6 +148,7 @@ categoryForRubyName = \case
   "argument_pair" -> ArgumentPair
   "array" -> ArrayLiteral
   "assignment" -> Assignment
+  "begin_block" -> BeginBlock
   "begin" -> Begin
   "binary" -> Binary
   "block_parameter" -> BlockParameter
@@ -160,6 +162,7 @@ categoryForRubyName = \case
   "element_reference" -> SubscriptAccess
   "else" -> Else
   "elsif" -> Elsif
+  "end_block" -> EndBlock
   "ensure" -> Ensure
   "ERROR" -> Error
   "exception_variable" -> RescuedException

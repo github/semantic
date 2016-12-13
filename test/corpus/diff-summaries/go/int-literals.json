@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'a' identifier"
+                    "summary": "Added the 'a' identifier"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'b' identifier"
+                    "summary": "Added the 'b' identifier"
                 },
                 {
                     "span": {
@@ -76,7 +76,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'c' identifier"
+                    "summary": "Added the 'c' identifier"
                 },
                 {
                     "span": {
@@ -230,7 +230,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '1'"
+                    "summary": "Added '1'"
                 },
                 {
                     "span": {
@@ -275,7 +275,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'c' identifier"
+                    "summary": "Added the 'c' identifier"
                 },
                 {
                     "span": {
@@ -886,7 +886,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '4'"
+                    "summary": "Deleted '4'"
                 },
                 {
                     "span": {
@@ -931,7 +931,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'c' identifier"
+                    "summary": "Deleted the 'c' identifier"
                 },
                 {
                     "span": {
@@ -989,7 +989,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'a' identifier"
+                    "summary": "Deleted the 'a' identifier"
                 },
                 {
                     "span": {
@@ -1019,7 +1019,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'b' identifier"
+                    "summary": "Deleted the 'b' identifier"
                 },
                 {
                     "span": {
@@ -1049,7 +1049,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'c' identifier"
+                    "summary": "Deleted the 'c' identifier"
                 },
                 {
                     "span": {

@@ -109,7 +109,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced an ensure block with an 'bar' identifier in a begin statement"
+                    "summary": "Replaced an ensure block with the 'bar' identifier in a begin statement"
                 }
             ]
         },
@@ -163,7 +163,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the ensure block in a begin statement"
+                    "summary": "Replaced the 'bar' identifier with an ensure block in a begin statement"
                 }
             ]
         },
