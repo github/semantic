@@ -3,7 +3,7 @@
 
 module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
-import Prologue hiding (intercalate, null, isPrefixOf)
+import Prologue
 import Diff
 import Patch
 import Term
@@ -13,8 +13,7 @@ import Syntax as S
 import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
-import Data.Text (intercalate, null, isPrefixOf)
-import qualified Data.Text as Text (head)
+import qualified Data.Text as Text
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
@@ -166,8 +165,8 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
       C.Continue -> categoryName'
       C.BeginBlock -> categoryName'
       C.EndBlock -> categoryName'
-      C.Yield | null termName -> categoryName'
-      C.Return | null termName -> categoryName'
+      C.Yield | Text.null termName -> categoryName'
+      C.Return | Text.null termName -> categoryName'
       _ -> "the" <+> squotes (toDoc termName) <+> toDoc categoryName
       where
         termAndCategoryName = "the" <+> toDoc termName <+> toDoc categoryName
@@ -222,10 +221,10 @@ toTermName source term = case unwrap term of
   S.Ternary expr _ -> toTermName' expr
   S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
+  S.Object kvs -> "{ " <> Text.intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair k v -> toKeyName k <> toArgName v
-  S.Return children -> intercalate ", " (termNameFromSource <$> children)
-  S.Yield children -> intercalate ", " (termNameFromSource <$> children)
+  S.Return children -> Text.intercalate ", " (termNameFromSource <$> children)
+  S.Yield children -> Text.intercalate ", " (termNameFromSource <$> children)
   S.Error _ -> termNameFromSource term
   S.If expr _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
@@ -243,11 +242,11 @@ toTermName source term = case unwrap term of
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier [] -> termNameFromSource identifier
   S.Import identifier exprs -> termNameFromChildren term exprs <> " from " <> toTermName' identifier
-  S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
+  S.Export Nothing expr -> "{ " <> Text.intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
-  S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
+  S.Export (Just identifier) expr -> "{ " <> Text.intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   S.Negate expr -> toTermName' expr
-  S.Rescue args _ -> intercalate ", " $ toTermName' <$> args
+  S.Rescue args _ -> Text.intercalate ", " $ toTermName' <$> args
   S.Break expr -> toTermName' expr
   S.Continue expr -> toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
@@ -256,7 +255,7 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
-        paramsToArgNames params = "(" <> intercalate ", " (toArgName <$> params) <> ")"
+        paramsToArgNames params = "(" <> Text.intercalate ", " (toArgName <$> params) <> ")"
         toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
