@@ -18,6 +18,7 @@ module Data.Functor.Listable
 , liftCons4
 ) where
 
+import Data.Bifunctor.Join
 import Prologue
 import Test.LeanCheck
 
@@ -64,3 +65,6 @@ instance Listable a => Listable1 ((,) a) where
 instance Listable1 [] where
   liftTiers tiers = go
     where go = cons0 [] \/ liftCons2 tiers go (:)
+
+instance Listable2 p => Listable1 (Join p) where
+  liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
