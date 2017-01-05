@@ -20,3 +20,6 @@ instance Arbitrary a => Arbitrary (Patch a) where
 
 instance Listable1 Patch where
   liftTiers t = liftCons1 t Insert \/ liftCons1 t Delete \/ liftCons2 t t Replace
+
+instance Listable a => Listable (Patch a) where
+  tiers = tiers1
