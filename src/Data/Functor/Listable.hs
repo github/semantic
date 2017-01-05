@@ -11,6 +11,7 @@ module Data.Functor.Listable
 , Listable1(..)
 , tiers1
 , Listable2(..)
+, tiers2
 , liftCons1
 ) where
 
@@ -26,6 +27,10 @@ tiers1 = liftTiers tiers
 
 class Listable2 l where
   liftTiers2 :: [[a]] -> [[b]] -> [[l a b]]
+
+tiers2 :: (Listable a, Listable b, Listable2 l) => [[l a b]]
+tiers2 = liftTiers2 tiers tiers
+
 
 liftCons1 :: [[a]] -> (a -> b) -> [[b]]
 liftCons1 tiers f = mapT f tiers `addWeight` 1
