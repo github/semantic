@@ -164,3 +164,6 @@ instance Listable2 Syntax where
     \/ liftCons1 recur Break
     \/ liftCons1 recur Continue
     \/ liftCons1 (liftTiers recur) BlockStatement
+
+instance Listable leaf => Listable1 (Syntax leaf) where
+  liftTiers = liftTiers2 tiers
