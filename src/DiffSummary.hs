@@ -15,7 +15,9 @@ import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
 import qualified Data.Text as Text
+import Data.Text.Listable
 import Test.QuickCheck hiding (Fixed)
+import Test.LeanCheck
 import Patch.Arbitrary()
 import Data.Record
 import Data.These
@@ -445,6 +447,10 @@ instance Listable Branch where
 instance Arbitrary a => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
+
+instance Listable1 DiffSummary where
+  liftTiers termTiers = liftCons2 (liftTiers termTiers) (liftTiers (eitherTiers (liftTiers (mapT unListableText tiers)))) DiffSummary
+    where eitherTiers tiers = liftTiers2 tiers tiers
 
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL (toCategoryName leafCategory))
