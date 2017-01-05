@@ -2,6 +2,7 @@
 module Syntax where
 
 import Prologue
+import Data.Functor.Listable
 import Data.Mergeable
 import GHC.Generics
 import Test.QuickCheck hiding (Fixed)
@@ -113,3 +114,53 @@ syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsO
           first <- recur m
           rest <- childrenOfSize (n - m)
           pure $! first : rest
+
+instance Listable2 Syntax where
+  liftTiers2 leaf recur
+    =  liftCons1 leaf Leaf
+    \/ liftCons1 (liftTiers recur) Indexed
+    \/ liftCons1 (liftTiers recur) Fixed
+    \/ liftCons2 recur (liftTiers recur) FunctionCall
+    \/ liftCons2 recur (liftTiers recur) Ternary
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Function
+    \/ liftCons2 recur recur Assignment
+    \/ liftCons2 recur recur OperatorAssignment
+    \/ liftCons2 recur recur MemberAccess
+    \/ liftCons3 recur recur (liftTiers recur) MethodCall
+    \/ liftCons1 (liftTiers recur) Operator
+    \/ liftCons1 recur VarDecl
+    \/ liftCons2 recur recur VarAssignment
+    \/ liftCons2 recur recur SubscriptAccess
+    \/ liftCons2 recur (liftTiers recur) Switch
+    \/ liftCons2 recur (liftTiers recur) Case
+    \/ liftCons1 (liftTiers recur) Select
+    \/ liftCons1 (liftTiers recur) Syntax.Object
+    \/ liftCons2 recur recur Pair
+    \/ liftCons1 leaf Comment
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
+    \/ liftCons1 (liftTiers recur) Syntax.Error
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) For
+    \/ liftCons2 recur recur DoWhile
+    \/ liftCons2 recur (liftTiers recur) While
+    \/ liftCons1 (liftTiers recur) Return
+    \/ liftCons1 recur Throw
+    \/ liftCons1 recur Constructor
+    \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
+    \/ liftCons1 (liftTiers recur) Syntax.Array
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Method
+    \/ liftCons2 recur (liftTiers recur) If
+    \/ liftCons2 recur (liftTiers recur) Module
+    \/ liftCons2 recur (liftTiers recur) Import
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) Export
+    \/ liftCons1 (liftTiers recur) Yield
+    \/ liftCons1 recur Negate
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) Rescue
+    \/ liftCons1 recur Go
+    \/ liftCons1 recur Defer
+    \/ liftCons2 recur recur TypeAssertion
+    \/ liftCons2 recur recur TypeConversion
+    \/ liftCons1 recur Break
+    \/ liftCons1 recur Continue
+    \/ liftCons1 (liftTiers recur) BlockStatement
