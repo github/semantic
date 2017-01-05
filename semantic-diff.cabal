@@ -81,6 +81,7 @@ library
                      , gitrev
                      , hashable
                      , kdt
+                     , leancheck
                      , MonadRandom
                      , mtl
                      , optparse-applicative
