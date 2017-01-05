@@ -4,6 +4,7 @@ module Category where
 
 import Prologue
 import Test.QuickCheck hiding (Args)
+import Data.Functor.Listable
 import Data.Text (pack)
 import Data.Text.Arbitrary()
 
@@ -278,3 +279,8 @@ instance Arbitrary Category where
 
   shrink (Other s) = Other <$> shrink s
   shrink _ = []
+
+newtype ListableText = ListableText { unListableText :: Text }
+
+instance Listable ListableText where
+  tiers = cons1 (ListableText . pack)
