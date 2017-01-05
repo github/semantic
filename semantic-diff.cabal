@@ -171,6 +171,7 @@ test-suite test
                      , RangeSpec
                      , Source.Spec
                      , TermSpec
+                     , Test.Hspec.LeanCheck
   build-depends:       base
                      , bifunctors
                      , deepseq
