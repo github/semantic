@@ -312,3 +312,6 @@ instance Arbitrary label => Arbitrary (Gram label) where
 
 instance Listable1 Gram where
   liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
+
+instance Listable a => Listable (Gram a) where
+  tiers = tiers1
