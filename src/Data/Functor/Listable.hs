@@ -8,6 +8,10 @@ module Data.Functor.Listable
 , cons5
 , cons6
 , (\/)
+, Listable1(..)
 ) where
 
 import Test.LeanCheck
+
+class Listable1 l where
+  liftTiers :: [[a]] -> [[l a]]
