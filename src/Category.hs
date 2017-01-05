@@ -1,14 +1,13 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Category
-( Category(..)
-) where
+module Category where
 
 import Prologue
 import Test.QuickCheck hiding (Args)
 import Data.Functor.Listable
 import Data.Text (pack)
 import Data.Text.Arbitrary()
+import Data.Text.Listable
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -366,8 +365,3 @@ instance Listable Category where
     \/ cons0 Superclass
     \/ cons0 SingletonClass
     \/ cons1 (Other . unListableText)
-
-newtype ListableText = ListableText { unListableText :: Text }
-
-instance Listable ListableText where
-  tiers = cons1 (ListableText . pack)
