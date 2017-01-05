@@ -167,3 +167,6 @@ instance Listable2 Syntax where
 
 instance Listable leaf => Listable1 (Syntax leaf) where
   liftTiers = liftTiers2 tiers
+
+instance (Listable leaf, Listable recur) => Listable (Syntax leaf recur) where
+  tiers = tiers1
