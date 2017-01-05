@@ -110,3 +110,6 @@ instance Arbitrary SourceSpan where
 
 instance Listable SourcePos where
   tiers = cons2 SourcePos
+
+instance Listable SourceSpan where
+  tiers = cons2 SourceSpan
