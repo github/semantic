@@ -13,6 +13,7 @@ module Data.Functor.Listable
 , liftCons1
 ) where
 
+import Prologue
 import Test.LeanCheck
 
 class Listable1 l where
@@ -24,3 +25,9 @@ tiers1 = liftTiers tiers
 
 liftCons1 :: [[a]] -> (a -> b) -> [[b]]
 liftCons1 tiers f = mapT f tiers `addWeight` 1
+
+
+-- Instances
+
+instance Listable1 Maybe where
+  liftTiers tiers = cons0 Nothing \/ liftCons1 tiers Just
