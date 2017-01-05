@@ -452,6 +452,9 @@ instance Listable1 DiffSummary where
   liftTiers termTiers = liftCons2 (liftTiers termTiers) (liftTiers (eitherTiers (liftTiers (mapT unListableText tiers)))) DiffSummary
     where eitherTiers tiers = liftTiers2 tiers tiers
 
+instance Listable a => Listable (DiffSummary a) where
+  tiers = tiers1
+
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL (toCategoryName leafCategory))
   pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
