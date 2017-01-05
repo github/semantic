@@ -60,6 +60,9 @@ instance Listable1 Maybe where
 instance Listable2 (,) where
   liftTiers2 = productWith (,)
 
+instance Listable2 Either where
+  liftTiers2 leftTiers rightTiers = liftCons1 leftTiers Left \/ liftCons1 rightTiers Right
+
 instance Listable a => Listable1 ((,) a) where
   liftTiers = liftTiers2 tiers
 
