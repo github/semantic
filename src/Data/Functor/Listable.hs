@@ -75,3 +75,6 @@ instance Listable2 p => Listable1 (Join p) where
 
 instance Listable2 These where
   liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
+
+instance Listable1 f => Listable2 (CofreeF f) where
+  liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
