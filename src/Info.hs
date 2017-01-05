@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
 module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost, SourceSpan(..), SourcePos(..), SourceSpans(..), SourceText(..), sourceText) where
 
+import Data.Functor.Listable
 import Data.Record
 import Prologue
 import Category
@@ -43,3 +44,6 @@ instance Arbitrary Cost where
   arbitrary = Cost <$> arbitrary
 
   shrink = fmap Cost . shrink . unCost
+
+instance Listable Cost where
+  tiers = cons1 Cost
