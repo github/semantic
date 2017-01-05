@@ -13,6 +13,7 @@ import Syntax as S
 import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
+import Data.Functor.Listable
 import qualified Data.Text as Text
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
@@ -437,6 +438,9 @@ instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
+
+instance Listable Branch where
+  tiers = cons0 BIndexed \/ cons0 BFixed \/ cons0 BCommented \/ cons0 BIf
 
 instance Arbitrary a => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
