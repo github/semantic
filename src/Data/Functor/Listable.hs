@@ -19,6 +19,7 @@ module Data.Functor.Listable
 ) where
 
 import Data.Bifunctor.Join
+import Data.These
 import Prologue
 import Test.LeanCheck
 
@@ -68,3 +69,6 @@ instance Listable1 [] where
 
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
+
+instance Listable2 These where
+  liftTiers2 this that = liftCons1 this This \/ liftCons1 that That \/ liftCons2 this that These
