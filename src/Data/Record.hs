@@ -96,5 +96,8 @@ instance Arbitrary (Record '[]) where
 
   shrink _ = []
 
+instance (Listable head, Listable (Record tail)) => Listable (Record (head ': tail)) where
+  tiers = cons2 RCons
+
 instance Listable (Record '[]) where
   tiers = cons0 RNil
