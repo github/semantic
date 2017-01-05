@@ -1,6 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
-module Category where
+module Category
+( Category(..)
+) where
 
 import Prologue
 import Test.QuickCheck hiding (Args)
