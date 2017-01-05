@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators, ConstraintKinds #-}
 module Data.Record where
 
+import Data.Functor.Listable
 import GHC.Show
 import Prologue
 import Test.QuickCheck
@@ -94,3 +95,6 @@ instance Arbitrary (Record '[]) where
   arbitrary = pure RNil
 
   shrink _ = []
+
+instance Listable (Record '[]) where
+  tiers = cons0 RNil
