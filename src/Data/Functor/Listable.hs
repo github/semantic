@@ -15,6 +15,7 @@ module Data.Functor.Listable
 , liftCons1
 , liftCons2
 , liftCons3
+, liftCons4
 ) where
 
 import Prologue
@@ -43,6 +44,10 @@ liftCons2 tiers1 tiers2 f = mapT (uncurry f) (productWith (,) tiers1 tiers2) `ad
 liftCons3 :: [[a]] -> [[b]] -> [[c]] -> (a -> b -> c -> d) -> [[d]]
 liftCons3 tiers1 tiers2 tiers3 f = mapT (uncurry3 f) (productWith (\ x (y, z) -> (x, y, z)) tiers1 (liftCons2 tiers2 tiers3 (,)) ) `addWeight` 1
   where uncurry3 f (a, b, c) = f a b c
+
+liftCons4 :: [[a]] -> [[b]] -> [[c]] -> [[d]] -> (a -> b -> c -> d -> e) -> [[e]]
+liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (productWith (\ x (y, z, w) -> (x, y, z, w)) tiers1 (liftCons3 tiers2 tiers3 tiers4 (,,)) ) `addWeight` 1
+  where uncurry4 f (a, b, c, d) = f a b c d
 
 
 -- Instances
