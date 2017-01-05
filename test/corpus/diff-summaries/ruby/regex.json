@@ -1,0 +1,350 @@
+[{
+    "testCaseDescription": "ruby-regex-insert-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/^(foo|bar[^_])$/i' regex"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index e69de29..02dce9d 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -0,0 +1 @@",
+        "+/^(foo|bar[^_])$/i"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "7c793b16609953b03f729c6de62ceafd095d2398..bff67126ff1234b0701fe26d1df24daf2dcd7227"
+}
+,{
+    "testCaseDescription": "ruby-regex-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/^(foo|bar[^_])$/i' regex with '%r/a/\n%r<a<b>c>\n/^(foo|bar[^_])$/i\n/^(foo|bar[^_])$/i\n' at line 1, column 1 - line 5, column 1"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index 02dce9d..c801d61 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -1 +1,4 @@",
+        "+%r/a/",
+        "+%r<a<b>c>",
+        "+/^(foo|bar[^_])$/i",
+        " /^(foo|bar[^_])$/i"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "bff67126ff1234b0701fe26d1df24daf2dcd7227..977685b8960ae105a57fae75b7d5bcdf314f3130"
+}
+,{
+    "testCaseDescription": "ruby-regex-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '%r/a/\n%r<a<b>c>\n/^(foo|bar[^_])$/i\n/^(foo|bar[^_])$/i\n' at line 1, column 1 - line 5, column 1 with the '/^(foo|bar[^_])$/i' regex"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index c801d61..42d4984 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -1,4 +1,3 @@",
+        "-%r/a/",
+        "-%r<a<b>c>",
+        "+/^(foo|bar[^_])$/i",
+        " /^(foo|bar[^_])$/i",
+        " /^(foo|bar[^_])$/i"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "977685b8960ae105a57fae75b7d5bcdf314f3130..5a5851f376095441bfd99d859ee89c48dd8e9e48"
+}
+,{
+    "testCaseDescription": "ruby-regex-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/^(foo|bar[^_])$/i' regex with '%r/a/\n%r<a<b>c>\n/^(foo|bar[^_])$/i\n/^(foo|bar[^_])$/i\n' at line 1, column 1 - line 5, column 1"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index 42d4984..c801d61 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -1,3 +1,4 @@",
+        "-/^(foo|bar[^_])$/i",
+        "+%r/a/",
+        "+%r<a<b>c>",
+        " /^(foo|bar[^_])$/i",
+        " /^(foo|bar[^_])$/i"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "5a5851f376095441bfd99d859ee89c48dd8e9e48..440e583da4d27b5b10b2da94f8c6599d1e730e58"
+}
+,{
+    "testCaseDescription": "ruby-regex-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '%r/a/\n%r<a<b>c>\n/^(foo|bar[^_])$/i\n/^(foo|bar[^_])$/i\n' at line 1, column 1 - line 5, column 1 with the '/^(foo|bar[^_])$/i' regex"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index c801d61..48e43a9 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -1,4 +1,3 @@",
+        "+/^(foo|bar[^_])$/i",
+        " %r/a/",
+        " %r<a<b>c>",
+        "-/^(foo|bar[^_])$/i",
+        "-/^(foo|bar[^_])$/i"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "440e583da4d27b5b10b2da94f8c6599d1e730e58..f24be3627259095f39a713912bc963aacea7e9bb"
+}
+,{
+    "testCaseDescription": "ruby-regex-delete-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/^(foo|bar[^_])$/i' regex"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index 48e43a9..b23927a 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -1,3 +1,2 @@",
+        "-/^(foo|bar[^_])$/i",
+        " %r/a/",
+        " %r<a<b>c>"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f24be3627259095f39a713912bc963aacea7e9bb..f9ba05160e0d30d3724104094c926cde57c7fc53"
+}
+,{
+    "testCaseDescription": "ruby-regex-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%r<a<b>c>' regex"
+                }
+            ]
+        },
+        "errors": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '%r/a/' at line 1, column 1 - line 1, column 6"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "patch": [
+        "diff --git a/regex.rb b/regex.rb",
+        "index b23927a..e69de29 100644",
+        "--- a/regex.rb",
+        "+++ b/regex.rb",
+        "@@ -1,2 +0,0 @@",
+        "-%r/a/",
+        "-%r<a<b>c>"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f9ba05160e0d30d3724104094c926cde57c7fc53..6958bb99ad03c2601f180ead5e0dc38c7ca529f4"
+}]

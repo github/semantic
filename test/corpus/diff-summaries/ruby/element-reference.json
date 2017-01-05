@@ -66,7 +66,7 @@
         "+foo[bar] = 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "72f935172c31da7ddd21bf1a12c7baeb4fdb3419..1b88f5fd6eaa6af48eef0522c818919cc89fe0f3"
+    "shas": "30d6a1e091e9063ca143102ef787d5d51b94c095..b82bd8becf9e32f4247ad0e6476a3861bbb5532e"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-replacement-insert-test",
@@ -171,7 +171,7 @@
         " foo[bar] = 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1b88f5fd6eaa6af48eef0522c818919cc89fe0f3..3114590b91f23ee9d8e9656e3c597b7710c5f08a"
+    "shas": "b82bd8becf9e32f4247ad0e6476a3861bbb5532e..76fd9f876d09e533d6ded757a9aa787d1a33c41d"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-insert-test",
@@ -297,7 +297,7 @@
         " foo[bar] = 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3114590b91f23ee9d8e9656e3c597b7710c5f08a..470abdcd5adc26a44bbd001539d731e36d417046"
+    "shas": "76fd9f876d09e533d6ded757a9aa787d1a33c41d..d5c5819a87fd828285633b154c68022edf965c44"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-replacement-test",
@@ -423,7 +423,7 @@
         " foo[bar] = 1"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "470abdcd5adc26a44bbd001539d731e36d417046..ee5fbeec520aa431dcf290c4a7eb220d2bb2b674"
+    "shas": "d5c5819a87fd828285633b154c68022edf965c44..36137248fc8b3bf929cd5bb1b8e4ba71fd7d90c7"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-replacement-test",
@@ -560,7 +560,7 @@
         "+x[:\"c\"]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ee5fbeec520aa431dcf290c4a7eb220d2bb2b674..3fb44d52e9f12fd560773298d89b1721698f358a"
+    "shas": "36137248fc8b3bf929cd5bb1b8e4ba71fd7d90c7..d2370083ae9deaae75f196d514e3a1408a71281d"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-test",
@@ -632,7 +632,7 @@
         " x[:\"c\"]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3fb44d52e9f12fd560773298d89b1721698f358a..0207d27c72e4662c924f3f408396247dbc990739"
+    "shas": "d2370083ae9deaae75f196d514e3a1408a71281d..0c513b9786263c61e3ab29b5434d024ddb8c755c"
 }
 ,{
     "testCaseDescription": "ruby-element-reference-delete-rest-test",
@@ -686,5 +686,5 @@
         "-x[:\"c\"]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0207d27c72e4662c924f3f408396247dbc990739..72e1f4912f54a936266422abbb53a9c2fc864992"
+    "shas": "0c513b9786263c61e3ab29b5434d024ddb8c755c..fc0411352ae036e9bb70161b0d14defacee8bba0"
 }]

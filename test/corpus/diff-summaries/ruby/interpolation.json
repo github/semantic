@@ -50,7 +50,7 @@
         "+\"foo #{bar}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2505617f30ca311da1378227cbf6a13d83647b91..ba6045bb44bd3872e04f0e0c67e330b73429defa"
+    "shas": "c0aa0ce3ae48f9845e1790cca61bfab311dc366b..25ea5a0b330d2e4c2b3de5e577ebe3fc5319c207"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-replacement-insert-test",
@@ -138,7 +138,7 @@
         " \"foo #{bar}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ba6045bb44bd3872e04f0e0c67e330b73429defa..9eab77466f1fc1d8a2ceaed51eab7b16159d2c4c"
+    "shas": "25ea5a0b330d2e4c2b3de5e577ebe3fc5319c207..424bf8f3eafe5ce1487fcc94cb5e3327ee7a51a3"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-insert-test",
@@ -221,7 +221,7 @@
         " :\"foo #{bar}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9eab77466f1fc1d8a2ceaed51eab7b16159d2c4c..c23529986ecc8afd8cc26b6e54dc68f203488cd0"
+    "shas": "424bf8f3eafe5ce1487fcc94cb5e3327ee7a51a3..d494b48ae5a3ad7c6c4996a454420209e2ce5f6c"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-replacement-test",
@@ -304,7 +304,7 @@
         " :\"foo #{bar}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c23529986ecc8afd8cc26b6e54dc68f203488cd0..477f525a5dd8fecc22f1eaaa4e77419e0255d2a9"
+    "shas": "d494b48ae5a3ad7c6c4996a454420209e2ce5f6c..341006d8c5bd3fa48ab3b834897ba3fe0ca175be"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-replacement-test",
@@ -424,7 +424,7 @@
         "+\"bar #{foo}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "477f525a5dd8fecc22f1eaaa4e77419e0255d2a9..c84f76f558cce919ec1935a75ad1b830b4511ff8"
+    "shas": "341006d8c5bd3fa48ab3b834897ba3fe0ca175be..49f5d52bca997be870605c2b9f556a33c826b3d1"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-test",
@@ -480,7 +480,7 @@
         " \"bar #{foo}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "c84f76f558cce919ec1935a75ad1b830b4511ff8..cf1a6e3114fde76b4c1d6ad65ac4c2c10f3a2b3a"
+    "shas": "49f5d52bca997be870605c2b9f556a33c826b3d1..8acceea55bd2460d0fe1af29859fdc4911b4626d"
 }
 ,{
     "testCaseDescription": "ruby-interpolation-delete-rest-test",
@@ -534,5 +534,5 @@
         "-\"bar #{foo}\""
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cf1a6e3114fde76b4c1d6ad65ac4c2c10f3a2b3a..ef8d34476c23317120bf744df9d41b9110a04c03"
+    "shas": "8acceea55bd2460d0fe1af29859fdc4911b4626d..84505dded647bd3b81bb4d834c05b8e7ca70d41a"
 }]
