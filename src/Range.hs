@@ -5,6 +5,7 @@ import Data.List (span)
 import Data.Semigroup
 import Data.String
 import Prologue
+import Test.LeanCheck
 import Test.QuickCheck
 
 
@@ -86,3 +87,6 @@ instance Arbitrary Range where
   arbitrary = Range <$> arbitrary <*> arbitrary
 
   shrink s = Range <$> shrink (start s) <*> shrink (end s)
+
+instance Listable Range where
+  tiers = cons2 Range
