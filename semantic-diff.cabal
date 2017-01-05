@@ -20,6 +20,7 @@ library
                      , Data.Align.Generic
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
+                     , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.RandomWalkSimilarity
