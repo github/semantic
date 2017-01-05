@@ -308,6 +308,24 @@
         "syntax": "export",
         "insert": "export { name1, name2, name3, nameN };\nexport { variable1 as name1, variable2 as name2, nameN };\nexport let name1, name2, nameN;\nexport let name1 = value1, name2 = value2, name3, nameN;\nexport default namedFunction;\nexport default function () { };\nexport default function name1() { };\nexport { name1 as default };\nexport * from 'foo';\nexport { name1, name2, nameN } from 'foo';\nexport { import1 as name1, import2 as name2, nameN } from 'bar';",
         "replacement": "export { name4, name5, name6, nameZ };\nexport { variable2 as name2, variable3 as name3, nameY };\nexport let name3, name4, nameT;\nexport let name2 = value2, name3 = value3, name4, nameO;\nexport default otherNamedFunction;\nexport default function newName1() {};\nexport default function () {};\nexport { name2 as statement };\nexport * from 'baz';\nexport { name7, name8, nameP } from 'buzz';\nexport { import6 as name6, import7 as name7, nameB } from 'fizz';"
+      },
+      {
+        "syntax": "break",
+        "insert": "break;",
+        "replacement": "continue;",
+        "template": "for (i = 0; i < 10; i++) { if (i === 4) { {0} }; i }"
+      },
+      {
+        "syntax": "continue",
+        "insert": "continue;",
+        "replacement": "break;",
+        "template": "for (i = 0; i < 10; i++) { if (i === 4) { {0} }; i }"
+      },
+      {
+        "syntax": "yield",
+        "insert": "yield i;",
+        "replacement": "yield i++;",
+        "template": "function* foo(){ var index = 0; {0} }"
       }
     ]
   }

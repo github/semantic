@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d58c4c1e194b7b160874111eee267a32f08fe98..e1dafa000bce58d04020a2828884a3eadd22b316"
+    "shas": "797c6862fbfbf10b056b4938b2f5d3902ede8ccb..6c9da0546b037bcf762ccf742306b7c5a22d8eef"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1dafa000bce58d04020a2828884a3eadd22b316..9feefb7af868c589ef7cadcb8cbe5883809e60e9"
+    "shas": "6c9da0546b037bcf762ccf742306b7c5a22d8eef..829199e20df03dc4d1e5b2c5bc2f5d4786a40f4a"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9feefb7af868c589ef7cadcb8cbe5883809e60e9..2f882100ccd53f6d17b79be46a23d53e433d14fc"
+    "shas": "829199e20df03dc4d1e5b2c5bc2f5d4786a40f4a..99f16b94b2e53f34ded36a1f2a37838fc444b7d4"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f882100ccd53f6d17b79be46a23d53e433d14fc..1249f77e1ee2af007e8a692855ddb1c2cf4206e1"
+    "shas": "99f16b94b2e53f34ded36a1f2a37838fc444b7d4..c8733fdebf191d5d2970c75d9959b1b4019b9aca"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1249f77e1ee2af007e8a692855ddb1c2cf4206e1..f6fb5a7514156f69f43a9b5b82cb20f8d5deb2b9"
+    "shas": "c8733fdebf191d5d2970c75d9959b1b4019b9aca..d2e84e27e4ff90b7f9bde562d0395135ddec7468"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f6fb5a7514156f69f43a9b5b82cb20f8d5deb2b9..465c0e2e2bcce4e0aa944f72704ec5e00f3fc6c8"
+    "shas": "d2e84e27e4ff90b7f9bde562d0395135ddec7468..91a7c1830966b35d27d71f75444fe93cd256cee8"
 }]

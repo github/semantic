@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement"
+                    "summary": "Added a return statement"
                 },
                 {
                     "span": {
@@ -191,7 +191,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement"
+                    "summary": "Deleted a return statement"
                 },
                 {
                     "span": {
@@ -221,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement"
+                    "summary": "Added a return statement"
                 }
             ]
         },
@@ -301,7 +301,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement"
+                    "summary": "Deleted a return statement"
                 }
             ]
         },

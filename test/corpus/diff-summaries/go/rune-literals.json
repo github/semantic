@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4e968b13372f698a7052494376f12760ebb66e27..68b8bf2d0046cc026c6fce5f5af00e3b297b1fd4"
+    "shas": "9bea4d9b913b2aa36024a30b0fd25cad043f3dab..f91b3b527856f643fcc99abe4fa295b69a754e9d"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -179,7 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 }
             ]
         }
@@ -206,7 +206,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68b8bf2d0046cc026c6fce5f5af00e3b297b1fd4..dc6a3333fcb884c14391747e4b317acf99746492"
+    "shas": "f91b3b527856f643fcc99abe4fa295b69a754e9d..c9396b961ebf971be5d5b2fedca1917252666397"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -407,7 +407,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 },
                 {
                     "span": {
@@ -422,7 +422,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 }
             ]
         }
@@ -454,7 +454,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc6a3333fcb884c14391747e4b317acf99746492..4954bff1ae56a12e298759ba22707943c9a3bbc7"
+    "shas": "c9396b961ebf971be5d5b2fedca1917252666397..abf206a0ea0071e0f69c2f016c141896e0bc602a"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -655,7 +655,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 },
                 {
                     "span": {
@@ -670,7 +670,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 }
             ]
         }
@@ -702,7 +702,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4954bff1ae56a12e298759ba22707943c9a3bbc7..5f9866d5c6de524649a9859ac3019f93e1fe93c7"
+    "shas": "abf206a0ea0071e0f69c2f016c141896e0bc602a..f94c291cd8a31ff85a78a946733cac907a32054c"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -846,7 +846,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
                 }
             ]
         }
@@ -873,7 +873,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f9866d5c6de524649a9859ac3019f93e1fe93c7..7c60f23b946969dea2f85dd924d3fa9b86f97fe5"
+    "shas": "f94c291cd8a31ff85a78a946733cac907a32054c..e430db8888c6c0a207bdb7f1396254b4cf6b320d"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -912,5 +912,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7c60f23b946969dea2f85dd924d3fa9b86f97fe5..2c9e06c6518a974b3a83028a0eabeb715241d2b6"
+    "shas": "e430db8888c6c0a207bdb7f1396254b4cf6b320d..5fff449fda240ef2415ceb7e8ee284054f218586"
 }]

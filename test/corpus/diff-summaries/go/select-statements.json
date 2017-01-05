@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "32835c31a64dadd483252a88dd85928f57ce5e44..371509eeeaf98517a2c1d053e31985f66d4089f6"
+    "shas": "21d9d45a2e97da412a64b92913dbfd3ac82cc701..5a8c2abbdf3a2bc903219f117737e9c5c73fba6b"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "371509eeeaf98517a2c1d053e31985f66d4089f6..d67ee5df6cdc71f4e1ae4ccdb61c9e5b83151a87"
+    "shas": "5a8c2abbdf3a2bc903219f117737e9c5c73fba6b..e665eaaa2d7a4bb57a86870813873a132f43d258"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d67ee5df6cdc71f4e1ae4ccdb61c9e5b83151a87..4cac8b5133e4bad9cc0ffa9e7aa30141c8f3d1e0"
+    "shas": "e665eaaa2d7a4bb57a86870813873a132f43d258..4de4da200e17fe030a3d77f8e66d29acbb1572ff"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4cac8b5133e4bad9cc0ffa9e7aa30141c8f3d1e0..6c3ef8e691ef04703d8716d17ba51278dda106da"
+    "shas": "4de4da200e17fe030a3d77f8e66d29acbb1572ff..ede2f95d67ac6f18694a2ee682e76a22cbaa7309"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6c3ef8e691ef04703d8716d17ba51278dda106da..a082267b061ee28bbb4f9536e607a138b1b483b6"
+    "shas": "ede2f95d67ac6f18694a2ee682e76a22cbaa7309..b7a8230749afbdaaf2cb9c9dd0808f1544b434e8"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a082267b061ee28bbb4f9536e607a138b1b483b6..9d302626b06231ccfe43953c3a0890225a7b6947"
+    "shas": "b7a8230749afbdaaf2cb9c9dd0808f1544b434e8..046b76b7401f5781415d12e2bfb4d60c03c48472"
 }]

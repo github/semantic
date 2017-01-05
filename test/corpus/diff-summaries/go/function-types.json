@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "77797aa59be812e3c6a7951b5e5c8d91f27ca7a8..709396cac401e9d8f5a5e8b227fc883b6382ad7a"
+    "shas": "458af42d75cbcda4aae56e6a8ef32cbdaad4c6f2..ba1f7f07547cf1d1c41a9c30f2396da685bf96f4"
 }
 ,{
     "testCaseDescription": "go-function-types-insert-test",
@@ -189,7 +189,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "709396cac401e9d8f5a5e8b227fc883b6382ad7a..570f26af74c020c7bfdd62b5c2762c8831c60e55"
+    "shas": "ba1f7f07547cf1d1c41a9c30f2396da685bf96f4..cc3109dfec07e5de792080378e0d6d01433db2a9"
 }
 ,{
     "testCaseDescription": "go-function-types-replacement-test",
@@ -418,7 +418,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "570f26af74c020c7bfdd62b5c2762c8831c60e55..ded919a8daf89a09c7ef8c7d6fba101b23569e45"
+    "shas": "cc3109dfec07e5de792080378e0d6d01433db2a9..101b850c4625a2e515d3c04e82210b0b87d8ec57"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-replacement-test",
@@ -580,6 +580,21 @@
                 },
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                28
+                            ],
+                            "end": [
+                                6,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'error' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
                         "delete": {
                             "start": [
                                 6,
@@ -607,21 +622,6 @@
                         }
                     },
                     "summary": "Deleted the 'error' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                28
-                            ],
-                            "end": [
-                                6,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -647,7 +647,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ded919a8daf89a09c7ef8c7d6fba101b23569e45..0f9fd6a140880e423969fb96f5253b459a22dcb1"
+    "shas": "101b850c4625a2e515d3c04e82210b0b87d8ec57..01d4ccd2cf52c25eeac4b6daea97b71190651004"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-insert-test",
@@ -798,7 +798,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f9fd6a140880e423969fb96f5253b459a22dcb1..1a0c554759792f339b650760b4a1446cefd21470"
+    "shas": "01d4ccd2cf52c25eeac4b6daea97b71190651004..fb6d712ca0a168f1acd7a441d373f7077711ebd0"
 }
 ,{
     "testCaseDescription": "go-function-types-teardown-test",
@@ -840,5 +840,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a0c554759792f339b650760b4a1446cefd21470..41133764e3945b380f42a5ed85a241bddc76bd16"
+    "shas": "fb6d712ca0a168f1acd7a441d373f7077711ebd0..1e84313b26476c61ce82318196f50460eb4366e4"
 }]

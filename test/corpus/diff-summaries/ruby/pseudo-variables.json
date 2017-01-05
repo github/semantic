@@ -16,7 +16,22 @@
                             ]
                         }
                     },
-                    "summary": "Added 'nil' identifier"
+                    "summary": "Added the 'nil' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
                 },
                 {
                     "span": {
@@ -67,13 +82,28 @@
         "+true"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "052401261edd2497b65b3546c0220694e89a03fb..eb4638e54cfb32940ad29a5070b90e44213e351b"
+    "shas": "2ffce3d30f77b7bd24e702013e47f91050c0ed06..3929950f26dec5f0af43dda569e0417dd949d355"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "pseudo-variables.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
+                },
                 {
                     "span": {
                         "insert": {
@@ -138,6 +168,21 @@
                     "span": {
                         "insert": {
                             "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'self' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
                                 7,
                                 1
                             ],
@@ -190,7 +235,7 @@
         " false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "eb4638e54cfb32940ad29a5070b90e44213e351b..35f40623910a2294db51fb259e7b4af6954dcb0f"
+    "shas": "3929950f26dec5f0af43dda569e0417dd949d355..38766d05c3684529438061f58dd0252025aa52b0"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-insert-test",
@@ -226,30 +271,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced 'TRUE' with 'false'"
+                    "summary": "Added 'false'"
                 },
                 {
                     "span": {
@@ -265,6 +298,21 @@
                         }
                     },
                     "summary": "Added 'true'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'TRUE'"
                 },
                 {
                     "span": {
@@ -306,7 +354,7 @@
         " false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "35f40623910a2294db51fb259e7b4af6954dcb0f..7228ef9145f92f76d1ce1f9af3111a0a9f402636"
+    "shas": "38766d05c3684529438061f58dd0252025aa52b0..8f80336c91ce46ae805eda02987947ab0efa3692"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-replacement-test",
@@ -315,30 +363,33 @@
             "pseudo-variables.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    4
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    4
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'nil' identifier with the 'NIL' identifier"
+                    "summary": "Deleted the 'nil' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'NIL' identifier"
                 },
                 {
                     "span": {
@@ -422,13 +473,28 @@
         " false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7228ef9145f92f76d1ce1f9af3111a0a9f402636..247085a3bb210f1ee85ba391c96725e7311fce20"
+    "shas": "8f80336c91ce46ae805eda02987947ab0efa3692..9a312b15cd4f54406122fd3e1cd2240ccaa7391a"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "pseudo-variables.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
+                },
                 {
                     "span": {
                         "delete": {
@@ -478,46 +544,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                5,
+                                9,
                                 1
                             ],
                             "end": [
-                                5,
+                                9,
                                 4
                             ]
                         }
                     },
                     "summary": "Deleted the 'nil' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'false'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'true'"
                 },
                 {
                     "span": {
@@ -563,6 +599,36 @@
                         }
                     },
                     "summary": "Added 'FALSE'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'true'"
                 }
             ]
         },
@@ -594,7 +660,7 @@
         "+FALSE"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "247085a3bb210f1ee85ba391c96725e7311fce20..3c4b678a23d925ae1efdd94cb47b240c63af6ff1"
+    "shas": "9a312b15cd4f54406122fd3e1cd2240ccaa7391a..8ce9065e59871233c9f7d7c2ca1447253e2a37d3"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-test",
@@ -615,6 +681,21 @@
                         }
                     },
                     "summary": "Deleted the 'nil' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
                 },
                 {
                     "span": {
@@ -668,13 +749,28 @@
         " TRUE"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3c4b678a23d925ae1efdd94cb47b240c63af6ff1..349da6fa88ae41a84f50976e21182a5d9cd7a701"
+    "shas": "8ce9065e59871233c9f7d7c2ca1447253e2a37d3..ae2b0ad6c228e0a8f301c9b3d6ff6edb1023c3c4"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-rest-test",
     "expectedResult": {
         "changes": {
             "pseudo-variables.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'self' identifier"
+                },
                 {
                     "span": {
                         "delete": {
@@ -688,7 +784,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'NIL' identifier"
+                    "summary": "Deleted the 'NIL' identifier"
                 },
                 {
                     "span": {
@@ -739,5 +835,5 @@
         "-FALSE"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "349da6fa88ae41a84f50976e21182a5d9cd7a701..f8cc3489b25f8d1857452648c25c51084dbdbdb9"
+    "shas": "ae2b0ad6c228e0a8f301c9b3d6ff6edb1023c3c4..a966f9b2783f127617cc42cbed16e6ec570b75ad"
 }]

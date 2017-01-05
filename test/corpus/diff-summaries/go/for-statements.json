@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "695dc8f6eadde4811f068db1566ef6445fb5a7d8..fc16ebed6ab291582d95a7eebfcfe2e0dcc81f20"
+    "shas": "3c18118ea8496b4ffea7d20ce7e0302dded5c3d1..61766b7065ddf9051bdc21333a88a09745e12df1"
 }
 ,{
     "testCaseDescription": "go-for-statements-insert-test",
@@ -160,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc16ebed6ab291582d95a7eebfcfe2e0dcc81f20..7af5a6e42ae38ef9604cc321305b9f6a5aa64822"
+    "shas": "61766b7065ddf9051bdc21333a88a09745e12df1..3645c8ec6ac0b747b8b5db12101534db3454ab0f"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -207,7 +207,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'i' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -252,7 +252,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'i' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7af5a6e42ae38ef9604cc321305b9f6a5aa64822..b10779d173dc6f39594ba82f98d52f06c2c98217"
+    "shas": "3645c8ec6ac0b747b8b5db12101534db3454ab0f..5bd76a34c50b51b01165c9f156ab1437a719573b"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -404,7 +404,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'i' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -449,7 +449,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'i' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -554,7 +554,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b10779d173dc6f39594ba82f98d52f06c2c98217..598b6a46856e51515bf7088669dd409859947d89"
+    "shas": "5bd76a34c50b51b01165c9f156ab1437a719573b..4e100b8c5c64d1ed4bd571ebcd9bbfc5b1a45597"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -676,7 +676,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "598b6a46856e51515bf7088669dd409859947d89..c221fd8e40726978d51275afb67f92a2f83a601f"
+    "shas": "4e100b8c5c64d1ed4bd571ebcd9bbfc5b1a45597..9538de00b5c9e9b2385c5463fdae5c308324b311"
 }
 ,{
     "testCaseDescription": "go-for-statements-teardown-test",
@@ -718,5 +718,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c221fd8e40726978d51275afb67f92a2f83a601f..1d58c4c1e194b7b160874111eee267a32f08fe98"
+    "shas": "9538de00b5c9e9b2385c5463fdae5c308324b311..797c6862fbfbf10b056b4938b2f5d3902ede8ccb"
 }]

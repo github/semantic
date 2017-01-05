@@ -1,0 +1,410 @@
+[{
+    "testCaseDescription": "ruby-end-block-insert-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index e69de29..0684d73 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -0,0 +1,3 @@",
+        "+END {",
+        "+ foo",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "82c6448a6e4e2d885ac6f12d9f86cdb1d6d1dd2d..d2ed526fb844a051febd47469d494caa75fe91f0"
+}
+,{
+    "testCaseDescription": "ruby-end-block-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added an END block"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index 0684d73..6ab1278 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -1,3 +1,10 @@",
+        "+foo",
+        "+END {",
+        "+ bar",
+        "+}",
+        "+END {",
+        "+ foo",
+        "+}",
+        " END {",
+        "  foo",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d2ed526fb844a051febd47469d494caa75fe91f0..d63a52f07a0f0bcf858af8cd8be7547da36d07f9"
+}
+,{
+    "testCaseDescription": "ruby-end-block-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added an END block"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index 6ab1278..6a9e874 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -1,6 +1,5 @@",
+        "-foo",
+        " END {",
+        "- bar",
+        "+ foo",
+        " }",
+        " END {",
+        "  foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d63a52f07a0f0bcf858af8cd8be7547da36d07f9..e81caf1424dc328e8ab385e9c747a63d54698444"
+}
+,{
+    "testCaseDescription": "ruby-end-block-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    2
+                                ],
+                                "end": [
+                                    2,
+                                    5
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    2
+                                ],
+                                "end": [
+                                    3,
+                                    5
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier in an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index 6a9e874..6ab1278 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -1,5 +1,6 @@",
+        "+foo",
+        " END {",
+        "- foo",
+        "+ bar",
+        " }",
+        " END {",
+        "  foo"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e81caf1424dc328e8ab385e9c747a63d54698444..e84b2b99dab363e56f8785e8b39c18a71009aa4e"
+}
+,{
+    "testCaseDescription": "ruby-end-block-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                10,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index 6ab1278..ad181ce 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -1,10 +1,7 @@",
+        "-foo",
+        "-END {",
+        "- bar",
+        "-}",
+        " END {",
+        "  foo",
+        " }",
+        "+foo",
+        " END {",
+        "- foo",
+        "+ bar",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "e84b2b99dab363e56f8785e8b39c18a71009aa4e..d064522cbf35b19bb71d3999617cd95576ef5d15"
+}
+,{
+    "testCaseDescription": "ruby-end-block-delete-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index ad181ce..dd2d1da 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -1,6 +1,3 @@",
+        "-END {",
+        "- foo",
+        "-}",
+        " foo",
+        " END {",
+        "  bar"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "d064522cbf35b19bb71d3999617cd95576ef5d15..f28e52757945cbfc7235452bdfb242f59fe209b6"
+}
+,{
+    "testCaseDescription": "ruby-end-block-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "end-block.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an END block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "end-block.rb"
+    ],
+    "patch": [
+        "diff --git a/end-block.rb b/end-block.rb",
+        "index dd2d1da..e69de29 100644",
+        "--- a/end-block.rb",
+        "+++ b/end-block.rb",
+        "@@ -1,4 +0,0 @@",
+        "-foo",
+        "-END {",
+        "- bar",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f28e52757945cbfc7235452bdfb242f59fe209b6..ad37c6bddef1ebfea76c652b142476e8268b9f9f"
+}]

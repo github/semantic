@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fbe26e2c64c3de9eb14fdaf1467c4035ff37de23..368ac0416072e90f39698fc5e934d7ef3935eb35"
+    "shas": "dd5e97a8cc2bbda76dbda960bba5db45fb6604b8..315b60591d6de46c8cc0cca7e03b30499ae0194e"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -267,7 +267,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "368ac0416072e90f39698fc5e934d7ef3935eb35..070c90fc1681e7d8c1580752d1918dea3e173165"
+    "shas": "315b60591d6de46c8cc0cca7e03b30499ae0194e..e3d66cfd6ed2884bdfc1abc834698e29d4ccfaf7"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -382,7 +382,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "070c90fc1681e7d8c1580752d1918dea3e173165..3c48dccef06530f9284ea40a5262292034aa6bee"
+    "shas": "e3d66cfd6ed2884bdfc1abc834698e29d4ccfaf7..22a4288f343e00443d2500b2f7739ce13e3f863f"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -497,7 +497,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c48dccef06530f9284ea40a5262292034aa6bee..65be5fe927cc5bc75f4799d076f70959dc8bb780"
+    "shas": "22a4288f343e00443d2500b2f7739ce13e3f863f..b0bd8223549d61b33815e3235244ef099d963b6f"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -726,7 +726,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65be5fe927cc5bc75f4799d076f70959dc8bb780..77b8a317d686867c286a7f80440eb9462a56d0a3"
+    "shas": "b0bd8223549d61b33815e3235244ef099d963b6f..6303b5139eedd23bc77aa6d3b86fa7d73e28d07b"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -768,5 +768,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "77b8a317d686867c286a7f80440eb9462a56d0a3..d702df98cd991374b103078c3d3868a9b3bc5534"
+    "shas": "6303b5139eedd23bc77aa6d3b86fa7d73e28d07b..32bc1a4c3030014f034299eaf358ed9540142bd4"
 }]

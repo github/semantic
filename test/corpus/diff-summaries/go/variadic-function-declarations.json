@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "044460a74ea4718fcdbd79197f8fc1a26518989e..8c3eeab240bc574150cf7b86e40657109006160f"
+    "shas": "c440e7136559f8e8bb04e8a9e0900bc29626237c..c5b75783b9383fad0e41d3441fbbbd95f67512de"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -137,7 +137,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
+                    "summary": "Added 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
                 }
             ]
         }
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c3eeab240bc574150cf7b86e40657109006160f..7bcf35ba6e787a76402323ae593cac38ac04319f"
+    "shas": "c5b75783b9383fad0e41d3441fbbbd95f67512de..4320efbb7417c36842a81c89c4f43ce8a84d73d1"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -274,7 +274,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7bcf35ba6e787a76402323ae593cac38ac04319f..abe602b0c7157abd2e1cb5ece59b30212e4b11be"
+    "shas": "4320efbb7417c36842a81c89c4f43ce8a84d73d1..a25fd927d8267a65718ad03918dfe1cd8866fb29"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -387,7 +387,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "abe602b0c7157abd2e1cb5ece59b30212e4b11be..a2d80a9819d2aa32de8214b58a4f18cb91502e35"
+    "shas": "a25fd927d8267a65718ad03918dfe1cd8866fb29..a7eb9006b444791092b5b8a09d5130f305587fbd"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -486,7 +486,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
+                    "summary": "Deleted 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
                 }
             ]
         }
@@ -510,7 +510,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2d80a9819d2aa32de8214b58a4f18cb91502e35..7776b619852e27d05eb6003f9537cc710ae8b971"
+    "shas": "a7eb9006b444791092b5b8a09d5130f305587fbd..f3d9093e481d1fa0e27096147e3dc6be43696b26"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -552,5 +552,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7776b619852e27d05eb6003f9537cc710ae8b971..fccb257c8f92940c2a2207096f1f4c83b1720e43"
+    "shas": "f3d9093e481d1fa0e27096147e3dc6be43696b26..b076630878d46ba8c71d3e6485d4d3fb02d45f5c"
 }]

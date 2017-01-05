@@ -111,7 +111,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced an else block with an 'qoz' identifier in the 'foo' case statement"
+                    "summary": "Replaced an else block with the 'qoz' identifier in the 'foo' case statement"
                 }
             ]
         },
@@ -165,7 +165,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'qoz' identifier with the else block in the 'foo' case statement"
+                    "summary": "Replaced the 'qoz' identifier with an else block in the 'foo' case statement"
                 }
             ]
         },

@@ -19,7 +19,9 @@ ana :: (a -> Base t a) -- a (Base t)-coalgebra
     -> a               -- seed
     -> t               -- resulting fixed point
 
-Anamorphism as a recursion scheme "builds up" a recursive structure. Anamorphisms work by using a coalgebra, which maps a seed value to a fixed point structure.
+Anamorphism as a recursion scheme "builds up" a recursive structure.
+Anamorphisms work by using a coalgebra, which maps a seed value to a fixed point
+structure.
 
 The example below adds a new field to the `Record` fields.
 -}
@@ -35,19 +37,23 @@ cata :: (Base t a -> a) -- a (Base t)-algebra
        -> t             -- fixed point
        -> a             -- result
 
-Catamorphism as a recursion scheme "tears down" a recursive structure. Catamorphisms work by using an algebra, which maps a shape in our fixed point structure to a new shape.
+Catamorphism as a recursion scheme "tears down" a recursive structure.
+Catamorphisms work by using an algebra, which maps a shape in our fixed point
+structure to a new shape.
 
 The example below adds a new field to the `Record` fields.
 -}
 indexedTermCata :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
+    algebra :: CofreeF f (Record t) (Cofree f (Record (NewField : t))) -> Cofree f (Record (NewField : t))
     algebra term = cofree $ (NewField .: (headF term)) :< tailF term
 
 {-
 Anamorphism -- construct a Term from a string
 
-The example below shows how to build up a recursive Term structure from a string representation.
+The example below shows how to build up a recursive Term structure from a string
+representation.
 
 Example usage:
 
@@ -64,13 +70,17 @@ stringToTermAna "indexed" =>
 
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"] ) )
 
-  While building up the `Indexed` structure, we continue to recurse over the `Indexed` terms ["leaf1", "leaf2", "leaf3"]. These are pattern matched using the catch all `_` and default to `Leaf` Syntax shapes:
+  While building up the `Indexed` structure, we continue to recurse over the
+  `Indexed` terms ["leaf1", "leaf2", "leaf3"]. These are pattern matched using
+  the catch all `_` and default to `Leaf` Syntax shapes:
 
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf1" ) )
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf2" ) )
   CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf3" ) )
 
-  These structures are substituted in place of ["leaf1", "leaf2", "leaf3"] in the new cofree `Indexed` structure, resulting in a expansion of all possible string terms.
+  These structures are substituted in place of ["leaf1", "leaf2", "leaf3"] in
+  the new cofree `Indexed` structure, resulting in a expansion of all possible
+  string terms.
 -}
 stringToTermAna :: String -> Term (Syntax String) (Record '[Range, Category])
 stringToTermAna = ana coalgebra
@@ -82,7 +92,8 @@ stringToTermAna = ana coalgebra
 {-
 Catamorphism -- construct a list of Strings from a recursive Term structure.
 
-The example below shows how to tear down a recursive Term structure into a list of String representation.
+The example below shows how to tear down a recursive Term structure into a list
+of String representation.
 -}
 termToStringCata :: Term (Syntax String) (Record '[Range, Category]) -> [String]
 termToStringCata = cata algebra
@@ -100,9 +111,13 @@ hylo :: Functor f => (f b -> b) -- an algebra
                   -> a          -- seed value
                   -> b          -- result
 
-Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a structure. An algebra (catamorphism) is then applied to this structure. Because of fusion the anamorphism and catamorphism occur in a single pass rather than two separate traversals.
+Hylomorphisms work by first applying a coalgebra (anamorphism) to build up a
+structure. An algebra (catamorphism) is then applied to this structure. Because
+of fusion the anamorphism and catamorphism occur in a single pass rather than
+two separate traversals.
 
-The example below shows how our algebra and coalgebra defined in the termToStringCata and stringToTermAna can be utilized as a hylomorphism.
+The example below shows how our algebra and coalgebra defined in the
+termToStringCata and stringToTermAna can be utilized as a hylomorphism.
 
 Example Usage:
 stringTermHylo "indexed" => ["indexed", "leaf1", "leaf2", "leaf3"]
@@ -126,9 +141,18 @@ para :: (Base t (t, a) -> a) -- an algebra that takes a tuple of the last input
        -> t                  -- fixed point
        -> a                  -- result
 
-Paramorphisms, like all recursion schemes, work via a bottom up traversal (leaves to root), in which an algebra is applied to every node in the recursive structure. The difference between paramorphisms and catamorphisms is the algebra receives a tuple of the original subobject and its computed value (t, a) where `t` is the original suboject and `a` is the computed value.
+Paramorphisms, like all recursion schemes, work via a bottom up traversal
+(leaves to root), in which an algebra is applied to every node in the recursive
+structure. The difference between paramorphisms and catamorphisms is the algebra
+receives a tuple of the original subobject and its computed value (t, a) where
+`t` is the original suboject and `a` is the computed value.
 
-The example implementation below calculates a string representation for each Syntax type, flattening the recursive structure into a one dimensional list to tuples. The tuple contains the original syntax subobject, and its computed string representation. This example aims to showcase how paramorphisms work by returning a final list of tuples that mimics the intermediate tuple shapes the algebra receives throughout the bottom up traversal.
+The example implementation below calculates a string representation for each
+Syntax type, flattening the recursive structure into a one dimensional list to
+tuples. The tuple contains the original syntax subobject, and its computed
+string representation. This example aims to showcase how paramorphisms work by
+returning a final list of tuples that mimics the intermediate tuple shapes the
+algebra receives throughout the bottom up traversal.
 
 Example Usage:
 let terms = indexedTerm ["leaf1", "leaf2", "leaf3"]

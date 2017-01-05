@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a604ef4090da0a6381e77dbbe72ebb13604d5aee..9a0d9f6bc928f42c8a780d4408d633fe9e234039"
+    "shas": "4ea37bb18e38d126d304a9e398aeb3dd0c011565..0690af94774138da10deb642cf57e72dcad7cbaf"
 }
 ,{
     "testCaseDescription": "go-float-literals-insert-test",
@@ -145,7 +145,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a0d9f6bc928f42c8a780d4408d633fe9e234039..52aa29f026c5ac178389bb70fd925461f6618057"
+    "shas": "0690af94774138da10deb642cf57e72dcad7cbaf..6c253e07c841401629f00a67ea57899ed1e07f8d"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-test",
@@ -177,7 +177,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1.5' with '2.6' in an assignment to f1 of the 'main' function"
+                    "summary": "Replaced the '1.5' float with the '2.6' float in an assignment to f1 of the 'main' function"
                 },
                 {
                     "span": {
@@ -204,7 +204,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1.5e100' with '2.6e211' in an assignment to f2 of the 'main' function"
+                    "summary": "Replaced the '1.5e100' float with the '2.6e211' float in an assignment to f2 of the 'main' function"
                 },
                 {
                     "span": {
@@ -231,7 +231,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1.5e+50' with '2.6e+60' in an assignment to f3 of the 'main' function"
+                    "summary": "Replaced the '1.5e+50' float with the '2.6e+60' float in an assignment to f3 of the 'main' function"
                 },
                 {
                     "span": {
@@ -258,7 +258,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1.5e-5' with '2.6e-7' in an assignment to f4 of the 'main' function"
+                    "summary": "Replaced the '1.5e-5' float with the '2.6e-7' float in an assignment to f4 of the 'main' function"
                 },
                 {
                     "span": {
@@ -285,7 +285,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '.5e-50' with '.6e-60' in an assignment to f5 of the 'main' function"
+                    "summary": "Replaced the '.5e-50' float with the '.6e-60' float in an assignment to f5 of the 'main' function"
                 }
             ]
         },
@@ -316,7 +316,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52aa29f026c5ac178389bb70fd925461f6618057..f02b6ce09f99de0dcb82678e5e40486c0aeb47a9"
+    "shas": "6c253e07c841401629f00a67ea57899ed1e07f8d..2d439a5ab740da19a05d2d676d0d8f88220c6672"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-replacement-test",
@@ -348,7 +348,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2.6' with '1.5' in an assignment to f1 of the 'main' function"
+                    "summary": "Replaced the '2.6' float with the '1.5' float in an assignment to f1 of the 'main' function"
                 },
                 {
                     "span": {
@@ -375,7 +375,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2.6e211' with '1.5e100' in an assignment to f2 of the 'main' function"
+                    "summary": "Replaced the '2.6e211' float with the '1.5e100' float in an assignment to f2 of the 'main' function"
                 },
                 {
                     "span": {
@@ -402,7 +402,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2.6e+60' with '1.5e+50' in an assignment to f3 of the 'main' function"
+                    "summary": "Replaced the '2.6e+60' float with the '1.5e+50' float in an assignment to f3 of the 'main' function"
                 },
                 {
                     "span": {
@@ -429,7 +429,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2.6e-7' with '1.5e-5' in an assignment to f4 of the 'main' function"
+                    "summary": "Replaced the '2.6e-7' float with the '1.5e-5' float in an assignment to f4 of the 'main' function"
                 },
                 {
                     "span": {
@@ -456,7 +456,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '.6e-60' with '.5e-50' in an assignment to f5 of the 'main' function"
+                    "summary": "Replaced the '.6e-60' float with the '.5e-50' float in an assignment to f5 of the 'main' function"
                 }
             ]
         },
@@ -487,7 +487,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f02b6ce09f99de0dcb82678e5e40486c0aeb47a9..55a9e3a9377a1f4baf0ac0eaf557f5ec7e8a811a"
+    "shas": "2d439a5ab740da19a05d2d676d0d8f88220c6672..549388628b477f802c460afed5b504f2b9399ae8"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-insert-test",
@@ -594,7 +594,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "55a9e3a9377a1f4baf0ac0eaf557f5ec7e8a811a..fa6bda43932f5258ffb8259047189ba9455f5dcc"
+    "shas": "549388628b477f802c460afed5b504f2b9399ae8..45ce0fbd6d06836c59e9ea4ed74cb958e03ee38b"
 }
 ,{
     "testCaseDescription": "go-float-literals-teardown-test",
@@ -636,5 +636,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fa6bda43932f5258ffb8259047189ba9455f5dcc..4e968b13372f698a7052494376f12760ebb66e27"
+    "shas": "45ce0fbd6d06836c59e9ea4ed74cb958e03ee38b..9bea4d9b913b2aa36024a30b0fd25cad043f3dab"
 }]

@@ -16,22 +16,27 @@ functions :: [Text]
 functions = [ "arrow_function", "generator_function", "function" ]
 
 forStatements :: [Text]
-forStatements = [ "for_statement", "for_of_statement", "for_in_statement" ]
+forStatements = [ "for_statement", "for_of_statement", "for_in_statement", "trailing_for_statement", "trailing_for_of_statement", "trailing_for_in_statement" ]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
-  -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children
+  -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
+  -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
+  -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
+termConstructor source sourceSpan name range children allChildren
   | name == "ERROR" = withDefaultInfo (S.Error children)
+  | name `elem` operators = do
+    allChildren' <- allChildren
+    withDefaultInfo $ S.Operator allChildren'
   | otherwise = withDefaultInfo $ case (name, children) of
-    ("return_statement", _) -> S.Return (listToMaybe children)
+    ("return_statement", _) -> S.Return children
+    ("trailing_return_statement", _) -> S.Return children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
-    ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+    ("math_assignment", [ identifier, value ]) -> S.OperatorAssignment identifier value
     ("math_assignment", _ ) -> S.Error children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("member_access", _ ) -> S.Error children
@@ -52,6 +57,7 @@ termConstructor source sourceSpan name range children
     ("var_assignment", [ x, y ]) -> S.VarAssignment x y
     ("var_assignment", _ ) -> S.Error children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
+    ("trailing_var_declaration", _) -> S.Indexed $ toVarDecl <$> children
     ("switch_statement", expr : rest) -> S.Switch expr rest
     ("switch_statement", _ ) -> S.Error children
     ("case", [ expr, body ]) -> S.Case expr [body]
@@ -60,13 +66,21 @@ termConstructor source sourceSpan name range children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("if_statement", expr : rest ) -> S.If expr rest
+    ("trailing_if_statement", expr : rest ) -> S.If expr rest
     ("if_statement", _ ) -> S.Error children
+    ("trailing_if_statement", _ ) -> S.Error children
     ("while_statement", expr : rest ) -> S.While expr rest
+    ("trailing_while_statement", expr : rest ) -> S.While expr rest
     ("while_statement", _ ) -> S.Error children
+    ("trailing_while_statement", _ ) -> S.Error children
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
+    ("trailing_do_statement", [ expr, body ]) -> S.DoWhile expr body
     ("do_statement", _ ) -> S.Error children
+    ("trailing_do_statement", _ ) -> S.Error children
     ("throw_statement", [ expr ]) -> S.Throw expr
+    ("trailing_throw_statement", [ expr ]) -> S.Throw expr
     ("throw_statment", _ ) -> S.Error children
+    ("trailing_throw_statment", _ ) -> S.Error children
     ("new_expression", [ expr ]) -> S.Constructor expr
     ("new_expression", _ ) -> S.Error children
     ("try_statement", _) -> case children of
@@ -92,10 +106,11 @@ termConstructor source sourceSpan name range children
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
+    ("break_statement", [ expr ] ) -> S.Break expr
+    ("yield_statement", _ ) -> S.Yield children
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]
           _ -> S.Error children
-    _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
           [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
@@ -114,6 +129,7 @@ categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of
   "object" -> Object
   "expression_statement" -> ExpressionStatements
+  "trailing_expression_statement" -> ExpressionStatements
   "this_expression" -> Identifier
   "null" -> Identifier
   "undefined" -> Identifier
@@ -125,13 +141,18 @@ categoryForJavaScriptProductionName name = case name of
   "delete_op" -> Operator -- delete operator, e.g. delete x[2].
   "type_op" -> Operator -- type operator, e.g. typeof Object.
   "void_op" -> Operator -- void operator, e.g. void 2.
+  "for_statement" -> For
+  "trailing_for_statement" -> For
   "for_in_statement" -> For
+  "trailing_for_in_statement" -> For
   "for_of_statement" -> For
+  "trailing_for_of_statement" -> For
   "new_expression" -> Constructor
   "class"  -> Class
   "catch" -> Catch
   "finally" -> Finally
   "if_statement" -> If
+  "trailing_if_statement" -> If
   "empty_statement" -> Empty
   "program" -> Program
   "ERROR" -> Error
@@ -156,17 +177,21 @@ categoryForJavaScriptProductionName name = case name of
   "template_string" -> TemplateString
   "var_assignment" -> VarAssignment
   "var_declaration" -> VarDecl
+  "trailing_var_declaration" -> VarDecl
   "switch_statement" -> Switch
   "math_assignment" -> MathAssignment
   "case" -> Case
   "true" -> Boolean
   "false" -> Boolean
   "ternary" -> Ternary
-  "for_statement" -> For
   "while_statement" -> While
+  "trailing_while_statement" -> While
   "do_statement" -> DoWhile
+  "trailing_do_statement" -> DoWhile
   "return_statement" -> Return
+  "trailing_return_statement" -> Return
   "throw_statement" -> Throw
+  "trailing_throw_statement" -> Throw
   "try_statement" -> Try
   "method_definition" -> Method
   "comment" -> Comment
@@ -174,4 +199,7 @@ categoryForJavaScriptProductionName name = case name of
   "rel_op" -> RelationalOperator
   "import_statement" -> Import
   "export_statement" -> Export
+  "break_statement" -> Break
+  "continue_statement" -> Continue
+  "yield_statement" -> Yield
   _ -> Other name

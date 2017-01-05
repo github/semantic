@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e7cf72f7ca77faa65f54df06a3ed9b0dfb54980..26777dae71ad7b467d17de5dbaef5ebe326a0312"
+    "shas": "d66b71957411bd7a2c7774ef68c167f1a4f80efa..90fcfe93739becca6157985b5833b3222c03b9ed"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "26777dae71ad7b467d17de5dbaef5ebe326a0312..5805868e9f74a60616d258fa383d51c6cc8b9673"
+    "shas": "90fcfe93739becca6157985b5833b3222c03b9ed..41f8022371d9cee89548a30a57a0e7fccedc969f"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5805868e9f74a60616d258fa383d51c6cc8b9673..e569c9ac78ada85bb58b8550b4fe64269599a686"
+    "shas": "41f8022371d9cee89548a30a57a0e7fccedc969f..2e9634ead1868ad49765264ae5ed2fef149c35cc"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e569c9ac78ada85bb58b8550b4fe64269599a686..ec6e60fbf622a591b104023fac651b731d7721eb"
+    "shas": "2e9634ead1868ad49765264ae5ed2fef149c35cc..22234691339a0f6257692c87b95d859b3a307fc7"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ec6e60fbf622a591b104023fac651b731d7721eb..e846d0abed7495ca231a79d1ca0259363bca3511"
+    "shas": "22234691339a0f6257692c87b95d859b3a307fc7..1f102a0446f14f0236c36cf3bb0ed056a692afae"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e846d0abed7495ca231a79d1ca0259363bca3511..eedd4cea7ca7eda4bc841d6ac361a3d061a0e875"
+    "shas": "1f102a0446f14f0236c36cf3bb0ed056a692afae..0ee5a4c57cfe71d667e39f86339ab621f1653e09"
 }]

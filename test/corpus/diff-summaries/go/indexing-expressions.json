@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "886b33d41824a470340628cf21c936e1b396a5b9..b2a6657fec309a57f439f903b18ad3ccbbb1b8b6"
+    "shas": "2754db7a232d4bd458e6d63420c7107cc4bf7e72..4ee38099964017d0f7882c6a9465a1d8d32506ed"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b2a6657fec309a57f439f903b18ad3ccbbb1b8b6..8d572e0d98df1c65e9d88622e6ec7516118bcc30"
+    "shas": "4ee38099964017d0f7882c6a9465a1d8d32506ed..a81ef66818b26f1db014bba34dffa9cb54a74981"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -291,7 +291,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8d572e0d98df1c65e9d88622e6ec7516118bcc30..9031a1fcefba57dab561bcd07d75d8af6b1d53c3"
+    "shas": "a81ef66818b26f1db014bba34dffa9cb54a74981..e694ea5e621088a5306cd9a2f09244fa2cb1c62f"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -421,7 +421,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9031a1fcefba57dab561bcd07d75d8af6b1d53c3..249ab92c61e81bdba2460bbb89b8a7650a11ed0a"
+    "shas": "e694ea5e621088a5306cd9a2f09244fa2cb1c62f..8a865c9964371251ae427a90ec602594169bc65a"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -544,7 +544,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "249ab92c61e81bdba2460bbb89b8a7650a11ed0a..c7bc775b32f4b36b6746eaee13ac18a839cd3dfc"
+    "shas": "8a865c9964371251ae427a90ec602594169bc65a..32e8cf058f37f451a5a450230d2104c36bcdd9b8"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -586,5 +586,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c7bc775b32f4b36b6746eaee13ac18a839cd3dfc..4e6da70fe034893465e0df27568f4bf7524c3afb"
+    "shas": "32e8cf058f37f451a5a450230d2104c36bcdd9b8..5019ab10a0d01229e7306b70f1401b8fcc6498b2"
 }]

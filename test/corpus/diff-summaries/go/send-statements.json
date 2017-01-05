@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e5a6185e98c97f96ff4589135ac2170a4c0a147..9101321591e04db5807c91e71e9c19734617759c"
+    "shas": "3f34a10b2e6608640c4757f2d2fdb8f26b3c0936..2c383c43d7f3bef03737e26087656616df730b4a"
 }
 ,{
     "testCaseDescription": "go-send-statements-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'foo' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'foo' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9101321591e04db5807c91e71e9c19734617759c..a2a7930cf4f95639c6827a46627ef54af57c0afb"
+    "shas": "2c383c43d7f3bef03737e26087656616df730b4a..c0ec7b8141cb1343e7a4fe8fdd2fdd9269b64cf2"
 }
 ,{
     "testCaseDescription": "go-send-statements-replacement-test",
@@ -178,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2a7930cf4f95639c6827a46627ef54af57c0afb..79963b78b47027bed34d8fc80d4f25869547e3c6"
+    "shas": "c0ec7b8141cb1343e7a4fe8fdd2fdd9269b64cf2..9726824120027c0cc264583d4cbb29e13d0481e3"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-replacement-test",
@@ -260,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "79963b78b47027bed34d8fc80d4f25869547e3c6..b88c47afebabaa12e0387282b9ec94b3e236734b"
+    "shas": "9726824120027c0cc264583d4cbb29e13d0481e3..da4f549be8c5407c3372940b48decaa8e7e7984e"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-insert-test",
@@ -280,7 +280,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'foo' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'foo' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -318,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b88c47afebabaa12e0387282b9ec94b3e236734b..286fcc6657c6d4f7d426c6ceafce0665509bddcf"
+    "shas": "da4f549be8c5407c3372940b48decaa8e7e7984e..c9f309571c4f25c9112b6b25ce47b3284c8feaa9"
 }
 ,{
     "testCaseDescription": "go-send-statements-teardown-test",
@@ -360,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "286fcc6657c6d4f7d426c6ceafce0665509bddcf..ac4b7fa9d117b427fb2c76d3802976beb8d4db19"
+    "shas": "c9f309571c4f25c9112b6b25ce47b3284c8feaa9..0caa6845091f9b7743b06f2feaa7507925d065f5"
 }]

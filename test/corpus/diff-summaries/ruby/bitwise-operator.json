@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a | b' bitwise operator"
+                    "summary": "Added the 'a | b' binary statement"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a >> b' bitwise operator"
+                    "summary": "Added the 'a >> b' binary statement"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a ^ b' bitwise operator"
+                    "summary": "Added the 'a ^ b' binary statement"
                 }
             ]
         },
@@ -66,7 +66,7 @@
         "+a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "70d36a6a9817b1e91707c1f7f830a0568b959efa..ce65ef18e5032a270bbfcef7d593c68d270abaf4"
+    "shas": "f7475f092fd81593aab4939187efba0e1a894cc6..1fb1f51718a4b8ddf240e498b79dd574de91f7ee"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-replacement-insert-test",
@@ -86,7 +86,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a & b' bitwise operator"
+                    "summary": "Added the 'a & b' binary statement"
                 },
                 {
                     "span": {
@@ -101,7 +101,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a << b' bitwise operator"
+                    "summary": "Added the 'a << b' binary statement"
                 },
                 {
                     "span": {
@@ -116,7 +116,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a | b' bitwise operator"
+                    "summary": "Added the 'a | b' binary statement"
                 },
                 {
                     "span": {
@@ -131,7 +131,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a >> b' bitwise operator"
+                    "summary": "Added the 'a >> b' binary statement"
                 },
                 {
                     "span": {
@@ -146,7 +146,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a ^ b' bitwise operator"
+                    "summary": "Added the 'a ^ b' binary statement"
                 }
             ]
         },
@@ -171,7 +171,7 @@
         " a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ce65ef18e5032a270bbfcef7d593c68d270abaf4..3710a2840202f8625b9a440d8b556a6d30d2b6f6"
+    "shas": "1fb1f51718a4b8ddf240e498b79dd574de91f7ee..6aedb1ce3a8797ff587dd8ab390fd0ce6aeb0d47"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-insert-test",
@@ -191,7 +191,61 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a | b' bitwise operator"
+                    "summary": "Added the 'a | b' binary statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a & b' binary statement with the 'a >> b' binary statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a << b' binary statement with the 'a ^ b' binary statement"
                 }
             ]
         },
@@ -216,13 +270,43 @@
         " a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3710a2840202f8625b9a440d8b556a6d30d2b6f6..88289eb5fde1222a010efda881ce7888c282fe61"
+    "shas": "6aedb1ce3a8797ff587dd8ab390fd0ce6aeb0d47..0549c1aa48fc56756472ca67726a9003416f9454"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-replacement-test",
     "expectedResult": {
         "changes": {
             "bitwise-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a & b' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a << b' binary statement"
+                },
                 {
                     "span": {
                         "delete": {
@@ -236,7 +320,37 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a | b' bitwise operator"
+                    "summary": "Deleted the 'a | b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a >> b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a ^ b' binary statement"
                 }
             ]
         },
@@ -261,7 +375,7 @@
         " a ^ b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "88289eb5fde1222a010efda881ce7888c282fe61..5ae589defd184d837cb3d384ab225f42299801d8"
+    "shas": "0549c1aa48fc56756472ca67726a9003416f9454..8a618461620c18e9ea3a33b5b770de186e326ebc"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-replacement-test",
@@ -281,7 +395,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a & b' bitwise operator"
+                    "summary": "Deleted the 'a & b' binary statement"
                 },
                 {
                     "span": {
@@ -296,7 +410,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a << b' bitwise operator"
+                    "summary": "Deleted the 'a << b' binary statement"
                 },
                 {
                     "span": {
@@ -311,7 +425,67 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a | b' bitwise operator"
+                    "summary": "Deleted the 'a | b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a >> b' binary statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a ^ b' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a & b' binary statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a << b' binary statement"
                 }
             ]
         },
@@ -338,7 +512,7 @@
         "+a << b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5ae589defd184d837cb3d384ab225f42299801d8..29cf76ea1e49cdef2e616fed189fec268693ca87"
+    "shas": "8a618461620c18e9ea3a33b5b770de186e326ebc..a5688f715668b3db076f20ff3399d2bff365d1da"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-test",
@@ -358,7 +532,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a | b' bitwise operator"
+                    "summary": "Deleted the 'a | b' binary statement"
                 },
                 {
                     "span": {
@@ -373,7 +547,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a >> b' bitwise operator"
+                    "summary": "Deleted the 'a >> b' binary statement"
                 },
                 {
                     "span": {
@@ -388,7 +562,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a ^ b' bitwise operator"
+                    "summary": "Deleted the 'a ^ b' binary statement"
                 }
             ]
         },
@@ -410,7 +584,7 @@
         " a << b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "29cf76ea1e49cdef2e616fed189fec268693ca87..4bb4fee464aeaf7f957b7750b0947e7c02f2a8a8"
+    "shas": "a5688f715668b3db076f20ff3399d2bff365d1da..67a9aacd2e7ce87b09f9e3772b7766c58e875edd"
 }
 ,{
     "testCaseDescription": "ruby-bitwise-operator-delete-rest-test",
@@ -430,7 +604,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a & b' bitwise operator"
+                    "summary": "Deleted the 'a & b' binary statement"
                 },
                 {
                     "span": {
@@ -445,7 +619,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a << b' bitwise operator"
+                    "summary": "Deleted the 'a << b' binary statement"
                 }
             ]
         },
@@ -464,5 +638,5 @@
         "-a << b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4bb4fee464aeaf7f957b7750b0947e7c02f2a8a8..8b196e55798c1a5f125a87a869f770dca83665d6"
+    "shas": "67a9aacd2e7ce87b09f9e3772b7766c58e875edd..1965f9bdeebab8468bebb4f2c29230d3a42c255e"
 }]

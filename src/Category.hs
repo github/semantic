@@ -122,8 +122,8 @@ data Category
   | Interpolation
   -- | A subshell command (e.g. `ls -la` in Ruby)
   | Subshell
-  -- | A conditional assignment expression.
-  | ConditionalAssignment
+  -- | Operator assignment, e.g. a ||= b, a += 1 in Ruby.
+  | OperatorAssignment
   -- | A yield statement.
   | Yield
   -- | An until expression.
@@ -165,6 +165,28 @@ data Category
   | DictionaryTy
   | StructTy
   | Struct
+  -- | A break statement, e.g. break; in JavaScript.
+  | Break
+  -- | A continue statement, e.g. continue; in JavaScript.
+  | Continue
+  -- | A binary statement, e.g. a | b in Ruby.
+  | Binary
+  -- | A unary statement, e.g. !a in Ruby.
+  | Unary
+  -- | A constant, e.g `Foo::Bar` in Ruby.
+  | Constant
+  -- | A superclass, e.g `< Foo` in Ruby.
+  | Superclass
+  -- | A singleton class declaration, e.g. `class << self;end` in Ruby
+  | SingletonClass
+  -- | A range expression, e.g. `1..10` in Ruby.
+  | RangeExpression
+  -- | A scope resolution operator, e.g. `Foo::bar` in Ruby.
+  | ScopeOperator
+  -- | A BEGIN {} block of statements.
+  | BeginBlock
+  -- | An END {} block of statements.
+  | EndBlock
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -225,7 +247,7 @@ instance Arbitrary Category where
     , pure Export
     , pure Interpolation
     , pure Subshell
-    , pure ConditionalAssignment
+    , pure OperatorAssignment
     , pure Yield
     , pure Until
     , pure Unless
@@ -253,6 +275,13 @@ instance Arbitrary Category where
     , pure BlockParameter
     , pure ArrayTy
     , pure DictionaryTy
+    , pure Break
+    , pure Continue
+    , pure Binary
+    , pure Unary
+    , pure Constant
+    , pure Superclass
+    , pure SingletonClass
     , Other <$> arbitrary
     ]
 

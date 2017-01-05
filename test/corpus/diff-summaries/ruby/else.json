@@ -109,7 +109,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced an else block with an 'bar()' function call in a begin statement"
+                    "summary": "Replaced an else block with the 'bar()' method call in a begin statement"
                 }
             ]
         },
@@ -163,7 +163,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar()' function call with the else block in a begin statement"
+                    "summary": "Replaced the 'bar()' method call with an else block in a begin statement"
                 }
             ]
         },

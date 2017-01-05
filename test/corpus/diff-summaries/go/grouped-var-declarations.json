@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f7d4d88eae70a1a14e1fad28ebb852095ef2075..1d6c02943d38514028ff19ffe87a1a69870290da"
+    "shas": "e01b079477b06cf87b8a4196330e5d3dbe64ac09..d8310db279ee1a9147802aaef106e0eb175e762e"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d6c02943d38514028ff19ffe87a1a69870290da..bb1ac09c2093225603c8583d84bcd30badf24bfe"
+    "shas": "d8310db279ee1a9147802aaef106e0eb175e762e..f88b6265bf14b587b29771812228fe2b0f35b345"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bb1ac09c2093225603c8583d84bcd30badf24bfe..8508845eb0f5835ef5337142c1a5011e6937d150"
+    "shas": "f88b6265bf14b587b29771812228fe2b0f35b345..7c90cfefe695a24bfd35ed41a9e8a4bc437d26e7"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8508845eb0f5835ef5337142c1a5011e6937d150..707c5ae4c832fedfc7e14f285c370eb3fc615b54"
+    "shas": "7c90cfefe695a24bfd35ed41a9e8a4bc437d26e7..c0df01948a110079691e30886e618d4dedca21ee"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "707c5ae4c832fedfc7e14f285c370eb3fc615b54..291ee53fce19e787c65cec64e1bcd944ebdf797e"
+    "shas": "c0df01948a110079691e30886e618d4dedca21ee..02bbc15363cb11ecb5ef1e09efa6f390ebc692f9"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "291ee53fce19e787c65cec64e1bcd944ebdf797e..3470491d4f15b4c823b3bd6fc6f8148e9c47b9fb"
+    "shas": "02bbc15363cb11ecb5ef1e09efa6f390ebc692f9..529ea7bffabc5e923508fb53a94813b3d6ff338a"
 }]

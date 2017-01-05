@@ -34,7 +34,7 @@
         "+return foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b9eed5bd1eb6aacf2a54e334b4297955018776a8..bea7290ff72c82de8db2a0c9ae8eae0095f9f133"
+    "shas": "c098817a0924917fa730442b5593361c7558bf94..d177fc3b7a364cc0c0f9b99a698f8368dee22c8c"
 }
 ,{
     "testCaseDescription": "ruby-return-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement"
+                    "summary": "Added a return statement"
                 },
                 {
                     "span": {
@@ -89,7 +89,7 @@
         " return foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bea7290ff72c82de8db2a0c9ae8eae0095f9f133..328345c3ed837afd421202db539c4e8b374e4877"
+    "shas": "d177fc3b7a364cc0c0f9b99a698f8368dee22c8c..53ea66673eb285331f75ac06d498cf043fc6c72b"
 }
 ,{
     "testCaseDescription": "ruby-return-delete-insert-test",
@@ -130,7 +130,7 @@
         " return foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "328345c3ed837afd421202db539c4e8b374e4877..564f0138ad63d31ca573e410cd1f69143df79e04"
+    "shas": "53ea66673eb285331f75ac06d498cf043fc6c72b..d608622f26473010fc66350571ca61c49fc2fe22"
 }
 ,{
     "testCaseDescription": "ruby-return-replacement-test",
@@ -171,7 +171,7 @@
         " return foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "564f0138ad63d31ca573e410cd1f69143df79e04..daf6b77e4ee816ceef89bc43e56baa339ca2708f"
+    "shas": "d608622f26473010fc66350571ca61c49fc2fe22..3ac4d31eb749e7ad1387372ebec9a2e6b84a63e3"
 }
 ,{
     "testCaseDescription": "ruby-return-delete-replacement-test",
@@ -191,7 +191,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement"
+                    "summary": "Deleted a return statement"
                 },
                 {
                     "span": {
@@ -221,7 +221,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement"
+                    "summary": "Added a return statement"
                 }
             ]
         },
@@ -242,7 +242,7 @@
         "+return"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "daf6b77e4ee816ceef89bc43e56baa339ca2708f..837ad22ea13472d087a09e873830453c9e7bf89d"
+    "shas": "3ac4d31eb749e7ad1387372ebec9a2e6b84a63e3..4beff4220223e005a178c4d68b23b32b3a1ecd48"
 }
 ,{
     "testCaseDescription": "ruby-return-delete-test",
@@ -281,7 +281,7 @@
         " return"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "837ad22ea13472d087a09e873830453c9e7bf89d..76fdd8535cd04dcae0eef2cddafc74d3176932f6"
+    "shas": "4beff4220223e005a178c4d68b23b32b3a1ecd48..1428f73c2494d079bf29b577b69da0f668d36be1"
 }
 ,{
     "testCaseDescription": "ruby-return-delete-rest-test",
@@ -301,7 +301,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement"
+                    "summary": "Deleted a return statement"
                 }
             ]
         },
@@ -319,5 +319,5 @@
         "-return"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "76fdd8535cd04dcae0eef2cddafc74d3176932f6..e9e47a7e8dfaea6fade11176891263b27322f29d"
+    "shas": "1428f73c2494d079bf29b577b69da0f668d36be1..6320f83c8822c0efc1ee3f921342eb41977e9fb8"
 }]
