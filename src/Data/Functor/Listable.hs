@@ -55,3 +55,7 @@ instance Listable2 (,) where
 
 instance Listable a => Listable1 ((,) a) where
   liftTiers = liftTiers2 tiers
+
+instance Listable1 [] where
+  liftTiers tiers = go
+    where go = cons0 [] \/ liftCons2 tiers go (:)
