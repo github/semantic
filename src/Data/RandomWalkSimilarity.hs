@@ -19,6 +19,7 @@ import Control.Applicative
 import Control.Monad.Random
 import Control.Monad.State
 import Data.Functor.Both hiding (fst, snd)
+import Data.Functor.Listable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
@@ -308,3 +309,6 @@ instance Arbitrary label => Arbitrary (Gram label) where
   arbitrary = join $ gramWithPQ <$> arbitrary <*> arbitrary
 
   shrink (Gram a b) = Gram <$> shrink a <*> shrink b
+
+instance Listable1 Gram where
+  liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
