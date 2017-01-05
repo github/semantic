@@ -9,6 +9,7 @@ module SourceSpan where
 import Prologue
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
+import Test.LeanCheck
 import Test.QuickCheck
 import Data.These
 import Data.Text.Arbitrary()
@@ -106,3 +107,6 @@ instance Arbitrary SourcePos where
 instance Arbitrary SourceSpan where
   arbitrary = SourceSpan <$> arbitrary <*> arbitrary
   shrink = genericShrink
+
+instance Listable SourcePos where
+  tiers = cons2 SourcePos
