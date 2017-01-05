@@ -13,6 +13,7 @@ module Data.Functor.Listable
 , Listable2(..)
 , tiers2
 , liftCons1
+, liftCons2
 ) where
 
 import Prologue
@@ -34,6 +35,9 @@ tiers2 = liftTiers2 tiers tiers
 
 liftCons1 :: [[a]] -> (a -> b) -> [[b]]
 liftCons1 tiers f = mapT f tiers `addWeight` 1
+
+liftCons2 :: [[a]] -> [[b]] -> (a -> b -> c) -> [[c]]
+liftCons2 tiers1 tiers2 f = mapT (uncurry f) (productWith (,) tiers1 tiers2) `addWeight` 1
 
 
 -- Instances
