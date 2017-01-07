@@ -79,6 +79,9 @@ instance Listable2 These where
 instance Listable1 f => Listable2 (CofreeF f) where
   liftTiers2 annotationTiers recurTiers = liftCons2 annotationTiers (liftTiers recurTiers) (:<)
 
+instance (Listable1 f, Listable a) => Listable1 (CofreeF f a) where
+  liftTiers = liftTiers2 tiers
+
 instance Listable1 f => Listable1 (Cofree f) where
   liftTiers annotationTiers = go
     where go = liftCons1 (liftTiers2 annotationTiers go) cofree
