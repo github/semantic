@@ -16,6 +16,7 @@ module Data.Functor.Listable
 , liftCons2
 , liftCons3
 , liftCons4
+, ListableF(..)
 ) where
 
 import Data.Bifunctor.Join
@@ -50,6 +51,9 @@ liftCons3 tiers1 tiers2 tiers3 f = mapT (uncurry3 f) (productWith (\ x (y, z) ->
 liftCons4 :: [[a]] -> [[b]] -> [[c]] -> [[d]] -> (a -> b -> c -> d -> e) -> [[e]]
 liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (productWith (\ x (y, z, w) -> (x, y, z, w)) tiers1 (liftCons3 tiers2 tiers3 tiers4 (,,)) ) `addWeight` 1
   where uncurry4 f (a, b, c, d) = f a b c d
+
+newtype ListableF f a = ListableF { unListableF :: f a }
+  deriving Show
 
 
 -- Instances
@@ -95,3 +99,6 @@ instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
 instance Listable1 f => Listable1 (Free f) where
   liftTiers pureTiers = go
     where go = liftCons1 (liftTiers2 pureTiers go) free
+
+instance (Listable1 f, Listable a) => Listable (ListableF f a) where
+  tiers = ListableF `mapT` tiers1
