@@ -86,6 +86,9 @@ instance Listable1 f => Listable1 (Cofree f) where
 instance Listable1 f => Listable2 (FreeF f) where
   liftTiers2 pureTiers recurTiers = liftCons1 pureTiers Pure \/ liftCons1 (liftTiers recurTiers) Free
 
+instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
+  liftTiers = liftTiers2 tiers
+
 instance Listable1 f => Listable1 (Free f) where
   liftTiers pureTiers = go
     where go = liftCons1 (liftTiers2 pureTiers go) free
