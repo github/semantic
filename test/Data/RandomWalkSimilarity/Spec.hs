@@ -1,9 +1,12 @@
 {-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
+import Category
 import Data.Functor.Both
+import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
+import Data.String
 import qualified Data.Vector as Vector
 import Diff
 import Info
@@ -12,30 +15,27 @@ import Prologue
 import Syntax
 import Term
 import Diffing (getLabel)
-import Term.Arbitrary
 import Test.Hspec
-import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
-      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term (Syntax Text) (Record '[Text])) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (unListableF term :: SyntaxTerm String '[Category]) `shouldSatisfy` all ((== positively p) . length . stem . rhead)
 
     prop "produces grams with bases of the specified width" $
-      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term (Syntax Text) (Record '[Text])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (unListableF term :: SyntaxTerm String '[Category]) `shouldSatisfy` all ((== positively q) . length . base . rhead)
 
   describe "featureVectorDecorator" $ do
     prop "produces a vector of the specified dimension" $
-      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term (Syntax Text) (Record '[Text])) `shouldSatisfy` all ((== positively d) . length . rhead)
+      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (unListableF term :: SyntaxTerm String '[Category]) `shouldSatisfy` all ((== positively d) . length . rhead)
 
   describe "rws" $ do
-    let toTerm' = decorate . toTerm
-    prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
-      \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
-                        tbs = toTerm' <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
+    prop "produces correct diffs" $
+      \ (as, bs) -> let tas = decorate <$> (unListableF <$> as :: [SyntaxTerm String '[Category]])
+                        tbs = decorate <$> (unListableF <$> bs :: [SyntaxTerm String '[Category]])
                         root = cofree . ((Program .: RNil) :<) . Indexed
                         diff = wrap (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare getLabel tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
