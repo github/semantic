@@ -1,5 +1,6 @@
 module Data.Functor.Listable
 ( Listable(..)
+, mapT
 , cons0
 , cons1
 , cons2
@@ -8,6 +9,7 @@ module Data.Functor.Listable
 , cons5
 , cons6
 , (\/)
+, Tier
 , Listable1(..)
 , tiers1
 , Listable2(..)
@@ -23,6 +25,8 @@ import Data.Bifunctor.Join
 import Data.These
 import Prologue
 import Test.LeanCheck
+
+type Tier a = [a]
 
 class Listable1 l where
   liftTiers :: [[a]] -> [[l a]]
