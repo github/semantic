@@ -178,7 +178,9 @@ test-suite test
                      , filepath
                      , Glob
                      , hspec >= 2.1.10
+                     , hspec-core
                      , hspec-expectations-pretty-diff
+                     , leancheck
                      , mtl
                      , protolude
                      , QuickCheck >= 2.8.1
