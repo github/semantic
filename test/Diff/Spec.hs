@@ -2,41 +2,38 @@
 module Diff.Spec where
 
 import Category
-import Data.RandomWalkSimilarity
-import Data.Record
-import Data.Text.Arbitrary ()
+import Data.Bifunctor.Join
+import Data.Functor.Listable
+import Data.String
 import Diff
-import Diff.Arbitrary
 import Diffing (getLabel)
-import Info
 import Interpreter
+import Patch
+import Patch.Arbitrary ()
 import Prologue
-import Term.Arbitrary
+import Term
 import Test.Hspec
-import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
-  let toTerm' = defaultFeatureVectorDecorator (category . headF) . toTerm
   prop "equality is reflexive" $
-    \ a b -> let diff = diffTerms wrap (==) diffCost getLabel (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
+    \ a -> let diff = unListableDiff a :: SyntaxDiff String '[Category] in
       diff `shouldBe` diff
 
   prop "equal terms produce identity diffs" $
-    \ a -> let term = toTerm' (a :: ArbitraryTerm Text (Record '[Category])) in
+    \ a -> let term = unListableF a :: SyntaxTerm String '[Category] in
       diffCost (diffTerms wrap (==) diffCost getLabel term term) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = diffTerms wrap (==) diffCost getLabel (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
-        beforeTerm diff `shouldBe` Just (toTerm' a)
+      \ a b -> let diff = diffTerms wrap (==) diffCost getLabel (unListableF a) (unListableF b :: SyntaxTerm String '[Category]) in
+        beforeTerm diff `shouldBe` Just (unListableF a)
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = diffTerms wrap (==) diffCost getLabel (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
-        afterTerm diff `shouldBe` Just (toTerm' b)
+      \ a b -> let diff = diffTerms wrap (==) diffCost getLabel (unListableF a) (unListableF b :: SyntaxTerm String '[Category]) in
+        afterTerm diff `shouldBe` Just (unListableF b)
 
-  describe "ArbitraryDiff" $ do
-    prop "generates diffs of a specific size" . forAll ((arbitrary >>= \ n -> (,) n <$> diffOfSize n) `suchThat` ((> 0) . fst)) $
-      \ (n, diff) -> arbitraryDiffSize (diff :: ArbitraryDiff Text ()) `shouldBe` n
+unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
+unListableDiff diff = transFreeT (first unListableF) $ fmap unListableF <$> unListableF diff
