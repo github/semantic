@@ -41,7 +41,7 @@ generativeBenchmarkWith :: (Show m, Ord m) => String -> Int -> (Int -> [Tier a])
 generativeBenchmarkWith name n generate metric benchmark = do
   benchmarks <- traverse measure (take 2 (concat (generate n)))
   pure $! bgroup name (snd <$> sortOn fst benchmarks)
-  where measure input = let measurement = metric input in pure $! (measurement, bench (show measurement) (benchmark input))
+  where measure input = let measurement = metric input in pure (measurement, bench (show measurement) (benchmark input))
 
 syncAsyncBenchmark :: Benchmark
 syncAsyncBenchmark =
