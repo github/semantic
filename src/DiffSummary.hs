@@ -61,6 +61,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
           S.Struct{} -> Identifiable
+          S.Array ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.BlockStatement{} -> Identifiable
           _ -> Unidentifiable
 
@@ -235,7 +236,7 @@ toTermName source term = case unwrap term of
   S.Constructor expr -> toTermName' expr
   S.Try clauses _ _ _ -> termNameFromChildren term clauses
   S.Select clauses -> termNameFromChildren term clauses
-  S.Array _ _ -> termNameFromSource term
+  S.Array ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toCategoryName a

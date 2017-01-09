@@ -215,4 +215,5 @@ categoryForGoName = \case
   "struct_type" -> StructTy
   "dictionary_type" -> DictionaryTy
   "array_type" -> ArrayTy
+  "implicit_length_array_type" -> ArrayTy
   s -> Other (toS s)
