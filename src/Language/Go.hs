@@ -163,11 +163,8 @@ termConstructor source sourceSpan name range children _ = case name of
           assignments' <- sequenceA $ zipWith (\id expr ->
             withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
-        [idList] | category (extract idList) == VarAssignment -> do
-           withCategory ExpressionStatements (S.Indexed [idList])
         [idList] -> do
-           varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
-           withDefaultInfo (S.Indexed varDecls)
+           withDefaultInfo (S.Indexed [idList])
         rest -> withCategory Error (S.Error rest)
 
     withRanges originalRange category' terms syntax = do
@@ -221,5 +218,4 @@ categoryForGoName = \case
   "map_type" -> DictionaryTy
   "array_type" -> ArrayTy
   "implicit_length_array_type" -> ArrayTy
-  "const_declaration" -> VarDecl
   s -> Other (toS s)
