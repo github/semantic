@@ -17,7 +17,6 @@ import Data.Functor.Listable
 import qualified Data.Text as Text
 import Data.Text.Listable
 import Test.QuickCheck hiding (Fixed)
-import Test.LeanCheck
 import Patch.Arbitrary()
 import Data.Record
 import Data.These
