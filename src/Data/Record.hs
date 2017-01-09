@@ -1,16 +1,14 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators, ConstraintKinds #-}
 module Data.Record where
 
+import Category
+import Data.Aeson
+import Data.Aeson.Types
 import Data.Functor.Listable
 import GHC.Show
 import Prologue
-import Test.QuickCheck
-import Category
 import Range
 import SourceSpan
-import Data.Aeson
-import Data.Aeson.Types
-
 
 -- | A type alias for HasField constraints commonly used throughout semantic-diff.
 type DefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields SourceSpan)
@@ -85,16 +83,6 @@ instance (Ord h, Ord (Record t)) => Ord (Record (h ': t)) where
 instance Ord (Record '[]) where
   _ `compare` _ = EQ
 
-
-instance (Arbitrary field, Arbitrary (Record fields)) => Arbitrary (Record (field ': fields)) where
-  arbitrary = RCons <$> arbitrary <*> arbitrary
-
-  shrink (RCons h t) = RCons <$> shrink h <*> shrink t
-
-instance Arbitrary (Record '[]) where
-  arbitrary = pure RNil
-
-  shrink _ = []
 
 instance (Listable head, Listable (Record tail)) => Listable (Record (head ': tail)) where
   tiers = cons2 RCons

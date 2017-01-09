@@ -3,10 +3,8 @@
 module Category where
 
 import Prologue
-import Test.QuickCheck hiding (Args)
 import Data.Functor.Listable
 import Data.Text (pack)
-import Data.Text.Arbitrary()
 import Data.Text.Listable
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -191,95 +189,6 @@ instance Hashable Category
 
 instance (StringConv Category Text) where
   strConv _ = pack . show
-
-instance Arbitrary Category where
-  arbitrary = oneof [
-      pure Program
-    , pure Error
-    , pure Boolean
-    , pure BooleanOperator
-    , pure MathOperator
-    , pure DictionaryLiteral
-    , pure Pair
-    , pure FunctionCall
-    , pure Function
-    , pure Identifier
-    , pure Params
-    , pure ExpressionStatements
-    , pure MethodCall
-    , pure Args
-    , pure StringLiteral
-    , pure IntegerLiteral
-    , pure NumberLiteral
-    , pure Regex
-    , pure Return
-    , pure SymbolLiteral
-    , pure TemplateString
-    , pure ArrayLiteral
-    , pure Assignment
-    , pure MathAssignment
-    , pure MemberAccess
-    , pure SubscriptAccess
-    , pure VarAssignment
-    , pure VarDecl
-    , pure For
-    , pure DoWhile
-    , pure While
-    , pure Switch
-    , pure Ternary
-    , pure Case
-    , pure Operator
-    , pure Object
-    , pure Throw
-    , pure Constructor
-    , pure Try
-    , pure Catch
-    , pure Finally
-    , pure Class
-    , pure Method
-    , pure Module
-    , pure Import
-    , pure Export
-    , pure Interpolation
-    , pure Subshell
-    , pure OperatorAssignment
-    , pure Yield
-    , pure Until
-    , pure Unless
-    , pure Begin
-    , pure Else
-    , pure Elsif
-    , pure Ensure
-    , pure Rescue
-    , pure RescueModifier
-    , pure RescuedException
-    , pure RescueArgs
-    , pure When
-    , pure Negate
-    , pure Select
-    , pure Defer
-    , pure Go
-    , pure Slice
-    , pure TypeAssertion
-    , pure TypeConversion
-    , pure ArgumentPair
-    , pure KeywordParameter
-    , pure OptionalParameter
-    , pure SplatParameter
-    , pure HashSplatParameter
-    , pure BlockParameter
-    , pure Break
-    , pure Continue
-    , pure Binary
-    , pure Unary
-    , pure Constant
-    , pure Superclass
-    , pure SingletonClass
-    , Other <$> arbitrary
-    ]
-
-  shrink (Other s) = Other <$> shrink s
-  shrink _ = []
 
 instance Listable Category where
   tiers

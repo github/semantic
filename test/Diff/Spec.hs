@@ -9,7 +9,6 @@ import Diff
 import Diffing (getLabel)
 import Interpreter
 import Patch
-import Patch.Arbitrary ()
 import Prologue
 import Term
 import Test.Hspec

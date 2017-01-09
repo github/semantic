@@ -1,12 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Prologue
+import Data.Aeson
 import Data.Functor.Listable
 import Data.Mergeable
 import GHC.Generics
-import Test.QuickCheck hiding (Fixed)
-import Data.Aeson
+import Prologue
 
 -- | A node in an abstract syntax tree.
 --
@@ -95,25 +94,6 @@ data Syntax a f
 
 
 -- Instances
-
-instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
-  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
-
-  shrink = genericShrink
-
-syntaxOfSize :: Arbitrary leaf => (Int -> Gen f) -> Int -> Gen (Syntax leaf f)
-syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
-                     | otherwise = oneof $ branchGeneratorsOfSize n
-  where branchGeneratorsOfSize n =
-          [ Indexed <$> childrenOfSize (pred n)
-          , Fixed <$> childrenOfSize (pred n)
-          ]
-        childrenOfSize n | n <= 0 = pure []
-        childrenOfSize n = do
-          m <- choose (1, n)
-          first <- recur m
-          rest <- childrenOfSize (n - m)
-          pure $! first : rest
 
 instance Listable2 Syntax where
   liftTiers2 leaf recur

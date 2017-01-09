@@ -7,7 +7,6 @@ import Prologue
 import Category
 import Range
 import SourceSpan
-import Test.QuickCheck
 import Data.Aeson
 
 newtype Cost = Cost { unCost :: Int }
@@ -39,11 +38,6 @@ setCost = setField
 
 
 -- Instances
-
-instance Arbitrary Cost where
-  arbitrary = Cost <$> arbitrary
-
-  shrink = fmap Cost . shrink . unCost
 
 instance Listable Cost where
   tiers = cons1 Cost

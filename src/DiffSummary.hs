@@ -16,8 +16,6 @@ import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
 import qualified Data.Text as Text
 import Data.Text.Listable
-import Test.QuickCheck hiding (Fixed)
-import Patch.Arbitrary()
 import Data.Record
 import Data.These
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty, hsep)
@@ -436,16 +434,8 @@ instance HasCategory Category where
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
 
-instance Arbitrary Branch where
-  arbitrary = oneof [ pure BIndexed, pure BFixed ]
-  shrink = genericShrink
-
 instance Listable Branch where
   tiers = cons0 BIndexed \/ cons0 BFixed \/ cons0 BCommented \/ cons0 BIf
-
-instance Arbitrary a => Arbitrary (DiffSummary a) where
-  arbitrary = DiffSummary <$> arbitrary <*> arbitrary
-  shrink = genericShrink
 
 instance Listable1 DiffSummary where
   liftTiers termTiers = liftCons2 (liftTiers termTiers) (liftTiers (eitherTiers (liftTiers (mapT unListableText tiers)))) DiffSummary

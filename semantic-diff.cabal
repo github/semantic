@@ -18,7 +18,6 @@ library
                      , Arguments
                      , Category
                      , Data.Align.Generic
-                     , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.Functor.Listable
                      , Data.Mergeable
@@ -40,7 +39,6 @@ library
                      , Parse
                      , Parser
                      , Patch
-                     , Patch.Arbitrary
                      , Paths_semantic_diff
                      , Prologue
                      , Range
