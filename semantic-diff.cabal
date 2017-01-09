@@ -88,6 +88,7 @@ library
                      , QuickCheck >= 2.8.1
                      , quickcheck-instances
                      , quickcheck-text
+                     , random
                      , recursion-schemes
                      , regex-compat
                      , semigroups
