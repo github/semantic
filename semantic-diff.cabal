@@ -27,7 +27,6 @@ library
                      , Data.Record
                      , Data.Text.Listable
                      , Diff
-                     , Diff.Arbitrary
                      , Diffing
                      , DiffSummary
                      , Info
@@ -58,7 +57,6 @@ library
                      , SplitDiff
                      , Syntax
                      , Term
-                     , Term.Arbitrary
                      , TreeSitter
                      , FDoc.Term
                      , FDoc.RecursionSchemes
