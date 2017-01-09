@@ -85,9 +85,6 @@ library
                      , optparse-applicative
                      , pointed
                      , protolude
-                     , QuickCheck >= 2.8.1
-                     , quickcheck-instances
-                     , quickcheck-text
                      , random
                      , recursion-schemes
                      , regex-compat
@@ -180,8 +177,6 @@ test-suite test
                      , leancheck
                      , mtl
                      , protolude
-                     , QuickCheck >= 2.8.1
-                     , quickcheck-text
                      , recursion-schemes >= 4.1
                      , semantic-diff
                      , text >= 1.2.1.3
