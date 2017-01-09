@@ -62,6 +62,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Pair{} -> Identifiable
           S.Struct{} -> Identifiable
           S.Array ty _ -> if isJust ty then Identifiable else Unidentifiable
+          S.Object ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.BlockStatement{} -> Identifiable
           _ -> Unidentifiable
 
@@ -223,7 +224,7 @@ toTermName source term = case unwrap term of
   S.Ternary expr _ -> toTermName' expr
   S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object _ kvs -> "{ " <> Text.intercalate ", " (toTermName' <$> kvs) <> " }"
+  S.Object ty kvs -> maybe ("{ " <> Text.intercalate ", " (toTermName' <$> kvs) <> " }") termNameFromSource ty
   S.Pair k v -> toKeyName k <> toArgName v
   S.Return children -> Text.intercalate ", " (termNameFromSource <$> children)
   S.Yield children -> Text.intercalate ", " (termNameFromSource <$> children)

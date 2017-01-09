@@ -214,7 +214,7 @@ categoryForGoName = \case
   "type_conversion_expression" -> TypeConversion
   "keyed_element" -> Pair
   "struct_type" -> StructTy
-  "dictionary_type" -> DictionaryTy
+  "map_type" -> DictionaryTy
   "array_type" -> ArrayTy
   "implicit_length_array_type" -> ArrayTy
   s -> Other (toS s)
