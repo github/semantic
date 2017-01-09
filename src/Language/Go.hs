@@ -136,6 +136,7 @@ termConstructor source sourceSpan name range children _ = case name of
 
     toVarDecl varSpec = listToVarDecls (toList $ unwrap varSpec)
 
+    -- TODO Can we reuse toVarAssignment
     listToVarDecls list = case list of
       [idList, exprs] | category (extract exprs) == Other "expression_list" -> do
         assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
@@ -150,17 +151,17 @@ termConstructor source sourceSpan name range children _ = case name of
 
     toConsts constSpecs = do
       assignments' <- mapM constSpecToVarAssignment constSpecs
-      withCategory VarAssignment (S.Indexed assignments')
+      withDefaultInfo (S.Indexed assignments')
     constSpecToVarAssignment = toVarAssignment . toList . unwrap
     toVarAssignment = \case
         [idList, expressionList] -> do
           assignments' <- sequenceA $ zipWith (\id expr ->
-            withDefaultInfo $ S.VarAssignment id expr)
+            withCategory VarAssignment $ S.VarAssignment id expr)
             (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
         [idList, _, expressionList] -> do
           assignments' <- sequenceA $ zipWith (\id expr ->
-            withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+            withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
         [idList] | category (extract idList) == VarAssignment -> do
            withCategory ExpressionStatements (S.Indexed [idList])
