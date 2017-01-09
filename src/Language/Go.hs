@@ -78,7 +78,9 @@ termConstructor source sourceSpan name range children _ = case name of
   "const_declaration" -> toConsts children
   "const_spec" -> toVarAssignment children
   "func_literal" -> withDefaultInfo $ case children of
-    [params, _, body] -> S.AnonymousFunction (toList $ unwrap params) (toList $ unwrap body)
+    [params, _, body] -> case toList (unwrap params) of
+      [params'] -> S.AnonymousFunction (toList $ unwrap params') (toList $ unwrap body)
+      rest -> S.Error rest
     rest -> S.Error rest
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
@@ -147,8 +149,8 @@ termConstructor source sourceSpan name range children _ = case name of
       _ -> withCategory Error (S.Error list)
 
     toConsts constSpecs = do
-      assignments' <- sequenceA $ constSpecToVarAssignment <$> constSpecs
-      withDefaultInfo (S.Indexed assignments')
+      assignments' <- mapM constSpecToVarAssignment constSpecs
+      withCategory VarAssignment (S.Indexed assignments')
     constSpecToVarAssignment = toVarAssignment . toList . unwrap
     toVarAssignment = \case
         [idList, expressionList] -> do
@@ -161,8 +163,7 @@ termConstructor source sourceSpan name range children _ = case name of
             withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
         [idList] -> do
-           varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
-           withDefaultInfo (S.Indexed varDecls)
+           withDefaultInfo (S.Indexed [idList])
         rest -> withCategory Error (S.Error rest)
 
     withRanges originalRange category' terms syntax = do
@@ -199,7 +200,6 @@ categoryForGoName = \case
   "var_spec" -> VarAssignment
   "assignment_statement" -> Assignment
   "source_file" -> Module
-  "const_declaration" -> VarDecl
   "if_statement" -> If
   "for_statement" -> For
   "expression_switch_statement" -> Switch
