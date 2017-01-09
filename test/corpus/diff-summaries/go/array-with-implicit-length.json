@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "76bcdd875f780855cc6dff6a6e525c997eddbac1..8ad268325c70179fb885600546492a7f16e8f235"
+    "shas": "32cfd3f4563961b53e54909e289d0939571c5509..86a2b7dbd75737b26ced9cef68679bfbb9468ba5"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ad268325c70179fb885600546492a7f16e8f235..e7f4351eb678861323b087ccf117b5d1765da1f1"
+    "shas": "86a2b7dbd75737b26ced9cef68679bfbb9468ba5..333d7439f9ee119fe76b7e88ed4fdb602191cda2"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -128,7 +128,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '4' in the [...]int struct of the 'main' function"
+                    "summary": "Replaced '1' with '4' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                23
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '5' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
@@ -141,33 +156,6 @@
                                 "end": [
                                     4,
                                     25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    23
-                                ],
-                                "end": [
-                                    4,
-                                    24
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '2' with '5' in the [...]int struct of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    27
-                                ],
-                                "end": [
-                                    4,
-                                    28
                                 ]
                             },
                             {
@@ -182,7 +170,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in the [...]int struct of the 'main' function"
+                    "summary": "Replaced '2' with '6' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                27
+                            ],
+                            "end": [
+                                4,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3' in the [...]int array of the 'main' function"
                 }
             ]
         },
@@ -205,7 +208,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7f4351eb678861323b087ccf117b5d1765da1f1..f70b14a28d810d0b2f6ce94c9fe88ad1ddbcac71"
+    "shas": "333d7439f9ee119fe76b7e88ed4fdb602191cda2..6a24a0952c650a7818e89535fd2f30ee91ea85cd"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -237,7 +240,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '1' in the [...]int struct of the 'main' function"
+                    "summary": "Replaced '4' with '1' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
@@ -255,33 +273,6 @@
                             {
                                 "start": [
                                     4,
-                                    24
-                                ],
-                                "end": [
-                                    4,
-                                    25
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '2' in the [...]int struct of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    25
-                                ],
-                                "end": [
-                                    4,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
                                     27
                                 ],
                                 "end": [
@@ -291,7 +282,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in the [...]int struct of the 'main' function"
+                    "summary": "Replaced '5' with '3' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                25
+                            ],
+                            "end": [
+                                4,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '6' in the [...]int array of the 'main' function"
                 }
             ]
         },
@@ -314,7 +320,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f70b14a28d810d0b2f6ce94c9fe88ad1ddbcac71..a43b52734673ad2bbb5866917161d538270ccedc"
+    "shas": "6a24a0952c650a7818e89535fd2f30ee91ea85cd..4d90127387fb7638c0fe53327f0e839905da4807"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -372,7 +378,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a43b52734673ad2bbb5866917161d538270ccedc..e62f33662236ab1656e184831fcbabc79ed60698"
+    "shas": "4d90127387fb7638c0fe53327f0e839905da4807..286d4be0b5d02d7ec241211c38c03f12314c34aa"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-teardown-test",
@@ -414,5 +420,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e62f33662236ab1656e184831fcbabc79ed60698..448e795784d1aee1d1cf28bd856fbb68936b4c5d"
+    "shas": "286d4be0b5d02d7ec241211c38c03f12314c34aa..496e7a825e183ef3ec6927a5b2267ce1bae3160a"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9bb52005e388bd5cc9357e8492af2322ce0b4299..eb62c63abe41aeed322618196cae641f4a80af6e"
+    "shas": "95c931e493a7d347a01337613f6a8edcda9c72b9..6f6be11f5b48d2b7f6eb2b60b08aebdcc202f974"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eb62c63abe41aeed322618196cae641f4a80af6e..8cb102d0a1f3b6c2cdad36f0631270277ce7b0fa"
+    "shas": "6f6be11f5b48d2b7f6eb2b60b08aebdcc202f974..909abe7e0fdb950af7f2cae20ecbd7b8709a4f68"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8cb102d0a1f3b6c2cdad36f0631270277ce7b0fa..e19d29f6bdcb3e4bb6086598de139a01065e1769"
+    "shas": "909abe7e0fdb950af7f2cae20ecbd7b8709a4f68..4765c8f7ccea0fb468d045f7868e248dec250580"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e19d29f6bdcb3e4bb6086598de139a01065e1769..0cb3912ce76907ba4ac6c077a15e03b23cca6bed"
+    "shas": "4765c8f7ccea0fb468d045f7868e248dec250580..a310b1b78db73260b98ec97e56e597c2c2b69544"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0cb3912ce76907ba4ac6c077a15e03b23cca6bed..79d5b4aa4b1277fd8bbebd2042875de69605a68c"
+    "shas": "a310b1b78db73260b98ec97e56e597c2c2b69544..f32de25d9ffe972e2695a592f32c83099c0f8704"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "79d5b4aa4b1277fd8bbebd2042875de69605a68c..2754db7a232d4bd458e6d63420c7107cc4bf7e72"
+    "shas": "f32de25d9ffe972e2695a592f32c83099c0f8704..3780a3748556cad489d07632c99242dd125a2d3d"
 }]

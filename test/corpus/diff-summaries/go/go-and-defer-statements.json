@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "046b76b7401f5781415d12e2bfb4d60c03c48472..776ed502056c68f82cf9bd41784cd4194c72836d"
+    "shas": "ecb6ee4aa1cfd70e6c5775c60170fe04b2f6a691..a4b82c61ac7df6c1094f679ebf407861155ed797"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "776ed502056c68f82cf9bd41784cd4194c72836d..af5b8e705ae0f31b9ac938b345641c8352e96ce9"
+    "shas": "a4b82c61ac7df6c1094f679ebf407861155ed797..97bd530c8e8852362314f96be3a2161624b68a45"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af5b8e705ae0f31b9ac938b345641c8352e96ce9..a1d3b96cf4d4d488f444949d49d013d58dd2f4f9"
+    "shas": "97bd530c8e8852362314f96be3a2161624b68a45..7dc1e3bbf966efe8944ad9c739b1f4b8f13fd228"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1d3b96cf4d4d488f444949d49d013d58dd2f4f9..91e0410f2e6b6ddc06ce968b92d6de0a4cdca0c4"
+    "shas": "7dc1e3bbf966efe8944ad9c739b1f4b8f13fd228..b6ac7b9bd6c9003e8e97c38f31d1d5ab893eb0cc"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "91e0410f2e6b6ddc06ce968b92d6de0a4cdca0c4..65b4c96644c4b7aff15ad6e3b55c3e48f5e385d4"
+    "shas": "b6ac7b9bd6c9003e8e97c38f31d1d5ab893eb0cc..5cb18780e82137e63e6495fbbc22ff33815b5b05"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65b4c96644c4b7aff15ad6e3b55c3e48f5e385d4..08ffb30570dd5dfa94d28706aba89d46d94d95de"
+    "shas": "5cb18780e82137e63e6495fbbc22ff33815b5b05..78eff94a1a09fa60a957d52c31c93faa349a8c60"
 }]

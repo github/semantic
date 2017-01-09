@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d66b71957411bd7a2c7774ef68c167f1a4f80efa..90fcfe93739becca6157985b5833b3222c03b9ed"
+    "shas": "1070e71cda96a0476c6f6542fd4eea44080bffdb..7e145db8f90cd2e87675c9792a93cdd4bd6ed3f2"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90fcfe93739becca6157985b5833b3222c03b9ed..41f8022371d9cee89548a30a57a0e7fccedc969f"
+    "shas": "7e145db8f90cd2e87675c9792a93cdd4bd6ed3f2..b623eeae3478e36c45a2be633cd5c2e4ee7ed606"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "41f8022371d9cee89548a30a57a0e7fccedc969f..2e9634ead1868ad49765264ae5ed2fef149c35cc"
+    "shas": "b623eeae3478e36c45a2be633cd5c2e4ee7ed606..2251d2d0c0f6ac33d71d20f9f97476d364a2c67d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2e9634ead1868ad49765264ae5ed2fef149c35cc..22234691339a0f6257692c87b95d859b3a307fc7"
+    "shas": "2251d2d0c0f6ac33d71d20f9f97476d364a2c67d..4a6ef10c87199946fa786f0ff7b60452c9216a40"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "22234691339a0f6257692c87b95d859b3a307fc7..1f102a0446f14f0236c36cf3bb0ed056a692afae"
+    "shas": "4a6ef10c87199946fa786f0ff7b60452c9216a40..04deeba54977f6a79b405a83b3160fcd9e669d23"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f102a0446f14f0236c36cf3bb0ed056a692afae..0ee5a4c57cfe71d667e39f86339ab621f1653e09"
+    "shas": "04deeba54977f6a79b405a83b3160fcd9e669d23..e32c2689f296094fbfc1fd76f6e5998e950976dc"
 }]

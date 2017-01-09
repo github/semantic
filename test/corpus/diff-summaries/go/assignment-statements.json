@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b82351a928b3ca013071a29952ba2996558399db..ec6c9518776a8858b574568da625c550df55fe3b"
+    "shas": "6aa325bc1db5085a10d9818fe3532375407fb1d0..4da7e4fcb9f8c5a85ebc9d874bcfeb79883f7ff6"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ec6c9518776a8858b574568da625c550df55fe3b..bbdf27da162c7dee08a661efef087fdd4b476395"
+    "shas": "4da7e4fcb9f8c5a85ebc9d874bcfeb79883f7ff6..5095a8568724408b6994f984174117c76e8f71af"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bbdf27da162c7dee08a661efef087fdd4b476395..b9d30f11f9ffdb8492190d7cb55f2f07b81bcf88"
+    "shas": "5095a8568724408b6994f984174117c76e8f71af..4ab31a81735045734992794b6cfb69ae8ec50e86"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b9d30f11f9ffdb8492190d7cb55f2f07b81bcf88..b235ae4efe1d628091a7cc8c775badb6419d85f1"
+    "shas": "4ab31a81735045734992794b6cfb69ae8ec50e86..1c732a2401ef14458d2267aa0c6276c3b0016fcb"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b235ae4efe1d628091a7cc8c775badb6419d85f1..cb2e3201b350fb06476cdf34ce4318fd7bfdd349"
+    "shas": "1c732a2401ef14458d2267aa0c6276c3b0016fcb..3b311851d44977549a4b8feb1d5a5534fe683e64"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb2e3201b350fb06476cdf34ce4318fd7bfdd349..dc2e5c07146f17cbac1023a5d4a3c318da0e0c2b"
+    "shas": "3b311851d44977549a4b8feb1d5a5534fe683e64..4631150a68594dfe09ecb65b028d01e8e9fcf06a"
 }]
