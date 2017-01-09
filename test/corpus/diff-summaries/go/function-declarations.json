@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b52aff486e199f993d614a758c6c991ae4c8571c..ac84a580666647247b1817ef37c11a9b07122af7"
+    "shas": "b8eec1c43890f6532de99f06759f8b4aed674953..658fb1404ea2e5236bc9d154f281e77f1ac48dd8"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac84a580666647247b1817ef37c11a9b07122af7..9afe65301282de4d62fff937e3235a4682871308"
+    "shas": "658fb1404ea2e5236bc9d154f281e77f1ac48dd8..d4f810691ebcafcda627ebd1623b08b76c2446dc"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9afe65301282de4d62fff937e3235a4682871308..9ac29db097075a26b978506e860b2d6341f51ad8"
+    "shas": "d4f810691ebcafcda627ebd1623b08b76c2446dc..4cccda73273a4c00dd7aafe072237b76075b68bc"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ac29db097075a26b978506e860b2d6341f51ad8..6a7cf4b46f1c81806a4a0eb9a1381efbb91c32ea"
+    "shas": "4cccda73273a4c00dd7aafe072237b76075b68bc..88897f4733e4c96c27b8fff5922dc084b6cf2a17"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6a7cf4b46f1c81806a4a0eb9a1381efbb91c32ea..c7d6abb4133469f1e4490436f0de33bf02beb62e"
+    "shas": "88897f4733e4c96c27b8fff5922dc084b6cf2a17..d205f130b678dc60fc2f6346a2f348c69707e284"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c7d6abb4133469f1e4490436f0de33bf02beb62e..ed887a1c92673c84ce031efb86c3d896c2464dd8"
+    "shas": "d205f130b678dc60fc2f6346a2f348c69707e284..92413f0e5c4c26958418b88010b1bfc6603c9308"
 }]

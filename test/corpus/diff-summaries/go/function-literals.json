@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "64a6e0292843c6d64cb3a7de81b9807d992407b6..59b341d11c120fd3c0ab3ee67ecea629d1f6d907"
+    "shas": "fd40ccbc4221be2af6d4898578ec6268d3503e1c..cebd84ce1e99dde0552b79f575ada78e1428ea15"
 }
 ,{
     "testCaseDescription": "go-function-literals-insert-test",
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'anonymous(…)' variable in the main function of the 'main' module"
+                    "summary": "Added the 'anonymous(s, string)' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -98,7 +98,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "59b341d11c120fd3c0ab3ee67ecea629d1f6d907..63f1c3100b720e5ef601eabd4d1f6700f3bea137"
+    "shas": "cebd84ce1e99dde0552b79f575ada78e1428ea15..f2c2c7fb26bb4a8238afac1a6e27f04adcd1cc89"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
@@ -182,7 +182,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "63f1c3100b720e5ef601eabd4d1f6700f3bea137..8ee9bfb4a40d3df1299c9b1628e1d959a1f3ab93"
+    "shas": "f2c2c7fb26bb4a8238afac1a6e27f04adcd1cc89..d0615e4dd62fbffe83b6f4acc9f689d9e08e48c5"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
@@ -266,7 +266,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ee9bfb4a40d3df1299c9b1628e1d959a1f3ab93..7a8a609d86df75f1ea1372c1bd45e386a8ef3cde"
+    "shas": "d0615e4dd62fbffe83b6f4acc9f689d9e08e48c5..a0810570c93a64b0331e3b80820ac5254a42580d"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -301,7 +301,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'anonymous(…)' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'anonymous(s, string)' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -326,7 +326,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a8a609d86df75f1ea1372c1bd45e386a8ef3cde..393fcae19b5d2212bc05f63be11b72056781c69e"
+    "shas": "a0810570c93a64b0331e3b80820ac5254a42580d..bc8509548102b6cfbd7f5ca0f5d416b2c2f23985"
 }
 ,{
     "testCaseDescription": "go-function-literals-teardown-test",
@@ -368,5 +368,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "393fcae19b5d2212bc05f63be11b72056781c69e..5ce9f449496f437312173ce68834fc6114fdb44b"
+    "shas": "bc8509548102b6cfbd7f5ca0f5d416b2c2f23985..9c9ab0aa8794dc41e957597184e498fad87a7408"
 }]

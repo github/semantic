@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ecb6ee4aa1cfd70e6c5775c60170fe04b2f6a691..a4b82c61ac7df6c1094f679ebf407861155ed797"
+    "shas": "eb455685b0555cc54580041a414c1d2b3504f720..4856c336d84a292aeec065121b1b2ba7bc55409a"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a4b82c61ac7df6c1094f679ebf407861155ed797..97bd530c8e8852362314f96be3a2161624b68a45"
+    "shas": "4856c336d84a292aeec065121b1b2ba7bc55409a..2de9113ccfd54182298a46ab628f8e5eb25961a3"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97bd530c8e8852362314f96be3a2161624b68a45..7dc1e3bbf966efe8944ad9c739b1f4b8f13fd228"
+    "shas": "2de9113ccfd54182298a46ab628f8e5eb25961a3..717550175d50e4a24fde17e021fff8162b0ae450"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7dc1e3bbf966efe8944ad9c739b1f4b8f13fd228..b6ac7b9bd6c9003e8e97c38f31d1d5ab893eb0cc"
+    "shas": "717550175d50e4a24fde17e021fff8162b0ae450..4733e1bce9d8329dd77a4f18f7903078aa092be8"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b6ac7b9bd6c9003e8e97c38f31d1d5ab893eb0cc..5cb18780e82137e63e6495fbbc22ff33815b5b05"
+    "shas": "4733e1bce9d8329dd77a4f18f7903078aa092be8..1c28e34e68d6e8383c87607054eb22446670dd5e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5cb18780e82137e63e6495fbbc22ff33815b5b05..78eff94a1a09fa60a957d52c31c93faa349a8c60"
+    "shas": "1c28e34e68d6e8383c87607054eb22446670dd5e..860d356fd344d639742848cef5248f121b5dd285"
 }]

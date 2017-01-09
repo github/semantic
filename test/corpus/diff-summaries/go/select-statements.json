@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cc7734d2c90d793cab203e579a7a39270d7c10f1..edb9fba0009dc6cb137001ea77099c5a081bb7f4"
+    "shas": "af728a5072c35474e194a98dc2b3e0f328ba63d2..fb5de1adf713e84cfbd483f8608da64cac3c7178"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "edb9fba0009dc6cb137001ea77099c5a081bb7f4..83a0d6b29c061b1a8649288ff9838ab8f2216838"
+    "shas": "fb5de1adf713e84cfbd483f8608da64cac3c7178..ddf33d46c7e12186a1cee8d22892739dc83a8386"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "83a0d6b29c061b1a8649288ff9838ab8f2216838..1a4c242b069717c20b4271e8a72058d9a74b2610"
+    "shas": "ddf33d46c7e12186a1cee8d22892739dc83a8386..8c3fefc9952e0f7985fcfbee91772ef26ea71e55"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a4c242b069717c20b4271e8a72058d9a74b2610..97d2d7f86b62dd2c734bdf0e4c1b2f54bc8205e2"
+    "shas": "8c3fefc9952e0f7985fcfbee91772ef26ea71e55..4a2c027f1a355163c40e5067350131f86a9f7ef0"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97d2d7f86b62dd2c734bdf0e4c1b2f54bc8205e2..05a3ee1a8662a7eb87cbdd1e288c74ba8b63c7b9"
+    "shas": "4a2c027f1a355163c40e5067350131f86a9f7ef0..5210d1e127105be852344f7068dba4d04a366aa4"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05a3ee1a8662a7eb87cbdd1e288c74ba8b63c7b9..ecb6ee4aa1cfd70e6c5775c60170fe04b2f6a691"
+    "shas": "5210d1e127105be852344f7068dba4d04a366aa4..eb455685b0555cc54580041a414c1d2b3504f720"
 }]

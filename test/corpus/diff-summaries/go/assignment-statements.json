@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6aa325bc1db5085a10d9818fe3532375407fb1d0..4da7e4fcb9f8c5a85ebc9d874bcfeb79883f7ff6"
+    "shas": "8a11754197c09bbe273ad18d28c56f8f474ccbc6..a9580e0272005bcefbbab171ac372d8e4a31b41e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4da7e4fcb9f8c5a85ebc9d874bcfeb79883f7ff6..5095a8568724408b6994f984174117c76e8f71af"
+    "shas": "a9580e0272005bcefbbab171ac372d8e4a31b41e..c086db552013147e28fb25e486df98e01a068078"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5095a8568724408b6994f984174117c76e8f71af..4ab31a81735045734992794b6cfb69ae8ec50e86"
+    "shas": "c086db552013147e28fb25e486df98e01a068078..8420301f4f9965da3557411ea67a386c630fbc61"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ab31a81735045734992794b6cfb69ae8ec50e86..1c732a2401ef14458d2267aa0c6276c3b0016fcb"
+    "shas": "8420301f4f9965da3557411ea67a386c630fbc61..a7197dbb923ba3a58e487ed0ad17ef376f6943a1"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1c732a2401ef14458d2267aa0c6276c3b0016fcb..3b311851d44977549a4b8feb1d5a5534fe683e64"
+    "shas": "a7197dbb923ba3a58e487ed0ad17ef376f6943a1..a09f5b64239a37e49f570aee7140426742ada360"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3b311851d44977549a4b8feb1d5a5534fe683e64..4631150a68594dfe09ecb65b028d01e8e9fcf06a"
+    "shas": "a09f5b64239a37e49f570aee7140426742ada360..0a862da9e8813b21d92496866980a161915d23e3"
 }]

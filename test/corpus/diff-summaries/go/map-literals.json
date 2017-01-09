@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "496e7a825e183ef3ec6927a5b2267ce1bae3160a..abc11e880021d2184c09d104f8d98772796d2858"
+    "shas": "07478bb81ec42a595e72816c1b2bb6279bad9772..f5af84d6ba5bc82a118bb02c6f9225db75a94e30"
 }
 ,{
     "testCaseDescription": "go-map-literals-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "abc11e880021d2184c09d104f8d98772796d2858..012f1e560a68e929a2256f3beef4fc65136e1841"
+    "shas": "f5af84d6ba5bc82a118bb02c6f9225db75a94e30..db035cff10ee3be2d8916f3ceb26a00aa3a98c34"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-test",
@@ -108,33 +108,60 @@
             "map-literals.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                15
-                            ],
-                            "end": [
-                                4,
-                                21
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    22
+                                ],
+                                "end": [
+                                    4,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    22
+                                ],
+                                "end": [
+                                    4,
+                                    25
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'string' identifier in the map[string]int struct of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the map[string]int dictionary of the 'main' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
-                                22
+                                5,
+                                1
                             ],
                             "end": [
-                                4,
-                                25
+                                5,
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier in the map[string]int struct of the 'main' function"
+                    "summary": "Added the \"foo\" string in the map[string]int dictionary of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                8
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"bar\" string in the map[string]int dictionary of the 'main' function"
                 },
                 {
                     "span": {
@@ -151,60 +178,6 @@
                             },
                             {
                                 "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hi\" string with the \"foo\" string in the map[string]int struct of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    7
-                                ],
-                                "end": [
-                                    5,
-                                    14
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    8
-                                ],
-                                "end": [
-                                    5,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hello\" string with the \"bar\" string in the map[string]int struct of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
                                     6,
                                     1
                                 ],
@@ -215,34 +188,37 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bye\" string with the \"baz\" string in the map[string]int struct of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the map[string]int dictionary of the 'main' function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    8
-                                ],
-                                "end": [
-                                    6,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    8
-                                ],
-                                "end": [
-                                    6,
-                                    15
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the \"goodbye\" string with the \"hello\" string in the map[string]int struct of the 'main' function"
+                    "summary": "Deleted the \"bye\" string in the map[string]int dictionary of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                8
+                            ],
+                            "end": [
+                                6,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"goodbye\" string in the map[string]int dictionary of the 'main' function"
                 }
             ]
         },
@@ -270,7 +246,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "012f1e560a68e929a2256f3beef4fc65136e1841..e49a702ed9f376e1ae41f571965fd7f4d2825023"
+    "shas": "db035cff10ee3be2d8916f3ceb26a00aa3a98c34..2eb21f25d9ee18fc2ecc8fab7965456c5f1db7b8"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-replacement-test",
@@ -293,16 +269,16 @@
                             {
                                 "start": [
                                     4,
-                                    15
+                                    22
                                 ],
                                 "end": [
                                     4,
-                                    21
+                                    28
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the map[string]string struct of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the map[string]string dictionary of the 'main' function"
                 },
                 {
                     "span": {
@@ -329,7 +305,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the map[string]string struct of the 'main' function"
+                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the map[string]string dictionary of the 'main' function"
                 },
                 {
                     "span": {
@@ -356,7 +332,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the map[string]string struct of the 'main' function"
+                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the map[string]string dictionary of the 'main' function"
                 },
                 {
                     "span": {
@@ -383,7 +359,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the map[string]string struct of the 'main' function"
+                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the map[string]string dictionary of the 'main' function"
                 },
                 {
                     "span": {
@@ -410,7 +386,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the map[string]string struct of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the map[string]string dictionary of the 'main' function"
                 }
             ]
         },
@@ -438,7 +414,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e49a702ed9f376e1ae41f571965fd7f4d2825023..c1ea5e566c41c332faf31bdf3ec600054d0a9d6e"
+    "shas": "2eb21f25d9ee18fc2ecc8fab7965456c5f1db7b8..aafd5a2a025562c730be8b953ae82c6988d619cc"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-insert-test",
@@ -499,7 +475,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c1ea5e566c41c332faf31bdf3ec600054d0a9d6e..864d0cc63daaf2a92a1a1293b2c56ce4f3e0db5d"
+    "shas": "aafd5a2a025562c730be8b953ae82c6988d619cc..e78130c3e7c1672502a5edd9b9532898a746ff87"
 }
 ,{
     "testCaseDescription": "go-map-literals-teardown-test",
@@ -541,5 +517,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "864d0cc63daaf2a92a1a1293b2c56ce4f3e0db5d..558c52a8cf3235254d5676618a9c13f09b7a1a76"
+    "shas": "e78130c3e7c1672502a5edd9b9532898a746ff87..c6c34c8496e500e6c74584de2220dcd777365b39"
 }]

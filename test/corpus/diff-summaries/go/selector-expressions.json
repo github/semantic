@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95c931e493a7d347a01337613f6a8edcda9c72b9..6f6be11f5b48d2b7f6eb2b60b08aebdcc202f974"
+    "shas": "fdbdae52725e160db325c0b61fa80187a0b3978a..981ee2a8c17b81ca1091f25f21fd6e5ac5402841"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6f6be11f5b48d2b7f6eb2b60b08aebdcc202f974..909abe7e0fdb950af7f2cae20ecbd7b8709a4f68"
+    "shas": "981ee2a8c17b81ca1091f25f21fd6e5ac5402841..80b7b739c793c7fdbd1f34b9a36a525bbb4b66cb"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "909abe7e0fdb950af7f2cae20ecbd7b8709a4f68..4765c8f7ccea0fb468d045f7868e248dec250580"
+    "shas": "80b7b739c793c7fdbd1f34b9a36a525bbb4b66cb..fd84e4023d7914fe4f3398bbc1c8bd46b19782f8"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4765c8f7ccea0fb468d045f7868e248dec250580..a310b1b78db73260b98ec97e56e597c2c2b69544"
+    "shas": "fd84e4023d7914fe4f3398bbc1c8bd46b19782f8..33ae13690959972b5e2cfbbd49d1d892ca2ee11b"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a310b1b78db73260b98ec97e56e597c2c2b69544..f32de25d9ffe972e2695a592f32c83099c0f8704"
+    "shas": "33ae13690959972b5e2cfbbd49d1d892ca2ee11b..4af6ef169677af0adfc9065fb7d6b3ac2cb614ea"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f32de25d9ffe972e2695a592f32c83099c0f8704..3780a3748556cad489d07632c99242dd125a2d3d"
+    "shas": "4af6ef169677af0adfc9065fb7d6b3ac2cb614ea..dc98019ab5f433f8c483856a973463a3574b2d5c"
 }]
