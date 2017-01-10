@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7f0801bb1334a5f5f13e17a6f3b67de15117091..2fccc1d48afadd598bacdacb2be066c4aed87b99"
+    "shas": "4ecd4ba349a7ffe01c74f3e25d2bc7712da25400..d2517c543dc3cf3f5534d9904f2ec4d98d31fde1"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -80,7 +80,7 @@
                         "insert": {
                             "start": [
                                 5,
-                                12
+                                9
                             ],
                             "end": [
                                 5,
@@ -88,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Added the '...int' parameter declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2fccc1d48afadd598bacdacb2be066c4aed87b99..d0bdd3c96a78f91b9fb86216767942038dd92a0d"
+    "shas": "d2517c543dc3cf3f5534d9904f2ec4d98d31fde1..f5d7b50ab885584cf3616274e4a6c0a8da3c10f4"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -274,7 +274,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0bdd3c96a78f91b9fb86216767942038dd92a0d..ca965ffc50849245b1deb6742cf3109881eb91c6"
+    "shas": "f5d7b50ab885584cf3616274e4a6c0a8da3c10f4..c6d44dccf8ddcbb15d13d44ce8c9af73f55c0226"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -387,7 +387,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca965ffc50849245b1deb6742cf3109881eb91c6..e6ea1b8eac00099af1a4395546845ef802d5df83"
+    "shas": "c6d44dccf8ddcbb15d13d44ce8c9af73f55c0226..698258dc65b42683cc261f6c99efca989e6df0ad"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -429,7 +429,7 @@
                         "delete": {
                             "start": [
                                 5,
-                                12
+                                9
                             ],
                             "end": [
                                 5,
@@ -437,7 +437,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the '...int' parameter declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -510,7 +510,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e6ea1b8eac00099af1a4395546845ef802d5df83..bd04fcc71dd601fd3fc4d13a5becb7cf3357c21b"
+    "shas": "698258dc65b42683cc261f6c99efca989e6df0ad..8a49e98b8993c4dbdaa40651f8e2b51ca52670e4"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -552,5 +552,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bd04fcc71dd601fd3fc4d13a5becb7cf3357c21b..cdf6033e61da72434053c0f89cc2d4daf7ade65c"
+    "shas": "8a49e98b8993c4dbdaa40651f8e2b51ca52670e4..70869bde4ca394121b153f1a8c3d6ef3feff2406"
 }]

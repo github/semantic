@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5d54e8a2f09c5b25fe5045ee1c159540429d56a..f74e2986af8a77032a5c50a55c3cda05249c814e"
+    "shas": "b1f03ccd0dc1063c9180b9337f6d1c8bb7d5ea96..d4a4686d39baba2184d93cbb4e75712ea062b3b2"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f74e2986af8a77032a5c50a55c3cda05249c814e..4a24db57f42e50a36fa2ac42e69f018fbd505e72"
+    "shas": "d4a4686d39baba2184d93cbb4e75712ea062b3b2..ab0f113b7beeae7ec64e151cd208f9f7b05615c4"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4a24db57f42e50a36fa2ac42e69f018fbd505e72..a22c5f74d488a409757315c085241b21dca6cb3e"
+    "shas": "ab0f113b7beeae7ec64e151cd208f9f7b05615c4..ee40003bc0fdd2a99d61df36672c211adc2e5644"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a22c5f74d488a409757315c085241b21dca6cb3e..6194d8658d6aea9b0e5ed97131b5a2fd0db77b77"
+    "shas": "ee40003bc0fdd2a99d61df36672c211adc2e5644..7f9e9ae1da70b70def51eff208491560d8c12aa2"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6194d8658d6aea9b0e5ed97131b5a2fd0db77b77..14045f0da23bd52a83fc24aca0c00fdf5a396368"
+    "shas": "7f9e9ae1da70b70def51eff208491560d8c12aa2..641808d85125ddbc5aa96b127c255829a26399b6"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "14045f0da23bd52a83fc24aca0c00fdf5a396368..04bedce4af4de1485a268fc481929a08f010751b"
+    "shas": "641808d85125ddbc5aa96b127c255829a26399b6..9cfb40fd6aae4204e7d55a7d4259b0a015b4feae"
 }]

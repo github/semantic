@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fed3f54df513dc6e5faff4d10a233dd6c9f0a200..3c9abf4f527fc75f4953598565c29109d06516c0"
+    "shas": "260befb4337d89a8b355af4152ae54a8ec9b023e..dc6223d3dab2cf257d034d6b5d2b2a7c018b3594"
 }
 ,{
     "testCaseDescription": "go-function-literals-insert-test",
@@ -83,40 +83,13 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c9abf4f527fc75f4953598565c29109d06516c0..3872e808df9131009d82edf5d1632fe493a131d5"
+    "shas": "dc6223d3dab2cf257d034d6b5d2b2a7c018b3594..92205e53eaf0ec6621209435ec2a18e15de3a806"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
     "expectedResult": {
         "changes": {
             "function-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    17
-                                ],
-                                "end": [
-                                    4,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    17
-                                ],
-                                "end": [
-                                    4,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the s1 var assignment of the 'main' function"
-                },
                 {
                     "span": {
                         "replace": [
@@ -143,37 +116,7 @@
                         ]
                     },
                     "summary": "Replaced the 'string' identifier with the 'int' identifier in the s1 var assignment of the 'main' function"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "function-literals.go"
-    ],
-    "patch": [
-        "diff --git a/function-literals.go b/function-literals.go",
-        "index 1f4ead9..7b03466 100644",
-        "--- a/function-literals.go",
-        "+++ b/function-literals.go",
-        "@@ -1,7 +1,7 @@",
-        " package main",
-        " ",
-        " func main() {",
-        "-const s1 = func(s string) (int, int) {",
-        "+const s1 = func(b int) (string, string) {",
-        " return 1, 2",
-        " }",
-        " }"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "3872e808df9131009d82edf5d1632fe493a131d5..5443f3462af5d6635c6de7ac9833a8f427702469"
-}
-,{
-    "testCaseDescription": "go-function-literals-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "function-literals.go": [
+                },
                 {
                     "span": {
                         "replace": [
@@ -199,8 +142,38 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the s1 var assignment of the 'main' function"
-                },
+                    "summary": "Replaced the 's' identifier with the 'b' identifier in the s1 var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-literals.go"
+    ],
+    "patch": [
+        "diff --git a/function-literals.go b/function-literals.go",
+        "index 1f4ead9..7b03466 100644",
+        "--- a/function-literals.go",
+        "+++ b/function-literals.go",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const s1 = func(s string) (int, int) {",
+        "+const s1 = func(b int) (string, string) {",
+        " return 1, 2",
+        " }",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "92205e53eaf0ec6621209435ec2a18e15de3a806..5d190855bc4431628bdbe6b3fbb52597c404d535"
+}
+,{
+    "testCaseDescription": "go-function-literals-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-literals.go": [
                 {
                     "span": {
                         "replace": [
@@ -227,6 +200,33 @@
                         ]
                     },
                     "summary": "Replaced the 'int' identifier with the 'string' identifier in the s1 var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    17
+                                ],
+                                "end": [
+                                    4,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    17
+                                ],
+                                "end": [
+                                    4,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 's' identifier in the s1 var assignment of the 'main' function"
                 }
             ]
         },
@@ -251,7 +251,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5443f3462af5d6635c6de7ac9833a8f427702469..0a813dbfcf2eee80a29b64940d6f7df0098431ec"
+    "shas": "5d190855bc4431628bdbe6b3fbb52597c404d535..f7f60798626069bb2a7a12b29da31cf410ac69f1"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -296,7 +296,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a813dbfcf2eee80a29b64940d6f7df0098431ec..b60e9e4bbc4eadc5871f18f472304a4f1abfbf32"
+    "shas": "f7f60798626069bb2a7a12b29da31cf410ac69f1..96ffe3dbca5bf13db3379f0e9b748c42a538bb63"
 }
 ,{
     "testCaseDescription": "go-function-literals-teardown-test",
@@ -338,5 +338,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b60e9e4bbc4eadc5871f18f472304a4f1abfbf32..b4de8673b198ab5744eaaf91bcff29a2c9f2267c"
+    "shas": "96ffe3dbca5bf13db3379f0e9b748c42a538bb63..ac7d836d938c18c3fce926820f7451b8763c4b93"
 }]

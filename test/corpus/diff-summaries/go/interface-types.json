@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "25c27fa318753b079c2f47f49445fa7203b682ac..0e0071233c856b4f6e8e7df4eef19926f74bc0eb"
+    "shas": "ed0b8f9d02f6e8adf7d0a57035eb6d45481e24ed..79cd272b9dc6911d92ad159326357f31535909c9"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -204,26 +204,11 @@
                             ],
                             "end": [
                                 9,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                15
-                            ],
-                            "end": [
-                                9,
                                 21
                             ]
                         }
                     },
-                    "summary": "Added the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Added the 's string' parameter declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -267,7 +252,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e0071233c856b4f6e8e7df4eef19926f74bc0eb..dfb463fd1bb2aa704a1b84982d9fcdfb86868ea7"
+    "shas": "79cd272b9dc6911d92ad159326357f31535909c9..66cf6ac19030318e64653c9507dbfc15a4bbcc63"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -382,7 +367,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfb463fd1bb2aa704a1b84982d9fcdfb86868ea7..a0007d0a2335ef28ced85763a946f1fea50535a3"
+    "shas": "66cf6ac19030318e64653c9507dbfc15a4bbcc63..53cad40c5780c0b098d539c8cea5f9ae6166573d"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -497,7 +482,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a0007d0a2335ef28ced85763a946f1fea50535a3..620abbdd731aabaf0734fec825bf11411c452f8a"
+    "shas": "53cad40c5780c0b098d539c8cea5f9ae6166573d..450392156a45fd1ba3adfb914ece9b945ddfe5db"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -663,26 +648,11 @@
                             ],
                             "end": [
                                 9,
-                                14
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                15
-                            ],
-                            "end": [
-                                9,
                                 21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 's string' parameter declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -726,7 +696,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "620abbdd731aabaf0734fec825bf11411c452f8a..c343b176f53e453136c2cbdb8ca0023ab0496c07"
+    "shas": "450392156a45fd1ba3adfb914ece9b945ddfe5db..1c2e04706825f846a74e99ebadd504f4cf606e65"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -768,5 +738,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c343b176f53e453136c2cbdb8ca0023ab0496c07..9132985021c301c10d3ab5e316879e302cbffc7b"
+    "shas": "1c2e04706825f846a74e99ebadd504f4cf606e65..9e78b47631275349a4fb30f33b8a537c58b64a87"
 }]

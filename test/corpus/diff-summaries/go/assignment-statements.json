@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc59d7bf7c2d2e0b67b4106f2d8ac97e82a8d59c..4cdcf35ff05244cfd2ceb349567772aa8018a759"
+    "shas": "1f4e3d9c510a84872697c905ff4725b82965fff2..965325bcc0ad450d8a2fc95cf734b7b9abfae566"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4cdcf35ff05244cfd2ceb349567772aa8018a759..0b8c9f8fb121f2ec2a474cbe1f463c8efe90cf4d"
+    "shas": "965325bcc0ad450d8a2fc95cf734b7b9abfae566..f41269b210d0361ba2343e4cc601921944fe784b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0b8c9f8fb121f2ec2a474cbe1f463c8efe90cf4d..bde7b65db3404967fb4958d12389ec65ce24292f"
+    "shas": "f41269b210d0361ba2343e4cc601921944fe784b..c1c3d8e1fee502be80dc41ab5d9c6011a872861f"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bde7b65db3404967fb4958d12389ec65ce24292f..098773de2bf10c88654ef2ac10fbe3feb9774e9b"
+    "shas": "c1c3d8e1fee502be80dc41ab5d9c6011a872861f..573c521eac19ed045b804ee868980b538ba9fe30"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "098773de2bf10c88654ef2ac10fbe3feb9774e9b..ae7590940b54952cdc5f4fe1c4000a15a9e7cfe7"
+    "shas": "573c521eac19ed045b804ee868980b538ba9fe30..f317d4fdb70bd38f0e764e4d2a92da3b76ed67b4"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ae7590940b54952cdc5f4fe1c4000a15a9e7cfe7..d8d67eca0a5ef27c2ba7b36c8f2bb929d4ffab84"
+    "shas": "f317d4fdb70bd38f0e764e4d2a92da3b76ed67b4..1d9bd1dd0569b442209f6a6b7d514043e44d4c06"
 }]

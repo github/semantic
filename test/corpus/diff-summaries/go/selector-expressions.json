@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c9324837822c517225f33244c7079bc01cc70a0..dfefdf519e83ac9c42f102c22361ab613ddcd52c"
+    "shas": "5726fca36737028da7e040273066ce7221567198..e3d64f4cc07d48dd13ad2d11ef4222d770bb8c6f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfefdf519e83ac9c42f102c22361ab613ddcd52c..71031e1e2571bd5e9ced44cab1383c9c96988063"
+    "shas": "e3d64f4cc07d48dd13ad2d11ef4222d770bb8c6f..ab98a072103b98f3586585aab1aa196207499816"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71031e1e2571bd5e9ced44cab1383c9c96988063..ff28a3ff8890dffec8d590593e2065d5070e9c5f"
+    "shas": "ab98a072103b98f3586585aab1aa196207499816..2fb01c81c8e5e88783d7c9114a9ea3d8b1e1d6eb"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff28a3ff8890dffec8d590593e2065d5070e9c5f..99cc894a4e93cd69b64af06bf5ad7520b12ed5fe"
+    "shas": "2fb01c81c8e5e88783d7c9114a9ea3d8b1e1d6eb..5201481716f07eb79e47c9b614ab1a4fea85567c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "99cc894a4e93cd69b64af06bf5ad7520b12ed5fe..bcb3a9f91652d7096e9bfcfdbed92e5b432b1cd9"
+    "shas": "5201481716f07eb79e47c9b614ab1a4fea85567c..4e0cee2a3aeabba0afbf622ec72eeaff234f5fc9"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bcb3a9f91652d7096e9bfcfdbed92e5b432b1cd9..705187e6645de7fa42ca91e1bcc3b725d19eb0fc"
+    "shas": "4e0cee2a3aeabba0afbf622ec72eeaff234f5fc9..7dd495d3d2721a121a6c866bd5d3aee8ef6a9783"
 }]

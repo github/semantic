@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "705187e6645de7fa42ca91e1bcc3b725d19eb0fc..413048ae196f5cffcce131920c57c64d28aed2b1"
+    "shas": "7dd495d3d2721a121a6c866bd5d3aee8ef6a9783..a4b3405f2b850b44bf8a669a5a590c2ad332664a"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "413048ae196f5cffcce131920c57c64d28aed2b1..dcf6616095e5949d7e3655be2dff102a6716757a"
+    "shas": "a4b3405f2b850b44bf8a669a5a590c2ad332664a..7e77ee6f34acc90f8fdbe309f365972e731966d1"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -291,7 +291,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dcf6616095e5949d7e3655be2dff102a6716757a..bfad2d2af4f42228ceca65af862568e231046b71"
+    "shas": "7e77ee6f34acc90f8fdbe309f365972e731966d1..c4e5627ebbf4cadf50199c7ae2471106dc11ecb9"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -421,7 +421,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bfad2d2af4f42228ceca65af862568e231046b71..7b94166b0383841321a35b2e82abd2341be0cf07"
+    "shas": "c4e5627ebbf4cadf50199c7ae2471106dc11ecb9..ffb159d3e2c2d205c5d0e80dda4f0ff0581bce49"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -544,7 +544,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b94166b0383841321a35b2e82abd2341be0cf07..38ae48773a57419e212fc0642449a6c87699b822"
+    "shas": "ffb159d3e2c2d205c5d0e80dda4f0ff0581bce49..1f2fe4692a43a499b3d1dafda4f26f725ccb88f3"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -586,5 +586,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38ae48773a57419e212fc0642449a6c87699b822..443194fe42ee83a9dca098d74ec0a4940921efdb"
+    "shas": "1f2fe4692a43a499b3d1dafda4f26f725ccb88f3..9f67d98794eed4e253a213bfedfda7e797cb6fd4"
 }]
