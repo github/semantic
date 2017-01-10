@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "995665dc2a5a206afa84348c94b2f2b063716b6b..b7696ed51755fad5ab25f445153000950e669e97"
+    "shas": "d7a1d7f41b618a9ff0adcd8047b00eacd993989e..1336d1118fc58531906bc58d35324e54579e5a4d"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b7696ed51755fad5ab25f445153000950e669e97..9cce31d764aaffc28a4efeb268542c56f3a0e18e"
+    "shas": "1336d1118fc58531906bc58d35324e54579e5a4d..ef56a874734a180474f582176f6ceb19f1261f38"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9cce31d764aaffc28a4efeb268542c56f3a0e18e..8a1cab73f46dac682e3ed1c646a5e58bb26d6fd0"
+    "shas": "ef56a874734a180474f582176f6ceb19f1261f38..1867e16c3d1264c1484556a64b5982f0ec61ed32"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8a1cab73f46dac682e3ed1c646a5e58bb26d6fd0..10b34af8f31d013f39a448b6e92ba8de97fa3b54"
+    "shas": "1867e16c3d1264c1484556a64b5982f0ec61ed32..40a72fd38075dd45f42d19a3e006616514ed9c13"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "10b34af8f31d013f39a448b6e92ba8de97fa3b54..0f3528d3f16e4e1b68fe84774950dd57dfc2022f"
+    "shas": "40a72fd38075dd45f42d19a3e006616514ed9c13..f6f7355ba58086972926d3457b8437c48ef9cdde"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f3528d3f16e4e1b68fe84774950dd57dfc2022f..a0b25b647b5bf5cd35beae5fdf542e57796009ec"
+    "shas": "f6f7355ba58086972926d3457b8437c48ef9cdde..f423aff45f42049c255b89a561e69a15cf63efb7"
 }]

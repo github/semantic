@@ -38,7 +38,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cdf6033e61da72434053c0f89cc2d4daf7ade65c..97bd8f4af90e2f10dcadfdd4bacbb7f5a4333ec1"
+    "shas": "9439c36a72cbb783e3b574edf888a27066f49719..f974aec27f88831bef33c0203f942b76155db5af"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -54,26 +54,11 @@
                             ],
                             "end": [
                                 5,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'self' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
                                 18
                             ]
                         }
                     },
-                    "summary": "Added the 'Person' identifier in the main module"
+                    "summary": "Added the 'self Person' parameter declaration in the main module"
                 },
                 {
                     "span": {
@@ -99,26 +84,11 @@
                             ],
                             "end": [
                                 5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'other' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                33
-                            ],
-                            "end": [
-                                5,
                                 39
                             ]
                         }
                     },
-                    "summary": "Added the 'Person' identifier in the main module"
+                    "summary": "Added the 'other Person' parameter declaration in the main module"
                 },
                 {
                     "span": {
@@ -170,7 +140,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97bd8f4af90e2f10dcadfdd4bacbb7f5a4333ec1..25a53f6a9d2b1f42beb2634ccbed4e93ff8f752d"
+    "shas": "f974aec27f88831bef33c0203f942b76155db5af..195aefb79621522bb8c9bcbf95e21c087ed0853e"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -251,7 +221,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "25a53f6a9d2b1f42beb2634ccbed4e93ff8f752d..178c3f3359b7267df5b354107997bf528a189b58"
+    "shas": "195aefb79621522bb8c9bcbf95e21c087ed0853e..12369c253f3e6683be9dd6ce12aa6682d4ae9c45"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -332,7 +302,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "178c3f3359b7267df5b354107997bf528a189b58..791ed665829db67d9fc4309abe6b432da831f15a"
+    "shas": "12369c253f3e6683be9dd6ce12aa6682d4ae9c45..08a799df1eb875d2f18315d28ce7f05323da2548"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -348,26 +318,11 @@
                             ],
                             "end": [
                                 5,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'self' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
                                 18
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Person' identifier in the main module"
+                    "summary": "Deleted the 'self Person' parameter declaration in the main module"
                 },
                 {
                     "span": {
@@ -393,26 +348,11 @@
                             ],
                             "end": [
                                 5,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'other' identifier in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                33
-                            ],
-                            "end": [
-                                5,
                                 39
                             ]
                         }
                     },
-                    "summary": "Deleted the 'Person' identifier in the main module"
+                    "summary": "Deleted the 'other Person' parameter declaration in the main module"
                 },
                 {
                     "span": {
@@ -464,7 +404,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "791ed665829db67d9fc4309abe6b432da831f15a..e666324cdc0c560a273b7dd88b6480b40e714c93"
+    "shas": "08a799df1eb875d2f18315d28ce7f05323da2548..0478bd3f6b32392f0ef8b2aaaaf6729cd9b3601f"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -506,5 +446,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e666324cdc0c560a273b7dd88b6480b40e714c93..fa25164285caf5e1394858d635977290afc5cbf5"
+    "shas": "0478bd3f6b32392f0ef8b2aaaaf6729cd9b3601f..611e2214d1b5940df77efdbea2f5fd91bc8c5a55"
 }]

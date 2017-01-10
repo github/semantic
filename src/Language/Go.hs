@@ -43,9 +43,19 @@ termConstructor source sourceSpan name range children _ = case name of
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
-        clauses' <- withDefaultInfo $ S.Indexed clauses
-        withDefaultInfo $ S.Switch clauses' cases
-      where isCaseClause = (== Case) . category . extract
+        clauses' <- case clauses of
+          [] -> pure Nothing
+          clauses'' -> Just <$> (withCategory ExpressionStatements (S.Indexed clauses''))
+        cases' <- sequenceA $ toCase <$> cases
+        withDefaultInfo $ S.Switch clauses' cases'
+      where
+        isCaseClause = (== Other "expression_case_clause") . category . extract
+        toCase clause = case toList (unwrap clause) of
+          clause' : rest -> case toList (unwrap clause') of
+            [clause''] -> withCategory Case $ S.Case clause'' rest
+            [] -> withCategory Default $ S.Default rest
+            rest -> withCategory Error $ S.Error rest
+          [] -> withCategory Error $ S.Error [clause]
   "parameter_declaration" -> withDefaultInfo $ case children of
     [param, ty] -> S.ParameterDecl (Just ty) param
     [param] -> S.ParameterDecl Nothing param
@@ -55,7 +65,7 @@ termConstructor source sourceSpan name range children _ = case name of
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
         withDefaultInfo $ case clauses of
-          [id] -> S.Switch id cases
+          [id] -> S.Switch (Just id) cases
           _ -> S.Error children
       where isCaseClause = (== Case) . category . extract
   "select_statement" -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
@@ -209,7 +219,6 @@ categoryForGoName = \case
   "if_statement" -> If
   "for_statement" -> For
   "expression_switch_statement" -> Switch
-  "expression_case_clause" -> Case
   "type_switch_statement" -> Switch
   "type_case_clause" -> Case
   "select_statement" -> Select
@@ -224,4 +233,5 @@ categoryForGoName = \case
   "array_type" -> ArrayTy
   "implicit_length_array_type" -> ArrayTy
   "parameter_declaration" -> ParameterDecl
+  "expression_case" -> Case
   s -> Other (toS s)

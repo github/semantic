@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2154f50d9cfc2158bb7b8c4e0b7d3b6de0039124..723d08d6cad300eaa6d7c93c169683b224a9834c"
+    "shas": "59f4e88ece267e1c88cf0d73910f0161d64d63ad..808a9f72309254e5742e112cf7d9bfe764f08600"
 }
 ,{
     "testCaseDescription": "go-function-types-insert-test",
@@ -189,7 +189,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "723d08d6cad300eaa6d7c93c169683b224a9834c..a6f0757b43fe836af488764513a7a80264aa3bd6"
+    "shas": "808a9f72309254e5742e112cf7d9bfe764f08600..e48047f047ea51286130b01b8a33972db3d2ca6a"
 }
 ,{
     "testCaseDescription": "go-function-types-replacement-test",
@@ -339,22 +339,7 @@
                         "insert": {
                             "start": [
                                 6,
-                                26
-                            ],
-                            "end": [
-                                6,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the ',' ERROR in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                28
+                                22
                             ],
                             "end": [
                                 6,
@@ -362,7 +347,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'error' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'chan, error' parameter declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -418,7 +403,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a6f0757b43fe836af488764513a7a80264aa3bd6..95bd2247ab71182fdf6df173efa4ea6d7e021f63"
+    "shas": "e48047f047ea51286130b01b8a33972db3d2ca6a..7bb288899d8e5c9937b3af0891e1247f7041fe79"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-replacement-test",
@@ -598,22 +583,7 @@
                         "delete": {
                             "start": [
                                 6,
-                                26
-                            ],
-                            "end": [
-                                6,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ',' ERROR in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                28
+                                22
                             ],
                             "end": [
                                 6,
@@ -621,7 +591,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'error' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'chan, error' parameter declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -647,7 +617,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95bd2247ab71182fdf6df173efa4ea6d7e021f63..b785d51a81c42261aace089d07d43394f7ed6291"
+    "shas": "7bb288899d8e5c9937b3af0891e1247f7041fe79..547c9e9d58f8558f972cb5a6fb08f01d620527a6"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-insert-test",
@@ -798,7 +768,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b785d51a81c42261aace089d07d43394f7ed6291..956e7ed9ff155e7339ae12818ba751be50392efa"
+    "shas": "547c9e9d58f8558f972cb5a6fb08f01d620527a6..6753f75036800642b2bdb0f374975c23baaf1bf7"
 }
 ,{
     "testCaseDescription": "go-function-types-teardown-test",
@@ -840,5 +810,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "956e7ed9ff155e7339ae12818ba751be50392efa..26bf032db93f22de78983ebaa81dd10d3384e0f4"
+    "shas": "6753f75036800642b2bdb0f374975c23baaf1bf7..78afa1145b3f1cc54007897517234c44a922aae5"
 }]

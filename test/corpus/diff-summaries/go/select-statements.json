@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6b7d99e1a38af07a800f9c0101d63ff434da74f3..c880f1eb8e66e371329214d81e45cca43ec90595"
+    "shas": "bbd6967914e3a76cf9bbee06545061e1adebc848..0734a671efb665501956ae7699008e8030b4e606"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c880f1eb8e66e371329214d81e45cca43ec90595..f36b4308f91f7497d692e842a25338c1dc8b2be0"
+    "shas": "0734a671efb665501956ae7699008e8030b4e606..70e4db12b3e1848f7b718714054ab3077b115258"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f36b4308f91f7497d692e842a25338c1dc8b2be0..ebc439f29be2db2dc9e941c71238aea5a74f4752"
+    "shas": "70e4db12b3e1848f7b718714054ab3077b115258..ca440edb1471fa0613451f27115b0d8f253edb28"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ebc439f29be2db2dc9e941c71238aea5a74f4752..e8aa4c753488763bad2236b17e8ae1e0d175a64c"
+    "shas": "ca440edb1471fa0613451f27115b0d8f253edb28..6bd4e3ad1adfc3d2864638fea2e46898ff428cef"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e8aa4c753488763bad2236b17e8ae1e0d175a64c..5db552d4c0fe13a2832bf2fa38ae5db4e0c12c83"
+    "shas": "6bd4e3ad1adfc3d2864638fea2e46898ff428cef..95a1f3ffd8627b05d62d73f42c450e278f3be572"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5db552d4c0fe13a2832bf2fa38ae5db4e0c12c83..995665dc2a5a206afa84348c94b2f2b063716b6b"
+    "shas": "95a1f3ffd8627b05d62d73f42c450e278f3be572..d7a1d7f41b618a9ff0adcd8047b00eacd993989e"
 }]

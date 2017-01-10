@@ -39,7 +39,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "26bf032db93f22de78983ebaa81dd10d3384e0f4..c11eb7aed32add35b99b5d80f203217604cbe44b"
+    "shas": "78afa1145b3f1cc54007897517234c44a922aae5..e861130263165ace1ea3d174122998f93d24ce13"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-insert-test",
@@ -82,40 +82,13 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c11eb7aed32add35b99b5d80f203217604cbe44b..2d30e5698b951eabda90fed67caae97ceb9bfff4"
+    "shas": "e861130263165ace1ea3d174122998f93d24ce13..a3985d2e2180694e29b3f0471aae9602e94d9568"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-replacement-test",
     "expectedResult": {
         "changes": {
             "parameter-declarations-with-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    10
-                                ],
-                                "end": [
-                                    6,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    10
-                                ],
-                                "end": [
-                                    6,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the foo function of the 'main' module"
-                },
                 {
                     "span": {
                         "replace": [
@@ -149,26 +122,26 @@
                             {
                                 "start": [
                                     6,
-                                    17
+                                    10
                                 ],
                                 "end": [
                                     6,
-                                    18
+                                    11
                                 ]
                             },
                             {
                                 "start": [
                                     6,
-                                    20
+                                    10
                                 ],
                                 "end": [
                                     6,
-                                    21
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the foo function of the 'main' module"
                 },
                 {
                     "span": {
@@ -196,6 +169,33 @@
                         ]
                     },
                     "summary": "Replaced the 'string' identifier with the 'uint64' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    17
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    20
+                                ],
+                                "end": [
+                                    6,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the foo function of the 'main' module"
                 }
             ]
         },
@@ -218,40 +218,13 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2d30e5698b951eabda90fed67caae97ceb9bfff4..1d1b15f563df60d344d5d3bde120274d240b7457"
+    "shas": "a3985d2e2180694e29b3f0471aae9602e94d9568..9ed6bfb08030082c11dfb821d4a26ee5f15af6f4"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "parameter-declarations-with-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    10
-                                ],
-                                "end": [
-                                    6,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    10
-                                ],
-                                "end": [
-                                    6,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the foo function of the 'main' module"
-                },
                 {
                     "span": {
                         "replace": [
@@ -285,26 +258,26 @@
                             {
                                 "start": [
                                     6,
-                                    20
+                                    10
                                 ],
                                 "end": [
                                     6,
-                                    21
+                                    11
                                 ]
                             },
                             {
                                 "start": [
                                     6,
-                                    17
+                                    10
                                 ],
                                 "end": [
                                     6,
-                                    18
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the foo function of the 'main' module"
                 },
                 {
                     "span": {
@@ -332,6 +305,33 @@
                         ]
                     },
                     "summary": "Replaced the 'uint64' identifier with the 'string' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    20
+                                ],
+                                "end": [
+                                    6,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    17
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the foo function of the 'main' module"
                 }
             ]
         },
@@ -354,7 +354,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d1b15f563df60d344d5d3bde120274d240b7457..2286a56a5e016ebf969693b15af35592d9cb359d"
+    "shas": "9ed6bfb08030082c11dfb821d4a26ee5f15af6f4..30893a7f454e4aea4c70b66e29a17ff4d827b7e4"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-insert-test",
@@ -397,7 +397,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2286a56a5e016ebf969693b15af35592d9cb359d..2bb3dda3b7c51211f0b8acc46d8d60d115f9318d"
+    "shas": "30893a7f454e4aea4c70b66e29a17ff4d827b7e4..e2ee7ea0f873bc2861f71b842cc4f4b7f731a7fb"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-teardown-test",
@@ -440,5 +440,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2bb3dda3b7c51211f0b8acc46d8d60d115f9318d..644e38c5e87430153b32bdf5f4a10aa148af936e"
+    "shas": "e2ee7ea0f873bc2861f71b842cc4f4b7f731a7fb..00591f56ce266bf6bef5e150fa94296fbe87c808"
 }]

@@ -129,6 +129,7 @@ styleName category = "category-" <> case category of
   C.BeginBlock -> "begin_block"
   C.EndBlock -> "end_block"
   C.ParameterDecl -> "parameter_declaration"
+  C.Default -> "default_statement"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

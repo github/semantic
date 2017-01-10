@@ -315,6 +315,12 @@
           "syntax": "parameter-declarations-with-types",
           "insert": "func foo(a int, b string) {\n}",
           "replacement": "func foo(x string, y uint64) {\n}"
+      },
+      {
+          "template": "package main\n\nfunc main() {\n{0}\n}",
+          "syntax": "case-statements",
+          "insert": "switch { }",
+          "replacement": "switch { case foo: f1() }"
       }
     ]
   }

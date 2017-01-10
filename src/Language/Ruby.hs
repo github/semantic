@@ -70,7 +70,7 @@ termConstructor source sourceSpan name range children allChildren
           [ elseBlock ] | Else <- category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
           [ ensure ] | Ensure <- category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    ("case", expr : body ) -> S.Switch expr body
+    ("case", expr : body ) -> S.Switch (Just expr) body
     ("case", _ ) -> S.Error children
     ("when", condition : body ) -> S.Case condition body
     ("when", _ ) -> S.Error children

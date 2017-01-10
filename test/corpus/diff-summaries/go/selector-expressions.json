@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c9324837822c517225f33244c7079bc01cc70a0..dfefdf519e83ac9c42f102c22361ab613ddcd52c"
+    "shas": "cc9705e4f1e5e330f059e9bef93a8ae4853fea53..9bd920098364aa2a91cab198de312a014a044d14"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfefdf519e83ac9c42f102c22361ab613ddcd52c..71031e1e2571bd5e9ced44cab1383c9c96988063"
+    "shas": "9bd920098364aa2a91cab198de312a014a044d14..d3a041d24660545036dd4b6ba2319b243f5ac353"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71031e1e2571bd5e9ced44cab1383c9c96988063..ff28a3ff8890dffec8d590593e2065d5070e9c5f"
+    "shas": "d3a041d24660545036dd4b6ba2319b243f5ac353..1bed3dd43632db3124b9f1c48ca611a9bba54818"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff28a3ff8890dffec8d590593e2065d5070e9c5f..99cc894a4e93cd69b64af06bf5ad7520b12ed5fe"
+    "shas": "1bed3dd43632db3124b9f1c48ca611a9bba54818..54589b7801ba53dbb1aedc097dda2c10e7580949"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "99cc894a4e93cd69b64af06bf5ad7520b12ed5fe..bcb3a9f91652d7096e9bfcfdbed92e5b432b1cd9"
+    "shas": "54589b7801ba53dbb1aedc097dda2c10e7580949..1344563cc5b006c6e36b75ac8e4e282a2460d46c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bcb3a9f91652d7096e9bfcfdbed92e5b432b1cd9..705187e6645de7fa42ca91e1bcc3b725d19eb0fc"
+    "shas": "1344563cc5b006c6e36b75ac8e4e282a2460d46c..5872306e73d2a39edbee7521acdbf82daffce06e"
 }]
