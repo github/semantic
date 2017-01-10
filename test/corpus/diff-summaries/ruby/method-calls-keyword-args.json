@@ -34,7 +34,7 @@
         "+foo(bar: true)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e82ac8cf1ad73c21f8fc255132f075683884c711..b3639fba547d045dfcab1d6e245f97e460e34f32"
+    "shas": "0a21b5bc55d33503289a9d86ac42f0ddf22c31f2..843054816d256de7961acebab6b17ce02935ed14"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-keyword-args-replacement-insert-test",
@@ -89,7 +89,7 @@
         " foo(bar: true)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b3639fba547d045dfcab1d6e245f97e460e34f32..5c4507afbf8aadd9189e4707dfa2728ef67accf3"
+    "shas": "843054816d256de7961acebab6b17ce02935ed14..c1d07be5862adf6f4082fb00b61629722ed9fe08"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-keyword-args-delete-insert-test",
@@ -130,7 +130,7 @@
         " foo(bar: true)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5c4507afbf8aadd9189e4707dfa2728ef67accf3..a40d7984a209b142e06698a5b4373f4ecc9d4050"
+    "shas": "c1d07be5862adf6f4082fb00b61629722ed9fe08..95fb2c59298ffeb1525c964fc9f5bf31d18f1af7"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-keyword-args-replacement-test",
@@ -171,7 +171,7 @@
         " foo(bar: true)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a40d7984a209b142e06698a5b4373f4ecc9d4050..2fb9efe9ca387be1b44d4aaba4d679574f7e582e"
+    "shas": "95fb2c59298ffeb1525c964fc9f5bf31d18f1af7..d8433a84ab6d4754429e547233b0767553e852a0"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-keyword-args-delete-replacement-test",
@@ -242,7 +242,7 @@
         "+foo(bar: true, baz: 1)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2fb9efe9ca387be1b44d4aaba4d679574f7e582e..fbb48ae7e9fdaed147bbd12fe7ad87583f80ab6a"
+    "shas": "d8433a84ab6d4754429e547233b0767553e852a0..20b7cf874300b30ba9ffa64e9b44ad015e4aee00"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-keyword-args-delete-test",
@@ -281,7 +281,7 @@
         " foo(bar: true, baz: 1)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "fbb48ae7e9fdaed147bbd12fe7ad87583f80ab6a..6cd55b2a707fb86321cce17f90515d7989337a49"
+    "shas": "20b7cf874300b30ba9ffa64e9b44ad015e4aee00..ee47e09d4826a1754478032c5eb71f04d2ef659b"
 }
 ,{
     "testCaseDescription": "ruby-method-calls-keyword-args-delete-rest-test",
@@ -319,5 +319,5 @@
         "-foo(bar: true, baz: 1)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6cd55b2a707fb86321cce17f90515d7989337a49..2a9d54f70d1cd8ebbf9096801a8db3ef9767dea2"
+    "shas": "ee47e09d4826a1754478032c5eb71f04d2ef659b..34b02ea5ce601d782394ced033a89b581dfa0e48"
 }]
