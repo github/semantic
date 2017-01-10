@@ -217,7 +217,6 @@ categoryForGoName = \case
   "if_statement" -> If
   "for_statement" -> For
   "expression_switch_statement" -> Switch
-  "expression_case_clause" -> Case
   "type_switch_statement" -> Switch
   "type_case_clause" -> Case
   "select_statement" -> Select
