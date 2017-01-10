@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f2fed1f3d20e4ad3da39aacc5114498700c4816d..1bf834de2b750a45c3f9b6d2f2a974c9b7eb28fe"
+    "shas": "fa7ab04fb1e0200cd48b718dbf94e17f382064e2..935190858c3c33463806d577f184dbc8b24e2dca"
 }
 ,{
     "testCaseDescription": "go-switch-statements-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'branch' switch statement in the main function of the 'main' module"
+                    "summary": "Added a switch statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -84,7 +84,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1bf834de2b750a45c3f9b6d2f2a974c9b7eb28fe..692184a138faca8c2639c9f75bc7937696b2c6cc"
+    "shas": "935190858c3c33463806d577f184dbc8b24e2dca..f06fa0eb596ec00d8d5403e11353499bfdb4f62e"
 }
 ,{
     "testCaseDescription": "go-switch-statements-replacement-test",
@@ -116,7 +116,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the 'a < b' case statement of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -143,7 +143,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the 'a < b' case statement of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -170,7 +170,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the 'c < d' case statement of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'c' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -197,7 +197,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'd' identifier in the 'c < d' case statement of the 'main' function"
+                    "summary": "Replaced the 'z' identifier with the 'd' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -224,7 +224,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'e' identifier in the 'e == 4' case statement of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'e' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -279,7 +279,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "692184a138faca8c2639c9f75bc7937696b2c6cc..a85d74349cb9f854b9d17f94a2c394c088494543"
+    "shas": "f06fa0eb596ec00d8d5403e11353499bfdb4f62e..fb9d97871bcff3847cf7c1d3754046fa5ec3d416"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-replacement-test",
@@ -311,7 +311,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the 'x < y' case statement of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -338,7 +338,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the 'x < y' case statement of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -365,7 +365,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the 'x < z' case statement of the 'main' function"
+                    "summary": "Replaced the 'c' identifier with the 'x' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -392,7 +392,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'd' identifier with the 'z' identifier in the 'x < z' case statement of the 'main' function"
+                    "summary": "Replaced the 'd' identifier with the 'z' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -419,7 +419,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'e' identifier with the 'x' identifier in the 'x == 4' case statement of the 'main' function"
+                    "summary": "Replaced the 'e' identifier with the 'x' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
@@ -474,7 +474,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a85d74349cb9f854b9d17f94a2c394c088494543..b803d7d60cfe186d6c83edd111bc16c40529f9bf"
+    "shas": "fb9d97871bcff3847cf7c1d3754046fa5ec3d416..1c6110752e2791b04588c39d5b57b3ecdcaf1133"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-insert-test",
@@ -494,7 +494,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'branch' switch statement in the main function of the 'main' module"
+                    "summary": "Deleted a switch statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -520,7 +520,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b803d7d60cfe186d6c83edd111bc16c40529f9bf..f781c901582e0d7bf34dcdfe71e5a4b9a0ab5ce2"
+    "shas": "1c6110752e2791b04588c39d5b57b3ecdcaf1133..d5b923c466b11baa57bc743b397c7d658cf72352"
 }
 ,{
     "testCaseDescription": "go-switch-statements-teardown-test",
@@ -562,5 +562,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f781c901582e0d7bf34dcdfe71e5a4b9a0ab5ce2..6581272ba3299f4fde1a9aa41c30b47127f93df0"
+    "shas": "d5b923c466b11baa57bc743b397c7d658cf72352..79f00c97b509b40e5e9f8ad0acc8f9a754aa0e61"
 }]

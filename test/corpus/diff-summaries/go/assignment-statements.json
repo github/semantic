@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f61204d912b311ab018be25f4b78fc82ac6aae3..44d5685e32abd2d5b3f1f82a0c75f0a0a287767b"
+    "shas": "92a951b2595559e86f4b17b239fd22865ffe2486..6c5f6b9cf14eba9836688fd7849f64d90132bfb9"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44d5685e32abd2d5b3f1f82a0c75f0a0a287767b..cd902e65639e177c885afab621130523b75d4391"
+    "shas": "6c5f6b9cf14eba9836688fd7849f64d90132bfb9..a6700ba2cabc2cd121f26e9941585e1ba7f0e7fb"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cd902e65639e177c885afab621130523b75d4391..6216a18e4a101eb1712a50beaba913c36aa77327"
+    "shas": "a6700ba2cabc2cd121f26e9941585e1ba7f0e7fb..4c33e60b12b39765bd62d6b3d6b39afceaf13b54"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6216a18e4a101eb1712a50beaba913c36aa77327..66c315f0079c073a8a4a631a60cd85b0484c06f3"
+    "shas": "4c33e60b12b39765bd62d6b3d6b39afceaf13b54..686a23dc714fd29cc5edfc45a4caa009ba1079f8"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66c315f0079c073a8a4a631a60cd85b0484c06f3..d611add8ada2994bcdd97bc164a45412eec0fc25"
+    "shas": "686a23dc714fd29cc5edfc45a4caa009ba1079f8..63a8547ca9cd523f8a2220bed1b518abf18a37c8"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d611add8ada2994bcdd97bc164a45412eec0fc25..8b74d6961ac1bac698e1a3698276473f22bf1d6f"
+    "shas": "63a8547ca9cd523f8a2220bed1b518abf18a37c8..dbaa2403e0969e21bed04d2fa076e925ab682ae3"
 }]

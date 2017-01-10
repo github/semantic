@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e63697323245115e7df39669cfc6246c45cef4bc..eadab695a0d7bc2e7c69721fdcd919d7692d75f9"
+    "shas": "00591f56ce266bf6bef5e150fa94296fbe87c808..9981f50b202a95857e7b02e03bd4f27344b22dfe"
 }
 ,{
     "testCaseDescription": "go-case-statements-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'branch' switch statement in the main function of the 'main' module"
+                    "summary": "Added a switch statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eadab695a0d7bc2e7c69721fdcd919d7692d75f9..3a822a16e2a54121942eec79786b4f315e5cce19"
+    "shas": "9981f50b202a95857e7b02e03bd4f27344b22dfe..5b8dc31311d1f1bbd0d55765ef20f769975911e5"
 }
 ,{
     "testCaseDescription": "go-case-statements-replacement-test",
@@ -101,7 +101,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement in the 'branch' switch statement of the 'main' function"
+                    "summary": "Added the 'foo' case statement in a switch statement of the 'main' function"
                 }
             ]
         },
@@ -124,7 +124,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a822a16e2a54121942eec79786b4f315e5cce19..b7a647533b7e89735159274f2c61fab92488282f"
+    "shas": "5b8dc31311d1f1bbd0d55765ef20f769975911e5..dcfb0a1af6f5529e605e5d2d9fba64834c6be390"
 }
 ,{
     "testCaseDescription": "go-case-statements-delete-replacement-test",
@@ -144,7 +144,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement in the 'branch' switch statement of the 'main' function"
+                    "summary": "Deleted the 'foo' case statement in a switch statement of the 'main' function"
                 }
             ]
         },
@@ -167,7 +167,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b7a647533b7e89735159274f2c61fab92488282f..f7d8c823d27b2e973994da1f5c3187e10e3fb9ee"
+    "shas": "dcfb0a1af6f5529e605e5d2d9fba64834c6be390..230453a8266d0b2d9ff6755956e3e4d586f2318a"
 }
 ,{
     "testCaseDescription": "go-case-statements-delete-insert-test",
@@ -187,7 +187,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'branch' switch statement in the main function of the 'main' module"
+                    "summary": "Deleted a switch statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -210,7 +210,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f7d8c823d27b2e973994da1f5c3187e10e3fb9ee..e208281607c3ed6eb5dc7de017aa1c62590a92c5"
+    "shas": "230453a8266d0b2d9ff6755956e3e4d586f2318a..8f8d9c31c6e2498fbe7bd88963b73be1c53589d1"
 }
 ,{
     "testCaseDescription": "go-case-statements-teardown-test",
@@ -252,5 +252,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e208281607c3ed6eb5dc7de017aa1c62590a92c5..4b3bded08aaf3fa00d0370e8ba8cd8b4bf0171cc"
+    "shas": "8f8d9c31c6e2498fbe7bd88963b73be1c53589d1..a0749fc3294aefc254a16311a647828a63fda1eb"
 }]

@@ -61,7 +61,6 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
           S.Struct{} -> Identifiable
-          S.Case{} -> Identifiable
           S.Array ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.Object ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.BlockStatement{} -> Identifiable
