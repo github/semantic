@@ -58,7 +58,7 @@ termConstructor source sourceSpan name range children allChildren
     ("var_assignment", _ ) -> S.Error children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
     ("trailing_var_declaration", _) -> S.Indexed $ toVarDecl <$> children
-    ("switch_statement", expr : rest) -> S.Switch expr rest
+    ("switch_statement", expr : rest) -> S.Switch (Just expr) rest
     ("switch_statement", _ ) -> S.Error children
     ("case", [ expr, body ]) -> S.Case expr [body]
     ("case", _ ) -> S.Error children

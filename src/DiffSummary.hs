@@ -171,6 +171,7 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
       C.EndBlock -> categoryName'
       C.Yield | Text.null termName -> categoryName'
       C.Return | Text.null termName -> categoryName'
+      C.Switch | Text.null termName -> categoryName'
       _ -> "the" <+> squotes (toDoc termName) <+> toDoc categoryName
       where
         termAndCategoryName = "the" <+> toDoc termName <+> toDoc categoryName
@@ -222,7 +223,7 @@ toTermName source term = case unwrap term of
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> termNameFromSource expr
-  S.Switch expr _ -> toTermName' expr
+  S.Switch expr _ -> maybe "" toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
@@ -289,7 +290,9 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
       C.If -> "in the" <+> squotes (termName t) <+> catName c
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
-      C.Switch -> "in the" <+> squotes (termName t) <+> catName c
+      C.Switch -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
       C.When -> "in a" <+> catName c
       C.BeginBlock -> "in a" <+> catName c
       C.EndBlock -> "in an" <+> catName c
