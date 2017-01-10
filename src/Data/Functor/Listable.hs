@@ -28,34 +28,53 @@ import Test.LeanCheck
 
 type Tier a = [a]
 
+-- | Lifting of 'Listable' to @* -> *@.
 class Listable1 l where
+  -- | The tiers for @l :: * -> *@, parameterized by the tiers for @a :: *@.
   liftTiers :: [[a]] -> [[l a]]
 
+-- | A suitable definition of 'tiers' for 'Listable1' type constructors parameterized by 'Listable' types.
 tiers1 :: (Listable a, Listable1 l) => [[l a]]
 tiers1 = liftTiers tiers
 
 
+-- | Lifting of 'Listable' to @* -> * -> *@.
 class Listable2 l where
+  -- | The tiers for @l :: * -> * -> *@, parameterized by the tiers for @a :: *@ & @b :: *@.
   liftTiers2 :: [[a]] -> [[b]] -> [[l a b]]
 
+-- | A suitable definition of 'tiers' for 'Listable2' type constructors parameterized by 'Listable' types.
 tiers2 :: (Listable a, Listable b, Listable2 l) => [[l a b]]
 tiers2 = liftTiers2 tiers tiers
 
 
+-- | Lifts a unary constructor to a list of tiers, given a list of tiers for its argument.
+--
+--   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons1 :: [[a]] -> (a -> b) -> [[b]]
 liftCons1 tiers f = mapT f tiers `addWeight` 1
 
+-- | Lifts a binary constructor to a list of tiers, given lists of tiers for its arguments.
+--
+--   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons2 :: [[a]] -> [[b]] -> (a -> b -> c) -> [[c]]
 liftCons2 tiers1 tiers2 f = mapT (uncurry f) (productWith (,) tiers1 tiers2) `addWeight` 1
 
+-- | Lifts a ternary constructor to a list of tiers, given lists of tiers for its arguments.
+--
+--   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons3 :: [[a]] -> [[b]] -> [[c]] -> (a -> b -> c -> d) -> [[d]]
 liftCons3 tiers1 tiers2 tiers3 f = mapT (uncurry3 f) (productWith (\ x (y, z) -> (x, y, z)) tiers1 (liftCons2 tiers2 tiers3 (,)) ) `addWeight` 1
   where uncurry3 f (a, b, c) = f a b c
 
+-- | Lifts a quaternary constructor to a list of tiers, given lists of tiers for its arguments.
+--
+--   Commonly used in the definition of 'Listable1' and 'Listable2' instances.
 liftCons4 :: [[a]] -> [[b]] -> [[c]] -> [[d]] -> (a -> b -> c -> d -> e) -> [[e]]
 liftCons4 tiers1 tiers2 tiers3 tiers4 f = mapT (uncurry4 f) (productWith (\ x (y, z, w) -> (x, y, z, w)) tiers1 (liftCons3 tiers2 tiers3 tiers4 (,,)) ) `addWeight` 1
   where uncurry4 f (a, b, c, d) = f a b c d
 
+-- | Convenient wrapper for 'Listable1' type constructors and 'Listable' types, where a 'Listable' instance would necessarily be orphaned.
 newtype ListableF f a = ListableF { unListableF :: f a }
   deriving Show
 
