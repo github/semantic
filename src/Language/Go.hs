@@ -231,4 +231,5 @@ categoryForGoName = \case
   "array_type" -> ArrayTy
   "implicit_length_array_type" -> ArrayTy
   "parameter_declaration" -> ParameterDecl
+  "expression_case" -> Case
   s -> Other (toS s)
