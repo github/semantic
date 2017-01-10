@@ -188,6 +188,8 @@ data Category
   -- | An END {} block of statements.
   | EndBlock
   | ParameterDecl
+  -- | A default case in a switch statement.
+  | Default
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

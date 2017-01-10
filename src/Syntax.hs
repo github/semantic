@@ -47,6 +47,8 @@ data Syntax a f
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
+  -- | A default case in a switch statement.
+  | Default [f]
   | Select { cases :: [f] }
   | Object { objectTy :: Maybe f, keyValues :: [f] }
   -- | A pair in an Object. e.g. foo: bar or foo => bar
