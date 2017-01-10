@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e057d065bb4bc3c63720c79b045a002529632d7c..0c0361ea6c9cdf06fca709f0b736cee88a352283"
+    "shas": "de859039e83c9bb69eac6fcc05b538a1c6b45e52..f94800376bb0cbf11f832ac1934b1537cf6cdeb3"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c0361ea6c9cdf06fca709f0b736cee88a352283..3c82e5a3cef49b4221401dd77281884ebc8fb63d"
+    "shas": "f94800376bb0cbf11f832ac1934b1537cf6cdeb3..3836f75b7dbf653100d585446e2be7518891252d"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c82e5a3cef49b4221401dd77281884ebc8fb63d..28d1d10465274845dcc3d742a90a9c9ccc166ef6"
+    "shas": "3836f75b7dbf653100d585446e2be7518891252d..3474643b08d4cea2d378d9f20a07237260e9f730"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "28d1d10465274845dcc3d742a90a9c9ccc166ef6..befbf0f281bc1668203ca70dc2c0a1ad10716349"
+    "shas": "3474643b08d4cea2d378d9f20a07237260e9f730..a96a0db774ab24294c7cf5ceced94944a0ba6bfc"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "befbf0f281bc1668203ca70dc2c0a1ad10716349..b4bf2baefda56f1f71ea57a52b8deff2111996e6"
+    "shas": "a96a0db774ab24294c7cf5ceced94944a0ba6bfc..69840df62daab5d321a9e0aae7e2bb4bc2de65e9"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4bf2baefda56f1f71ea57a52b8deff2111996e6..da6581de4fb10e7c7d4c4b34e237512c83db5ddb"
+    "shas": "69840df62daab5d321a9e0aae7e2bb4bc2de65e9..f71da83529be4b910d80b2f9bf87cc4aa9f26019"
 }]

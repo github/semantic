@@ -5,18 +5,18 @@
             "parameter-declarations-with-types.go": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                6,
+                                1,
                                 1
                             ],
                             "end": [
                                 7,
-                                2
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' function in the main module"
+                    "summary": "Added the 'main' module"
                 }
             ]
         },
@@ -27,19 +27,19 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index ed6bff2..a92cefe 100644",
+        "index e69de29..a92cefe 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
-        "@@ -3,5 +3,4 @@ package main",
-        " func main() {",
-        " }",
-        " ",
-        "-func foo(a int, b string) {",
-        "-}",
+        "@@ -0,0 +1,6 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+}",
+        "+",
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c61926f2bff6be416a68f3b620ce5b8d1bd2d418..bc999b149478745153f33d810228882c65cf3a98"
+    "shas": "5aff937b6390364bef168c03525319ca79331200..bfd46172a920d575a1aee74db88e659326362001"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-insert-test",
@@ -82,7 +82,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc999b149478745153f33d810228882c65cf3a98..b65027898626af5ef0bc162588b5c955b34be516"
+    "shas": "bfd46172a920d575a1aee74db88e659326362001..b59b0422c1c0e62efb8575a567b1070f059b0f92"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-replacement-test",
@@ -218,7 +218,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b65027898626af5ef0bc162588b5c955b34be516..56767c6b0b2e484f7eaefcf6b135a9cb87254bbe"
+    "shas": "b59b0422c1c0e62efb8575a567b1070f059b0f92..86cb67751646d547642d95390b83de0546d92b45"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-replacement-test",
@@ -354,7 +354,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "56767c6b0b2e484f7eaefcf6b135a9cb87254bbe..097e23b24a231da99e2d24d040f5701f0cc184eb"
+    "shas": "86cb67751646d547642d95390b83de0546d92b45..a4d71f8a2c4f616e3e8653371a190ac108d42801"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-insert-test",
@@ -397,7 +397,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "097e23b24a231da99e2d24d040f5701f0cc184eb..698f8df54efb5955278cc019826234618648af83"
+    "shas": "a4d71f8a2c4f616e3e8653371a190ac108d42801..275ba0e4ff2d7818b05d397554bcc534c5916eba"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-teardown-test",
@@ -440,5 +440,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "698f8df54efb5955278cc019826234618648af83..0126a01cd6d7643eb244db5b70c620347a73b567"
+    "shas": "275ba0e4ff2d7818b05d397554bcc534c5916eba..f55bf9909a5290dfef2664cb4fd82d0d2f79169c"
 }]

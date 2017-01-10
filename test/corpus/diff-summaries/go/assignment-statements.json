@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f4e3d9c510a84872697c905ff4725b82965fff2..965325bcc0ad450d8a2fc95cf734b7b9abfae566"
+    "shas": "1f61204d912b311ab018be25f4b78fc82ac6aae3..44d5685e32abd2d5b3f1f82a0c75f0a0a287767b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "965325bcc0ad450d8a2fc95cf734b7b9abfae566..f41269b210d0361ba2343e4cc601921944fe784b"
+    "shas": "44d5685e32abd2d5b3f1f82a0c75f0a0a287767b..cd902e65639e177c885afab621130523b75d4391"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f41269b210d0361ba2343e4cc601921944fe784b..c1c3d8e1fee502be80dc41ab5d9c6011a872861f"
+    "shas": "cd902e65639e177c885afab621130523b75d4391..6216a18e4a101eb1712a50beaba913c36aa77327"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c1c3d8e1fee502be80dc41ab5d9c6011a872861f..573c521eac19ed045b804ee868980b538ba9fe30"
+    "shas": "6216a18e4a101eb1712a50beaba913c36aa77327..66c315f0079c073a8a4a631a60cd85b0484c06f3"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "573c521eac19ed045b804ee868980b538ba9fe30..f317d4fdb70bd38f0e764e4d2a92da3b76ed67b4"
+    "shas": "66c315f0079c073a8a4a631a60cd85b0484c06f3..d611add8ada2994bcdd97bc164a45412eec0fc25"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f317d4fdb70bd38f0e764e4d2a92da3b76ed67b4..1d9bd1dd0569b442209f6a6b7d514043e44d4c06"
+    "shas": "d611add8ada2994bcdd97bc164a45412eec0fc25..8b74d6961ac1bac698e1a3698276473f22bf1d6f"
 }]

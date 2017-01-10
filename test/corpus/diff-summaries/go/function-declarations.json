@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0b54cf7ec00c5add5744ad865e1396f962a7e182..e1c1986e53666be5b75f57a99857a25913d04341"
+    "shas": "eb604dc37d1dad7626dcb78e1d858f09877e2542..d5647a9946455445c96e7119b82ba00886408bf2"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1c1986e53666be5b75f57a99857a25913d04341..ee65a855aad86d836d956251a3531cc12be1379a"
+    "shas": "d5647a9946455445c96e7119b82ba00886408bf2..d1a97ce41d01eb12eb7d4ba5feb8c75c3af38078"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ee65a855aad86d836d956251a3531cc12be1379a..047d3457c9d0160f95d0cd702f3a498f34f5f4d1"
+    "shas": "d1a97ce41d01eb12eb7d4ba5feb8c75c3af38078..0be9699a23ba8d6b4bd864c10962d4f779e6aa5d"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "047d3457c9d0160f95d0cd702f3a498f34f5f4d1..9225dc04346bc33dac9085dac7bebf10ac8678da"
+    "shas": "0be9699a23ba8d6b4bd864c10962d4f779e6aa5d..7fd70206c64cf825e551914eef06fe39ac6994c0"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9225dc04346bc33dac9085dac7bebf10ac8678da..fd4a77854abe7943fd72269afcc21ead7cb49361"
+    "shas": "7fd70206c64cf825e551914eef06fe39ac6994c0..7a250928341e5e8c42a458cc345c81da4082cca8"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd4a77854abe7943fd72269afcc21ead7cb49361..8fb80dc4affc7c68bae5299f11c5794e9304e7f3"
+    "shas": "7a250928341e5e8c42a458cc345c81da4082cca8..16c79f10879cafd3feb18bb793c7f1de76029dad"
 }]

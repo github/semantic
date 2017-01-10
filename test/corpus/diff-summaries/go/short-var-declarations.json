@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1f03ccd0dc1063c9180b9337f6d1c8bb7d5ea96..d4a4686d39baba2184d93cbb4e75712ea062b3b2"
+    "shas": "6df35ccb381d5bb9112a73c779d2daea982f05fe..86b2285d6733151c3b2be043f6c63fb3bb52e0f6"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d4a4686d39baba2184d93cbb4e75712ea062b3b2..ab0f113b7beeae7ec64e151cd208f9f7b05615c4"
+    "shas": "86b2285d6733151c3b2be043f6c63fb3bb52e0f6..2d26c4dbdeb859baf02e695621096f6d0b5ff834"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ab0f113b7beeae7ec64e151cd208f9f7b05615c4..ee40003bc0fdd2a99d61df36672c211adc2e5644"
+    "shas": "2d26c4dbdeb859baf02e695621096f6d0b5ff834..9a618c7df51e0b502758ec859a21e65481dac7e6"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ee40003bc0fdd2a99d61df36672c211adc2e5644..7f9e9ae1da70b70def51eff208491560d8c12aa2"
+    "shas": "9a618c7df51e0b502758ec859a21e65481dac7e6..03987914f1091b841d6890bbf1d063f925a5c78b"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7f9e9ae1da70b70def51eff208491560d8c12aa2..641808d85125ddbc5aa96b127c255829a26399b6"
+    "shas": "03987914f1091b841d6890bbf1d063f925a5c78b..c7f5a909729cdb645c7992adba9b6edeea91658d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "641808d85125ddbc5aa96b127c255829a26399b6..9cfb40fd6aae4204e7d55a7d4259b0a015b4feae"
+    "shas": "c7f5a909729cdb645c7992adba9b6edeea91658d..dd3bb4dd8c16d7b788263fcb69e7d294a4816146"
 }]

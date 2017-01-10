@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e4a58513851d2b4e39cf2be63f3e367c4824f6ee..dd44899347a3e6384ee91330f08df515d034ca3a"
+    "shas": "dc1dccf16f7c02589456035163385b69944f497a..111a783cdb1a5681fc18827636c3bc20b4586e6d"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dd44899347a3e6384ee91330f08df515d034ca3a..6f5827050447a6cb619504c6515c0ada5efaecfd"
+    "shas": "111a783cdb1a5681fc18827636c3bc20b4586e6d..c32b658d2247299c90b9ed754960c92800c0672f"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6f5827050447a6cb619504c6515c0ada5efaecfd..46ebab45c776763b761897570ac95dd06662c84e"
+    "shas": "c32b658d2247299c90b9ed754960c92800c0672f..92f5f2bdb6367e38f325bad2e0641c0d4449e119"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "46ebab45c776763b761897570ac95dd06662c84e..032fa33b62b7321b319b1528a560b2f6994f1916"
+    "shas": "92f5f2bdb6367e38f325bad2e0641c0d4449e119..10554932e231c1ec6872647af4d725c929ef1269"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "032fa33b62b7321b319b1528a560b2f6994f1916..91413890d39f3e0601d9b91de79d9c84cbb0c903"
+    "shas": "10554932e231c1ec6872647af4d725c929ef1269..7de5a49cca8811b11f87b14b1a6cf65e91b34b24"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "91413890d39f3e0601d9b91de79d9c84cbb0c903..53bfb8f9ff3a794ad449660ae7d5c23166bb6ca6"
+    "shas": "7de5a49cca8811b11f87b14b1a6cf65e91b34b24..f2fed1f3d20e4ad3da39aacc5114498700c4816d"
 }]

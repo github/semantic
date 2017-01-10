@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5726fca36737028da7e040273066ce7221567198..e3d64f4cc07d48dd13ad2d11ef4222d770bb8c6f"
+    "shas": "e97813f24a4335d7eaed1921519bba9b94c230cd..bcdec3522403fd500ef9e3bcfd90a343802f8179"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e3d64f4cc07d48dd13ad2d11ef4222d770bb8c6f..ab98a072103b98f3586585aab1aa196207499816"
+    "shas": "bcdec3522403fd500ef9e3bcfd90a343802f8179..d079e33d697922c9aa52ad707227060e6ade850e"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ab98a072103b98f3586585aab1aa196207499816..2fb01c81c8e5e88783d7c9114a9ea3d8b1e1d6eb"
+    "shas": "d079e33d697922c9aa52ad707227060e6ade850e..39b0b233f8f499a3a71cfc46a5feee84c2ff0f34"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2fb01c81c8e5e88783d7c9114a9ea3d8b1e1d6eb..5201481716f07eb79e47c9b614ab1a4fea85567c"
+    "shas": "39b0b233f8f499a3a71cfc46a5feee84c2ff0f34..05e1565d1b2229acb4ef316325495c761167eab2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5201481716f07eb79e47c9b614ab1a4fea85567c..4e0cee2a3aeabba0afbf622ec72eeaff234f5fc9"
+    "shas": "05e1565d1b2229acb4ef316325495c761167eab2..87fb01bb6ccfbaa19aa547491e32289205d4d10f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4e0cee2a3aeabba0afbf622ec72eeaff234f5fc9..7dd495d3d2721a121a6c866bd5d3aee8ef6a9783"
+    "shas": "87fb01bb6ccfbaa19aa547491e32289205d4d10f..7e245edb2be2900da66cfd024a2f94e687bbde8d"
 }]
