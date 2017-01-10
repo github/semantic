@@ -255,6 +255,7 @@ toTermName source term = case unwrap term of
   S.Break expr -> toTermName' expr
   S.Continue expr -> toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
+  S.Default children -> termNameFromChildren term children
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -291,6 +292,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.When -> "in a" <+> catName c
       C.BeginBlock -> "in a" <+> catName c
       C.EndBlock -> "in an" <+> catName c
+      C.Default -> "in a" <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
@@ -441,6 +443,7 @@ instance HasCategory Category where
     C.BeginBlock -> "BEGIN block"
     C.EndBlock -> "END block"
     C.ParameterDecl -> "parameter declaration"
+    C.Default -> "default statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
