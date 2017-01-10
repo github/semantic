@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "07478bb81ec42a595e72816c1b2bb6279bad9772..f5af84d6ba5bc82a118bb02c6f9225db75a94e30"
+    "shas": "38e18c9dd57524434a5642aa20c18ede96843737..bd1bd734921bca04a06ef92ccaa4ea15c6c5e884"
 }
 ,{
     "testCaseDescription": "go-map-literals-insert-test",
@@ -50,7 +50,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 7,
@@ -58,22 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'map[string]string' variable in the main function of the 'main' module"
+                    "summary": "Added the 's' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -99,7 +84,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f5af84d6ba5bc82a118bb02c6f9225db75a94e30..db035cff10ee3be2d8916f3ceb26a00aa3a98c34"
+    "shas": "bd1bd734921bca04a06ef92ccaa4ea15c6c5e884..e64128937c1810c17302c601949222e01010956d"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-test",
@@ -246,7 +231,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "db035cff10ee3be2d8916f3ceb26a00aa3a98c34..2eb21f25d9ee18fc2ecc8fab7965456c5f1db7b8"
+    "shas": "e64128937c1810c17302c601949222e01010956d..6eb2c171bce6b245f75bb19d5910bec27ae3ff5d"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-replacement-test",
@@ -414,7 +399,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2eb21f25d9ee18fc2ecc8fab7965456c5f1db7b8..aafd5a2a025562c730be8b953ae82c6988d619cc"
+    "shas": "6eb2c171bce6b245f75bb19d5910bec27ae3ff5d..e3478d085f1ae8ee045c3f5bcf37778fb5a6210d"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-insert-test",
@@ -426,7 +411,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 7,
@@ -434,22 +419,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'map[string]string' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 's' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -475,7 +445,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aafd5a2a025562c730be8b953ae82c6988d619cc..e78130c3e7c1672502a5edd9b9532898a746ff87"
+    "shas": "e3478d085f1ae8ee045c3f5bcf37778fb5a6210d..98a2819d23d751b8217b4078b53f345cf2a99cc5"
 }
 ,{
     "testCaseDescription": "go-map-literals-teardown-test",
@@ -517,5 +487,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e78130c3e7c1672502a5edd9b9532898a746ff87..c6c34c8496e500e6c74584de2220dcd777365b39"
+    "shas": "98a2819d23d751b8217b4078b53f345cf2a99cc5..11d6e03592e3b9ec5a72e9c33d1b0e9b2f29d4e1"
 }]

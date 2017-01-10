@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f346e88e7625fee5e8f6d7f5bd7042e6590a9d2e..acdf0da08ca33add6ba238c882e3b65fc98c1724"
+    "shas": "02a0d1702bc9284a086f38b438e3af0ec35be85e..0166e7aa7b78c7648cc15df1c0ef35b752b54866"
 }
 ,{
     "testCaseDescription": "go-float-literals-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f1' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f1' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f2' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f2' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -88,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f3' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f3' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -103,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f4' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f4' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -118,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f5' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'f5' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -145,7 +145,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "acdf0da08ca33add6ba238c882e3b65fc98c1724..2e695aca55d6149ecc9f7e691547fbdd3b2fb96a"
+    "shas": "0166e7aa7b78c7648cc15df1c0ef35b752b54866..515ac93878616d297d43e4b7393940a03e7390cb"
 }
 ,{
     "testCaseDescription": "go-float-literals-replacement-test",
@@ -177,7 +177,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.5' float with the '2.6' float in an assignment to f1 of the 'main' function"
+                    "summary": "Replaced the '1.5' float with the '2.6' float in the f1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -204,7 +204,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.5e100' float with the '2.6e211' float in an assignment to f2 of the 'main' function"
+                    "summary": "Replaced the '1.5e100' float with the '2.6e211' float in the f2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -231,7 +231,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.5e+50' float with the '2.6e+60' float in an assignment to f3 of the 'main' function"
+                    "summary": "Replaced the '1.5e+50' float with the '2.6e+60' float in the f3 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -258,7 +258,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1.5e-5' float with the '2.6e-7' float in an assignment to f4 of the 'main' function"
+                    "summary": "Replaced the '1.5e-5' float with the '2.6e-7' float in the f4 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -285,7 +285,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '.5e-50' float with the '.6e-60' float in an assignment to f5 of the 'main' function"
+                    "summary": "Replaced the '.5e-50' float with the '.6e-60' float in the f5 var assignment of the 'main' function"
                 }
             ]
         },
@@ -316,7 +316,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2e695aca55d6149ecc9f7e691547fbdd3b2fb96a..600217ad7857033e9d44b23fb78745a2991648a5"
+    "shas": "515ac93878616d297d43e4b7393940a03e7390cb..19ff3c33f2978a2399c00cd8e3ff11b53d6c5aac"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-replacement-test",
@@ -348,7 +348,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '2.6' float with the '1.5' float in an assignment to f1 of the 'main' function"
+                    "summary": "Replaced the '2.6' float with the '1.5' float in the f1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -375,7 +375,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '2.6e211' float with the '1.5e100' float in an assignment to f2 of the 'main' function"
+                    "summary": "Replaced the '2.6e211' float with the '1.5e100' float in the f2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -402,7 +402,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '2.6e+60' float with the '1.5e+50' float in an assignment to f3 of the 'main' function"
+                    "summary": "Replaced the '2.6e+60' float with the '1.5e+50' float in the f3 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -429,7 +429,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '2.6e-7' float with the '1.5e-5' float in an assignment to f4 of the 'main' function"
+                    "summary": "Replaced the '2.6e-7' float with the '1.5e-5' float in the f4 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -456,7 +456,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '.6e-60' float with the '.5e-50' float in an assignment to f5 of the 'main' function"
+                    "summary": "Replaced the '.6e-60' float with the '.5e-50' float in the f5 var assignment of the 'main' function"
                 }
             ]
         },
@@ -487,7 +487,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "600217ad7857033e9d44b23fb78745a2991648a5..76b2c3b6dc03c112d574433e13adf557e5fba5fe"
+    "shas": "19ff3c33f2978a2399c00cd8e3ff11b53d6c5aac..7139ffb04d578d65b58f6f469002f918f561fe3c"
 }
 ,{
     "testCaseDescription": "go-float-literals-delete-insert-test",
@@ -507,7 +507,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f1' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f1' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -522,7 +522,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f2' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f2' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -537,7 +537,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f3' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f3' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -552,7 +552,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f4' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f4' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -567,7 +567,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f5' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'f5' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -594,7 +594,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "76b2c3b6dc03c112d574433e13adf557e5fba5fe..c3777e480f67addccddc345efff66c6ff4afb8df"
+    "shas": "7139ffb04d578d65b58f6f469002f918f561fe3c..997a436d5c7c5022588bb34ff09a47c05afc3055"
 }
 ,{
     "testCaseDescription": "go-float-literals-teardown-test",
@@ -636,5 +636,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c3777e480f67addccddc345efff66c6ff4afb8df..747db897a06270aa19ea8682dc582e46677b713a"
+    "shas": "997a436d5c7c5022588bb34ff09a47c05afc3055..57632c98af6a661b5b5377e19baaa6832f581e86"
 }]

@@ -309,6 +309,12 @@
         "syntax": "function-types",
         "insert": "type (\na func(int) int\nb func(int, string) (bool, error)\n)",
         "replacement": "type (\nx func(string) string\ny func(string, int) (chan, error)\n)"
+      },
+      {
+          "template": "package main\n\nfunc main() {\n}\n\n{0}",
+          "syntax": "parameter-declarations-with-types",
+          "insert": "func foo(a int, b string) {\n}",
+          "replacement": "func foo(x string, y uint64) {\n}"
       }
     ]
   }

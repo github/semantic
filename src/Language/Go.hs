@@ -46,6 +46,10 @@ termConstructor source sourceSpan name range children _ = case name of
         clauses' <- withDefaultInfo $ S.Indexed clauses
         withDefaultInfo $ S.Switch clauses' cases
       where isCaseClause = (== Case) . category . extract
+  "parameter_declaration" -> withDefaultInfo $ case children of
+    [param, ty] -> S.ParameterDecl (Just ty) param
+    [param] -> S.ParameterDecl Nothing param
+    _ -> S.Error children
   "assignment_statement" -> toVarAssignment children
   "type_switch_statement" ->
     case Prologue.break isCaseClause children of
@@ -219,4 +223,5 @@ categoryForGoName = \case
   "map_type" -> DictionaryTy
   "array_type" -> ArrayTy
   "implicit_length_array_type" -> ArrayTy
+  "parameter_declaration" -> ParameterDecl
   s -> Other (toS s)

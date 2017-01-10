@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fdbdae52725e160db325c0b61fa80187a0b3978a..981ee2a8c17b81ca1091f25f21fd6e5ac5402841"
+    "shas": "5c9324837822c517225f33244c7079bc01cc70a0..dfefdf519e83ac9c42f102c22361ab613ddcd52c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "981ee2a8c17b81ca1091f25f21fd6e5ac5402841..80b7b739c793c7fdbd1f34b9a36a525bbb4b66cb"
+    "shas": "dfefdf519e83ac9c42f102c22361ab613ddcd52c..71031e1e2571bd5e9ced44cab1383c9c96988063"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "80b7b739c793c7fdbd1f34b9a36a525bbb4b66cb..fd84e4023d7914fe4f3398bbc1c8bd46b19782f8"
+    "shas": "71031e1e2571bd5e9ced44cab1383c9c96988063..ff28a3ff8890dffec8d590593e2065d5070e9c5f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd84e4023d7914fe4f3398bbc1c8bd46b19782f8..33ae13690959972b5e2cfbbd49d1d892ca2ee11b"
+    "shas": "ff28a3ff8890dffec8d590593e2065d5070e9c5f..99cc894a4e93cd69b64af06bf5ad7520b12ed5fe"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "33ae13690959972b5e2cfbbd49d1d892ca2ee11b..4af6ef169677af0adfc9065fb7d6b3ac2cb614ea"
+    "shas": "99cc894a4e93cd69b64af06bf5ad7520b12ed5fe..bcb3a9f91652d7096e9bfcfdbed92e5b432b1cd9"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4af6ef169677af0adfc9065fb7d6b3ac2cb614ea..dc98019ab5f433f8c483856a973463a3574b2d5c"
+    "shas": "bcb3a9f91652d7096e9bfcfdbed92e5b432b1cd9..705187e6645de7fa42ca91e1bcc3b725d19eb0fc"
 }]

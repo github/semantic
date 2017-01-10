@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af728a5072c35474e194a98dc2b3e0f328ba63d2..fb5de1adf713e84cfbd483f8608da64cac3c7178"
+    "shas": "6b7d99e1a38af07a800f9c0101d63ff434da74f3..c880f1eb8e66e371329214d81e45cca43ec90595"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fb5de1adf713e84cfbd483f8608da64cac3c7178..ddf33d46c7e12186a1cee8d22892739dc83a8386"
+    "shas": "c880f1eb8e66e371329214d81e45cca43ec90595..f36b4308f91f7497d692e842a25338c1dc8b2be0"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ddf33d46c7e12186a1cee8d22892739dc83a8386..8c3fefc9952e0f7985fcfbee91772ef26ea71e55"
+    "shas": "f36b4308f91f7497d692e842a25338c1dc8b2be0..ebc439f29be2db2dc9e941c71238aea5a74f4752"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c3fefc9952e0f7985fcfbee91772ef26ea71e55..4a2c027f1a355163c40e5067350131f86a9f7ef0"
+    "shas": "ebc439f29be2db2dc9e941c71238aea5a74f4752..e8aa4c753488763bad2236b17e8ae1e0d175a64c"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4a2c027f1a355163c40e5067350131f86a9f7ef0..5210d1e127105be852344f7068dba4d04a366aa4"
+    "shas": "e8aa4c753488763bad2236b17e8ae1e0d175a64c..5db552d4c0fe13a2832bf2fa38ae5db4e0c12c83"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5210d1e127105be852344f7068dba4d04a366aa4..eb455685b0555cc54580041a414c1d2b3504f720"
+    "shas": "5db552d4c0fe13a2832bf2fa38ae5db4e0c12c83..995665dc2a5a206afa84348c94b2f2b063716b6b"
 }]

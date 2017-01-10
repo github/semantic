@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd40ccbc4221be2af6d4898578ec6268d3503e1c..cebd84ce1e99dde0552b79f575ada78e1428ea15"
+    "shas": "fed3f54df513dc6e5faff4d10a233dd6c9f0a200..3c9abf4f527fc75f4953598565c29109d06516c0"
 }
 ,{
     "testCaseDescription": "go-function-literals-insert-test",
@@ -50,7 +50,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 6,
@@ -58,22 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'anonymous(s, string)' variable in the main function of the 'main' module"
+                    "summary": "Added the 's1' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -98,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cebd84ce1e99dde0552b79f575ada78e1428ea15..f2c2c7fb26bb4a8238afac1a6e27f04adcd1cc89"
+    "shas": "3c9abf4f527fc75f4953598565c29109d06516c0..3872e808df9131009d82edf5d1632fe493a131d5"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
@@ -130,7 +115,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 's' identifier with the 'b' identifier in the s1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -157,7 +142,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the s1 var assignment of the 'main' function"
                 }
             ]
         },
@@ -182,7 +167,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f2c2c7fb26bb4a8238afac1a6e27f04adcd1cc89..d0615e4dd62fbffe83b6f4acc9f689d9e08e48c5"
+    "shas": "3872e808df9131009d82edf5d1632fe493a131d5..5443f3462af5d6635c6de7ac9833a8f427702469"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
@@ -214,7 +199,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 's' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 's' identifier in the s1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -241,7 +226,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the s1 var assignment of the 'main' function"
                 }
             ]
         },
@@ -266,7 +251,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0615e4dd62fbffe83b6f4acc9f689d9e08e48c5..a0810570c93a64b0331e3b80820ac5254a42580d"
+    "shas": "5443f3462af5d6635c6de7ac9833a8f427702469..0a813dbfcf2eee80a29b64940d6f7df0098431ec"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -278,7 +263,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 6,
@@ -286,22 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'anonymous(s, string)' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 's1' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -326,7 +296,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a0810570c93a64b0331e3b80820ac5254a42580d..bc8509548102b6cfbd7f5ca0f5d416b2c2f23985"
+    "shas": "0a813dbfcf2eee80a29b64940d6f7df0098431ec..b60e9e4bbc4eadc5871f18f472304a4f1abfbf32"
 }
 ,{
     "testCaseDescription": "go-function-literals-teardown-test",
@@ -368,5 +338,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc8509548102b6cfbd7f5ca0f5d416b2c2f23985..9c9ab0aa8794dc41e957597184e498fad87a7408"
+    "shas": "b60e9e4bbc4eadc5871f18f472304a4f1abfbf32..b4de8673b198ab5744eaaf91bcff29a2c9f2267c"
 }]

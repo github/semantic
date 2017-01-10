@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "747db897a06270aa19ea8682dc582e46677b713a..81887baada94ef3844814f42639348829486d4c2"
+    "shas": "57632c98af6a661b5b5377e19baaa6832f581e86..5b7454c0fcb3fca4fc19e030760492f76029625b"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -46,121 +46,61 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                3,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                3,
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable in the main module"
+                    "summary": "Added the 'a' var assignment in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                4,
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the ''0'' variable in the main module"
+                    "summary": "Added the 'b' var assignment in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                8,
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable in the main module"
+                    "summary": "Added the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                9,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                9,
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the ''\\''' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''\\u0000'' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''\\U01234567'' variable in the main module"
+                    "summary": "Added the 'c' var assignment in the main module"
                 }
             ]
         },
@@ -206,7 +146,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "81887baada94ef3844814f42639348829486d4c2..148f9ffc0bf51efd41f560c93eafe5c7507b1ccf"
+    "shas": "5b7454c0fcb3fca4fc19e030760492f76029625b..bdfbe1ae51d10c6838833a304323a34fb680f069"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -238,157 +178,82 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''0'' rune_literal with the ''1'' rune_literal in the main module"
+                    "summary": "Replaced the ''0'' rune_literal with the ''1'' rune_literal in the a var assignment of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                6,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                6,
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable in the main module"
+                    "summary": "Added the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                9,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                9,
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the ''\\u0011'' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''\\U01234568'' variable in the main module"
+                    "summary": "Added the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                4,
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable in the main module"
+                    "summary": "Deleted the 'b' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                8,
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the ''\\''' variable in the main module"
+                    "summary": "Deleted the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                9,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                9,
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''\\u0000'' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''\\U01234567'' variable in the main module"
+                    "summary": "Deleted the 'c' var assignment in the main module"
                 }
             ]
         },
@@ -454,7 +319,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "148f9ffc0bf51efd41f560c93eafe5c7507b1ccf..4f3c51b12590caa5727917c59e8d1f278a8caf0b"
+    "shas": "bdfbe1ae51d10c6838833a304323a34fb680f069..43d4544c5e191dfe021ac862304a456d439e544d"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -486,157 +351,82 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''1'' rune_literal with the ''0'' rune_literal in the main module"
+                    "summary": "Replaced the ''1'' rune_literal with the ''0'' rune_literal in the a var assignment of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                4,
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable in the main module"
+                    "summary": "Added the 'b' var assignment in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                8,
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the ''\\''' variable in the main module"
+                    "summary": "Added the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                9,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                9,
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''\\u0000'' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the ''\\U01234567'' variable in the main module"
+                    "summary": "Added the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                6,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                6,
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' variable in the main module"
+                    "summary": "Deleted the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                9,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                9,
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the ''\\u0011'' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''\\U01234568'' variable in the main module"
+                    "summary": "Deleted the 'c' var assignment in the main module"
                 }
             ]
         },
@@ -702,7 +492,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4f3c51b12590caa5727917c59e8d1f278a8caf0b..4a1101ab82e3deed1b6aa0735ce012cd4256b639"
+    "shas": "43d4544c5e191dfe021ac862304a456d439e544d..40574b990eaf1e9610236ce33fc131507fea4580"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -713,121 +503,61 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                3,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                3,
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable in the main module"
+                    "summary": "Deleted the 'a' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                4,
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the ''0'' variable in the main module"
+                    "summary": "Deleted the 'b' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                8,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                8,
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable in the main module"
+                    "summary": "Deleted the 'c' var assignment in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                9,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                9,
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the ''\\''' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''\\u0000'' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable in the main module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ''\\U01234567'' variable in the main module"
+                    "summary": "Deleted the 'c' var assignment in the main module"
                 }
             ]
         },
@@ -873,7 +603,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4a1101ab82e3deed1b6aa0735ce012cd4256b639..463c133f27ef7d631486a53822db9699c1833cb7"
+    "shas": "40574b990eaf1e9610236ce33fc131507fea4580..063d83c17a92459b1daf9a35f0edbaa0543db28c"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -912,5 +642,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "463c133f27ef7d631486a53822db9699c1833cb7..2141d3d0ce5959ff5dc451eef4b220a59f0ae5e3"
+    "shas": "063d83c17a92459b1daf9a35f0edbaa0543db28c..59a9b354f2594c27d8c6acd6904f4b6039a97162"
 }]

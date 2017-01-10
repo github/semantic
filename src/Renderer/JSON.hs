@@ -146,4 +146,5 @@ syntaxToTermField syntax = case syntax of
   S.Break expr -> [ "expression" .= expr ]
   S.Continue expr -> [ "expression" .= expr ]
   S.BlockStatement c -> childrenFields c
+  S.ParameterDecl ty field -> [ "type" .= ty ] <> [ "identifier" .= field ]
   where childrenFields c = [ "children" .= c ]

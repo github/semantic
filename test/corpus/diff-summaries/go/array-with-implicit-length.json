@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c52cd2bbd43d7d64c70f32d2ff2b2023097c8b8..184db5a1191024858c392544f618b98e77e6037f"
+    "shas": "e66634fd3bfcf7d9886d619435b9973dde0e7ac9..14f8a3423b728ca4e3005274ec9dc2854a189497"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
@@ -50,7 +50,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 4,
@@ -58,22 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Added the '[...]int' variable in the main function of the 'main' module"
+                    "summary": "Added the 'a1' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -96,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "184db5a1191024858c392544f618b98e77e6037f..5d7c3d3552ab789761ac98778c82a95b71da7d86"
+    "shas": "14f8a3423b728ca4e3005274ec9dc2854a189497..f4689d5e559afc87056c2294697b68615d695bd7"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -208,7 +193,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5d7c3d3552ab789761ac98778c82a95b71da7d86..8f0df6f05c6c762c96bfc664207cac8fd3165f22"
+    "shas": "f4689d5e559afc87056c2294697b68615d695bd7..dac7e8b096df16a131eba5396deda8a4dd21f58e"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -320,7 +305,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8f0df6f05c6c762c96bfc664207cac8fd3165f22..e09bae57b95116ae4ebbe0753e2eab99fcb1bfc1"
+    "shas": "dac7e8b096df16a131eba5396deda8a4dd21f58e..6ed7b047f3d01d9dfaaf0063cc3d2859ce441319"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -332,7 +317,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 4,
@@ -340,22 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                29
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '[...]int' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'a1' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -378,7 +348,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e09bae57b95116ae4ebbe0753e2eab99fcb1bfc1..d55af9a90a535fa690a56c989608e8c35773a62b"
+    "shas": "6ed7b047f3d01d9dfaaf0063cc3d2859ce441319..b29591ad47947e5eaf95d7056968ab5cb32c4ec4"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-teardown-test",
@@ -420,5 +390,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d55af9a90a535fa690a56c989608e8c35773a62b..07478bb81ec42a595e72816c1b2bb6279bad9772"
+    "shas": "b29591ad47947e5eaf95d7056968ab5cb32c4ec4..38e18c9dd57524434a5642aa20c18ede96843737"
 }]

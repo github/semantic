@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c6c34c8496e500e6c74584de2220dcd777365b39..c8002fde882e073e63c58d6135eccbf966c3f846"
+    "shas": "11d6e03592e3b9ec5a72e9c33d1b0e9b2f29d4e1..de045675a860abbd56a5ccb46c22e94fcf35c84e"
 }
 ,{
     "testCaseDescription": "go-struct-literals-insert-test",
@@ -50,7 +50,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 7,
@@ -58,29 +58,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' variable in the main function of the 'main' module"
+                    "summary": "Added the 's1' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 8,
-                                1
+                                7
                             ],
                             "end": [
                                 8,
@@ -88,29 +73,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's2' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'struct{i int;}' variable in the main function of the 'main' module"
+                    "summary": "Added the 's2' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 9,
-                                1
+                                7
                             ],
                             "end": [
                                 9,
@@ -118,22 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's3' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'time.Time' variable in the main function of the 'main' module"
+                    "summary": "Added the 's3' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -161,7 +116,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c8002fde882e073e63c58d6135eccbf966c3f846..745eec233779c4983042b468482a8957a84ad805"
+    "shas": "de045675a860abbd56a5ccb46c22e94fcf35c84e..86dd744adce853df8ef6cb17cd00b2fd533a89cb"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
@@ -331,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "745eec233779c4983042b468482a8957a84ad805..d5c5d964685933582529f5239289354bcd47b95b"
+    "shas": "86dd744adce853df8ef6cb17cd00b2fd533a89cb..68a2fb9c5fc819500b04b296d25370b15a88889d"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
@@ -501,7 +456,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5c5d964685933582529f5239289354bcd47b95b..2fbf351d2503909c1bfbd585c8a6b56e9137c635"
+    "shas": "68a2fb9c5fc819500b04b296d25370b15a88889d..0a949672965d2355ad6e80ec10cdb7e998919b7c"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
@@ -513,7 +468,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                7
                             ],
                             "end": [
                                 7,
@@ -521,29 +476,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's1' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 's1' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 8,
-                                1
+                                7
                             ],
                             "end": [
                                 8,
@@ -551,29 +491,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's2' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                32
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'struct{i int;}' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 's2' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 9,
-                                1
+                                7
                             ],
                             "end": [
                                 9,
@@ -581,22 +506,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's3' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'time.Time' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 's3' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -624,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2fbf351d2503909c1bfbd585c8a6b56e9137c635..3e08a40041972172159815c971be35b2ded8dade"
+    "shas": "0a949672965d2355ad6e80ec10cdb7e998919b7c..e3f304d65a371f0b0a02826adf3a5b2090f7e901"
 }
 ,{
     "testCaseDescription": "go-struct-literals-teardown-test",
@@ -666,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3e08a40041972172159815c971be35b2ded8dade..6ff409be235fac17958898bb714cbea71a1da153"
+    "shas": "e3f304d65a371f0b0a02826adf3a5b2090f7e901..2dee8498574db7f7d3bf7136a7b619af434d1e22"
 }]

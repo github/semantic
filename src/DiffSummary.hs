@@ -193,6 +193,7 @@ toTermName source term = case unwrap term of
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
+  S.ParameterDecl _ _ -> termNameFromSource term
   S.FunctionCall i args -> case unwrap i of
     S.AnonymousFunction params _ ->
       -- Omit a function call's arguments if it's arguments match the underlying
@@ -439,6 +440,7 @@ instance HasCategory Category where
     C.ScopeOperator -> "scope operator"
     C.BeginBlock -> "BEGIN block"
     C.EndBlock -> "END block"
+    C.ParameterDecl -> "parameter declaration"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

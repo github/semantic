@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8a11754197c09bbe273ad18d28c56f8f474ccbc6..a9580e0272005bcefbbab171ac372d8e4a31b41e"
+    "shas": "bc59d7bf7c2d2e0b67b4106f2d8ac97e82a8d59c..4cdcf35ff05244cfd2ceb349567772aa8018a759"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'b' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -88,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'c' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -103,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'd' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'd' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -118,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'e' assignment in the main function of the 'main' module"
+                    "summary": "Added the 'e' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a9580e0272005bcefbbab171ac372d8e4a31b41e..c086db552013147e28fb25e486df98e01a068078"
+    "shas": "4cdcf35ff05244cfd2ceb349567772aa8018a759..0b8c9f8fb121f2ec2a474cbe1f463c8efe90cf4d"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -176,7 +176,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in an assignment to x of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -203,7 +203,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in an assignment to y of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -230,7 +230,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'd' identifier with the 'z' identifier in an assignment to z of the 'main' function"
+                    "summary": "Replaced the 'd' identifier with the 'z' identifier in the z var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -257,7 +257,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'e' identifier with the 'h' identifier in an assignment to h of the 'main' function"
+                    "summary": "Replaced the 'e' identifier with the 'h' identifier in the h var assignment of the 'main' function"
                 }
             ]
         },
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c086db552013147e28fb25e486df98e01a068078..8420301f4f9965da3557411ea67a386c630fbc61"
+    "shas": "0b8c9f8fb121f2ec2a474cbe1f463c8efe90cf4d..bde7b65db3404967fb4958d12389ec65ce24292f"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -318,7 +318,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in an assignment to a of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -345,7 +345,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in an assignment to b of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -372,7 +372,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'd' identifier in an assignment to d of the 'main' function"
+                    "summary": "Replaced the 'z' identifier with the 'd' identifier in the d var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -399,7 +399,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'e' identifier in an assignment to e of the 'main' function"
+                    "summary": "Replaced the 'h' identifier with the 'e' identifier in the e var assignment of the 'main' function"
                 }
             ]
         },
@@ -428,7 +428,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8420301f4f9965da3557411ea67a386c630fbc61..a7197dbb923ba3a58e487ed0ad17ef376f6943a1"
+    "shas": "bde7b65db3404967fb4958d12389ec65ce24292f..098773de2bf10c88654ef2ac10fbe3feb9774e9b"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -448,7 +448,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -463,7 +463,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -478,7 +478,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'c' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -493,7 +493,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'd' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -508,7 +508,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e' assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'e' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a7197dbb923ba3a58e487ed0ad17ef376f6943a1..a09f5b64239a37e49f570aee7140426742ada360"
+    "shas": "098773de2bf10c88654ef2ac10fbe3feb9774e9b..ae7590940b54952cdc5f4fe1c4000a15a9e7cfe7"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a09f5b64239a37e49f570aee7140426742ada360..0a862da9e8813b21d92496866980a161915d23e3"
+    "shas": "ae7590940b54952cdc5f4fe1c4000a15a9e7cfe7..d8d67eca0a5ef27c2ba7b36c8f2bb929d4ffab84"
 }]

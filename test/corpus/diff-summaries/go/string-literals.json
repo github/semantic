@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5e959b3c911cf7a8f92b11750434c9de4325051..f6e314ad9fd0e37cdb9549482345ad979cd9a5ed"
+    "shas": "88cf898f809b92583496f094c2a3a8b15dd2e6c7..73afc2a6cca28e386c681ab0b085ac17163454cc"
 }
 ,{
     "testCaseDescription": "go-string-literals-insert-test",
@@ -49,61 +49,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable in the main function of the 'main' module"
+                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                6,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                6,
+                                18
                             ]
                         }
                     },
-                    "summary": "Added the '\"0\"' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the '\"hello world\"' variable in the main function of the 'main' module"
+                    "summary": "Added the 'b' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -129,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f6e314ad9fd0e37cdb9549482345ad979cd9a5ed..adf0e90daf3b4510480c38841154a7c90cb65576"
+    "shas": "73afc2a6cca28e386c681ab0b085ac17163454cc..0618acca8b9120a941bdb90f342bfca686bd6cb6"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-test",
@@ -161,7 +131,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"0\" string with the \"2\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"0\" string with the \"2\" string in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -188,7 +158,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the b var assignment of the 'main' function"
                 }
             ]
         },
@@ -214,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "adf0e90daf3b4510480c38841154a7c90cb65576..d671ae3a653dc3548453b4d7785ff6a738b96610"
+    "shas": "0618acca8b9120a941bdb90f342bfca686bd6cb6..cff74f3e07a8175c10e645ed978767171323d82c"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-replacement-test",
@@ -246,7 +216,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"2\" string with the \"0\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"2\" string with the \"0\" string in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -273,7 +243,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the main function of the 'main' module"
+                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the b var assignment of the 'main' function"
                 }
             ]
         },
@@ -299,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d671ae3a653dc3548453b4d7785ff6a738b96610..60d5917a9f3e595b3a79648c5f690767ebfb71e8"
+    "shas": "cff74f3e07a8175c10e645ed978767171323d82c..acd6ca2fe073f7341d42d379949b7b8e69b9dc5a"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-insert-test",
@@ -310,61 +280,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                6,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                6,
+                                18
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"0\"' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '\"hello world\"' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -390,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "60d5917a9f3e595b3a79648c5f690767ebfb71e8..69640ec5b16e312690553192bad322f791339ba4"
+    "shas": "acd6ca2fe073f7341d42d379949b7b8e69b9dc5a..671a559ab597acfb3a2e51ae92b5816323eafbee"
 }
 ,{
     "testCaseDescription": "go-string-literals-teardown-test",
@@ -432,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "69640ec5b16e312690553192bad322f791339ba4..8f218b163dbefd3dc3c90869ad21c4ce35b7bf76"
+    "shas": "671a559ab597acfb3a2e51ae92b5816323eafbee..8c40ae41cd9d77cf85279257ca49f9199dfdc64f"
 }]

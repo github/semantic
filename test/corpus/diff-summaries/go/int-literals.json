@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d3fa41d4542e9fae364344c7080b7cd7a14d880a..f88d64648996fead27d688861304e20c7053e40a"
+    "shas": "2897fd958e259fc425d84e2aad1c7942d9c14844..6d384e455895f2bd47cc1fa83c858c9d57181a71"
 }
 ,{
     "testCaseDescription": "go-int-literals-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable in the main function of the 'main' module"
+                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f88d64648996fead27d688861304e20c7053e40a..42963550996d4ed7da8777eb91121f8a89456c06"
+    "shas": "6d384e455895f2bd47cc1fa83c858c9d57181a71..3abdfbf1bb8dd315b6b9ac66bf14293b13fef790"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
@@ -115,7 +115,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '4' in the a const_spec of the 'main' function"
+                    "summary": "Replaced '1' with '4' in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -142,7 +142,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5' in an assignment to 5 of the 'main' function"
+                    "summary": "Replaced '2' with '5' in the 5 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -169,7 +169,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in an assignment to 5 of the 'main' function"
+                    "summary": "Replaced '3' with '6' in the 5 var assignment of the 'main' function"
                 }
             ]
         },
@@ -193,7 +193,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "42963550996d4ed7da8777eb91121f8a89456c06..89caaeede544e372bd08151d92e8c4de3cf8edc0"
+    "shas": "3abdfbf1bb8dd315b6b9ac66bf14293b13fef790..85c9ca6bfa5cc18fc8cfc005dcb69297418456d5"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
@@ -225,7 +225,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '1' in the a const_spec of the 'main' function"
+                    "summary": "Replaced '4' with '1' in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -252,7 +252,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in an assignment to 2 of the 'main' function"
+                    "summary": "Replaced '5' with '2' in the 2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -279,7 +279,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in an assignment to 2 of the 'main' function"
+                    "summary": "Replaced '6' with '3' in the 2 var assignment of the 'main' function"
                 }
             ]
         },
@@ -303,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "89caaeede544e372bd08151d92e8c4de3cf8edc0..169024b36026645cfbd7f7a5549d7e350f2361ba"
+    "shas": "85c9ca6bfa5cc18fc8cfc005dcb69297418456d5..362510ea3aaa460b85f26824e79706c3b784142f"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-insert-test",
@@ -323,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -348,7 +348,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "169024b36026645cfbd7f7a5549d7e350f2361ba..19cf56f3eab8735c67ffc94e13e8a89cf721f6fd"
+    "shas": "362510ea3aaa460b85f26824e79706c3b784142f..cea9e4a98881e41a7701411fd485547b14df5a52"
 }
 ,{
     "testCaseDescription": "go-int-literals-teardown-test",
@@ -390,5 +390,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "19cf56f3eab8735c67ffc94e13e8a89cf721f6fd..8a11754197c09bbe273ad18d28c56f8f474ccbc6"
+    "shas": "cea9e4a98881e41a7701411fd485547b14df5a52..bc59d7bf7c2d2e0b67b4106f2d8ac97e82a8d59c"
 }]

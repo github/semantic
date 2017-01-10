@@ -86,12 +86,14 @@ data Syntax a f
   | Defer f
   | TypeAssertion f f
   | TypeConversion f f
-  -- | A struct with an optional type
+  -- | A struct with an optional type.
   | Struct (Maybe f) [f]
   | Break f
   | Continue f
   -- | A block statement has an ordered branch of child nodes, e.g. BEGIN {...} or END {...} in Ruby/Perl.
   | BlockStatement [f]
+  -- | A parameter declaration with an optional type.
+  | ParameterDecl (Maybe f) f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

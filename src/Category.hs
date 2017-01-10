@@ -187,6 +187,7 @@ data Category
   | BeginBlock
   -- | An END {} block of statements.
   | EndBlock
+  | ParameterDecl
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -282,6 +283,7 @@ instance Arbitrary Category where
     , pure Constant
     , pure Superclass
     , pure SingletonClass
+    , pure ParameterDecl
     , Other <$> arbitrary
     ]
 

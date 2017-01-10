@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b8eec1c43890f6532de99f06759f8b4aed674953..658fb1404ea2e5236bc9d154f281e77f1ac48dd8"
+    "shas": "5ee82082a46c778d2d73f23d2d266ea19676839a..3b2d0f344948eb8d8861c6095c84a84f4892cd5f"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "658fb1404ea2e5236bc9d154f281e77f1ac48dd8..d4f810691ebcafcda627ebd1623b08b76c2446dc"
+    "shas": "3b2d0f344948eb8d8861c6095c84a84f4892cd5f..d22e3d1c200a31f80f84a10c1179f07fcdb1338a"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d4f810691ebcafcda627ebd1623b08b76c2446dc..4cccda73273a4c00dd7aafe072237b76075b68bc"
+    "shas": "d22e3d1c200a31f80f84a10c1179f07fcdb1338a..66594d797cd042296aa4acfabb49a5d0df4b8c7f"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4cccda73273a4c00dd7aafe072237b76075b68bc..88897f4733e4c96c27b8fff5922dc084b6cf2a17"
+    "shas": "66594d797cd042296aa4acfabb49a5d0df4b8c7f..8c91c066e0960e41d9f69b552f4d0d789368a9f9"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "88897f4733e4c96c27b8fff5922dc084b6cf2a17..d205f130b678dc60fc2f6346a2f348c69707e284"
+    "shas": "8c91c066e0960e41d9f69b552f4d0d789368a9f9..56b47e3c7d7ab1229f2ff8f83465820c691449b6"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d205f130b678dc60fc2f6346a2f348c69707e284..92413f0e5c4c26958418b88010b1bfc6603c9308"
+    "shas": "56b47e3c7d7ab1229f2ff8f83465820c691449b6..3b975fed0b66d037c50f3b21d664f68301f0c901"
 }]
