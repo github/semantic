@@ -20,10 +20,11 @@ termConstructor
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children _ = case name of
   "return_statement" -> withDefaultInfo $ S.Return children
-  "source_file" -> case children of
-    packageName : rest | category (extract packageName) == Other "package_clause" ->
-      case unwrap packageName of
-        S.Indexed [id] -> withCategory Module (S.Module id rest)
+  "source_file" -> case Prologue.break (\node -> category (extract node) == Other "package_clause") children of
+    (comments, packageName : rest) -> case unwrap packageName of
+        S.Indexed [id] -> do
+          module' <- withCategory Module (S.Module id rest)
+          withCategory Program (S.Indexed (comments <> [module']))
         _ -> withCategory Error (S.Error children)
     _ -> withCategory Error (S.Error children)
   "import_declaration" -> toImports children
