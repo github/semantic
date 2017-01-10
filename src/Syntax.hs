@@ -96,6 +96,8 @@ data Syntax a f
   | BlockStatement [f]
   -- | A parameter declaration with an optional type.
   | ParameterDecl (Maybe f) f
+  -- | A type declaration.
+  | TypeDecl f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 

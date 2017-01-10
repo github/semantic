@@ -148,4 +148,5 @@ syntaxToTermField syntax = case syntax of
   S.BlockStatement c -> childrenFields c
   S.ParameterDecl ty field -> [ "type" .= ty ] <> [ "identifier" .= field ]
   S.Default c -> childrenFields c
+  S.TypeDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
   where childrenFields c = [ "children" .= c ]

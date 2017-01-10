@@ -184,6 +184,7 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
+  S.TypeDecl id _ -> toTermName' id
   S.TypeAssertion _ _ -> termNameFromSource term
   S.TypeConversion _ _ -> termNameFromSource term
   S.Go expr -> toTermName' expr
@@ -447,6 +448,7 @@ instance HasCategory Category where
     C.EndBlock -> "END block"
     C.ParameterDecl -> "parameter declaration"
     C.Default -> "default statement"
+    C.TypeDecl -> "type declaration"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

@@ -190,6 +190,8 @@ data Category
   | ParameterDecl
   -- | A default case in a switch statement.
   | Default
+  -- | A type declaration.
+  | TypeDecl
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

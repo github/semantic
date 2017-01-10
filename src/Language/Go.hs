@@ -40,6 +40,8 @@ termConstructor source sourceSpan name range children _ = case name of
       [rangeClause, body] | category (extract rangeClause) == Other "range_clause" ->
         S.For (toList $ unwrap rangeClause) (toList $ unwrap body)
       other -> S.Error other
+  "type_declaration" -> toTypeDecls children
+  "type_spec" -> toTypeDecl children
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
@@ -140,6 +142,10 @@ termConstructor source sourceSpan name range children _ = case name of
         clause' <- withRanges range If [expr, clause] (S.Indexed [expr, clause])
         withDefaultInfo $ S.If clause' (toList $ unwrap block)
       rest -> withCategory Error (S.Error rest)
+    toTypeDecls types = withDefaultInfo $ S.Indexed types
+    toTypeDecl = \case
+      [identifier, ty] -> withDefaultInfo $ S.TypeDecl identifier ty
+      rest -> withCategory Error $ S.Error rest
     toImports imports = do
       imports' <- mapM toImport imports
       withDefaultInfo $ S.Indexed (mconcat imports')
@@ -234,4 +240,5 @@ categoryForGoName = \case
   "implicit_length_array_type" -> ArrayTy
   "parameter_declaration" -> ParameterDecl
   "expression_case" -> Case
+  "type_spec" -> TypeDecl
   s -> Other (toS s)
