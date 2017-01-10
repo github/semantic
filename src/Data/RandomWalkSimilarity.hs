@@ -33,8 +33,8 @@ import Info
 import Patch
 import Prologue as P
 import qualified SES
-import System.Random (mkStdGen)
 import Term (termSize, zipTerms, Term, TermF)
+import Test.QuickCheck.Random (mkQCGen)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
@@ -277,7 +277,7 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
-unitVector d hash = normalize ((`evalRand` mkStdGen hash) (sequenceA (Vector.replicate d getRandom)))
+unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
   where
     normalize vec = fmap (/ vmagnitude vec) vec
     vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
