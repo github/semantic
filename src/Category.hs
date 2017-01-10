@@ -288,6 +288,8 @@ instance Arbitrary Category where
     , pure Superclass
     , pure SingletonClass
     , pure ParameterDecl
+    , pure Default
+    , pure TypeDecl
     , Other <$> arbitrary
     ]
 
