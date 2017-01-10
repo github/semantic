@@ -43,9 +43,17 @@ termConstructor source sourceSpan name range children _ = case name of
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
-        clauses' <- withDefaultInfo $ S.Indexed clauses
-        withDefaultInfo $ S.Switch clauses' cases
-      where isCaseClause = (== Case) . category . extract
+        clauses <- withCategory ExpressionStatements (S.Indexed clauses)
+        cases' <- sequenceA $ toCase <$> cases
+        withDefaultInfo $ S.Switch clauses cases'
+      where
+        isCaseClause = (== Other "expression_case_clause") . category . extract
+        toCase clause = case toList (unwrap clause) of
+          clause' : rest -> case toList (unwrap clause') of
+            [clause''] -> withCategory Case $ S.Case clause'' rest
+            [] -> withCategory Default $ S.Default rest
+            rest -> withCategory Error $ S.Error rest
+          [] -> withCategory Error $ S.Error [clause]
   "parameter_declaration" -> withDefaultInfo $ case children of
     [param, ty] -> S.ParameterDecl (Just ty) param
     [param] -> S.ParameterDecl Nothing param
