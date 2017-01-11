@@ -60,10 +60,10 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Switch{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
-          S.Struct{} -> Identifiable
           S.Array ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.Object ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.BlockStatement{} -> Identifiable
+          S.TypeDecl {} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
