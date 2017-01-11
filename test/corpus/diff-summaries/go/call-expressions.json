@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c758d5dbcbd39e871113d740f42b6641d3e752a..a20d4469c46222f41b819f0e6b86b58b47282907"
+    "shas": "28e155607a6d8245c8cbf00f5bf098aaf850ffa2..5632eccdffdea5cde374209c8bd55d70a1ff670d"
 }
 ,{
     "testCaseDescription": "go-call-expressions-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 7905807..72918e5 100644",
+        "index 79058077..72918e59 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,5 +1,7 @@",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a20d4469c46222f41b819f0e6b86b58b47282907..e6eda5873ca9016051c01b6849b7e5ee175454c6"
+    "shas": "5632eccdffdea5cde374209c8bd55d70a1ff670d..84c48b1c4bcffecd17a409934a6faafff405118d"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-test",
@@ -210,7 +210,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 72918e5..2d5e765 100644",
+        "index 72918e59..2d5e765c 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,7 +1,7 @@",
@@ -226,7 +226,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e6eda5873ca9016051c01b6849b7e5ee175454c6..e74bb95260d16f6051b5bcabd913f8103648da86"
+    "shas": "84c48b1c4bcffecd17a409934a6faafff405118d..9f5178174132212af3946b4cd42d5417465b6c78"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-replacement-test",
@@ -323,7 +323,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 2d5e765..72918e5 100644",
+        "index 2d5e765c..72918e59 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,7 +1,7 @@",
@@ -339,7 +339,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e74bb95260d16f6051b5bcabd913f8103648da86..b68ac967cd07b1451fc3b32a65379512ed8f1abc"
+    "shas": "9f5178174132212af3946b4cd42d5417465b6c78..dbc11da6bd0a90d7be51f52fce9279bf9b06eff5"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-insert-test",
@@ -400,7 +400,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 72918e5..7905807 100644",
+        "index 72918e59..79058077 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,7 +1,5 @@",
@@ -414,7 +414,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b68ac967cd07b1451fc3b32a65379512ed8f1abc..f39337d442db7dadeb4bd0636951677adae813e1"
+    "shas": "dbc11da6bd0a90d7be51f52fce9279bf9b06eff5..86a663cb2a06b160458884084bf281a38dc3596d"
 }
 ,{
     "testCaseDescription": "go-call-expressions-teardown-test",
@@ -445,7 +445,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -456,5 +456,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f39337d442db7dadeb4bd0636951677adae813e1..bd369337b32ddb9a4177bca66fda0ad5a4760806"
+    "shas": "86a663cb2a06b160458884084bf281a38dc3596d..6297631c16f8d4eb6a57994c26a41fcfd389c7a4"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "749335f33e6843341d9cab1b1c2e0d7b7d98b159..2f3133f7878eb34e5c365c7759347be991b9004a"
+    "shas": "af744e699347285d9bb35dcbb0c9edff66a77b29..ac5a079265223b1e2da470a1ec50702a928903a7"
 }
 ,{
     "testCaseDescription": "go-send-statements-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 7905807..5f327d1 100644",
+        "index 79058077..5f327d16 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f3133f7878eb34e5c365c7759347be991b9004a..b21cf69aee024583d2e5723e447b71e5b21d64c9"
+    "shas": "ac5a079265223b1e2da470a1ec50702a928903a7..f259a89ea558eceaea5e535f8cb6f43495bd3768"
 }
 ,{
     "testCaseDescription": "go-send-statements-replacement-test",
@@ -166,7 +166,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 5f327d1..3829478 100644",
+        "index 5f327d16..3829478b 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -178,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b21cf69aee024583d2e5723e447b71e5b21d64c9..5f34ab5b413b8384e2dc90608a1d59d92282a28f"
+    "shas": "f259a89ea558eceaea5e535f8cb6f43495bd3768..bdd5b4bda793c41a97d26493a30c6c517494cf7a"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-replacement-test",
@@ -248,7 +248,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 3829478..5f327d1 100644",
+        "index 3829478b..5f327d16 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -260,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f34ab5b413b8384e2dc90608a1d59d92282a28f..5ffef88ddc803149bf98ff979d9e7498e79ed3a1"
+    "shas": "bdd5b4bda793c41a97d26493a30c6c517494cf7a..5ff6af05ca4e37f0db2f271833987f9b0b1c5b18"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-insert-test",
@@ -306,7 +306,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 5f327d1..7905807 100644",
+        "index 5f327d16..79058077 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -318,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5ffef88ddc803149bf98ff979d9e7498e79ed3a1..1d7e438f1e441c291c1ea70c66100d014d35da8a"
+    "shas": "5ff6af05ca4e37f0db2f271833987f9b0b1c5b18..53d56819468b5fefc791b607600a89551df2db11"
 }
 ,{
     "testCaseDescription": "go-send-statements-teardown-test",
@@ -349,7 +349,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -360,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d7e438f1e441c291c1ea70c66100d014d35da8a..ad1c2d6741abd7d30757510c329724648207e4b3"
+    "shas": "53d56819468b5fefc791b607600a89551df2db11..c4c6ef27a48b579de609c1ba035b55e9dbaf0026"
 }]

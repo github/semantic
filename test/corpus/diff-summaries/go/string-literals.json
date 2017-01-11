@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2420437d1f60b50d652949eee05ef984b2989303..f763be97288fda36b851f7c68f29071fee1dfe02"
+    "shas": "3b4402537636d87434352887cbfed24b196609c7..3ab5c481f7e0b433157b8c0a770c184017bdecf7"
 }
 ,{
     "testCaseDescription": "go-string-literals-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 7905807..9a69966 100644",
+        "index 79058077..9a69966c 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
         "@@ -1,5 +1,8 @@",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f763be97288fda36b851f7c68f29071fee1dfe02..804c22cf7cb512ffd7cd13a8538af271a6262741"
+    "shas": "3ab5c481f7e0b433157b8c0a770c184017bdecf7..679b8272e4b218d5f14a6bb453265c8ea1853877"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-test",
@@ -169,7 +169,7 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 9a69966..fbbdb93 100644",
+        "index 9a69966c..fbbdb93e 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "804c22cf7cb512ffd7cd13a8538af271a6262741..76a756ea0c490d82b2bd4f0da4ef1e409d25ec18"
+    "shas": "679b8272e4b218d5f14a6bb453265c8ea1853877..97acfb9d7e99250cb5246eea7007824b09b154db"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-replacement-test",
@@ -254,7 +254,7 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index fbbdb93..9a69966 100644",
+        "index fbbdb93e..9a69966c 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "76a756ea0c490d82b2bd4f0da4ef1e409d25ec18..7f5fd59b88b15e34b2697de21bdf19ca8bc3fe29"
+    "shas": "97acfb9d7e99250cb5246eea7007824b09b154db..71024308bad6a594ebb3a0312278a1615382b11a"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-insert-test",
@@ -315,7 +315,7 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 9a69966..7905807 100644",
+        "index 9a69966c..79058077 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
         "@@ -1,8 +1,5 @@",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7f5fd59b88b15e34b2697de21bdf19ca8bc3fe29..5196edd7558edcc84b15c7c2168cd1a1d36d1708"
+    "shas": "71024308bad6a594ebb3a0312278a1615382b11a..7be16a6346dfa60fb224a032b9e217388b73ab44"
 }
 ,{
     "testCaseDescription": "go-string-literals-teardown-test",
@@ -361,7 +361,7 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5196edd7558edcc84b15c7c2168cd1a1d36d1708..81846b671d219b8ee7aa9acd97a7d2364a4bb163"
+    "shas": "7be16a6346dfa60fb224a032b9e217388b73ab44..debbb1d2da154fb6d30d4baa594a24b83decf9ce"
 }]

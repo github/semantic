@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a436e80abc6a72293d81d833d4c0c26bc48c1a64..e379120c0d7adc2f009cb9b96aa71f877ca17ee9"
+    "shas": "465fc46eb1664a967dd2910516c01b2594ac814b..79094af78579cb2346ba683528cc8625e004e5d5"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-insert-test",
@@ -114,7 +114,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index 7905807..c6d65a7 100644",
+        "index 79058077..c6d65a70 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,5 +1,8 @@",
@@ -129,7 +129,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e379120c0d7adc2f009cb9b96aa71f877ca17ee9..f54a01b769457aed043b453266f23a556100d32d"
+    "shas": "79094af78579cb2346ba683528cc8625e004e5d5..de4e54abbccce9dcf12b69f6fbff3689a089897d"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -523,7 +523,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index c6d65a7..4c4381a 100644",
+        "index c6d65a70..4c4381a6 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,8 +1,8 @@",
@@ -541,7 +541,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f54a01b769457aed043b453266f23a556100d32d..4a6e97d03bb9014a5187ca2f64c694706a7f02b6"
+    "shas": "de4e54abbccce9dcf12b69f6fbff3689a089897d..1a7cf88b4e818e77a908ede99147514a2c608e80"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -935,7 +935,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index 4c4381a..c6d65a7 100644",
+        "index 4c4381a6..c6d65a70 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,8 +1,8 @@",
@@ -953,7 +953,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4a6e97d03bb9014a5187ca2f64c694706a7f02b6..c5e9cbd1466426747c7775bd97d6420de05e3f58"
+    "shas": "1a7cf88b4e818e77a908ede99147514a2c608e80..a47937a7a6ed7a048d9f9210d00f9363c353c80b"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -1029,7 +1029,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index c6d65a7..7905807 100644",
+        "index c6d65a70..79058077 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,8 +1,5 @@",
@@ -1044,7 +1044,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c5e9cbd1466426747c7775bd97d6420de05e3f58..8fd252382d2f054e22d3f729449be0fbb523df33"
+    "shas": "a47937a7a6ed7a048d9f9210d00f9363c353c80b..4b1335588e8461c099345d545e507de97ffb06a8"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-teardown-test",
@@ -1075,7 +1075,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -1086,5 +1086,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8fd252382d2f054e22d3f729449be0fbb523df33..21a58a6e32967ea5a6ddb3ec9db910ee17e1bc61"
+    "shas": "4b1335588e8461c099345d545e507de97ffb06a8..9c41c917c2f0b1a5176774aa14e93043427e083c"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/const-declarations-without-types.go",
         "+++ b/const-declarations-without-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c782d9ecd80710acf0faa55894ce428a03124d5e..2131401e8282510d38231bbba4ff9d0b3ddfa3af"
+    "shas": "b52f08f4a0045631f22f0b110b00b232b91954f8..3f5f4ca66ecf8d16aaa0196ff6314f555331742b"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
-        "index 7905807..7ef3805 100644",
+        "index 79058077..7ef3805e 100644",
         "--- a/const-declarations-without-types.go",
         "+++ b/const-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2131401e8282510d38231bbba4ff9d0b3ddfa3af..6169f6868dcae0eff4f7f4fff4fbb95f93b34674"
+    "shas": "3f5f4ca66ecf8d16aaa0196ff6314f555331742b..b3145c61d9cf2dc8b148879af40cdeb90953da7e"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-replacement-test",
@@ -139,7 +139,7 @@
     ],
     "patch": [
         "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
-        "index 7ef3805..c4525e2 100644",
+        "index 7ef3805e..c4525e24 100644",
         "--- a/const-declarations-without-types.go",
         "+++ b/const-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -151,7 +151,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6169f6868dcae0eff4f7f4fff4fbb95f93b34674..6d3c64f13f4a0137bd8fa7756da07b004845a06f"
+    "shas": "b3145c61d9cf2dc8b148879af40cdeb90953da7e..68534ef230706e26ed5218f183c9868e490fccdb"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
@@ -209,7 +209,7 @@
     ],
     "patch": [
         "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
-        "index c4525e2..7ef3805 100644",
+        "index c4525e24..7ef3805e 100644",
         "--- a/const-declarations-without-types.go",
         "+++ b/const-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -221,7 +221,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6d3c64f13f4a0137bd8fa7756da07b004845a06f..69af9954ed7d7e299409436052642424b9f9948a"
+    "shas": "68534ef230706e26ed5218f183c9868e490fccdb..ce0e8dd8cd747fb78fb91cd8f7fa2388be0b505e"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
@@ -252,7 +252,7 @@
     ],
     "patch": [
         "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
-        "index 7ef3805..7905807 100644",
+        "index 7ef3805e..79058077 100644",
         "--- a/const-declarations-without-types.go",
         "+++ b/const-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -264,7 +264,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "69af9954ed7d7e299409436052642424b9f9948a..d3262debeb367a842601b0a68a36400b59d1bc40"
+    "shas": "ce0e8dd8cd747fb78fb91cd8f7fa2388be0b505e..f335acd788942143e7e00368503e07ebbdc94a5c"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-teardown-test",
@@ -295,7 +295,7 @@
     ],
     "patch": [
         "diff --git a/const-declarations-without-types.go b/const-declarations-without-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/const-declarations-without-types.go",
         "+++ b/const-declarations-without-types.go",
         "@@ -1,5 +0,0 @@",
@@ -306,5 +306,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d3262debeb367a842601b0a68a36400b59d1bc40..c070e0868bcc23df43831bc4523b7527d29d3a29"
+    "shas": "f335acd788942143e7e00368503e07ebbdc94a5c..18209f5ab16ca41dbda9265a74bc7eeb3eb31f39"
 }]

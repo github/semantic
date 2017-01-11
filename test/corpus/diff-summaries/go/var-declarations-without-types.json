@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "37f202b2f8c8559b48b91cf31099954a613a89ad..a47ff3fc3bee86c1a19617b14f23320f054c928b"
+    "shas": "3eacd1338711d34d927224e8d45d2d2936a26f80..02ce10f232a4a53b1aaa198814426fd82b453586"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 7905807..64f6074 100644",
+        "index 79058077..64f60746 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a47ff3fc3bee86c1a19617b14f23320f054c928b..e1622d706f765d2552b263357586b5110e730ce3"
+    "shas": "02ce10f232a4a53b1aaa198814426fd82b453586..5afb1be736ef81966088550957f3c23692edecea"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-replacement-test",
@@ -166,7 +166,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 64f6074..88a72ee 100644",
+        "index 64f60746..88a72ee0 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -178,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1622d706f765d2552b263357586b5110e730ce3..bbb04d55972bd24b19cf8690d7478bddb3b0a606"
+    "shas": "5afb1be736ef81966088550957f3c23692edecea..18971cbf283451a2cf997f950702eaad77c5ece8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-replacement-test",
@@ -263,7 +263,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 88a72ee..64f6074 100644",
+        "index 88a72ee0..64f60746 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -275,7 +275,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bbb04d55972bd24b19cf8690d7478bddb3b0a606..309551f32eab50c94607a558962ac0c3e6d490ed"
+    "shas": "18971cbf283451a2cf997f950702eaad77c5ece8..8e51951576541454b8491248f1c67fd76f577e02"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-insert-test",
@@ -306,7 +306,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 64f6074..7905807 100644",
+        "index 64f60746..79058077 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -318,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "309551f32eab50c94607a558962ac0c3e6d490ed..e2cbb6a6d7d2ded5acd6534eff6c3daf6212673c"
+    "shas": "8e51951576541454b8491248f1c67fd76f577e02..22ddb72416f7ecd2f9d2bbd4891a0b8e1b2cf49c"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-teardown-test",
@@ -349,7 +349,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +0,0 @@",
@@ -360,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e2cbb6a6d7d2ded5acd6534eff6c3daf6212673c..af705dd15ded51db4ce65dbb57af026377791a30"
+    "shas": "22ddb72416f7ecd2f9d2bbd4891a0b8e1b2cf49c..05400216c4bfb9f270e33264a64959dda91299c7"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6051b456130f350fd09d8a5b417f690bcc4c0a3c..5494b0d800d973b7edcb6a944f971bfbf406bb18"
+    "shas": "30f629eecfd2e53dbbea6efdd3f2839632b18bd1..ec9ab9a3cacca9caa740270a9fe8fac4e4307971"
 }
 ,{
     "testCaseDescription": "go-constructors-insert-test",
@@ -114,7 +114,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 7905807..082e65f 100644",
+        "index 79058077..082e65fd 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,5 +1,8 @@",
@@ -129,7 +129,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5494b0d800d973b7edcb6a944f971bfbf406bb18..aae6b0f5dc7a539ebd2233505b5af58760b30f95"
+    "shas": "ec9ab9a3cacca9caa740270a9fe8fac4e4307971..cad641022653a0884f966636b52a4fe2b28191e5"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -334,7 +334,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 082e65f..e4fdb2e 100644",
+        "index 082e65fd..e4fdb2e9 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,8 +1,8 @@",
@@ -352,7 +352,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aae6b0f5dc7a539ebd2233505b5af58760b30f95..2b826a5d8d44ab8d2449e0a93bfffd1ab3f33dc7"
+    "shas": "cad641022653a0884f966636b52a4fe2b28191e5..6a5cd91b66abb80522292270b83984c9fe312bdb"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -557,7 +557,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index e4fdb2e..082e65f 100644",
+        "index e4fdb2e9..082e65fd 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,8 +1,8 @@",
@@ -575,7 +575,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2b826a5d8d44ab8d2449e0a93bfffd1ab3f33dc7..753e31bcef94f5fe31627e9616842b79ddda0b87"
+    "shas": "6a5cd91b66abb80522292270b83984c9fe312bdb..18e50ea1fc07b6834cc0e4ff2ae06500042d6c95"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -651,7 +651,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 082e65f..7905807 100644",
+        "index 082e65fd..79058077 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,8 +1,5 @@",
@@ -666,7 +666,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "753e31bcef94f5fe31627e9616842b79ddda0b87..cf571fbd019cbe59b415714dad547cd40af82c9e"
+    "shas": "18e50ea1fc07b6834cc0e4ff2ae06500042d6c95..a79cc86ab966d58c5c52f5c87f454fcd282df4fe"
 }
 ,{
     "testCaseDescription": "go-constructors-teardown-test",
@@ -697,7 +697,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,5 +0,0 @@",
@@ -708,5 +708,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cf571fbd019cbe59b415714dad547cd40af82c9e..cc9705e4f1e5e330f059e9bef93a8ae4853fea53"
+    "shas": "a79cc86ab966d58c5c52f5c87f454fcd282df4fe..efe9e37ec87c67e949197ae391b64748f2edac96"
 }]

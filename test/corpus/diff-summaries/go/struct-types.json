@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1451c4b24454422399023033ded3f348545a9416..fbbcef9255344cb48a9ee3f9d675de3482e869fe"
+    "shas": "333e6b2e078510c06e8ab359f5397bc26f4b0da0..e1780ab74306d9e507e7ac8669baefd16942c453"
 }
 ,{
     "testCaseDescription": "go-struct-types-insert-test",
@@ -54,26 +54,11 @@
                             ],
                             "end": [
                                 4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
                                 18
                             ]
                         }
                     },
-                    "summary": "Added the 'struct {}' struct type in the main function of the 'main' module"
+                    "summary": "Added the 's1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -84,26 +69,11 @@
                             ],
                             "end": [
                                 5,
-                                8
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 's2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                18
-                            ],
-                            "end": [
-                                5,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier in the main function of the 'main' module"
+                    "summary": "Added the 's2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -113,57 +83,12 @@
                                 6
                             ],
                             "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
+                                8,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'f' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                4
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Added the 's3' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -173,87 +98,12 @@
                                 6
                             ],
                             "end": [
-                                9,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's4' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
+                                12,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'p' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                3
-                            ],
-                            "end": [
-                                10,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                2
-                            ],
-                            "end": [
-                                11,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'h' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                4
-                            ],
-                            "end": [
-                                11,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                8
-                            ],
-                            "end": [
-                                11,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the `json:\"h\"` string in the main function of the 'main' module"
+                    "summary": "Added the 's4' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -264,7 +114,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 7905807..13c82f8 100644",
+        "index 79058077..13c82f80 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,5 +1,13 @@",
@@ -284,7 +134,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fbbcef9255344cb48a9ee3f9d675de3482e869fe..e0e04cb783c30bd2e9e96e565ae3d31372c8f399"
+    "shas": "e1780ab74306d9e507e7ac8669baefd16942c453..f47419762d81ddcf767c35d310d97de77a48828c"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-test",
@@ -408,7 +258,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 13c82f8..d73e92a 100644",
+        "index 13c82f80..d73e92a6 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,12 +1,12 @@",
@@ -430,7 +280,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e0e04cb783c30bd2e9e96e565ae3d31372c8f399..cbcd081dc26db67f5ab6d34b8f1203edc209f20a"
+    "shas": "f47419762d81ddcf767c35d310d97de77a48828c..8bfd602a0784d5962626240b0c206c1a53cb50d2"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-replacement-test",
@@ -554,7 +404,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index d73e92a..13c82f8 100644",
+        "index d73e92a6..13c82f80 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,12 +1,12 @@",
@@ -576,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cbcd081dc26db67f5ab6d34b8f1203edc209f20a..8fbd371c14ee70e20d613742fa57b03f7bfc5f7c"
+    "shas": "8bfd602a0784d5962626240b0c206c1a53cb50d2..99050987a62a03c5c9857314035bf835f8a0d5b8"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-insert-test",
@@ -592,26 +442,11 @@
                             ],
                             "end": [
                                 4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
                                 18
                             ]
                         }
                     },
-                    "summary": "Deleted the 'struct {}' struct type in the main function of the 'main' module"
+                    "summary": "Deleted the 's1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -622,26 +457,11 @@
                             ],
                             "end": [
                                 5,
-                                8
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the 's2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                18
-                            ],
-                            "end": [
-                                5,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 's2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -651,57 +471,12 @@
                                 6
                             ],
                             "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
+                                8,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                4
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 's3' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -711,87 +486,12 @@
                                 6
                             ],
                             "end": [
-                                9,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's4' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
+                                12,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                3
-                            ],
-                            "end": [
-                                10,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                2
-                            ],
-                            "end": [
-                                11,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                4
-                            ],
-                            "end": [
-                                11,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                8
-                            ],
-                            "end": [
-                                11,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the `json:\"h\"` string in the main function of the 'main' module"
+                    "summary": "Deleted the 's4' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -802,7 +502,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 13c82f8..7905807 100644",
+        "index 13c82f80..79058077 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,13 +1,5 @@",
@@ -822,7 +522,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8fbd371c14ee70e20d613742fa57b03f7bfc5f7c..cff8ded61333f2e4306fdeea422fe75f12b90990"
+    "shas": "99050987a62a03c5c9857314035bf835f8a0d5b8..ff6e72aa064e9e76962ecf6a58fb82fc3b64f24a"
 }
 ,{
     "testCaseDescription": "go-struct-types-teardown-test",
@@ -853,7 +553,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,5 +0,0 @@",
@@ -864,5 +564,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cff8ded61333f2e4306fdeea422fe75f12b90990..b71f8f15067094f9bf9ca540677f6e7fe3e25316"
+    "shas": "ff6e72aa064e9e76962ecf6a58fb82fc3b64f24a..9f1f49894f80713cb6ca8f8303355cac94a1fbb9"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fa7ab04fb1e0200cd48b718dbf94e17f382064e2..935190858c3c33463806d577f184dbc8b24e2dca"
+    "shas": "7164be064f97252f970ac5f4d416eb9aa6a9596e..c5e08626fa3bba9bca0ab2e73a7478d23e6e6804"
 }
 ,{
     "testCaseDescription": "go-switch-statements-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 7905807..5cdd438 100644",
+        "index 79058077..5cdd438b 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
         "@@ -1,5 +1,8 @@",
@@ -84,7 +84,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "935190858c3c33463806d577f184dbc8b24e2dca..f06fa0eb596ec00d8d5403e11353499bfdb4f62e"
+    "shas": "c5e08626fa3bba9bca0ab2e73a7478d23e6e6804..117d3e17613fef916a2a09b5d04d6c52be572231"
 }
 ,{
     "testCaseDescription": "go-switch-statements-replacement-test",
@@ -262,7 +262,7 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 5cdd438..0b83893 100644",
+        "index 5cdd438b..0b838937 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
         "@@ -1,8 +1,8 @@",
@@ -279,7 +279,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f06fa0eb596ec00d8d5403e11353499bfdb4f62e..fb9d97871bcff3847cf7c1d3754046fa5ec3d416"
+    "shas": "117d3e17613fef916a2a09b5d04d6c52be572231..fa68aa30e4114ac06474646e8559dfdeaa422a87"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-replacement-test",
@@ -457,7 +457,7 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 0b83893..5cdd438 100644",
+        "index 0b838937..5cdd438b 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
         "@@ -1,8 +1,8 @@",
@@ -474,7 +474,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fb9d97871bcff3847cf7c1d3754046fa5ec3d416..1c6110752e2791b04588c39d5b57b3ecdcaf1133"
+    "shas": "fa68aa30e4114ac06474646e8559dfdeaa422a87..a2bc850e069c28310c329b722918aca4304a2bb3"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-insert-test",
@@ -505,7 +505,7 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 5cdd438..7905807 100644",
+        "index 5cdd438b..79058077 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
         "@@ -1,8 +1,5 @@",
@@ -520,7 +520,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1c6110752e2791b04588c39d5b57b3ecdcaf1133..d5b923c466b11baa57bc743b397c7d658cf72352"
+    "shas": "a2bc850e069c28310c329b722918aca4304a2bb3..489cea1bee64c7782b244fe0d12180c03952a660"
 }
 ,{
     "testCaseDescription": "go-switch-statements-teardown-test",
@@ -551,7 +551,7 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -562,5 +562,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5b923c466b11baa57bc743b397c7d658cf72352..79f00c97b509b40e5e9f8ad0acc8f9a754aa0e61"
+    "shas": "489cea1bee64c7782b244fe0d12180c03952a660..d488677fd5a364b9b4fc844b0b15b72a5a316993"
 }]

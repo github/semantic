@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index e69de29..a92cefe 100644",
+        "index e69de29b..a92cefed 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -0,0 +1,6 @@",
@@ -39,7 +39,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "78afa1145b3f1cc54007897517234c44a922aae5..e861130263165ace1ea3d174122998f93d24ce13"
+    "shas": "37c1fba586cb3ed872b71a90a4c7e47b0af853ce..4b35c424d661e405e15f98b5a58d230a971fcbbc"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-insert-test",
@@ -70,7 +70,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index a92cefe..ed6bff2 100644",
+        "index a92cefed..ed6bff2d 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,4 +3,5 @@ package main",
@@ -82,7 +82,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e861130263165ace1ea3d174122998f93d24ce13..a3985d2e2180694e29b3f0471aae9602e94d9568"
+    "shas": "4b35c424d661e405e15f98b5a58d230a971fcbbc..35f45e7b7a61a97abe2ec9d0308c4e97db6a7f56"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-replacement-test",
@@ -206,7 +206,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index ed6bff2..fcb6a30 100644",
+        "index ed6bff2d..fcb6a303 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,5 +3,5 @@ package main",
@@ -218,7 +218,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a3985d2e2180694e29b3f0471aae9602e94d9568..9ed6bfb08030082c11dfb821d4a26ee5f15af6f4"
+    "shas": "35f45e7b7a61a97abe2ec9d0308c4e97db6a7f56..a7acc857e1e3d605822d4ab2017aedd77309a8fe"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-replacement-test",
@@ -342,7 +342,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index fcb6a30..ed6bff2 100644",
+        "index fcb6a303..ed6bff2d 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,5 +3,5 @@ package main",
@@ -354,7 +354,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ed6bfb08030082c11dfb821d4a26ee5f15af6f4..30893a7f454e4aea4c70b66e29a17ff4d827b7e4"
+    "shas": "a7acc857e1e3d605822d4ab2017aedd77309a8fe..1f863ed356dbc83e54c1f800249da225a81a6032"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-insert-test",
@@ -385,7 +385,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index ed6bff2..a92cefe 100644",
+        "index ed6bff2d..a92cefed 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,5 +3,4 @@ package main",
@@ -397,7 +397,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "30893a7f454e4aea4c70b66e29a17ff4d827b7e4..e2ee7ea0f873bc2861f71b842cc4f4b7f731a7fb"
+    "shas": "1f863ed356dbc83e54c1f800249da225a81a6032..5586b0ab3e41cf6a3f3f9dce605dafcacc6f42f5"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-teardown-test",
@@ -428,7 +428,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index a92cefe..e69de29 100644",
+        "index a92cefed..e69de29b 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -1,6 +0,0 @@",
@@ -440,5 +440,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e2ee7ea0f873bc2861f71b842cc4f4b7f731a7fb..00591f56ce266bf6bef5e150fa94296fbe87c808"
+    "shas": "5586b0ab3e41cf6a3f3f9dce605dafcacc6f42f5..1c1797e1101c7eb547e8c1acfc86c8618f87978c"
 }]

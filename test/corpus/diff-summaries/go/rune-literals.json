@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index e69de29..c9ecbf5 100644",
+        "index e69de29b..c9ecbf5e 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -0,0 +1,2 @@",
@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1354f119efc1353abf7f54a6c704f4a99cfbaa21..dda8417e392602ba96cb16748b49e516dcfe4902"
+    "shas": "e7524a6092d2a76de2da4f406a303d74f8b367ef..16961cacbcf0cdf7df75542cc6b2a993663737e9"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -129,7 +129,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index c9ecbf5..7ecf7d8 100644",
+        "index c9ecbf5e..7ecf7d8d 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,2 +1,10 @@",
@@ -146,7 +146,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dda8417e392602ba96cb16748b49e516dcfe4902..08da608d23ebb01b923ff4e8bc4d2e85dd157c3f"
+    "shas": "16961cacbcf0cdf7df75542cc6b2a993663737e9..78dd9d1e245e63b6ce7837bda5d4100de3a56a12"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 7ecf7d8..cee94e2 100644",
+        "index 7ecf7d8d..cee94e2a 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -319,7 +319,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "08da608d23ebb01b923ff4e8bc4d2e85dd157c3f..35c8777e98abfd8b833360402e087fc85470018e"
+    "shas": "78dd9d1e245e63b6ce7837bda5d4100de3a56a12..247344602f852899b6bf0f91de74732b50a8feb0"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -470,7 +470,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index cee94e2..7ecf7d8 100644",
+        "index cee94e2a..7ecf7d8d 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -492,7 +492,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "35c8777e98abfd8b833360402e087fc85470018e..44beddc1516d76ac83c417de3ee282f8b5413b77"
+    "shas": "247344602f852899b6bf0f91de74732b50a8feb0..82ff77d7e8852d6ccc9ea664e0e7a4a599cada10"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -586,7 +586,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 7ecf7d8..c9ecbf5 100644",
+        "index 7ecf7d8d..c9ecbf5e 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,10 +1,2 @@",
@@ -603,7 +603,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44beddc1516d76ac83c417de3ee282f8b5413b77..fb8d16b43aacef64b069c9a04bd377269644eda3"
+    "shas": "82ff77d7e8852d6ccc9ea664e0e7a4a599cada10..3dfca4e93da9d7b7e7539cb48f8cd50a57b88b40"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -634,7 +634,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index c9ecbf5..e69de29 100644",
+        "index c9ecbf5e..e69de29b 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,2 +0,0 @@",
@@ -642,5 +642,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fb8d16b43aacef64b069c9a04bd377269644eda3..063f7fe09712b13ae1d6115d9566c3ada6a0c447"
+    "shas": "3dfca4e93da9d7b7e7539cb48f8cd50a57b88b40..acc4d37825b8d0c1e286a5d7eb63f170a05c41b1"
 }]

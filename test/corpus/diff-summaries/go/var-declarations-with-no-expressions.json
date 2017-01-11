@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1d4374dddf1e5e47a239613fcaa559892a8e1784..79fa8cc58ff7d733cedeb30cc142c61ffba89d6f"
+    "shas": "e168796f39a67e82d290bda0c85a63fdfd4e33b4..30b3413bd1f8508d6baeb8209b3cac6a389d5dbd"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 7905807..fcdc312 100644",
+        "index 79058077..fcdc3127 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,5 +1,6 @@",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "79fa8cc58ff7d733cedeb30cc142c61ffba89d6f..40d629f2af762ab0f7394731bf41c5a92a0a5754"
+    "shas": "30b3413bd1f8508d6baeb8209b3cac6a389d5dbd..81372455bfb612d7f71c386e44f13e6d28082bc5"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
@@ -209,7 +209,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index fcdc312..8aab74f 100644",
+        "index fcdc3127..8aab74f1 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -223,7 +223,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "40d629f2af762ab0f7394731bf41c5a92a0a5754..a1944f5227a611f4b0b00b6cfb859cd9827722bc"
+    "shas": "81372455bfb612d7f71c386e44f13e6d28082bc5..72eafee07b9477099d239b5b0b8813eb4eabe838"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
@@ -320,7 +320,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 8aab74f..fcdc312 100644",
+        "index 8aab74f1..fcdc3127 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -334,7 +334,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1944f5227a611f4b0b00b6cfb859cd9827722bc..dbcface2dbb1db8afc8400d55b52627fe08973f8"
+    "shas": "72eafee07b9477099d239b5b0b8813eb4eabe838..3f267c4b84334843ac167948fcb8aa59fb1d62bf"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
@@ -395,7 +395,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index fcdc312..7905807 100644",
+        "index fcdc3127..79058077 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,6 +1,5 @@",
@@ -408,7 +408,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbcface2dbb1db8afc8400d55b52627fe08973f8..4e7dd5cac8b583e47059cbce5b13dd401e601c4b"
+    "shas": "3f267c4b84334843ac167948fcb8aa59fb1d62bf..ef1fd7d66321d41cd0af71269f26cc9bdbc23fd0"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-teardown-test",
@@ -439,7 +439,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -450,5 +450,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4e7dd5cac8b583e47059cbce5b13dd401e601c4b..8ffcdcc4c7dd96d6a96f41a12f601801b7668f47"
+    "shas": "ef1fd7d66321d41cd0af71269f26cc9bdbc23fd0..d668b2008cb1fc89b7e95d929f39b976ae0bf6b6"
 }]
