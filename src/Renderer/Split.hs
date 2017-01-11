@@ -132,6 +132,7 @@ styleName category = "category-" <> case category of
   C.Default -> "default_statement"
   C.TypeDecl -> "type_declaration"
   C.PointerTy -> "pointer_type"
+  C.FieldDecl -> "field_declaration"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
