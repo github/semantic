@@ -240,4 +240,6 @@ categoryForGoName = \case
   "parameter_declaration" -> ParameterDecl
   "expression_case" -> Case
   "type_spec" -> TypeDecl
+  "type_declaration" -> TypeDecl
+  "field_declaration" -> FieldDecl
   s -> Other (toS s)
