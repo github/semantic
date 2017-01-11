@@ -1,0 +1,316 @@
+[{
+    "testCaseDescription": "go-struct-field-declarations-setup-test",
+    "expectedResult": {
+        "changes": {
+            "struct-field-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-field-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index e69de29..60d13f4 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+ type s3 struct {} ",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "9dea897213976b2b410a7096f3dfb2183495b995..1763313dec5ecc36cba475c5f9a9dedde6a780dc"
+}
+,{
+    "testCaseDescription": "go-struct-field-declarations-insert-test",
+    "expectedResult": {
+        "changes": {
+            "struct-field-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g int' field declaration in the s3 type declaration of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-field-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index 60d13f4..bc84b14 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "- type s3 struct {} ",
+        "+ type s3 struct {",
+        "+  g int",
+        "+} ",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "1763313dec5ecc36cba475c5f9a9dedde6a780dc..8255a1a817cda35dc96219354f4b8eb5e09ed880"
+}
+,{
+    "testCaseDescription": "go-struct-field-declarations-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "struct-field-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the s3 type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' identifier in the s3 type declaration of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-field-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index bc84b14..f3ca9a5 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
+        "  type s3 struct {",
+        "-  g int",
+        "+  h, i int",
+        " } ",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "8255a1a817cda35dc96219354f4b8eb5e09ed880..b9db097664e748969598aacacff3e3dd57fda68a"
+}
+,{
+    "testCaseDescription": "go-struct-field-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "struct-field-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    3
+                                ],
+                                "end": [
+                                    5,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the s3 type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' identifier in the s3 type declaration of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-field-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index f3ca9a5..bc84b14 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
+        "  type s3 struct {",
+        "-  h, i int",
+        "+  g int",
+        " } ",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b9db097664e748969598aacacff3e3dd57fda68a..b3fe477dc1c2ca7b36d2858f7313b3ca100a110f"
+}
+,{
+    "testCaseDescription": "go-struct-field-declarations-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "struct-field-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g int' field declaration in the s3 type declaration of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-field-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index bc84b14..60d13f4 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "- type s3 struct {",
+        "-  g int",
+        "-} ",
+        "+ type s3 struct {} ",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "b3fe477dc1c2ca7b36d2858f7313b3ca100a110f..3abcbc4d4630f29914eca397fc97dcb8eda73b55"
+}
+,{
+    "testCaseDescription": "go-struct-field-declarations-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "struct-field-declarations.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-field-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index 60d13f4..e69de29 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "- type s3 struct {} ",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3abcbc4d4630f29914eca397fc97dcb8eda73b55..bf83f554698ce7a18601fd81b74501ff553bcf91"
+}]
