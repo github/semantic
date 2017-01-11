@@ -241,4 +241,5 @@ categoryForGoName = \case
   "parameter_declaration" -> ParameterDecl
   "expression_case" -> Case
   "type_spec" -> TypeDecl
+  "pointer_type" -> PointerTy
   s -> Other (toS s)

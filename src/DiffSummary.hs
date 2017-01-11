@@ -450,6 +450,7 @@ instance HasCategory Category where
     C.ParameterDecl -> "parameter declaration"
     C.Default -> "default statement"
     C.TypeDecl -> "type declaration"
+    C.PointerTy -> "pointer type"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

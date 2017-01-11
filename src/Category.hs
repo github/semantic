@@ -192,6 +192,7 @@ data Category
   | Default
   -- | A type declaration.
   | TypeDecl
+  | PointerTy
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -288,6 +289,7 @@ instance Arbitrary Category where
     , pure Superclass
     , pure SingletonClass
     , pure ParameterDecl
+    , pure PointerTy
     , Other <$> arbitrary
     ]
 
