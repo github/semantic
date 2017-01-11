@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "debbb1d2da154fb6d30d4baa594a24b83decf9ce..8002dcbf81382492e34c18c810789483c2ab75d8"
+    "shas": "250675f9851f6cab4d70c5505bc7781de836c288..199de168b62fa4e26885ccd7bdd8a3c78b2ca4cc"
 }
 ,{
     "testCaseDescription": "go-slice-literals-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 79058077..3c94936e 100644",
+        "index 7905807..3c94936 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,5 +1,10 @@",
@@ -116,7 +116,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8002dcbf81382492e34c18c810789483c2ab75d8..f4f8cbaeb31a8d8f467a07f4c5e0d056779e511d"
+    "shas": "199de168b62fa4e26885ccd7bdd8a3c78b2ca4cc..5afce171f7961d5798c504c8a46f958229f9c904"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
@@ -136,7 +136,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"sup\" string in the []string struct of the 'main' function"
+                    "summary": "Added the \"sup\" string in the s1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -163,7 +163,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the []string struct of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -190,7 +190,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the []string struct of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the s3 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -217,7 +217,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the []string struct of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the s3 var assignment of the 'main' function"
                 }
             ]
         },
@@ -228,7 +228,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 3c94936e..caefc004 100644",
+        "index 3c94936..caefc00 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -248,7 +248,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f4f8cbaeb31a8d8f467a07f4c5e0d056779e511d..f8c25f9ccb50b9c66f186a72c32ca394de8befdf"
+    "shas": "5afce171f7961d5798c504c8a46f958229f9c904..c8dc6adac5c86321f51b6c0eaff1e9172bb393b8"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
@@ -268,7 +268,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"sup\" string in the []string struct of the 'main' function"
+                    "summary": "Deleted the \"sup\" string in the s1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -295,7 +295,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the []string struct of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -322,7 +322,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the []string struct of the 'main' function"
+                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the s3 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -349,7 +349,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the []string struct of the 'main' function"
+                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the s3 var assignment of the 'main' function"
                 }
             ]
         },
@@ -360,7 +360,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index caefc004..3c94936e 100644",
+        "index caefc00..3c94936 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f8c25f9ccb50b9c66f186a72c32ca394de8befdf..cf175e5d0090e582f31f83950fdd88db5eb8d648"
+    "shas": "c8dc6adac5c86321f51b6c0eaff1e9172bb393b8..969119894d612e7e3be07f22a9009ced6205cf15"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
@@ -441,7 +441,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 3c94936e..79058077 100644",
+        "index 3c94936..7905807 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,10 +1,5 @@",
@@ -458,7 +458,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cf175e5d0090e582f31f83950fdd88db5eb8d648..7d6c9cef8616a8168289e001d8c28efa59bc878a"
+    "shas": "969119894d612e7e3be07f22a9009ced6205cf15..4637438856ddb94e3c4a3e15572825cf0cf9218f"
 }
 ,{
     "testCaseDescription": "go-slice-literals-teardown-test",
@@ -489,7 +489,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -500,5 +500,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d6c9cef8616a8168289e001d8c28efa59bc878a..68d7fc5df8b748c35aeb0ed0daf56244cb1407a9"
+    "shas": "4637438856ddb94e3c4a3e15572825cf0cf9218f..ede817f2d69f14475f354045064794e04a6bfec8"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c41c917c2f0b1a5176774aa14e93043427e083c..031d58263ae48a390e7ccfbe208509f6faf1e9ee"
+    "shas": "57dd6a9a5bc7d3128095cd106eeac4343aee4433..3ccf27d4492c62a2f6a3b589d82b0ad880412aed"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index 79058077..bdf9ccc5 100644",
+        "index 7905807..bdf9ccc 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,5 +1,6 @@",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "031d58263ae48a390e7ccfbe208509f6faf1e9ee..f885c8e122d86b22747d0876e543dd55a0bf67e3"
+    "shas": "3ccf27d4492c62a2f6a3b589d82b0ad880412aed..562218a598df4f3dc179aef7c1fc97ce86e2d405"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -167,7 +167,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index bdf9ccc5..cf8ed882 100644",
+        "index bdf9ccc..cf8ed88 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -181,7 +181,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f885c8e122d86b22747d0876e543dd55a0bf67e3..dffde8a5a40b2d9b0bea0041ea7b1c1e8fb5766b"
+    "shas": "562218a598df4f3dc179aef7c1fc97ce86e2d405..ecf13586db0209429af9e52ded9cc36b123f6422"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -251,7 +251,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index cf8ed882..bdf9ccc5 100644",
+        "index cf8ed88..bdf9ccc 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -265,7 +265,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dffde8a5a40b2d9b0bea0041ea7b1c1e8fb5766b..0a994c3ac85cd6dab2f9b8e1ad8d5540a27a46e0"
+    "shas": "ecf13586db0209429af9e52ded9cc36b123f6422..ebd1b4d6118a59cee4a84142086271f9bce916c0"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -311,7 +311,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index bdf9ccc5..79058077 100644",
+        "index bdf9ccc..7905807 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,6 +1,5 @@",
@@ -324,7 +324,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a994c3ac85cd6dab2f9b8e1ad8d5540a27a46e0..b1d969393261868fc9a7cc729dcd0c27e0845448"
+    "shas": "ebd1b4d6118a59cee4a84142086271f9bce916c0..dfa9f8932180f8c141182d0b13166daec38fa45f"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-teardown-test",
@@ -355,7 +355,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -366,5 +366,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1d969393261868fc9a7cc729dcd0c27e0845448..1e100177263aaebf4c150582d3fc678e489a0a73"
+    "shas": "dfa9f8932180f8c141182d0b13166daec38fa45f..0a40b22c43aa00db120bff03da0f027e53466491"
 }]

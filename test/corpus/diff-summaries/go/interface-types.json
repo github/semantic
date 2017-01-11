@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9f1f49894f80713cb6ca8f8303355cac94a1fbb9..6eae3470550f290d57076f99f669f5e84f01a8dd"
+    "shas": "11cf3406e727046a2188e45a78cc38790f87bac9..a3f66104ce9afef3c20e0185619ba1873a0a586d"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 79058077..9b2ca4a9 100644",
+        "index 7905807..9b2ca4a 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,5 +1,11 @@",
@@ -117,7 +117,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6eae3470550f290d57076f99f669f5e84f01a8dd..3ea3911b69f58e9794561dd1c7f70a57f7a5f98d"
+    "shas": "a3f66104ce9afef3c20e0185619ba1873a0a586d..41ddf38ca26375355d248d1fa284485300077830"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -149,7 +149,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i1' identifier with the 'j1' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'i1' identifier with the 'j1' identifier in the j1 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -176,7 +176,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i2' identifier with the 'j2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'i2' identifier with the 'j2' identifier in the j2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -203,7 +203,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i3' identifier with the 'j3' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'i3' identifier with the 'j3' identifier in the j3 type declaration of the 'main' function"
                 }
             ]
         },
@@ -214,7 +214,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 9b2ca4a9..cba5600b 100644",
+        "index 9b2ca4a..cba5600 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,9 +1,9 @@",
@@ -232,7 +232,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3ea3911b69f58e9794561dd1c7f70a57f7a5f98d..da2d55da0679df81e1d9dd1016bfc2b415ab3a4e"
+    "shas": "41ddf38ca26375355d248d1fa284485300077830..1a558345b4b4e0a62892accdbe049c11c385c764"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -264,7 +264,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j1' identifier with the 'i1' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'j1' identifier with the 'i1' identifier in the i1 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -291,7 +291,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j2' identifier with the 'i2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'j2' identifier with the 'i2' identifier in the i2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -318,7 +318,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j3' identifier with the 'i3' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'j3' identifier with the 'i3' identifier in the i3 type declaration of the 'main' function"
                 }
             ]
         },
@@ -329,7 +329,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index cba5600b..9b2ca4a9 100644",
+        "index cba5600..9b2ca4a 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,9 +1,9 @@",
@@ -347,7 +347,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "da2d55da0679df81e1d9dd1016bfc2b415ab3a4e..386fa8ff3fa1b47bbf35262964107aabdbdcd997"
+    "shas": "1a558345b4b4e0a62892accdbe049c11c385c764..43938ac5100947f7aeaa1521f7773e8d910589ad"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -408,7 +408,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 9b2ca4a9..79058077 100644",
+        "index 9b2ca4a..7905807 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,11 +1,5 @@",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "386fa8ff3fa1b47bbf35262964107aabdbdcd997..59d14e822187578ec14f19772bf1db14a730f2ce"
+    "shas": "43938ac5100947f7aeaa1521f7773e8d910589ad..e31e08f0c0efea5a9533c076899a0d4ab52393f7"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -457,7 +457,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,5 +0,0 @@",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "59d14e822187578ec14f19772bf1db14a730f2ce..c84f9d4bacb632d3b80655d9a2983264d64ce754"
+    "shas": "e31e08f0c0efea5a9533c076899a0d4ab52393f7..b17f874e5668626df1e610dca63f9a5cdf2d582a"
 }]

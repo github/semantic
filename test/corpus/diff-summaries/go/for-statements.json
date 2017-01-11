@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "482e8ff1ba491df75e6d6d9ae345ce0a93760c98..ba8d30c57358d0f3cdd261017da165c8ffdd4bcc"
+    "shas": "ca65d40f5449d0d764090c6fc3b7a4a72934eb41..b2043c1fd3484321d535e1faadc80155f010a7f1"
 }
 ,{
     "testCaseDescription": "go-for-statements-insert-test",
@@ -129,7 +129,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 79058077..66e5f7a4 100644",
+        "index 7905807..66e5f7a 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,5 +1,24 @@",
@@ -160,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ba8d30c57358d0f3cdd261017da165c8ffdd4bcc..aaf843f56362c7af2ad445329f4fde332a6a2ed7"
+    "shas": "b2043c1fd3484321d535e1faadc80155f010a7f1..d3ccc80f54827e7f366808698a3a8f18fdefdf72"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -323,7 +323,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 66e5f7a4..4099658c 100644",
+        "index 66e5f7a..4099658 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,23 +1,23 @@",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aaf843f56362c7af2ad445329f4fde332a6a2ed7..bec403e70d266e0a7b06879669c08a14e2f490ee"
+    "shas": "d3ccc80f54827e7f366808698a3a8f18fdefdf72..298689562c37762a09861d536b2717c8ba2eec94"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -520,7 +520,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 4099658c..66e5f7a4 100644",
+        "index 4099658..66e5f7a 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,23 +1,23 @@",
@@ -554,7 +554,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bec403e70d266e0a7b06879669c08a14e2f490ee..c104680138054a17c58d71f6036d9368344e8817"
+    "shas": "298689562c37762a09861d536b2717c8ba2eec94..3fbb69c772c6e17fe80db070df73c92d72661ee2"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -645,7 +645,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 66e5f7a4..79058077 100644",
+        "index 66e5f7a..7905807 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,24 +1,5 @@",
@@ -676,7 +676,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c104680138054a17c58d71f6036d9368344e8817..fd35d105af4b2c796cdd78326b4e20393f07994f"
+    "shas": "3fbb69c772c6e17fe80db070df73c92d72661ee2..52ae435552e57cfdc52931ca1274ca04626303eb"
 }
 ,{
     "testCaseDescription": "go-for-statements-teardown-test",
@@ -707,7 +707,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -718,5 +718,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd35d105af4b2c796cdd78326b4e20393f07994f..6f1164f9e5c5708d7d871537279583db69ba4dfb"
+    "shas": "52ae435552e57cfdc52931ca1274ca04626303eb..afd5b32b49459e888137b0101aaf591a85f8efa5"
 }]

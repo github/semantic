@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/label-statements.go b/label-statements.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/label-statements.go",
         "+++ b/label-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05d44f149fc64a76f6112b2939238ad2fa8c5329..6554a1f98eb51e33419957894eb6c5baa041d502"
+    "shas": "96c7ac919c323eb7ae47923e3d286bc33091b733..d76b5225089f9faa2958a5ab161a2249611011d1"
 }
 ,{
     "testCaseDescription": "go-label-statements-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/label-statements.go b/label-statements.go",
-        "index 79058077..b0a29697 100644",
+        "index 7905807..b0a2969 100644",
         "--- a/label-statements.go",
         "+++ b/label-statements.go",
         "@@ -1,5 +1,7 @@",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6554a1f98eb51e33419957894eb6c5baa041d502..d9c0a6b1649d1eaec82ab43a8f9689ef593a1945"
+    "shas": "d76b5225089f9faa2958a5ab161a2249611011d1..c127745cde55bf842c216f88f950bdd2ca2d8328"
 }
 ,{
     "testCaseDescription": "go-label-statements-replacement-test",
@@ -126,7 +126,7 @@
     ],
     "patch": [
         "diff --git a/label-statements.go b/label-statements.go",
-        "index b0a29697..3d3cf164 100644",
+        "index b0a2969..3d3cf16 100644",
         "--- a/label-statements.go",
         "+++ b/label-statements.go",
         "@@ -2,6 +2,6 @@ package main",
@@ -139,7 +139,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d9c0a6b1649d1eaec82ab43a8f9689ef593a1945..d69256066efff20fff409d4433d9a3391a7a1dc6"
+    "shas": "c127745cde55bf842c216f88f950bdd2ca2d8328..d1bf058ffa540c05e2ef019ea8c41a4eb9587e1b"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-replacement-test",
@@ -182,7 +182,7 @@
     ],
     "patch": [
         "diff --git a/label-statements.go b/label-statements.go",
-        "index 3d3cf164..b0a29697 100644",
+        "index 3d3cf16..b0a2969 100644",
         "--- a/label-statements.go",
         "+++ b/label-statements.go",
         "@@ -2,6 +2,6 @@ package main",
@@ -195,7 +195,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d69256066efff20fff409d4433d9a3391a7a1dc6..2f4efb5328c92e344b1818f84c2d204f9297e059"
+    "shas": "d1bf058ffa540c05e2ef019ea8c41a4eb9587e1b..e9fdb354e62eb05a072a6e6fa6390a2e1621be58"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-insert-test",
@@ -226,7 +226,7 @@
     ],
     "patch": [
         "diff --git a/label-statements.go b/label-statements.go",
-        "index b0a29697..79058077 100644",
+        "index b0a2969..7905807 100644",
         "--- a/label-statements.go",
         "+++ b/label-statements.go",
         "@@ -1,7 +1,5 @@",
@@ -240,7 +240,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f4efb5328c92e344b1818f84c2d204f9297e059..a05887d4dde8ffc5ecfc0698e5ad9f4bc9694709"
+    "shas": "e9fdb354e62eb05a072a6e6fa6390a2e1621be58..296ef5c2694f2d9d95288a9370b750630ece66a8"
 }
 ,{
     "testCaseDescription": "go-label-statements-teardown-test",
@@ -271,7 +271,7 @@
     ],
     "patch": [
         "diff --git a/label-statements.go b/label-statements.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/label-statements.go",
         "+++ b/label-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -282,5 +282,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a05887d4dde8ffc5ecfc0698e5ad9f4bc9694709..482e8ff1ba491df75e6d6d9ae345ce0a93760c98"
+    "shas": "296ef5c2694f2d9d95288a9370b750630ece66a8..ca65d40f5449d0d764090c6fc3b7a4a72934eb41"
 }]

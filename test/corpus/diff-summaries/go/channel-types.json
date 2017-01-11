@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "37894e5b72781b149fab4f4a6a0af105c756c5ca..1f8f5db00ad54f1196a698e712bfd5e008d1e4a0"
+    "shas": "af3fb53612885aced55d8501c39d0e09f05a904c..0864b46f6889dfe97861651643c2bf7c1e2291e7"
 }
 ,{
     "testCaseDescription": "go-channel-types-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 79058077..1c10bf6f 100644",
+        "index 7905807..1c10bf6 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -1,5 +1,9 @@",
@@ -115,7 +115,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f8f5db00ad54f1196a698e712bfd5e008d1e4a0..52f79906bc092cb172e52d1642a2062aaf38ccfe"
+    "shas": "0864b46f6889dfe97861651643c2bf7c1e2291e7..042d5ab1d05f6ca975465fca239496bfd54122c6"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-test",
@@ -147,7 +147,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c1' identifier with the 'c2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'c1' identifier with the 'c2' identifier in the c2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -174,88 +174,67 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the c2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    3
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                26
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'c2' identifier with the 'c3' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'c3' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    3
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                24
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'c3' identifier with the 'c4' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'c4' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    18
-                                ],
-                                "end": [
-                                    7,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    18
-                                ],
-                                "end": [
-                                    7,
-                                    24
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                26
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'c2' type declaration in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c3' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -266,7 +245,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 1c10bf6f..196a7928 100644",
+        "index 1c10bf6..196a792 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -283,7 +262,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52f79906bc092cb172e52d1642a2062aaf38ccfe..deea72562bba6226b685799293654cf022e7e5a9"
+    "shas": "042d5ab1d05f6ca975465fca239496bfd54122c6..07e9422db7119cd8d76ee59e49b4a1d50d47b354"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-replacement-test",
@@ -318,7 +297,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'struct{}' struct type in the main function of the 'main' module"
+                    "summary": "Added the 'struct{}' struct in the c2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -333,7 +312,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'string' identifier in the c2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -348,7 +327,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'int' identifier in the c3 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -363,7 +342,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'struct{}' struct type in the main function of the 'main' module"
+                    "summary": "Deleted the 'struct{}' struct in the c3 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -389,7 +368,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 196a7928..1c10bf6f 100644",
+        "index 196a792..1c10bf6 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -406,7 +385,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "deea72562bba6226b685799293654cf022e7e5a9..7b1ee1449d1e44857f1b340c610771ae5ff1a397"
+    "shas": "07e9422db7119cd8d76ee59e49b4a1d50d47b354..e5c9311e6adabe4ca45dfb23ca48e05a2babace5"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-insert-test",
@@ -467,7 +446,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 1c10bf6f..79058077 100644",
+        "index 1c10bf6..7905807 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -1,9 +1,5 @@",
@@ -483,7 +462,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b1ee1449d1e44857f1b340c610771ae5ff1a397..3b0a7a0f0c2c85c97fbe0adf60519e698c8baddf"
+    "shas": "e5c9311e6adabe4ca45dfb23ca48e05a2babace5..7dae13d432ba17af6e725cc3aa16c02a0d0d5978"
 }
 ,{
     "testCaseDescription": "go-channel-types-teardown-test",
@@ -514,7 +493,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -1,5 +0,0 @@",
@@ -525,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3b0a7a0f0c2c85c97fbe0adf60519e698c8baddf..6224c190f4162c0a8eca8effcc8142909d20c4cc"
+    "shas": "7dae13d432ba17af6e725cc3aa16c02a0d0d5978..413c986cf068b52f7e7690feecb72a24b039a0f3"
 }]

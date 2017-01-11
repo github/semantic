@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a41d8bda96c1777b78f8522e0c360904237da45d..989ef9c710abdf9110fd576b30bdc808c1826283"
+    "shas": "f39c7d56a7c3a174293e7c6157c7410c17c654a3..24d4e33b9c81c8f1937fa8dc5b577675de6d4286"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 79058077..4f148f43 100644",
+        "index 7905807..4f148f4 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "989ef9c710abdf9110fd576b30bdc808c1826283..7173f2f436093edecc94809de0b001c9a59ae29c"
+    "shas": "24d4e33b9c81c8f1937fa8dc5b577675de6d4286..95c6043503f246feeed7a1b26a5868882267f2b8"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -178,7 +178,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 4f148f43..e7463b41 100644",
+        "index 4f148f4..e7463b4 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7173f2f436093edecc94809de0b001c9a59ae29c..6fe385edfe1d0ffcdbb894d37236a7319c72718a"
+    "shas": "95c6043503f246feeed7a1b26a5868882267f2b8..d25d882307811a8290a3ee83cb3e4cfe8387655a"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -287,7 +287,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index e7463b41..4f148f43 100644",
+        "index e7463b4..4f148f4 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6fe385edfe1d0ffcdbb894d37236a7319c72718a..c2fa00e13513004d1351367438ed5bf86edb6d0a"
+    "shas": "d25d882307811a8290a3ee83cb3e4cfe8387655a..ae276bcda533d9b7467451b4864585c00b5e0fb4"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -330,7 +330,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 4f148f43..79058077 100644",
+        "index 4f148f4..7905807 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c2fa00e13513004d1351367438ed5bf86edb6d0a..2dba88158673f4d02e8d97d1aef8c119f0829793"
+    "shas": "ae276bcda533d9b7467451b4864585c00b5e0fb4..5d341bf39ac6e36b5acad4ce455beb73293b3ea5"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-teardown-test",
@@ -373,7 +373,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2dba88158673f4d02e8d97d1aef8c119f0829793..465fc46eb1664a967dd2910516c01b2594ac814b"
+    "shas": "5d341bf39ac6e36b5acad4ce455beb73293b3ea5..3a8236b9d52638e4cb632f80f594ea015576542d"
 }]

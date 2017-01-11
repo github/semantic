@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b5b60f1073ce309c369adbb8068930f8410e619f..2f51b516f0bf59f38a2ad64e500b759d903c3e9b"
+    "shas": "ec0920b704179f760c0897c96869f2acb3f0bfae..ba955164e931425263468cbfd5a48e87ebfeaf7b"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index 79058077..d98ee4cf 100644",
+        "index 7905807..d98ee4c 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -1,5 +1,9 @@",
@@ -115,7 +115,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f51b516f0bf59f38a2ad64e500b759d903c3e9b..5d5509afd0c38f2d39390a8b7277f4848c59f640"
+    "shas": "ba955164e931425263468cbfd5a48e87ebfeaf7b..c41729cecb893ff7b238f7f7a9cfd8047d275a3d"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-replacement-test",
@@ -212,7 +212,7 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index d98ee4cf..c4c9127b 100644",
+        "index d98ee4c..c4c9127 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -229,7 +229,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5d5509afd0c38f2d39390a8b7277f4848c59f640..a48ee2cdaf05702ab829baa28427c1044709f7b5"
+    "shas": "c41729cecb893ff7b238f7f7a9cfd8047d275a3d..9e61080c6399acf0b63a2f40018d8d149073e12c"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-replacement-test",
@@ -326,7 +326,7 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index c4c9127b..d98ee4cf 100644",
+        "index c4c9127..d98ee4c 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -343,7 +343,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a48ee2cdaf05702ab829baa28427c1044709f7b5..9a702eb727c71c1bf77bf3b5065fcecc8292c63c"
+    "shas": "9e61080c6399acf0b63a2f40018d8d149073e12c..5edddaca874c4aa5809992110759842b56a97bf3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-delete-insert-test",
@@ -404,7 +404,7 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index d98ee4cf..79058077 100644",
+        "index d98ee4c..7905807 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -1,9 +1,5 @@",
@@ -420,7 +420,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a702eb727c71c1bf77bf3b5065fcecc8292c63c..7d83da50855ba5523cf4520bf3c9e416e3a5514d"
+    "shas": "5edddaca874c4aa5809992110759842b56a97bf3..e706664a8ed53d06b898679687021b2c4ec5cfd3"
 }
 ,{
     "testCaseDescription": "go-const-with-implicit-values-teardown-test",
@@ -451,7 +451,7 @@
     ],
     "patch": [
         "diff --git a/const-with-implicit-values.go b/const-with-implicit-values.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/const-with-implicit-values.go",
         "+++ b/const-with-implicit-values.go",
         "@@ -1,5 +0,0 @@",
@@ -462,5 +462,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d83da50855ba5523cf4520bf3c9e416e3a5514d..30f629eecfd2e53dbbea6efdd3f2839632b18bd1"
+    "shas": "e706664a8ed53d06b898679687021b2c4ec5cfd3..31a0236243256b4af2472a2e295e5f0aad75fab8"
 }]

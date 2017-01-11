@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/go-and-defer-statements.go",
         "+++ b/go-and-defer-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c060eed11d99e02648f0f242468636ff6c168e49..4199e9fa78c0de50cf5575b9a92ae9cd5510bd90"
+    "shas": "4e70785e6ea415366b749118d52feb0fbf26824f..958d81ca1e486c50aa7d970df5fbb9e253d5f0b9"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
-        "index 79058077..4eab4994 100644",
+        "index 7905807..4eab499 100644",
         "--- a/go-and-defer-statements.go",
         "+++ b/go-and-defer-statements.go",
         "@@ -1,5 +1,6 @@",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4199e9fa78c0de50cf5575b9a92ae9cd5510bd90..e03bb3711e18d4f37da8fc158a30a47c492094dc"
+    "shas": "958d81ca1e486c50aa7d970df5fbb9e253d5f0b9..e6c1eb0f6ddb3e27c5083cff96af70c09c7e0742"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -221,7 +221,7 @@
     ],
     "patch": [
         "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
-        "index 4eab4994..0537c4bc 100644",
+        "index 4eab499..0537c4b 100644",
         "--- a/go-and-defer-statements.go",
         "+++ b/go-and-defer-statements.go",
         "@@ -1,6 +1,6 @@",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e03bb3711e18d4f37da8fc158a30a47c492094dc..7899ad7a04e5076f9a85821e686375575850f721"
+    "shas": "e6c1eb0f6ddb3e27c5083cff96af70c09c7e0742..dfb49d4dd751f1d40548b3c85d52953646e3994b"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -359,7 +359,7 @@
     ],
     "patch": [
         "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
-        "index 0537c4bc..4eab4994 100644",
+        "index 0537c4b..4eab499 100644",
         "--- a/go-and-defer-statements.go",
         "+++ b/go-and-defer-statements.go",
         "@@ -1,6 +1,6 @@",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7899ad7a04e5076f9a85821e686375575850f721..081c312a3a0e2fd003e7b2c6c696b399afca39b9"
+    "shas": "dfb49d4dd751f1d40548b3c85d52953646e3994b..5c2624886b72ecf3e4266cea1b21ddd7d5d9fe91"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -419,7 +419,7 @@
     ],
     "patch": [
         "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
-        "index 4eab4994..79058077 100644",
+        "index 4eab499..7905807 100644",
         "--- a/go-and-defer-statements.go",
         "+++ b/go-and-defer-statements.go",
         "@@ -1,6 +1,5 @@",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "081c312a3a0e2fd003e7b2c6c696b399afca39b9..331724e9b97dcb30ca518a811caff550fe45328e"
+    "shas": "5c2624886b72ecf3e4266cea1b21ddd7d5d9fe91..a08f3b97f639e335b39b421cbd76191f8b5c4ada"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -463,7 +463,7 @@
     ],
     "patch": [
         "diff --git a/go-and-defer-statements.go b/go-and-defer-statements.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/go-and-defer-statements.go",
         "+++ b/go-and-defer-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "331724e9b97dcb30ca518a811caff550fe45328e..05d44f149fc64a76f6112b2939238ad2fa8c5329"
+    "shas": "a08f3b97f639e335b39b421cbd76191f8b5c4ada..96c7ac919c323eb7ae47923e3d286bc33091b733"
 }]

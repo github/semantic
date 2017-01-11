@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6297631c16f8d4eb6a57994c26a41fcfd389c7a4..978d3cec7b3abc390405f21fc39bb46870c598fb"
+    "shas": "3e502021cd3d8c7e11e89ade83196888145fb71f..b09fbf1bb5060c8ba4a1734ffba2ec051f27b17f"
 }
 ,{
     "testCaseDescription": "go-function-literals-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 79058077..1f4ead96 100644",
+        "index 7905807..1f4ead9 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
         "@@ -1,5 +1,7 @@",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "978d3cec7b3abc390405f21fc39bb46870c598fb..4dd4efb07f900e40b8a8ad4ffaee770a917d8fb8"
+    "shas": "b09fbf1bb5060c8ba4a1734ffba2ec051f27b17f..28754acd8cf1debdce1a12414f67279c45e1579f"
 }
 ,{
     "testCaseDescription": "go-function-literals-replacement-test",
@@ -153,7 +153,7 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 1f4ead96..7b034662 100644",
+        "index 1f4ead9..7b03466 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
         "@@ -1,7 +1,7 @@",
@@ -167,7 +167,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4dd4efb07f900e40b8a8ad4ffaee770a917d8fb8..4e9bb76945ee469542b093553e87f4ea1966d65c"
+    "shas": "28754acd8cf1debdce1a12414f67279c45e1579f..769e625f4f8dfb13a9255399f7372cb196804898"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-replacement-test",
@@ -237,7 +237,7 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 7b034662..1f4ead96 100644",
+        "index 7b03466..1f4ead9 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
         "@@ -1,7 +1,7 @@",
@@ -251,7 +251,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4e9bb76945ee469542b093553e87f4ea1966d65c..2dbc4e992082380b2119f17696ccecf7c63a8431"
+    "shas": "769e625f4f8dfb13a9255399f7372cb196804898..6235b7da121a133dd7cd12984c13d71a8fbb828a"
 }
 ,{
     "testCaseDescription": "go-function-literals-delete-insert-test",
@@ -282,7 +282,7 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 1f4ead96..79058077 100644",
+        "index 1f4ead9..7905807 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
         "@@ -1,7 +1,5 @@",
@@ -296,7 +296,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2dbc4e992082380b2119f17696ccecf7c63a8431..f81e34aa86b5edc5f561f64263a582272a033bcc"
+    "shas": "6235b7da121a133dd7cd12984c13d71a8fbb828a..a6fc93da4d6bf1634997a6c97f8f861117147197"
 }
 ,{
     "testCaseDescription": "go-function-literals-teardown-test",
@@ -327,7 +327,7 @@
     ],
     "patch": [
         "diff --git a/function-literals.go b/function-literals.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/function-literals.go",
         "+++ b/function-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -338,5 +338,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f81e34aa86b5edc5f561f64263a582272a033bcc..b52f08f4a0045631f22f0b110b00b232b91954f8"
+    "shas": "a6fc93da4d6bf1634997a6c97f8f861117147197..f87f118c5fbe213deaa773d37f03f8f82215d1c9"
 }]

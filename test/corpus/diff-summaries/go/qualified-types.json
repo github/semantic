@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3aa69bcfd3f37a8737d5bcf4a8c99702d4fe38df..54add09914aa967d4543bb908e49c7c73918d55a"
+    "shas": "2fd04d085d7d971a02047ea702803d98c8613ee7..87a0b274bd953902df577afcb5e071d4a6d07a86"
 }
 ,{
     "testCaseDescription": "go-qualified-types-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 79058077..e03cf221 100644",
+        "index 7905807..e03cf22 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "54add09914aa967d4543bb908e49c7c73918d55a..fda97ba3a472c5e2a6833e32138e1b5bc17ef8d2"
+    "shas": "87a0b274bd953902df577afcb5e071d4a6d07a86..dc0d7c3a7770190dbd5e888cec97b2507747ae34"
 }
 ,{
     "testCaseDescription": "go-qualified-types-replacement-test",
@@ -113,7 +113,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -140,7 +140,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the x type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -167,7 +167,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the x type declaration of the 'main' function"
                 }
             ]
         },
@@ -178,7 +178,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e03cf221..241e5267 100644",
+        "index e03cf22..241e526 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fda97ba3a472c5e2a6833e32138e1b5bc17ef8d2..b4f62cf2c1e51f4278f55d85950bd3c268f94d61"
+    "shas": "dc0d7c3a7770190dbd5e888cec97b2507747ae34..a5f900bdfd65370176d58e8dd3e369e6d28acaed"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-replacement-test",
@@ -222,7 +222,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -249,7 +249,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the a type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -276,7 +276,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the a type declaration of the 'main' function"
                 }
             ]
         },
@@ -287,7 +287,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 241e5267..e03cf221 100644",
+        "index 241e526..e03cf22 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4f62cf2c1e51f4278f55d85950bd3c268f94d61..307714e846eebc7aab8f905247c95628ed7101f3"
+    "shas": "a5f900bdfd65370176d58e8dd3e369e6d28acaed..98bf61617324961516fe37f7a20714c3fafa9cfd"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-insert-test",
@@ -330,7 +330,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e03cf221..79058077 100644",
+        "index e03cf22..7905807 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "307714e846eebc7aab8f905247c95628ed7101f3..421d1efced1ae795d54ab2a99bfc6a45a7501f4a"
+    "shas": "98bf61617324961516fe37f7a20714c3fafa9cfd..86f5eb8fea3c37c6a10c8cbfa1e3f12ead55338e"
 }
 ,{
     "testCaseDescription": "go-qualified-types-teardown-test",
@@ -373,7 +373,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +0,0 @@",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "421d1efced1ae795d54ab2a99bfc6a45a7501f4a..250377688c06e8142d6746aa109043387e296db4"
+    "shas": "86f5eb8fea3c37c6a10c8cbfa1e3f12ead55338e..fd32c102b131d77c141df7ebfbefca3921214b64"
 }]

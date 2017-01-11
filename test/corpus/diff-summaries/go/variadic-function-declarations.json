@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "de768c9c604aa11a71c4f41ace3b09e07306c0a1..f00db7fcd217e1a2e5ce891b57dd62a1ffdb6efa"
+    "shas": "7c2e8f39e68df4ae5a362bc9e19f3b476c0e524f..38d579cf20a517896463568db7b89cc8d7321afc"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -147,7 +147,7 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 79058077..7447883f 100644",
+        "index 7905807..7447883 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
         "@@ -1,5 +1,7 @@",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f00db7fcd217e1a2e5ce891b57dd62a1ffdb6efa..df5110843f3c4a6b925866f1bbfb497bcb1c9e76"
+    "shas": "38d579cf20a517896463568db7b89cc8d7321afc..2c72280c7e6bd60114bc5fc00129b9f5dbe5eb5f"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -258,7 +258,7 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 7447883f..42ee7381 100644",
+        "index 7447883..42ee738 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
         "@@ -1,7 +1,7 @@",
@@ -274,7 +274,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "df5110843f3c4a6b925866f1bbfb497bcb1c9e76..110eee0e460e795c46b7ed978ff8b71525019d72"
+    "shas": "2c72280c7e6bd60114bc5fc00129b9f5dbe5eb5f..75a229f0366630fe755f01f3352f1e7b83b1c725"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -371,7 +371,7 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 42ee7381..7447883f 100644",
+        "index 42ee738..7447883 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
         "@@ -1,7 +1,7 @@",
@@ -387,7 +387,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "110eee0e460e795c46b7ed978ff8b71525019d72..01e232c7d2153734587bab7f33ae8fda9333a154"
+    "shas": "75a229f0366630fe755f01f3352f1e7b83b1c725..a32c9e661e5afb5c437ae1386ac35a1e4e5f3273"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -496,7 +496,7 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 7447883f..79058077 100644",
+        "index 7447883..7905807 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
         "@@ -1,7 +1,5 @@",
@@ -510,7 +510,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "01e232c7d2153734587bab7f33ae8fda9333a154..63fbe15db734e77fb80bf6afd3f70779a332752f"
+    "shas": "a32c9e661e5afb5c437ae1386ac35a1e4e5f3273..7d206d848e1cc05b13f0d6e10947c3a12b353f76"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -541,7 +541,7 @@
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -552,5 +552,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "63fbe15db734e77fb80bf6afd3f70779a332752f..fd0264745f91f065e890974d827ab17c79597f88"
+    "shas": "7d206d848e1cc05b13f0d6e10947c3a12b353f76..a5baa11113f4c2c8c2339966a5181d4cf9c7968e"
 }]

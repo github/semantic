@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac0e1099bbc71bf7699ae3e647c669dae3c50197..03834510bb2cef42a042bd45c1f42152b28bd9d0"
+    "shas": "55db2fe06bab1194ac40bdfd7dc8bca5d8f62fed..669e3ff2cf5cb0c808fbd9483553aff3119aac9d"
 }
 ,{
     "testCaseDescription": "go-struct-literals-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 79058077..e6fd4f15 100644",
+        "index 7905807..e6fd4f1 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
         "@@ -1,5 +1,10 @@",
@@ -116,7 +116,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "03834510bb2cef42a042bd45c1f42152b28bd9d0..c4a9224aa14a109aefce8e34faa90883e34722eb"
+    "shas": "669e3ff2cf5cb0c808fbd9483553aff3119aac9d..31264d06f8eaf2e05233a9ebbdbd792e2797d3ad"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the Dog struct of the 'main' function"
+                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the s1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -175,7 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the struct{i float;} struct of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'float' identifier in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -202,7 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the struct{i float;} struct of the 'main' function"
+                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -229,7 +229,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '6' in the struct{i float;} struct of the 'main' function"
+                    "summary": "Replaced '5' with '6' in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -256,7 +256,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the time.Month struct of the 'main' function"
+                    "summary": "Replaced the 'Time' identifier with the 'Month' identifier in the s3 var assignment of the 'main' function"
                 }
             ]
         },
@@ -267,7 +267,7 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index e6fd4f15..06724a46 100644",
+        "index e6fd4f1..06724a4 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c4a9224aa14a109aefce8e34faa90883e34722eb..eb9a45de77925fd6e519384b71cc72f01b08af13"
+    "shas": "31264d06f8eaf2e05233a9ebbdbd792e2797d3ad..9a00c998e656775efe032760809daca7cfddde00"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
@@ -318,7 +318,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the Person struct of the 'main' function"
+                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the s1 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -345,7 +345,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the struct{i int;} struct of the 'main' function"
+                    "summary": "Replaced the 'float' identifier with the 'int' identifier in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -372,7 +372,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the struct{i int;} struct of the 'main' function"
+                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -399,7 +399,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '5' in the struct{i int;} struct of the 'main' function"
+                    "summary": "Replaced '6' with '5' in the s2 var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -426,7 +426,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the time.Time struct of the 'main' function"
+                    "summary": "Replaced the 'Month' identifier with the 'Time' identifier in the s3 var assignment of the 'main' function"
                 }
             ]
         },
@@ -437,7 +437,7 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 06724a46..e6fd4f15 100644",
+        "index 06724a4..e6fd4f1 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -456,7 +456,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eb9a45de77925fd6e519384b71cc72f01b08af13..12f74ce687947f3e1f1f94ab544a959e8121c64d"
+    "shas": "9a00c998e656775efe032760809daca7cfddde00..63fd1dedb1ddd55f2dd218dfc4b93d4b959ef30f"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
@@ -517,7 +517,7 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index e6fd4f15..79058077 100644",
+        "index e6fd4f1..7905807 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
         "@@ -1,10 +1,5 @@",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "12f74ce687947f3e1f1f94ab544a959e8121c64d..588ef26d202342986305c13f9ec358dca8e0ee97"
+    "shas": "63fd1dedb1ddd55f2dd218dfc4b93d4b959ef30f..d31cfda2ccf5253864abe34564742b6600a6bba9"
 }
 ,{
     "testCaseDescription": "go-struct-literals-teardown-test",
@@ -565,7 +565,7 @@
     ],
     "patch": [
         "diff --git a/struct-literals.go b/struct-literals.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/struct-literals.go",
         "+++ b/struct-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "588ef26d202342986305c13f9ec358dca8e0ee97..af744e699347285d9bb35dcbb0c9edff66a77b29"
+    "shas": "d31cfda2ccf5253864abe34564742b6600a6bba9..2bd4831433df7f47de8e29abed25c68de14722f2"
 }]

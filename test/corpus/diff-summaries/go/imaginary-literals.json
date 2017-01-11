@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/imaginary-literals.go b/imaginary-literals.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/imaginary-literals.go",
         "+++ b/imaginary-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "acc4d37825b8d0c1e286a5d7eb63f170a05c41b1..20369fe5334c01610ea3fe2e91f20974ea3f3f0f"
+    "shas": "76f08190bffba036fc899c8b7180778ed761c374..73557f695fe16d27eb9b1fc8098f03c4a9b919e0"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/imaginary-literals.go b/imaginary-literals.go",
-        "index 79058077..25a97daf 100644",
+        "index 7905807..25a97da 100644",
         "--- a/imaginary-literals.go",
         "+++ b/imaginary-literals.go",
         "@@ -1,5 +1,8 @@",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "20369fe5334c01610ea3fe2e91f20974ea3f3f0f..03c62da71e1df5389b2dd1cdb65600b091a3d4e9"
+    "shas": "73557f695fe16d27eb9b1fc8098f03c4a9b919e0..0b7d6dbe051914737a78252de343f8099220d9ea"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-replacement-test",
@@ -169,7 +169,7 @@
     ],
     "patch": [
         "diff --git a/imaginary-literals.go b/imaginary-literals.go",
-        "index 25a97daf..151a5338 100644",
+        "index 25a97da..151a533 100644",
         "--- a/imaginary-literals.go",
         "+++ b/imaginary-literals.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "03c62da71e1df5389b2dd1cdb65600b091a3d4e9..c20f7401e5fa21ae83b0f43d3536a1830ccf6f78"
+    "shas": "0b7d6dbe051914737a78252de343f8099220d9ea..0949c5bc9b2db32638751fdd8adf85141aaf671e"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-replacement-test",
@@ -254,7 +254,7 @@
     ],
     "patch": [
         "diff --git a/imaginary-literals.go b/imaginary-literals.go",
-        "index 151a5338..25a97daf 100644",
+        "index 151a533..25a97da 100644",
         "--- a/imaginary-literals.go",
         "+++ b/imaginary-literals.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c20f7401e5fa21ae83b0f43d3536a1830ccf6f78..1a8650edcb69a87555e8adc9dd97f14eef06af46"
+    "shas": "0949c5bc9b2db32638751fdd8adf85141aaf671e..13ce221827e5ffc32a3c99f95908373f67687e9c"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-delete-insert-test",
@@ -315,7 +315,7 @@
     ],
     "patch": [
         "diff --git a/imaginary-literals.go b/imaginary-literals.go",
-        "index 25a97daf..79058077 100644",
+        "index 25a97da..7905807 100644",
         "--- a/imaginary-literals.go",
         "+++ b/imaginary-literals.go",
         "@@ -1,8 +1,5 @@",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a8650edcb69a87555e8adc9dd97f14eef06af46..5a4686a6435b4ec015c2eec1d8338ca64f7ab1e2"
+    "shas": "13ce221827e5ffc32a3c99f95908373f67687e9c..856d716acddaf6e7e91667c5627f39bc32477b7c"
 }
 ,{
     "testCaseDescription": "go-imaginary-literals-teardown-test",
@@ -361,7 +361,7 @@
     ],
     "patch": [
         "diff --git a/imaginary-literals.go b/imaginary-literals.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/imaginary-literals.go",
         "+++ b/imaginary-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5a4686a6435b4ec015c2eec1d8338ca64f7ab1e2..3b4402537636d87434352887cbfed24b196609c7"
+    "shas": "856d716acddaf6e7e91667c5627f39bc32477b7c..82995a356477b94c28f13f84e7c705e71bb610b2"
 }]

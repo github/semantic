@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbdd73a8a3cabe4a24d21eaf650ecc592b20dcba..1a15814eaf0c3969cc983b480303c35bea868061"
+    "shas": "d8f9557a132b5ece466963fc5cdfaf89748a45cb..283dedd44a8710088bbd0ce7cedc53934c77e05d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 79058077..4ca1ce37 100644",
+        "index 7905807..4ca1ce3 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a15814eaf0c3969cc983b480303c35bea868061..6e6315bcc0a3e5f759adc2b45462ab112e450542"
+    "shas": "283dedd44a8710088bbd0ce7cedc53934c77e05d..5cb96b265326ce1c1baf60d57f45a7e97d261832"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -220,7 +220,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 4ca1ce37..bbbf9372 100644",
+        "index 4ca1ce3..bbbf937 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e6315bcc0a3e5f759adc2b45462ab112e450542..54ead45c5871c0c895e3a5b0059802af40cf8731"
+    "shas": "5cb96b265326ce1c1baf60d57f45a7e97d261832..1cb5c94447506c4c9b9199a13750192f6c304aee"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -356,7 +356,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index bbbf9372..4ca1ce37 100644",
+        "index bbbf937..4ca1ce3 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "54ead45c5871c0c895e3a5b0059802af40cf8731..7f73a29dc019cc8ca645c60223f9a5cbd9d64634"
+    "shas": "1cb5c94447506c4c9b9199a13750192f6c304aee..51ff91a1c7e4affa0475c2a01a4729cd4814d00b"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -414,7 +414,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 4ca1ce37..79058077 100644",
+        "index 4ca1ce3..7905807 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7f73a29dc019cc8ca645c60223f9a5cbd9d64634..691161785b1b56ec46a531d5259006bfd89f3535"
+    "shas": "51ff91a1c7e4affa0475c2a01a4729cd4814d00b..556d0ec6cffd519d7213bebed19788116d78d3b5"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -457,7 +457,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "691161785b1b56ec46a531d5259006bfd89f3535..28e155607a6d8245c8cbf00f5bf098aaf850ffa2"
+    "shas": "556d0ec6cffd519d7213bebed19788116d78d3b5..a6d6b87e3b8498575c6a100bd3722f8ce2d30eee"
 }]

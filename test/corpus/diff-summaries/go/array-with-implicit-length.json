@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68d7fc5df8b748c35aeb0ed0daf56244cb1407a9..82f2fc998e70949bebe47226b4c98d43532f842e"
+    "shas": "ede817f2d69f14475f354045064794e04a6bfec8..9b9c64b0842e4a595bf50ee1abad0eaf95dcfab1"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index 79058077..a53dc8c5 100644",
+        "index 7905807..a53dc8c 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82f2fc998e70949bebe47226b4c98d43532f842e..a5cae51ed58b2bb1121537e35e282fef015df3d1"
+    "shas": "9b9c64b0842e4a595bf50ee1abad0eaf95dcfab1..17e8f1008c39db67963476087bcc325efb2b73b2"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -181,7 +181,7 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index a53dc8c5..e9e3d08f 100644",
+        "index a53dc8c..e9e3d08 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
         "@@ -1,5 +1,5 @@",
@@ -193,7 +193,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5cae51ed58b2bb1121537e35e282fef015df3d1..503800ad59792fd825b1c9be8bfbcf67edcb64e3"
+    "shas": "17e8f1008c39db67963476087bcc325efb2b73b2..2cc8087f56148a938af7da3813e34a58a321b287"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -293,7 +293,7 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index e9e3d08f..a53dc8c5 100644",
+        "index e9e3d08..a53dc8c 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
         "@@ -1,5 +1,5 @@",
@@ -305,7 +305,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "503800ad59792fd825b1c9be8bfbcf67edcb64e3..88c397a4e5ebcb281e75568b33aaf8d63f809942"
+    "shas": "2cc8087f56148a938af7da3813e34a58a321b287..1ac9bd8f7d472e400246863f84922ae5c11b6c82"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -336,7 +336,7 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index a53dc8c5..79058077 100644",
+        "index a53dc8c..7905807 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
         "@@ -1,5 +1,5 @@",
@@ -348,7 +348,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "88c397a4e5ebcb281e75568b33aaf8d63f809942..661db4eea0c353e22bcf61dfa58582226ecd4965"
+    "shas": "1ac9bd8f7d472e400246863f84922ae5c11b6c82..6391aa786800f3c356fa0d01c559cf3d25a015c6"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-teardown-test",
@@ -379,7 +379,7 @@
     ],
     "patch": [
         "diff --git a/array-with-implicit-length.go b/array-with-implicit-length.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/array-with-implicit-length.go",
         "+++ b/array-with-implicit-length.go",
         "@@ -1,5 +0,0 @@",
@@ -390,5 +390,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "661db4eea0c353e22bcf61dfa58582226ecd4965..85640fac3f3b17485e57db964df111fc1ecc3107"
+    "shas": "6391aa786800f3c356fa0d01c559cf3d25a015c6..261a5e2932b5820448fae2f0a1afcef36285490f"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "333e6b2e078510c06e8ab359f5397bc26f4b0da0..e1780ab74306d9e507e7ac8669baefd16942c453"
+    "shas": "65f9b951e0ca2913336697e29d8e82466117d13e..5d9fb4ad0f781018fc6fa044969026d3a841fc20"
 }
 ,{
     "testCaseDescription": "go-struct-types-insert-test",
@@ -114,7 +114,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 79058077..13c82f80 100644",
+        "index 7905807..13c82f8 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,5 +1,13 @@",
@@ -134,7 +134,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e1780ab74306d9e507e7ac8669baefd16942c453..f47419762d81ddcf767c35d310d97de77a48828c"
+    "shas": "5d9fb4ad0f781018fc6fa044969026d3a841fc20..efd18712c916bed785ea031243a1e3b93fdc6029"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-test",
@@ -166,7 +166,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's1' identifier with the 't1' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 's1' identifier with the 't1' identifier in the t1 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -193,7 +193,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's2' identifier with the 't2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 's2' identifier with the 't2' identifier in the t2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -220,7 +220,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's3' identifier with the 't3' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 's3' identifier with the 't3' identifier in the t3 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -247,7 +247,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's4' identifier with the 't4' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 's4' identifier with the 't4' identifier in the t4 type declaration of the 'main' function"
                 }
             ]
         },
@@ -258,7 +258,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 13c82f80..d73e92a6 100644",
+        "index 13c82f8..d73e92a 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,12 +1,12 @@",
@@ -280,7 +280,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f47419762d81ddcf767c35d310d97de77a48828c..8bfd602a0784d5962626240b0c206c1a53cb50d2"
+    "shas": "efd18712c916bed785ea031243a1e3b93fdc6029..aed77a6ac48aafba9aacb92a0272585e60475e15"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-replacement-test",
@@ -312,7 +312,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 't1' identifier with the 's1' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 't1' identifier with the 's1' identifier in the s1 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -339,7 +339,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 't2' identifier with the 's2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 't2' identifier with the 's2' identifier in the s2 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -366,7 +366,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 't3' identifier with the 's3' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 't3' identifier with the 's3' identifier in the s3 type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -393,7 +393,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 't4' identifier with the 's4' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 't4' identifier with the 's4' identifier in the s4 type declaration of the 'main' function"
                 }
             ]
         },
@@ -404,7 +404,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index d73e92a6..13c82f80 100644",
+        "index d73e92a..13c82f8 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,12 +1,12 @@",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8bfd602a0784d5962626240b0c206c1a53cb50d2..99050987a62a03c5c9857314035bf835f8a0d5b8"
+    "shas": "aed77a6ac48aafba9aacb92a0272585e60475e15..65c25dcea1b08fd77e049bc02612b8fd3b5785e3"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-insert-test",
@@ -502,7 +502,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 13c82f80..79058077 100644",
+        "index 13c82f8..7905807 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,13 +1,5 @@",
@@ -522,7 +522,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "99050987a62a03c5c9857314035bf835f8a0d5b8..ff6e72aa064e9e76962ecf6a58fb82fc3b64f24a"
+    "shas": "65c25dcea1b08fd77e049bc02612b8fd3b5785e3..1ac22fce544b65e67bbdd1dfa513c9aa21f325e8"
 }
 ,{
     "testCaseDescription": "go-struct-types-teardown-test",
@@ -553,7 +553,7 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
         "@@ -1,5 +0,0 @@",
@@ -564,5 +564,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff6e72aa064e9e76962ecf6a58fb82fc3b64f24a..9f1f49894f80713cb6ca8f8303355cac94a1fbb9"
+    "shas": "1ac22fce544b65e67bbdd1dfa513c9aa21f325e8..11cf3406e727046a2188e45a78cc38790f87bac9"
 }]

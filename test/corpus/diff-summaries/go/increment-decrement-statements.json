@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index e69de29b..79058077 100644",
+        "index e69de29..7905807 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c4c6ef27a48b579de609c1ba035b55e9dbaf0026..f3e8adcafe7380199e349e53b5bc83a6a66cb7d9"
+    "shas": "c5bc44c5e8be4fa60d6b37aa6bd894dbacb5d2e8..1d38886469f980152470a4e32cf92654f7b5fa74"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 79058077..18bf03a2 100644",
+        "index 7905807..18bf03a 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
         "@@ -1,5 +1,6 @@",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f3e8adcafe7380199e349e53b5bc83a6a66cb7d9..9c4a4e632ec6aa83b2d83ab533fde52002f1e181"
+    "shas": "1d38886469f980152470a4e32cf92654f7b5fa74..dcb52f8ec10c55891fe0c34d10fd7f5eca93d1b0"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-replacement-test",
@@ -140,7 +140,7 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 18bf03a2..08611ad4 100644",
+        "index 18bf03a..08611ad 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
         "@@ -1,6 +1,6 @@",
@@ -154,7 +154,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c4a4e632ec6aa83b2d83ab533fde52002f1e181..740e71d2b8c3e821393a0fb2987814c24f72b297"
+    "shas": "dcb52f8ec10c55891fe0c34d10fd7f5eca93d1b0..2e90c6c6711fcb87fc0e25f8b2a9984591c610be"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-replacement-test",
@@ -197,7 +197,7 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 08611ad4..18bf03a2 100644",
+        "index 08611ad..18bf03a 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
         "@@ -1,6 +1,6 @@",
@@ -211,7 +211,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "740e71d2b8c3e821393a0fb2987814c24f72b297..c500d8afff5638da811c64c28a142a7da1001c80"
+    "shas": "2e90c6c6711fcb87fc0e25f8b2a9984591c610be..cb10dc48c3d7312a6127b1b4a50843ebc8e372ab"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-delete-insert-test",
@@ -257,7 +257,7 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 18bf03a2..79058077 100644",
+        "index 18bf03a..7905807 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
         "@@ -1,6 +1,5 @@",
@@ -270,7 +270,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c500d8afff5638da811c64c28a142a7da1001c80..640b3dac85c8b6a5f2ef5d267726fe97571f447b"
+    "shas": "cb10dc48c3d7312a6127b1b4a50843ebc8e372ab..c978efd8f291e731c063d2aa625135776f1d05f6"
 }
 ,{
     "testCaseDescription": "go-increment-decrement-statements-teardown-test",
@@ -301,7 +301,7 @@
     ],
     "patch": [
         "diff --git a/increment-decrement-statements.go b/increment-decrement-statements.go",
-        "index 79058077..e69de29b 100644",
+        "index 7905807..e69de29 100644",
         "--- a/increment-decrement-statements.go",
         "+++ b/increment-decrement-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -312,5 +312,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "640b3dac85c8b6a5f2ef5d267726fe97571f447b..3aa69bcfd3f37a8737d5bcf4a8c99702d4fe38df"
+    "shas": "c978efd8f291e731c063d2aa625135776f1d05f6..2fd04d085d7d971a02047ea702803d98c8613ee7"
 }]
