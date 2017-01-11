@@ -107,8 +107,7 @@ termConstructor source sourceSpan name range children _ = case name of
       children@[ty, _] -> case category (extract ty) of
         ArrayTy -> toImplicitArray children
         DictionaryTy -> toMap children
-        _ ->
-          toStruct children
+        _ -> toStruct children
       rest -> withRanges range Error rest $ S.Error rest
     toImplicitArray = \case
       [ty, values] -> withCategory ArrayLiteral (S.Array (Just ty) (toList $ unwrap values))
