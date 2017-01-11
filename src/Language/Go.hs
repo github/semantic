@@ -42,6 +42,7 @@ termConstructor source sourceSpan name range children _ = case name of
       other -> S.Error other
   "type_declaration" -> toTypeDecls children
   "type_spec" -> toTypeDecl children
+  "struct_type" -> toStruct children
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
@@ -116,6 +117,8 @@ termConstructor source sourceSpan name range children _ = case name of
       [ty, values] -> withCategory DictionaryLiteral (S.Object (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
     toStruct = \case
+      [] -> withCategory Struct (S.Struct Nothing [])
+      [ty] -> withCategory Struct (S.Struct (Just ty) [])
       [ty, values] -> withCategory Struct (S.Struct (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
 
