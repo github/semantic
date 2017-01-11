@@ -258,6 +258,7 @@ toTermName source term = case unwrap term of
   S.Continue expr -> toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
   S.Default children -> termNameFromChildren term children
+  S.FieldDecl id expr -> termNameFromSource id <> (maybe "" (\expr' -> " " <> termNameFromSource expr') expr)
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -449,6 +450,7 @@ instance HasCategory Category where
     C.ParameterDecl -> "parameter declaration"
     C.Default -> "default statement"
     C.TypeDecl -> "type declaration"
+    C.FieldDecl -> "field declaration"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
