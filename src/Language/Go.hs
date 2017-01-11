@@ -43,6 +43,7 @@ termConstructor source sourceSpan name range children _ = case name of
   "type_declaration" -> toTypeDecls children
   "type_spec" -> toTypeDecl children
   "struct_type" -> toStruct children
+  "field_declaration" -> toFieldDecl children
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> do
@@ -121,7 +122,10 @@ termConstructor source sourceSpan name range children _ = case name of
       [ty] -> withCategory Struct (S.Struct (Just ty) [])
       [ty, values] -> withCategory Struct (S.Struct (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
-
+    toFieldDecl = \case
+      [identifier, ty] -> withCategory FieldDecl (S.FieldDecl identifier (Just ty))
+      [identifier] -> withCategory FieldDecl (S.FieldDecl identifier Nothing)
+      rest -> withRanges range Error rest $ S.Error rest
 
     toExpression f = \case
       [expr] -> f expr
