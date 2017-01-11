@@ -98,6 +98,8 @@ data Syntax a f
   | ParameterDecl (Maybe f) f
   -- | A type declaration.
   | TypeDecl f f
+  -- | A field declaration.
+  | FieldDecl f (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
