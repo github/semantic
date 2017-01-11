@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5872306e73d2a39edbee7521acdbf82daffce06e..d282cc544ae3f9997bfe22cfb04abad786d6acd8"
+    "shas": "6b490b5b50d0c9b056682c15ba76fe69a84e27ce..38b2646d09732b9864def593f0da20bd76e54a7a"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -144,7 +144,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 7905807..c2c7693 100644",
+        "index 79058077..c2c76934 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,5 +1,10 @@",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d282cc544ae3f9997bfe22cfb04abad786d6acd8..0a9147399e616a2c45c4900157f76ac1d287a3e3"
+    "shas": "38b2646d09732b9864def593f0da20bd76e54a7a..e1fbfae153b8e46a43a105085a7112858e7b72e0"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -273,7 +273,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index c2c7693..68a7634 100644",
+        "index c2c76934..68a76340 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,9 +1,9 @@",
@@ -291,7 +291,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a9147399e616a2c45c4900157f76ac1d287a3e3..1839cd649f21ec65c52634603ab5a1f83fd1450a"
+    "shas": "e1fbfae153b8e46a43a105085a7112858e7b72e0..bbaaa378e4ace22f82453743862d5f74d2f81f99"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -403,7 +403,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 68a7634..c2c7693 100644",
+        "index 68a76340..c2c76934 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,9 +1,9 @@",
@@ -421,7 +421,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1839cd649f21ec65c52634603ab5a1f83fd1450a..99ee8ecf44a9aa7ab114e6098611f5c0bb652592"
+    "shas": "bbaaa378e4ace22f82453743862d5f74d2f81f99..8600e6e1c0dbcf37d5e4ec74108cc8fb586e7fd9"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -527,7 +527,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index c2c7693..7905807 100644",
+        "index c2c76934..79058077 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,10 +1,5 @@",
@@ -544,7 +544,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "99ee8ecf44a9aa7ab114e6098611f5c0bb652592..f9cca606ca966f2793e52ad7271ae98c233d3482"
+    "shas": "8600e6e1c0dbcf37d5e4ec74108cc8fb586e7fd9..da570b85fe6dfd0ba016155381c8832a1f913d3e"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -575,7 +575,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -586,5 +586,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f9cca606ca966f2793e52ad7271ae98c233d3482..b1421a2a7471dadf525ec75b93551e0b58d77e09"
+    "shas": "da570b85fe6dfd0ba016155381c8832a1f913d3e..a41d8bda96c1777b78f8522e0c360904237da45d"
 }]

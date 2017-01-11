@@ -249,4 +249,5 @@ categoryForGoName = \case
   "type_spec" -> TypeDecl
   "type_declaration" -> TypeDecl
   "field_declaration" -> FieldDecl
+  "pointer_type" -> PointerTy
   s -> Other (toS s)

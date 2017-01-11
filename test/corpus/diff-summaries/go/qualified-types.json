@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3475a985b00066e829717af5fb397fc094cff00c..a38e1b93f42b0c158155c4160fa36750eb24a063"
+    "shas": "3aa69bcfd3f37a8737d5bcf4a8c99702d4fe38df..54add09914aa967d4543bb908e49c7c73918d55a"
 }
 ,{
     "testCaseDescription": "go-qualified-types-insert-test",
@@ -54,41 +54,11 @@
                             ],
                             "end": [
                                 4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
                                 11
                             ]
                         }
                     },
-                    "summary": "Added the 'c' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'a' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -99,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 7905807..e03cf22 100644",
+        "index 79058077..e03cf221 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -111,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a38e1b93f42b0c158155c4160fa36750eb24a063..65db52da15874215c666ac7f5bc28390918ec04c"
+    "shas": "54add09914aa967d4543bb908e49c7c73918d55a..fda97ba3a472c5e2a6833e32138e1b5bc17ef8d2"
 }
 ,{
     "testCaseDescription": "go-qualified-types-replacement-test",
@@ -208,7 +178,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e03cf22..241e526 100644",
+        "index e03cf221..241e5267 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -220,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65db52da15874215c666ac7f5bc28390918ec04c..258712947855ca2a953e04b06dfe4228bda7bbe1"
+    "shas": "fda97ba3a472c5e2a6833e32138e1b5bc17ef8d2..b4f62cf2c1e51f4278f55d85950bd3c268f94d61"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-replacement-test",
@@ -317,7 +287,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 241e526..e03cf22 100644",
+        "index 241e5267..e03cf221 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -329,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "258712947855ca2a953e04b06dfe4228bda7bbe1..cb26da92d749741c02343ef63fe9b318c5eac134"
+    "shas": "b4f62cf2c1e51f4278f55d85950bd3c268f94d61..307714e846eebc7aab8f905247c95628ed7101f3"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-insert-test",
@@ -345,41 +315,11 @@
                             ],
                             "end": [
                                 4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                10
-                            ],
-                            "end": [
-                                4,
                                 11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -390,7 +330,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e03cf22..7905807 100644",
+        "index e03cf221..79058077 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -402,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb26da92d749741c02343ef63fe9b318c5eac134..b12d30f9a082634f60b584c7f50858357eb31d4b"
+    "shas": "307714e846eebc7aab8f905247c95628ed7101f3..421d1efced1ae795d54ab2a99bfc6a45a7501f4a"
 }
 ,{
     "testCaseDescription": "go-qualified-types-teardown-test",
@@ -433,7 +373,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +0,0 @@",
@@ -444,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b12d30f9a082634f60b584c7f50858357eb31d4b..ed9c37df2e25af2f8d68bec63dfe7191437d8ec1"
+    "shas": "421d1efced1ae795d54ab2a99bfc6a45a7501f4a..250377688c06e8142d6746aa109043387e296db4"
 }]

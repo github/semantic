@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ffcdcc4c7dd96d6a96f41a12f601801b7668f47..92e2a05505cf460830f433e57c374fba59f21ce2"
+    "shas": "d668b2008cb1fc89b7e95d929f39b976ae0bf6b6..874e8a008d069b78093b1ad4d2cd7a4c470f79d5"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index 7905807..cdb45b3 100644",
+        "index 79058077..cdb45b39 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -1,5 +1,8 @@",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "92e2a05505cf460830f433e57c374fba59f21ce2..bb44c8c7050569bb73ab3fa562dd4fe36689d4f8"
+    "shas": "874e8a008d069b78093b1ad4d2cd7a4c470f79d5..04d06a07af8e0b63f9e3f7ee74fee4060e23c421"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -169,7 +169,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index cdb45b3..806a593 100644",
+        "index cdb45b39..806a5935 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bb44c8c7050569bb73ab3fa562dd4fe36689d4f8..44cb18b20b3941b7e93f81779ef9f934f7cfc937"
+    "shas": "04d06a07af8e0b63f9e3f7ee74fee4060e23c421..acb28254141bb7173adb448486080972e61de835"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -254,7 +254,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index 806a593..cdb45b3 100644",
+        "index 806a5935..cdb45b39 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44cb18b20b3941b7e93f81779ef9f934f7cfc937..9c18341a29d0290f2632a18e4f891536bcafa231"
+    "shas": "acb28254141bb7173adb448486080972e61de835..411eeaa0546b9eacd6b5018471b2d0f617b1c2ca"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -315,7 +315,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index cdb45b3..7905807 100644",
+        "index cdb45b39..79058077 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -1,8 +1,5 @@",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c18341a29d0290f2632a18e4f891536bcafa231..d26525d2d2a82db95767960564bafa364e8a3174"
+    "shas": "411eeaa0546b9eacd6b5018471b2d0f617b1c2ca..116b274e5b254b4ae9031888d937ee3609a5d3cd"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -361,7 +361,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d26525d2d2a82db95767960564bafa364e8a3174..fa7ab04fb1e0200cd48b718dbf94e17f382064e2"
+    "shas": "116b274e5b254b4ae9031888d937ee3609a5d3cd..7164be064f97252f970ac5f4d416eb9aa6a9596e"
 }]

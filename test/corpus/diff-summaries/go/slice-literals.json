@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "81846b671d219b8ee7aa9acd97a7d2364a4bb163..13d28259b060468f31862277b22748ac13a16180"
+    "shas": "debbb1d2da154fb6d30d4baa594a24b83decf9ce..8002dcbf81382492e34c18c810789483c2ab75d8"
 }
 ,{
     "testCaseDescription": "go-slice-literals-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 7905807..3c94936 100644",
+        "index 79058077..3c94936e 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,5 +1,10 @@",
@@ -116,7 +116,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "13d28259b060468f31862277b22748ac13a16180..c222e7f990207b35020dcd55444ca4f510db3de4"
+    "shas": "8002dcbf81382492e34c18c810789483c2ab75d8..f4f8cbaeb31a8d8f467a07f4c5e0d056779e511d"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
@@ -228,7 +228,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 3c94936..caefc00 100644",
+        "index 3c94936e..caefc004 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -248,7 +248,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c222e7f990207b35020dcd55444ca4f510db3de4..308613cc15a6cd95bc1bf9aa9dae884656537a2c"
+    "shas": "f4f8cbaeb31a8d8f467a07f4c5e0d056779e511d..f8c25f9ccb50b9c66f186a72c32ca394de8befdf"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
@@ -360,7 +360,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index caefc00..3c94936 100644",
+        "index caefc004..3c94936e 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "308613cc15a6cd95bc1bf9aa9dae884656537a2c..2610fc27ea3fd3c5f8da2b2b567c9ab5c9d5adb2"
+    "shas": "f8c25f9ccb50b9c66f186a72c32ca394de8befdf..cf175e5d0090e582f31f83950fdd88db5eb8d648"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
@@ -441,7 +441,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 3c94936..7905807 100644",
+        "index 3c94936e..79058077 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,10 +1,5 @@",
@@ -458,7 +458,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2610fc27ea3fd3c5f8da2b2b567c9ab5c9d5adb2..b1ac72dad68cc79bcd5a051dd5233290422e9d2e"
+    "shas": "cf175e5d0090e582f31f83950fdd88db5eb8d648..7d6c9cef8616a8168289e001d8c28efa59bc878a"
 }
 ,{
     "testCaseDescription": "go-slice-literals-teardown-test",
@@ -489,7 +489,7 @@
     ],
     "patch": [
         "diff --git a/slice-literals.go b/slice-literals.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/slice-literals.go",
         "+++ b/slice-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -500,5 +500,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1ac72dad68cc79bcd5a051dd5233290422e9d2e..1b4c2623cb156f068f9d25b67036e3e1c9539856"
+    "shas": "7d6c9cef8616a8168289e001d8c28efa59bc878a..68d7fc5df8b748c35aeb0ed0daf56244cb1407a9"
 }]

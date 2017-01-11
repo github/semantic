@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/if-statements.go b/if-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/if-statements.go",
         "+++ b/if-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dbaa2403e0969e21bed04d2fa076e925ab682ae3..b536ba5a2ac64cb7b89930744baa91b7ea96be1a"
+    "shas": "4ba4df339989c603edb2546aa476d7db31125dc9..da73ae4cc7f3e483069d6d9b2a43604588804921"
 }
 ,{
     "testCaseDescription": "go-if-statements-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/if-statements.go b/if-statements.go",
-        "index 7905807..76a6f33 100644",
+        "index 79058077..76a6f335 100644",
         "--- a/if-statements.go",
         "+++ b/if-statements.go",
         "@@ -1,5 +1,15 @@",
@@ -121,7 +121,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b536ba5a2ac64cb7b89930744baa91b7ea96be1a..3b8e84ecebaa4070bd925b47dcd202dd343be3fa"
+    "shas": "da73ae4cc7f3e483069d6d9b2a43604588804921..f4895a71b30524b69a80be8e06c704b624777290"
 }
 ,{
     "testCaseDescription": "go-if-statements-replacement-test",
@@ -218,7 +218,7 @@
     ],
     "patch": [
         "diff --git a/if-statements.go b/if-statements.go",
-        "index 76a6f33..39dfc0d 100644",
+        "index 76a6f335..39dfc0da 100644",
         "--- a/if-statements.go",
         "+++ b/if-statements.go",
         "@@ -1,13 +1,13 @@",
@@ -240,7 +240,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3b8e84ecebaa4070bd925b47dcd202dd343be3fa..def2da6675be5382e7fe693ac4c1e284ab8d7949"
+    "shas": "f4895a71b30524b69a80be8e06c704b624777290..092abc58352a65a71c64ff69248d7724bd0db707"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-replacement-test",
@@ -337,7 +337,7 @@
     ],
     "patch": [
         "diff --git a/if-statements.go b/if-statements.go",
-        "index 39dfc0d..76a6f33 100644",
+        "index 39dfc0da..76a6f335 100644",
         "--- a/if-statements.go",
         "+++ b/if-statements.go",
         "@@ -1,13 +1,13 @@",
@@ -359,7 +359,7 @@
         " c()"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "def2da6675be5382e7fe693ac4c1e284ab8d7949..7dc7cebc7701a2d862ea72d486bd001f6c8afad2"
+    "shas": "092abc58352a65a71c64ff69248d7724bd0db707..914d98369cccb3cbb571931f61e5049ebfbc25fc"
 }
 ,{
     "testCaseDescription": "go-if-statements-delete-insert-test",
@@ -420,7 +420,7 @@
     ],
     "patch": [
         "diff --git a/if-statements.go b/if-statements.go",
-        "index 76a6f33..7905807 100644",
+        "index 76a6f335..79058077 100644",
         "--- a/if-statements.go",
         "+++ b/if-statements.go",
         "@@ -1,15 +1,5 @@",
@@ -442,7 +442,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7dc7cebc7701a2d862ea72d486bd001f6c8afad2..bf11a8bbaba199716df4d23f6620f1ca16513ff0"
+    "shas": "914d98369cccb3cbb571931f61e5049ebfbc25fc..549ef6503fc4840f1195e16f005de3e58fb699c7"
 }
 ,{
     "testCaseDescription": "go-if-statements-teardown-test",
@@ -473,7 +473,7 @@
     ],
     "patch": [
         "diff --git a/if-statements.go b/if-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/if-statements.go",
         "+++ b/if-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -484,5 +484,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bf11a8bbaba199716df4d23f6620f1ca16513ff0..62d02f1a139bbe83809ce9236632f21ebe34f54b"
+    "shas": "549ef6503fc4840f1195e16f005de3e58fb699c7..dbdd73a8a3cabe4a24d21eaf650ecc592b20dcba"
 }]

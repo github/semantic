@@ -63,7 +63,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Array ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.Object ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.BlockStatement{} -> Identifiable
-          S.TypeDecl {} -> Identifiable
+          S.TypeDecl{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -450,6 +450,7 @@ instance HasCategory Category where
     C.ParameterDecl -> "parameter declaration"
     C.Default -> "default statement"
     C.TypeDecl -> "type declaration"
+    C.PointerTy -> "pointer type"
     C.FieldDecl -> "field declaration"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b0be4a9144b0aad672a36d64332bce5c33364aa..b841e840922e88e199b0915637432ce99803e6bb"
+    "shas": "6f1164f9e5c5708d7d871537279583db69ba4dfb..47fd5afe8ac80768ba6793dca82ddcdfb2fbe183"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -81,7 +81,7 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 7905807..2a1e7b8 100644",
+        "index 79058077..2a1e7b86 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
         "@@ -1,5 +1,8 @@",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b841e840922e88e199b0915637432ce99803e6bb..8c5a5f555cf540b5101db3bd65cb7c30e55e4f85"
+    "shas": "47fd5afe8ac80768ba6793dca82ddcdfb2fbe183..ecb4f943599c16642f3153a9b072d4e3ec3a1b13"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -220,7 +220,7 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 2a1e7b8..10d0b49 100644",
+        "index 2a1e7b86..10d0b496 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
         "@@ -1,8 +1,8 @@",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c5a5f555cf540b5101db3bd65cb7c30e55e4f85..f9cbe4cba58023941e138d78e50e7eefa003abd0"
+    "shas": "ecb4f943599c16642f3153a9b072d4e3ec3a1b13..5c123d24237a788ed86ca461aeaad12eefd6fa45"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -362,7 +362,7 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 10d0b49..2a1e7b8 100644",
+        "index 10d0b496..2a1e7b86 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
         "@@ -1,8 +1,8 @@",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f9cbe4cba58023941e138d78e50e7eefa003abd0..7d9b75a52507f9c9e6c8962c3f0d9462997fcc7e"
+    "shas": "5c123d24237a788ed86ca461aeaad12eefd6fa45..55ecb7086196a6c6df1fc32f80bd876e58370f32"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -423,7 +423,7 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 2a1e7b8..7905807 100644",
+        "index 2a1e7b86..79058077 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
         "@@ -1,8 +1,5 @@",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d9b75a52507f9c9e6c8962c3f0d9462997fcc7e..52eada96fdb633deeb35df8fe875ee223193959b"
+    "shas": "55ecb7086196a6c6df1fc32f80bd876e58370f32..2c5ca0949c92af37066b2665f763ec7429fb6a4e"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -469,7 +469,7 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52eada96fdb633deeb35df8fe875ee223193959b..2d08e3b11cf3a0b224114fdc56c17d2394956f29"
+    "shas": "2c5ca0949c92af37066b2665f763ec7429fb6a4e..69b68fd5a3c31b5b3b5dd7deb6ce7cbccb193aec"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/var-declarations-with-types.go",
         "+++ b/var-declarations-with-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af705dd15ded51db4ce65dbb57af026377791a30..34d3b4449bb844eae632070293e06674a84f1200"
+    "shas": "05400216c4bfb9f270e33264a64959dda91299c7..9cf311ba631eb4b3dbe1157df14674f0ad236d9f"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
-        "index 7905807..d946c80 100644",
+        "index 79058077..d946c807 100644",
         "--- a/var-declarations-with-types.go",
         "+++ b/var-declarations-with-types.go",
         "@@ -1,5 +1,6 @@",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "34d3b4449bb844eae632070293e06674a84f1200..81ebf77194c2903fa8aa47e1517e6ef208289b4f"
+    "shas": "9cf311ba631eb4b3dbe1157df14674f0ad236d9f..35f81af35f3d39c5f8f22893c2cdd3489cfa0106"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -209,7 +209,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
-        "index d946c80..14683f6 100644",
+        "index d946c807..14683f6f 100644",
         "--- a/var-declarations-with-types.go",
         "+++ b/var-declarations-with-types.go",
         "@@ -1,6 +1,6 @@",
@@ -223,7 +223,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "81ebf77194c2903fa8aa47e1517e6ef208289b4f..f413dc7d03a783e9c0a5617ffeb373cc9bd99d5d"
+    "shas": "35f81af35f3d39c5f8f22893c2cdd3489cfa0106..734a2d9fc2cee12d5a0bf79aa59db5b4979b785c"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -320,7 +320,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
-        "index 14683f6..d946c80 100644",
+        "index 14683f6f..d946c807 100644",
         "--- a/var-declarations-with-types.go",
         "+++ b/var-declarations-with-types.go",
         "@@ -1,6 +1,6 @@",
@@ -334,7 +334,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f413dc7d03a783e9c0a5617ffeb373cc9bd99d5d..cc6140857c610a7fb2e75d0451f39d9c23c3cdec"
+    "shas": "734a2d9fc2cee12d5a0bf79aa59db5b4979b785c..64e79a2c387382a1b1acdb1ee62b974f7980dbdc"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -395,7 +395,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
-        "index d946c80..7905807 100644",
+        "index d946c807..79058077 100644",
         "--- a/var-declarations-with-types.go",
         "+++ b/var-declarations-with-types.go",
         "@@ -1,6 +1,5 @@",
@@ -408,7 +408,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cc6140857c610a7fb2e75d0451f39d9c23c3cdec..5f5bceb839c4efcc83f7e04b6917f5371a09b64a"
+    "shas": "64e79a2c387382a1b1acdb1ee62b974f7980dbdc..287650c3dfaa1453eb4147e1e314ca22112434ab"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-teardown-test",
@@ -439,7 +439,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-types.go b/var-declarations-with-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/var-declarations-with-types.go",
         "+++ b/var-declarations-with-types.go",
         "@@ -1,5 +0,0 @@",
@@ -450,5 +450,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f5bceb839c4efcc83f7e04b6917f5371a09b64a..1d4374dddf1e5e47a239613fcaa559892a8e1784"
+    "shas": "287650c3dfaa1453eb4147e1e314ca22112434ab..e168796f39a67e82d290bda0c85a63fdfd4e33b4"
 }]

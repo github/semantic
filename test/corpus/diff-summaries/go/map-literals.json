@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/map-literals.go b/map-literals.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/map-literals.go",
         "+++ b/map-literals.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "641e383c333e48e145454fe7c2f5b70415cb0d25..61cc0866cd5992c23b341fed2ff9fee83a1c7c4b"
+    "shas": "85640fac3f3b17485e57db964df111fc1ecc3107..a6547c188032eee25f95697379e2a4f1fdb76e73"
 }
 ,{
     "testCaseDescription": "go-map-literals-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/map-literals.go b/map-literals.go",
-        "index 7905807..bb99b5b 100644",
+        "index 79058077..bb99b5ba 100644",
         "--- a/map-literals.go",
         "+++ b/map-literals.go",
         "@@ -1,5 +1,8 @@",
@@ -84,7 +84,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "61cc0866cd5992c23b341fed2ff9fee83a1c7c4b..f0803979f6733e0fedaea90b44493ff40f4d6ee9"
+    "shas": "a6547c188032eee25f95697379e2a4f1fdb76e73..5a302b167bf086102266d7ef70fd4e0c5639e2ff"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-test",
@@ -214,7 +214,7 @@
     ],
     "patch": [
         "diff --git a/map-literals.go b/map-literals.go",
-        "index bb99b5b..a9e0b66 100644",
+        "index bb99b5ba..a9e0b664 100644",
         "--- a/map-literals.go",
         "+++ b/map-literals.go",
         "@@ -1,8 +1,8 @@",
@@ -231,7 +231,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f0803979f6733e0fedaea90b44493ff40f4d6ee9..46e67f9401dffdb43d7fb221e7d47261209b195f"
+    "shas": "5a302b167bf086102266d7ef70fd4e0c5639e2ff..7cdadb81e6e20b83659843c801adfc2c515f366e"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-replacement-test",
@@ -382,7 +382,7 @@
     ],
     "patch": [
         "diff --git a/map-literals.go b/map-literals.go",
-        "index a9e0b66..bb99b5b 100644",
+        "index a9e0b664..bb99b5ba 100644",
         "--- a/map-literals.go",
         "+++ b/map-literals.go",
         "@@ -1,8 +1,8 @@",
@@ -399,7 +399,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "46e67f9401dffdb43d7fb221e7d47261209b195f..1f5e24c545a57a24fccaba206bf2f34930896277"
+    "shas": "7cdadb81e6e20b83659843c801adfc2c515f366e..e12db56de5d86a79715aa7c0658cfa7f15b38ca0"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-insert-test",
@@ -430,7 +430,7 @@
     ],
     "patch": [
         "diff --git a/map-literals.go b/map-literals.go",
-        "index bb99b5b..7905807 100644",
+        "index bb99b5ba..79058077 100644",
         "--- a/map-literals.go",
         "+++ b/map-literals.go",
         "@@ -1,8 +1,5 @@",
@@ -445,7 +445,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f5e24c545a57a24fccaba206bf2f34930896277..1ef7ce68ca77f9bed3bcefbbbdd8533398f73e38"
+    "shas": "e12db56de5d86a79715aa7c0658cfa7f15b38ca0..36fe66e556090a0e7b9916cac94231085729d036"
 }
 ,{
     "testCaseDescription": "go-map-literals-teardown-test",
@@ -476,7 +476,7 @@
     ],
     "patch": [
         "diff --git a/map-literals.go b/map-literals.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/map-literals.go",
         "+++ b/map-literals.go",
         "@@ -1,5 +0,0 @@",
@@ -487,5 +487,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1ef7ce68ca77f9bed3bcefbbbdd8533398f73e38..3f5dc8ba8d53e4a22b434b9a53b525d56cf0a1db"
+    "shas": "36fe66e556090a0e7b9916cac94231085729d036..ac0e1099bbc71bf7699ae3e647c669dae3c50197"
 }]

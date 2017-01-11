@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ed9c37df2e25af2f8d68bec63dfe7191437d8ec1..4f1648e3e4bd311f1fd9a1c7ebbbe0ad14ae824b"
+    "shas": "250377688c06e8142d6746aa109043387e296db4..5b78237b718a47a6d2b9fb68cf1c160a4d4a76f2"
 }
 ,{
     "testCaseDescription": "go-array-types-insert-test",
@@ -54,56 +54,11 @@
                             ],
                             "end": [
                                 4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added '2' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                11
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added '2' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                13
-                            ],
-                            "end": [
-                                4,
                                 14
                             ]
                         }
                     },
-                    "summary": "Added the 'x' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'a' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -114,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 7905807..3f73aea 100644",
+        "index 79058077..3f73aea0 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
         "@@ -1,5 +1,5 @@",
@@ -126,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4f1648e3e4bd311f1fd9a1c7ebbbe0ad14ae824b..2fe4edc38ed39843dfcfe1db0a93b88b3bb38f8e"
+    "shas": "5b78237b718a47a6d2b9fb68cf1c160a4d4a76f2..e35ae5ac0a296d885037f98fb4e964767eb1285e"
 }
 ,{
     "testCaseDescription": "go-array-types-replacement-test",
@@ -223,7 +178,7 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 3f73aea..4978312 100644",
+        "index 3f73aea0..49783126 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
         "@@ -1,5 +1,5 @@",
@@ -235,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2fe4edc38ed39843dfcfe1db0a93b88b3bb38f8e..5f01a2df989ae20e6c01696e46db08172f4d9597"
+    "shas": "e35ae5ac0a296d885037f98fb4e964767eb1285e..71dfb19278239909328ab9aaa48d16490744232f"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-replacement-test",
@@ -332,7 +287,7 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 4978312..3f73aea 100644",
+        "index 49783126..3f73aea0 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
         "@@ -1,5 +1,5 @@",
@@ -344,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f01a2df989ae20e6c01696e46db08172f4d9597..e022653c35e606f93169f0294bb72d67d4882c38"
+    "shas": "71dfb19278239909328ab9aaa48d16490744232f..5e224d69766d3559328ca398ba766382b1ee0f18"
 }
 ,{
     "testCaseDescription": "go-array-types-delete-insert-test",
@@ -360,56 +315,11 @@
                             ],
                             "end": [
                                 4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                11
-                            ],
-                            "end": [
-                                4,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                13
-                            ],
-                            "end": [
-                                4,
                                 14
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -420,7 +330,7 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 3f73aea..7905807 100644",
+        "index 3f73aea0..79058077 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
         "@@ -1,5 +1,5 @@",
@@ -432,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e022653c35e606f93169f0294bb72d67d4882c38..057120f7ad4f5696e49c6cf7b2c6a62f4e73f9cb"
+    "shas": "5e224d69766d3559328ca398ba766382b1ee0f18..cd4ffedd2ddc95faa0c815da532de88d92a1ae85"
 }
 ,{
     "testCaseDescription": "go-array-types-teardown-test",
@@ -463,7 +373,7 @@
     ],
     "patch": [
         "diff --git a/array-types.go b/array-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/array-types.go",
         "+++ b/array-types.go",
         "@@ -1,5 +0,0 @@",
@@ -474,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "057120f7ad4f5696e49c6cf7b2c6a62f4e73f9cb..a5f4a8ef7e43527b67f052d3befe2c3999b7cf76"
+    "shas": "cd4ffedd2ddc95faa0c815da532de88d92a1ae85..e5edf8a86bedf3266cf1002d6ab0f04e6d74e262"
 }]

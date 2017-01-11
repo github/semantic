@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/case-statements.go b/case-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/case-statements.go",
         "+++ b/case-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "00591f56ce266bf6bef5e150fa94296fbe87c808..9981f50b202a95857e7b02e03bd4f27344b22dfe"
+    "shas": "1c1797e1101c7eb547e8c1acfc86c8618f87978c..76896ca05d9e466082a9a1bc36753ca277cc5def"
 }
 ,{
     "testCaseDescription": "go-case-statements-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/case-statements.go b/case-statements.go",
-        "index 7905807..0b4c956 100644",
+        "index 79058077..0b4c9561 100644",
         "--- a/case-statements.go",
         "+++ b/case-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9981f50b202a95857e7b02e03bd4f27344b22dfe..5b8dc31311d1f1bbd0d55765ef20f769975911e5"
+    "shas": "76896ca05d9e466082a9a1bc36753ca277cc5def..34898baa9fd14dd3f4273aafaa0b14240fdb9f37"
 }
 ,{
     "testCaseDescription": "go-case-statements-replacement-test",
@@ -112,7 +112,7 @@
     ],
     "patch": [
         "diff --git a/case-statements.go b/case-statements.go",
-        "index 0b4c956..27b7090 100644",
+        "index 0b4c9561..27b70908 100644",
         "--- a/case-statements.go",
         "+++ b/case-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -124,7 +124,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b8dc31311d1f1bbd0d55765ef20f769975911e5..dcfb0a1af6f5529e605e5d2d9fba64834c6be390"
+    "shas": "34898baa9fd14dd3f4273aafaa0b14240fdb9f37..45f3556e84fa45fc1704777e049a632ff1df7876"
 }
 ,{
     "testCaseDescription": "go-case-statements-delete-replacement-test",
@@ -155,7 +155,7 @@
     ],
     "patch": [
         "diff --git a/case-statements.go b/case-statements.go",
-        "index 27b7090..0b4c956 100644",
+        "index 27b70908..0b4c9561 100644",
         "--- a/case-statements.go",
         "+++ b/case-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -167,7 +167,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dcfb0a1af6f5529e605e5d2d9fba64834c6be390..230453a8266d0b2d9ff6755956e3e4d586f2318a"
+    "shas": "45f3556e84fa45fc1704777e049a632ff1df7876..d6fb562ec8b8ad4e7c84a16295619a2208c3d5a1"
 }
 ,{
     "testCaseDescription": "go-case-statements-delete-insert-test",
@@ -198,7 +198,7 @@
     ],
     "patch": [
         "diff --git a/case-statements.go b/case-statements.go",
-        "index 0b4c956..7905807 100644",
+        "index 0b4c9561..79058077 100644",
         "--- a/case-statements.go",
         "+++ b/case-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -210,7 +210,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "230453a8266d0b2d9ff6755956e3e4d586f2318a..8f8d9c31c6e2498fbe7bd88963b73be1c53589d1"
+    "shas": "d6fb562ec8b8ad4e7c84a16295619a2208c3d5a1..1c65333ce0268e0d3fb2d352489e6e2edda15ecd"
 }
 ,{
     "testCaseDescription": "go-case-statements-teardown-test",
@@ -241,7 +241,7 @@
     ],
     "patch": [
         "diff --git a/case-statements.go b/case-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/case-statements.go",
         "+++ b/case-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -252,5 +252,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8f8d9c31c6e2498fbe7bd88963b73be1c53589d1..a0749fc3294aefc254a16311a647828a63fda1eb"
+    "shas": "1c65333ce0268e0d3fb2d352489e6e2edda15ecd..341ed1dc7ab9083621320ead20e41b58c85c75bb"
 }]

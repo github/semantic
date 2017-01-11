@@ -192,6 +192,7 @@ data Category
   | Default
   -- | A type declaration.
   | TypeDecl
+  | PointerTy
   -- | A field declaration.
   | FieldDecl
   deriving (Eq, Generic, Ord, Show)
@@ -292,6 +293,8 @@ instance Arbitrary Category where
     , pure ParameterDecl
     , pure Default
     , pure TypeDecl
+    , pure PointerTy
+    , pure FieldDecl
     , Other <$> arbitrary
     ]
 

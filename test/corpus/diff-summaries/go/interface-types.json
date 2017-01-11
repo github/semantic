@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b71f8f15067094f9bf9ca540677f6e7fe3e25316..0c1dccfb0954ffec0799e995f46b73f93ce3f6e9"
+    "shas": "9f1f49894f80713cb6ca8f8303355cac94a1fbb9..6eae3470550f290d57076f99f669f5e84f01a8dd"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -54,26 +54,11 @@
                             ],
                             "end": [
                                 4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
                                 21
                             ]
                         }
                     },
-                    "summary": "Added the 'interface {}' interface_type in the main function of the 'main' module"
+                    "summary": "Added the 'i1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -84,41 +69,11 @@
                             ],
                             "end": [
                                 5,
-                                8
+                                32
                             ]
                         }
                     },
-                    "summary": "Added the 'i2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                21
-                            ],
-                            "end": [
-                                5,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'io' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                24
-                            ],
-                            "end": [
-                                5,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Reader' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'i2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -128,102 +83,12 @@
                                 6
                             ],
                             "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i3' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'io' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Reader' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
+                                10,
                                 2
-                            ],
-                            "end": [
-                                9,
-                                12
                             ]
                         }
                     },
-                    "summary": "Added the 'SomeMethod' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                13
-                            ],
-                            "end": [
-                                9,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's string' parameter declaration in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                23
-                            ],
-                            "end": [
-                                9,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'i3' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -234,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 7905807..9b2ca4a 100644",
+        "index 79058077..9b2ca4a9 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,5 +1,11 @@",
@@ -252,7 +117,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c1dccfb0954ffec0799e995f46b73f93ce3f6e9..daca585bff989b6426bb0b23bc342ba2adafac30"
+    "shas": "6eae3470550f290d57076f99f669f5e84f01a8dd..3ea3911b69f58e9794561dd1c7f70a57f7a5f98d"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -349,7 +214,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 9b2ca4a..cba5600 100644",
+        "index 9b2ca4a9..cba5600b 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,9 +1,9 @@",
@@ -367,7 +232,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "daca585bff989b6426bb0b23bc342ba2adafac30..585ae8aa83c870accffe9683105266572e5028fc"
+    "shas": "3ea3911b69f58e9794561dd1c7f70a57f7a5f98d..da2d55da0679df81e1d9dd1016bfc2b415ab3a4e"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -464,7 +329,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index cba5600..9b2ca4a 100644",
+        "index cba5600b..9b2ca4a9 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,9 +1,9 @@",
@@ -482,7 +347,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "585ae8aa83c870accffe9683105266572e5028fc..5c13786bad2ba6cfc2986a0b4459bd2b50d99d1b"
+    "shas": "da2d55da0679df81e1d9dd1016bfc2b415ab3a4e..386fa8ff3fa1b47bbf35262964107aabdbdcd997"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -498,26 +363,11 @@
                             ],
                             "end": [
                                 4,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                9
-                            ],
-                            "end": [
-                                4,
                                 21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'interface {}' interface_type in the main function of the 'main' module"
+                    "summary": "Deleted the 'i1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -528,41 +378,11 @@
                             ],
                             "end": [
                                 5,
-                                8
+                                32
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                21
-                            ],
-                            "end": [
-                                5,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'io' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                24
-                            ],
-                            "end": [
-                                5,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Reader' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'i2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -572,102 +392,12 @@
                                 6
                             ],
                             "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i3' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i1' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'io' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Reader' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
+                                10,
                                 2
-                            ],
-                            "end": [
-                                9,
-                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'SomeMethod' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                13
-                            ],
-                            "end": [
-                                9,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's string' parameter declaration in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                23
-                            ],
-                            "end": [
-                                9,
-                                28
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'i3' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -678,7 +408,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 9b2ca4a..7905807 100644",
+        "index 9b2ca4a9..79058077 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,11 +1,5 @@",
@@ -696,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c13786bad2ba6cfc2986a0b4459bd2b50d99d1b..f21fd797e1e935f2339477fa2549dc280d876972"
+    "shas": "386fa8ff3fa1b47bbf35262964107aabdbdcd997..59d14e822187578ec14f19772bf1db14a730f2ce"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -727,7 +457,7 @@
     ],
     "patch": [
         "diff --git a/interface-types.go b/interface-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/interface-types.go",
         "+++ b/interface-types.go",
         "@@ -1,5 +0,0 @@",
@@ -738,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f21fd797e1e935f2339477fa2549dc280d876972..634eb7fe85653540b2535c33f494ba6df0d03c5a"
+    "shas": "59d14e822187578ec14f19772bf1db14a730f2ce..c84f9d4bacb632d3b80655d9a2983264d64ce754"
 }]

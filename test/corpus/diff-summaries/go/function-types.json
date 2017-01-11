@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/function-types.go b/function-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/function-types.go",
         "+++ b/function-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "59f4e88ece267e1c88cf0d73910f0161d64d63ad..808a9f72309254e5742e112cf7d9bfe764f08600"
+    "shas": "6224c190f4162c0a8eca8effcc8142909d20c4cc..c7af4a786343c3b624d49a524a080640d1300371"
 }
 ,{
     "testCaseDescription": "go-function-types-insert-test",
@@ -54,41 +54,11 @@
                             ],
                             "end": [
                                 5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                13
-                            ],
-                            "end": [
-                                5,
                                 16
                             ]
                         }
                     },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'a' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -99,71 +69,11 @@
                             ],
                             "end": [
                                 6,
-                                2
+                                34
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                13
-                            ],
-                            "end": [
-                                6,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                22
-                            ],
-                            "end": [
-                                6,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bool' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                28
-                            ],
-                            "end": [
-                                6,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'error' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'b' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -174,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/function-types.go b/function-types.go",
-        "index 7905807..eebe42e 100644",
+        "index 79058077..eebe42e8 100644",
         "--- a/function-types.go",
         "+++ b/function-types.go",
         "@@ -1,5 +1,8 @@",
@@ -189,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "808a9f72309254e5742e112cf7d9bfe764f08600..e48047f047ea51286130b01b8a33972db3d2ca6a"
+    "shas": "c7af4a786343c3b624d49a524a080640d1300371..b89429b889b92d23308229d18a4d3f19242c8e38"
 }
 ,{
     "testCaseDescription": "go-function-types-replacement-test",
@@ -388,7 +298,7 @@
     ],
     "patch": [
         "diff --git a/function-types.go b/function-types.go",
-        "index eebe42e..2ae1953 100644",
+        "index eebe42e8..2ae1953b 100644",
         "--- a/function-types.go",
         "+++ b/function-types.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -403,7 +313,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e48047f047ea51286130b01b8a33972db3d2ca6a..7bb288899d8e5c9937b3af0891e1247f7041fe79"
+    "shas": "b89429b889b92d23308229d18a4d3f19242c8e38..5b2630796d4ee9613f8c70755bb8d1c9dc251149"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-replacement-test",
@@ -602,7 +512,7 @@
     ],
     "patch": [
         "diff --git a/function-types.go b/function-types.go",
-        "index 2ae1953..eebe42e 100644",
+        "index 2ae1953b..eebe42e8 100644",
         "--- a/function-types.go",
         "+++ b/function-types.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -617,7 +527,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7bb288899d8e5c9937b3af0891e1247f7041fe79..547c9e9d58f8558f972cb5a6fb08f01d620527a6"
+    "shas": "5b2630796d4ee9613f8c70755bb8d1c9dc251149..cc9d39348015a70a196df992a05d1b5177c357a2"
 }
 ,{
     "testCaseDescription": "go-function-types-delete-insert-test",
@@ -633,41 +543,11 @@
                             ],
                             "end": [
                                 5,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                13
-                            ],
-                            "end": [
-                                5,
                                 16
                             ]
                         }
                     },
-                    "summary": "Deleted the 'int' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -678,71 +558,11 @@
                             ],
                             "end": [
                                 6,
-                                2
+                                34
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                13
-                            ],
-                            "end": [
-                                6,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                22
-                            ],
-                            "end": [
-                                6,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bool' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                28
-                            ],
-                            "end": [
-                                6,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'error' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -753,7 +573,7 @@
     ],
     "patch": [
         "diff --git a/function-types.go b/function-types.go",
-        "index eebe42e..7905807 100644",
+        "index eebe42e8..79058077 100644",
         "--- a/function-types.go",
         "+++ b/function-types.go",
         "@@ -1,8 +1,5 @@",
@@ -768,7 +588,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "547c9e9d58f8558f972cb5a6fb08f01d620527a6..6753f75036800642b2bdb0f374975c23baaf1bf7"
+    "shas": "cc9d39348015a70a196df992a05d1b5177c357a2..0523c24c216ea571aad176b8fdc656cec39112cc"
 }
 ,{
     "testCaseDescription": "go-function-types-teardown-test",
@@ -799,7 +619,7 @@
     ],
     "patch": [
         "diff --git a/function-types.go b/function-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/function-types.go",
         "+++ b/function-types.go",
         "@@ -1,5 +0,0 @@",
@@ -810,5 +630,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6753f75036800642b2bdb0f374975c23baaf1bf7..78afa1145b3f1cc54007897517234c44a922aae5"
+    "shas": "0523c24c216ea571aad176b8fdc656cec39112cc..37c1fba586cb3ed872b71a90a4c7e47b0af853ce"
 }]
