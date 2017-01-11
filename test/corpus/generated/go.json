@@ -1,6 +1,6 @@
 [
   {
-    "repoUrl": "https://github.com/joshvera/go.git",
+    "repoUrl": "https://github.com/diff-summaries/go.git",
     "language": "go",
     "fileExt": ".go",
     "syntaxes": [
