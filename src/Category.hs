@@ -192,6 +192,8 @@ data Category
   | Default
   -- | A type declaration.
   | TypeDecl
+  -- | A field declaration.
+  | FieldDecl
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
