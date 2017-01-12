@@ -64,6 +64,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Object ty _ -> if isJust ty then Identifiable else Unidentifiable
           S.BlockStatement{} -> Identifiable
           S.TypeDecl{} -> Identifiable
+          S.Ty{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
