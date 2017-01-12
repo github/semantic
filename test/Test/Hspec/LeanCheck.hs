@@ -47,20 +47,20 @@ instance Example Property where
 
 class IOTestable t where
   -- 'resultiers', lifted into 'IO'.
-  ioresultiers :: t -> [[IO ([String], Bool)]]
+  ioResultTiers :: t -> [[IO ([String], Bool)]]
 
 instance IOTestable (IO ()) where
-  ioresultiers action = [[ (action >> pure ([], True)) `catch` (\ e -> pure ([ displayException (e :: SomeException) ], False)) ]]
+  ioResultTiers action = [[ (action >> pure ([], True)) `catch` (\ e -> pure ([ displayException (e :: SomeException) ], False)) ]]
 
 instance (IOTestable b, Show a, Listable a) => IOTestable (a -> b) where
-  ioresultiers p = ioconcatMapT resultiersFor tiers
-    where resultiersFor x = fmap (fmap (first (showsPrec 11 x "":))) <$> ioresultiers (p x)
+  ioResultTiers p = ioconcatMapT resultiersFor tiers
+    where resultiersFor x = fmap (fmap (first (showsPrec 11 x "":))) <$> ioResultTiers (p x)
 
 instance IOTestable Bool where
-  ioresultiers p = [[ pure ([], p) ]]
+  ioResultTiers p = [[ pure ([], p) ]]
 
 instance IOTestable (ForAll a) where
-  ioresultiers (ForAll tiers property) = concatMapT (ioresultiers . property) tiers
+  ioResultTiers (ForAll tiers property) = concatMapT (ioResultTiers . property) tiers
 
 
 -- | 'concatMapT', lifted into 'IO'.
@@ -69,7 +69,7 @@ ioconcatMapT f = (>>= (>>= f))
 
 -- | 'counterExamples', lifted into 'IO'.
 iocounterExamples :: IOTestable a => Int -> a -> IO [[String]]
-iocounterExamples n = fmap (fmap fst . filter (not . snd)) . sequenceA . take n . concat . ioresultiers
+iocounterExamples n = fmap (fmap fst . filter (not . snd)) . sequenceA . take n . concat . ioResultTiers
 
 -- | 'counterExample', lifted into 'IO'.
 iocounterExample :: IOTestable a => Int -> a -> IO (Maybe [String])
