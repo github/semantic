@@ -195,6 +195,8 @@ data Category
   | PointerTy
   -- | A field declaration.
   | FieldDecl
+  -- | A slice type, e.g. []string{"hello"} in Go.
+  | SliceTy
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -295,6 +297,7 @@ instance Arbitrary Category where
     , pure TypeDecl
     , pure PointerTy
     , pure FieldDecl
+    , pure SliceTy
     , Other <$> arbitrary
     ]
 
