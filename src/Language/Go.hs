@@ -135,8 +135,8 @@ termConstructor source sourceSpan name range children _ = case name of
       rest -> S.Error rest
     sliceToSubscriptAccess = \case
       a : rest -> do
-        slice <- withRanges range Slice rest $ S.Fixed rest
-        withDefaultInfo $ S.SubscriptAccess a slice
+        sliceElement <- withRanges range Element rest $ S.Fixed rest
+        withCategory Slice (S.SubscriptAccess a sliceElement)
       rest -> withDefaultInfo $ S.Error rest
 
     toIfStatement = \case
@@ -250,4 +250,6 @@ categoryForGoName = \case
   "type_declaration" -> TypeDecl
   "field_declaration" -> FieldDecl
   "pointer_type" -> PointerTy
+  "slice_type" -> SliceTy
+  "element" -> Element
   s -> Other (toS s)
