@@ -13,6 +13,7 @@ module Patch
 , mapPatch
 ) where
 
+import Data.Functor.Listable
 import Data.These
 import Prologue
 
@@ -69,3 +70,12 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 -- | Return Just the value in That, or the second value in These, if any.
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
+
+
+-- Instances
+
+instance Listable1 Patch where
+  liftTiers t = liftCons1 t Insert \/ liftCons1 t Delete \/ liftCons2 t t Replace
+
+instance Listable a => Listable (Patch a) where
+  tiers = tiers1

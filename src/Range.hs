@@ -5,8 +5,7 @@ import Data.List (span)
 import Data.Semigroup
 import Data.String
 import Prologue
-import Test.QuickCheck
-
+import Test.LeanCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: Int, end :: Int }
@@ -82,7 +81,5 @@ instance Semigroup Range where
 instance Ord Range where
   a <= b = start a <= start b
 
-instance Arbitrary Range where
-  arbitrary = Range <$> arbitrary <*> arbitrary
-
-  shrink s = Range <$> shrink (start s) <*> shrink (end s)
+instance Listable Range where
+  tiers = cons2 Range
