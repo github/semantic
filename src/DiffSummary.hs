@@ -460,6 +460,7 @@ instance HasCategory Category where
     C.SliceTy -> "slice type"
     C.Element -> "element"
     C.Literal -> "literal"
+    C.ChannelTy -> "channel type"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

@@ -201,6 +201,8 @@ data Category
   | Element
   -- | A literal value.
   | Literal
+  -- | A channel type in Go.
+  | ChannelTy
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

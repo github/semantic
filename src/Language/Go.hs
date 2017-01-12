@@ -104,6 +104,9 @@ termConstructor source sourceSpan name range children _ = case name of
   "pointer_type" -> withDefaultInfo $ case children of
     [ty] -> S.Ty ty
     rest -> S.Error rest
+  "channel_type" -> withDefaultInfo $ case children of
+    [ty] -> S.Ty ty
+    rest -> S.Error rest
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
@@ -257,4 +260,5 @@ categoryForGoName = \case
   "slice_type" -> SliceTy
   "element" -> Element
   "literal_value" -> Literal
+  "channel_type" -> ChannelTy
   s -> Other (toS s)

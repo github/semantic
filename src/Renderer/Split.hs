@@ -136,6 +136,7 @@ styleName category = "category-" <> case category of
   C.SliceTy -> "slice_type"
   C.Element -> "element"
   C.Literal -> "literal"
+  C.ChannelTy -> "channel_type"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
