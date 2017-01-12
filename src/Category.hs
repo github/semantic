@@ -207,6 +207,8 @@ data Category
   | Send
   -- | An Index expression, e.g. x[1] in Go.
   | IndexExpression
+  -- | A function type.
+  | FunctionTy
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -310,6 +312,7 @@ instance Arbitrary Category where
     , pure SliceTy
     , pure Element
     , pure IndexExpression
+    , pure FunctionTy
     , Other <$> arbitrary
     ]
 

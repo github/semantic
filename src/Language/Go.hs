@@ -111,6 +111,9 @@ termConstructor source sourceSpan name range children _ = case name of
     [channel, expr] -> S.Send channel expr
     rest -> S.Error rest
   "unary_expression" -> withDefaultInfo $ S.Operator children
+  "function_type" -> do
+    params <- withRanges range Params children $ S.Indexed children
+    withDefaultInfo $ S.Ty params
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
@@ -267,4 +270,6 @@ categoryForGoName = \case
   "channel_type" -> ChannelTy
   "send_statement" -> Send
   "unary_expression" -> Operator
+  "ERROR" -> Error
+  "function_type" -> FunctionTy
   s -> Other (toS s)
