@@ -217,6 +217,9 @@ toTermName source term = case unwrap term of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' element <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' element
     (_, S.FunctionCall{}) -> toTermName' base <> "[" <> toTermName' element <> "()" <> "]"
+    (S.Indexed _, _) -> case category . extract $ base of
+      SliceTy -> termNameFromSource base <> toTermName' element
+      _ -> toTermName' base <> "[" <> toTermName' element <> "]"
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
   S.VarAssignment varId _ -> toTermName' varId
   S.VarDecl decl -> toTermName' decl
@@ -422,7 +425,7 @@ instance HasCategory Category where
     C.Negate -> "negate"
     C.Select -> "select statement"
     C.Go -> "go statement"
-    C.Slice -> "slice expression"
+    C.Slice -> "slice literal"
     C.Defer -> "defer statement"
     C.TypeAssertion -> "type assertion statement"
     C.TypeConversion -> "type conversion expression"
@@ -452,6 +455,9 @@ instance HasCategory Category where
     C.TypeDecl -> "type declaration"
     C.PointerTy -> "pointer type"
     C.FieldDecl -> "field declaration"
+    C.SliceTy -> "slice type"
+    C.Element -> "element"
+    C.Literal -> "literal"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
