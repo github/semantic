@@ -197,6 +197,8 @@ data Category
   | FieldDecl
   -- | A slice type, e.g. []string{"hello"} in Go.
   | SliceTy
+  -- | An element of a slice literal.
+  | Element
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -298,6 +300,7 @@ instance Arbitrary Category where
     , pure PointerTy
     , pure FieldDecl
     , pure SliceTy
+    , pure Element
     , Other <$> arbitrary
     ]
 
