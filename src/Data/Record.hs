@@ -69,6 +69,9 @@ instance (ToJSON a, ToJSON b, ToJSON c, ToJSON d) => ToJSON (Record (a ': b ': c
 instance ToJSON (Record '[]) where
   toJSON _ = emptyArray
 
+class ToJSONList t where
+  toJSONValues :: t -> [Value]
+
 
 instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where
   RCons h1 t1 == RCons h2 t2 = h1 == h2 && t1 == t2
