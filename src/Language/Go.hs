@@ -101,6 +101,9 @@ termConstructor source sourceSpan name range children _ = case name of
       [params'] -> S.AnonymousFunction (toList $ unwrap params') (toList $ unwrap body)
       rest -> S.Error rest
     rest -> S.Error rest
+  "pointer_type" -> withDefaultInfo $ case children of
+    [ty] -> S.Ty ty
+    rest -> S.Error rest
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children

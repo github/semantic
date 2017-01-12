@@ -150,4 +150,5 @@ syntaxToTermField syntax = case syntax of
   S.Default c -> childrenFields c
   S.TypeDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
   S.FieldDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
+  S.Ty ty -> [ "type" .= ty ]
   where childrenFields c = [ "children" .= c ]

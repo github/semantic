@@ -96,10 +96,12 @@ data Syntax a f
   | BlockStatement [f]
   -- | A parameter declaration with an optional type.
   | ParameterDecl (Maybe f) f
-  -- | A type declaration.
+  -- | A type declaration has an identifier and a type.
   | TypeDecl f f
   -- | A field declaration.
   | FieldDecl f (Maybe f)
+  -- | A type.
+  | Ty f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
