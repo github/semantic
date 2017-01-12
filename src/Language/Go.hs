@@ -253,4 +253,5 @@ categoryForGoName = \case
   "pointer_type" -> PointerTy
   "slice_type" -> SliceTy
   "element" -> Element
+  "literal_value" -> Literal
   s -> Other (toS s)

@@ -199,6 +199,8 @@ data Category
   | SliceTy
   -- | An element of a slice literal.
   | Element
+  -- | A literal value.
+  | Literal
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

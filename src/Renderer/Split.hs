@@ -135,6 +135,7 @@ styleName category = "category-" <> case category of
   C.FieldDecl -> "field_declaration"
   C.SliceTy -> "slice_type"
   C.Element -> "element"
+  C.Literal -> "literal"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
