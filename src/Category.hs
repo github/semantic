@@ -3,9 +3,9 @@
 module Category where
 
 import Prologue
-import Test.QuickCheck hiding (Args)
+import Data.Functor.Listable
 import Data.Text (pack)
-import Data.Text.Arbitrary()
+import Data.Text.Listable
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -190,91 +190,87 @@ instance Hashable Category
 instance (StringConv Category Text) where
   strConv _ = pack . show
 
-instance Arbitrary Category where
-  arbitrary = oneof [
-      pure Program
-    , pure Error
-    , pure Boolean
-    , pure BooleanOperator
-    , pure MathOperator
-    , pure DictionaryLiteral
-    , pure Pair
-    , pure FunctionCall
-    , pure Function
-    , pure Identifier
-    , pure Params
-    , pure ExpressionStatements
-    , pure MethodCall
-    , pure Args
-    , pure StringLiteral
-    , pure IntegerLiteral
-    , pure NumberLiteral
-    , pure Regex
-    , pure Return
-    , pure SymbolLiteral
-    , pure TemplateString
-    , pure ArrayLiteral
-    , pure Assignment
-    , pure MathAssignment
-    , pure MemberAccess
-    , pure SubscriptAccess
-    , pure VarAssignment
-    , pure VarDecl
-    , pure For
-    , pure DoWhile
-    , pure While
-    , pure Switch
-    , pure Ternary
-    , pure Case
-    , pure Operator
-    , pure Object
-    , pure Throw
-    , pure Constructor
-    , pure Try
-    , pure Catch
-    , pure Finally
-    , pure Class
-    , pure Method
-    , pure Module
-    , pure Import
-    , pure Export
-    , pure Interpolation
-    , pure Subshell
-    , pure OperatorAssignment
-    , pure Yield
-    , pure Until
-    , pure Unless
-    , pure Begin
-    , pure Else
-    , pure Elsif
-    , pure Ensure
-    , pure Rescue
-    , pure RescueModifier
-    , pure RescuedException
-    , pure RescueArgs
-    , pure When
-    , pure Negate
-    , pure Select
-    , pure Defer
-    , pure Go
-    , pure Slice
-    , pure TypeAssertion
-    , pure TypeConversion
-    , pure ArgumentPair
-    , pure KeywordParameter
-    , pure OptionalParameter
-    , pure SplatParameter
-    , pure HashSplatParameter
-    , pure BlockParameter
-    , pure Break
-    , pure Continue
-    , pure Binary
-    , pure Unary
-    , pure Constant
-    , pure Superclass
-    , pure SingletonClass
-    , Other <$> arbitrary
-    ]
-
-  shrink (Other s) = Other <$> shrink s
-  shrink _ = []
+instance Listable Category where
+  tiers
+    =  cons0 Program
+    \/ cons0 Error
+    \/ cons0 Boolean
+    \/ cons0 BooleanOperator
+    \/ cons0 MathOperator
+    \/ cons0 DictionaryLiteral
+    \/ cons0 Pair
+    \/ cons0 FunctionCall
+    \/ cons0 Function
+    \/ cons0 Identifier
+    \/ cons0 Params
+    \/ cons0 ExpressionStatements
+    \/ cons0 MethodCall
+    \/ cons0 Args
+    \/ cons0 StringLiteral
+    \/ cons0 IntegerLiteral
+    \/ cons0 NumberLiteral
+    \/ cons0 Regex
+    \/ cons0 Return
+    \/ cons0 SymbolLiteral
+    \/ cons0 TemplateString
+    \/ cons0 ArrayLiteral
+    \/ cons0 Assignment
+    \/ cons0 MathAssignment
+    \/ cons0 MemberAccess
+    \/ cons0 SubscriptAccess
+    \/ cons0 VarAssignment
+    \/ cons0 VarDecl
+    \/ cons0 For
+    \/ cons0 DoWhile
+    \/ cons0 While
+    \/ cons0 Switch
+    \/ cons0 Ternary
+    \/ cons0 Case
+    \/ cons0 Operator
+    \/ cons0 Object
+    \/ cons0 Throw
+    \/ cons0 Constructor
+    \/ cons0 Try
+    \/ cons0 Catch
+    \/ cons0 Finally
+    \/ cons0 Class
+    \/ cons0 Method
+    \/ cons0 Module
+    \/ cons0 Import
+    \/ cons0 Export
+    \/ cons0 Interpolation
+    \/ cons0 Subshell
+    \/ cons0 OperatorAssignment
+    \/ cons0 Yield
+    \/ cons0 Until
+    \/ cons0 Unless
+    \/ cons0 Begin
+    \/ cons0 Else
+    \/ cons0 Elsif
+    \/ cons0 Ensure
+    \/ cons0 Rescue
+    \/ cons0 RescueModifier
+    \/ cons0 RescuedException
+    \/ cons0 RescueArgs
+    \/ cons0 When
+    \/ cons0 Negate
+    \/ cons0 Select
+    \/ cons0 Defer
+    \/ cons0 Go
+    \/ cons0 Slice
+    \/ cons0 TypeAssertion
+    \/ cons0 TypeConversion
+    \/ cons0 ArgumentPair
+    \/ cons0 KeywordParameter
+    \/ cons0 OptionalParameter
+    \/ cons0 SplatParameter
+    \/ cons0 HashSplatParameter
+    \/ cons0 BlockParameter
+    \/ cons0 Break
+    \/ cons0 Continue
+    \/ cons0 Binary
+    \/ cons0 Unary
+    \/ cons0 Constant
+    \/ cons0 Superclass
+    \/ cons0 SingletonClass
+    \/ cons1 (Other . unListableText)

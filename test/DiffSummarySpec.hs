@@ -3,11 +3,12 @@ module DiffSummarySpec where
 
 import Category
 import Data.Functor.Both
+import Data.Functor.Listable
 import Data.List (partition)
 import Data.RandomWalkSimilarity
 import Data.Record
+import Data.String
 import Diff
-import Diff.Arbitrary
 import DiffSummary
 import Info
 import Interpreter
@@ -16,10 +17,9 @@ import Prologue
 import Source
 import Syntax
 import Term
-import Term.Arbitrary
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
-import Test.Hspec.QuickCheck
+import Test.Hspec.LeanCheck
 import Data.These
 import Diffing (getLabel)
 
@@ -51,13 +51,13 @@ spec = parallel $ do
       diffSummaries blobs testDiff `shouldBe` [ JSONSummary "Added the \"a\" string" (SourceSpans . That $ sourceSpanBetween (1, 2) (1, 4)) ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in
+      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (unListableF a :: SyntaxTerm String '[Category, Range, SourceSpan]) in
         diffSummaries blobs (diffTerms wrap (==) diffCost getLabel term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range, SourceSpan])))
+        diff = unListableDiff a :: SyntaxDiff String '[Category, Cost, Range, SourceSpan]
         summaries = diffToDiffSummaries (source <$> blobs) diff
         patches = toList diff
         in
@@ -66,14 +66,14 @@ spec = parallel $ do
               (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchDiffPatches, () <$ otherDiffPatches)
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range, SourceSpan])))
+        diff = unListableDiff a :: SyntaxDiff String '[Category, Range, SourceSpan]
         diffInfoPatches = patch <$> diffToDiffSummaries (source <$> blobs) diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
         extractLeaves leaf = [ leaf ]
 
-        extractDiffLeaves :: Term (Syntax Text) (Record '[Category, Range, SourceSpan]) -> [ Term (Syntax Text) (Record '[Category, Range, SourceSpan]) ]
+        extractDiffLeaves :: SyntaxTerm String '[Category, Range, SourceSpan] -> [ SyntaxTerm String '[Category, Range, SourceSpan] ]
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children
@@ -98,3 +98,6 @@ isIndexedOrFixed' syntax = case syntax of
 
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
+
+unListableDiff :: Functor f => ListableF (Free (TermF f (ListableF (Join (,)) annotation))) (Patch (ListableF (Term f) annotation)) -> Diff f annotation
+unListableDiff diff = transFreeT (first unListableF) $ fmap unListableF <$> unListableF diff
