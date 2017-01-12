@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "250675f9851f6cab4d70c5505bc7781de836c288..199de168b62fa4e26885ccd7bdd8a3c78b2ca4cc"
+    "shas": "c3b3855c7743f237244fce36ffb7c1cbb07fa7ff..02e30e6371ac73d59b281bf29357c4bbb14fe8b9"
 }
 ,{
     "testCaseDescription": "go-slice-literals-insert-test",
@@ -116,7 +116,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "199de168b62fa4e26885ccd7bdd8a3c78b2ca4cc..5afce171f7961d5798c504c8a46f958229f9c904"
+    "shas": "02e30e6371ac73d59b281bf29357c4bbb14fe8b9..c7aa475b6f8fcf8ad5ba04758266a18baaf37200"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
@@ -125,18 +125,30 @@
             "slice-literals.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                21
-                            ],
-                            "end": [
-                                4,
-                                26
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    20
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the \"sup\" string in the s1 var assignment of the 'main' function"
+                    "summary": "Replaced the '{}' literal with the \"sup\" string in the []string{\"sup\"} slice literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -163,7 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the s2 var assignment of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the []string{\"hello\"} slice literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -190,7 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the s3 var assignment of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the []string{\n\"bar\",\n \"baz\",\n} slice literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -217,7 +229,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the s3 var assignment of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the []string{\n\"bar\",\n \"baz\",\n} slice literal of the 'main' function"
                 }
             ]
         },
@@ -248,7 +260,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5afce171f7961d5798c504c8a46f958229f9c904..c8dc6adac5c86321f51b6c0eaff1e9172bb393b8"
+    "shas": "c7aa475b6f8fcf8ad5ba04758266a18baaf37200..24cd8af2b7e9dbc9f5ae157dd73f96dc887f9535"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
@@ -257,18 +269,30 @@
             "slice-literals.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                21
-                            ],
-                            "end": [
-                                4,
-                                26
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    20
+                                ],
+                                "end": [
+                                    4,
+                                    22
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the \"sup\" string in the s1 var assignment of the 'main' function"
+                    "summary": "Replaced the \"sup\" string with the '{}' literal in the []string{} slice literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -295,7 +319,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the s2 var assignment of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the []string{\"hi\"} slice literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -322,7 +346,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the s3 var assignment of the 'main' function"
+                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the []string{\n\"hi\",\n \"hello\",\n} slice literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -349,7 +373,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the s3 var assignment of the 'main' function"
+                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the []string{\n\"hi\",\n \"hello\",\n} slice literal of the 'main' function"
                 }
             ]
         },
@@ -380,7 +404,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c8dc6adac5c86321f51b6c0eaff1e9172bb393b8..969119894d612e7e3be07f22a9009ced6205cf15"
+    "shas": "24cd8af2b7e9dbc9f5ae157dd73f96dc887f9535..47be26de59eb833c604ee66f6432c12867b3722a"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
@@ -458,7 +482,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "969119894d612e7e3be07f22a9009ced6205cf15..4637438856ddb94e3c4a3e15572825cf0cf9218f"
+    "shas": "47be26de59eb833c604ee66f6432c12867b3722a..f270327170f2766decf667d70babf56ff140b9c6"
 }
 ,{
     "testCaseDescription": "go-slice-literals-teardown-test",
@@ -500,5 +524,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4637438856ddb94e3c4a3e15572825cf0cf9218f..ede817f2d69f14475f354045064794e04a6bfec8"
+    "shas": "f270327170f2766decf667d70babf56ff140b9c6..e7e3ce19924737aca0872994f3268f9f73e74c98"
 }]
