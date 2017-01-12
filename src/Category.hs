@@ -205,6 +205,8 @@ data Category
   | ChannelTy
   -- | A send statement in Go.
   | Send
+  -- | A function type.
+  | FunctionTy
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
