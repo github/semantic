@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eb22590bba5cac2db7b478012ad0ab6e980f7317..eb688f5978a25a0f97562827aeefb521104d7c0a"
+    "shas": "1a4aae0bafb6ad2a25b31b59421b337616dcbfd9..46673b0f84268bdcc0dda8104526874b70b2884c"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b[b[:]]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'b[b[:]]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -88,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'c[1]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -103,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'd[1:2]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'd[1:2]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -118,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'e[2:3]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'e[2:3]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -133,7 +133,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'f[1:2:3]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'f[1:2:3]' slice literal in the main function of the 'main' module"
                 }
             ]
         },
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eb688f5978a25a0f97562827aeefb521104d7c0a..73f4bf26640e48c500aed9ff29cf1577772b6178"
+    "shas": "46673b0f84268bdcc0dda8104526874b70b2884c..32b42936718bd32bec18310648de26048d5c4612"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -170,64 +170,70 @@
             "indexing-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    6
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'a[1]' subscript access with the 'z[2]' subscript access in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    2
-                                ],
-                                "end": [
-                                    5,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    2
-                                ],
-                                "end": [
-                                    5,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y[1] subscript access of the 'main' function"
+                    "summary": "Added the 'z[2]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y[1]' slice literal in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[1]' slice literal in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
                                 5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a[1]' subscript access in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                2
                             ],
                             "end": [
                                 5,
@@ -235,34 +241,22 @@
                             ]
                         }
                     },
-                    "summary": "Added '1' in the y[1] subscript access of the 'main' function"
+                    "summary": "Deleted the 'b[b[:]]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    2
-                                ],
-                                "end": [
-                                    6,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    2
-                                ],
-                                "end": [
-                                    6,
-                                    3
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the x[1] subscript access of the 'main' function"
+                    "summary": "Deleted the 'c[1]' slice literal in the main function of the 'main' module"
                 }
             ]
         },
@@ -291,7 +285,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "73f4bf26640e48c500aed9ff29cf1577772b6178..1b4535efce42dac8f36b0afe720bb93a357a87fb"
+    "shas": "32b42936718bd32bec18310648de26048d5c4612..9255e00abb10febd00ecfa015fb6e0a9957ee435"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -300,42 +294,30 @@
             "indexing-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    5
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'z[2]' subscript access with the 'a[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'a[1]' subscript access in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
-                                    2
+                                    4,
+                                    1
                                 ],
                                 "end": [
-                                    5,
-                                    3
+                                    4,
+                                    2
                                 ]
                             },
                             {
@@ -350,33 +332,33 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b[b[:]] subscript access of the 'main' function"
+                    "summary": "Replaced the 'z' identifier with the 'b' identifier in the b[b[:]] slice literal of the 'main' function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                5
+                                4,
+                                4
                             ],
                             "end": [
-                                5,
-                                6
+                                4,
+                                5
                             ]
                         }
                     },
-                    "summary": "Deleted '1' in the b[b[:]] subscript access of the 'main' function"
+                    "summary": "Deleted '2' in the b[b[:]] slice literal of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    6,
+                                    5,
                                     2
                                 ],
                                 "end": [
-                                    6,
+                                    5,
                                     3
                                 ]
                             },
@@ -392,7 +374,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the c[1] subscript access of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'c' identifier in the c[1] slice literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[1]' slice literal in the main function of the 'main' module"
                 }
             ]
         },
@@ -421,7 +418,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1b4535efce42dac8f36b0afe720bb93a357a87fb..55acb284dfae05ca8dadc8b80062489510ac2877"
+    "shas": "9255e00abb10febd00ecfa015fb6e0a9957ee435..2cbaa0c8dbc25e1ed464f14c8e9f7eeda2768112"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -456,7 +453,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b[b[:]]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'b[b[:]]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -471,7 +468,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'c[1]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -486,7 +483,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd[1:2]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'd[1:2]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -501,7 +498,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e[2:3]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'e[2:3]' slice literal in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -516,7 +513,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f[1:2:3]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'f[1:2:3]' slice literal in the main function of the 'main' module"
                 }
             ]
         },
@@ -544,7 +541,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "55acb284dfae05ca8dadc8b80062489510ac2877..bd8e5f699bca1948c711f3d6d47d08296f8191ef"
+    "shas": "2cbaa0c8dbc25e1ed464f14c8e9f7eeda2768112..e019086de4e2d426cb0f65c77fc0386b3d2faaec"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -586,5 +583,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bd8e5f699bca1948c711f3d6d47d08296f8191ef..f39c7d56a7c3a174293e7c6157c7410c17c654a3"
+    "shas": "e019086de4e2d426cb0f65c77fc0386b3d2faaec..aff56e988571d418e1187aa51b5aa4d25cc850e8"
 }]

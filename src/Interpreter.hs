@@ -81,6 +81,10 @@ algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $
     S.Method <$> recursively identifierA identifierB
              <*> bySimilarity paramsA paramsB
              <*> bySimilarity expressionsA expressionsB
+  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
+    S.Function <$> recursively idA idB
+               <*> bySimilarity paramsA paramsB
+               <*> bySimilarity bodyA bodyB
   _ -> Nothing
   where annotate = construct . (both (extract t1) (extract t2) :<)
 

@@ -463,6 +463,7 @@ instance HasCategory Category where
     C.Literal -> "literal"
     C.ChannelTy -> "channel type"
     C.Send -> "send statement"
+    C.IndexExpression -> "index expression"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

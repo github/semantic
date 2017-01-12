@@ -205,6 +205,8 @@ data Category
   | ChannelTy
   -- | A send statement in Go.
   | Send
+  -- | An Index expression, e.g. x[1] in Go.
+  | IndexExpression
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -307,6 +309,7 @@ instance Arbitrary Category where
     , pure FieldDecl
     , pure SliceTy
     , pure Element
+    , pure IndexExpression
     , Other <$> arbitrary
     ]
 

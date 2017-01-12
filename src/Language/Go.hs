@@ -231,8 +231,8 @@ categoryForGoName = \case
   "func_literal" -> AnonymousFunction
   "call_expression" -> FunctionCall
   "selector_expression" -> SubscriptAccess
-  "index_expression" -> SubscriptAccess
-  "slice_expression" -> SubscriptAccess
+  "index_expression" -> IndexExpression
+  "slice_expression" -> Slice
   "parameters" -> Args
   "short_var_declaration" -> VarDecl
   "var_declaration" -> VarDecl

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ede817f2d69f14475f354045064794e04a6bfec8..9b9c64b0842e4a595bf50ee1abad0eaf95dcfab1"
+    "shas": "5227190eb44ddd86d3eb4410380f4accfa52c94a..1f2b3e5cd31eaaaf2e1266e56f8831f3bf3a3060"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b9c64b0842e4a595bf50ee1abad0eaf95dcfab1..17e8f1008c39db67963476087bcc325efb2b73b2"
+    "shas": "1f2b3e5cd31eaaaf2e1266e56f8831f3bf3a3060..e6d182dd56724a2fd405ffd71b370bf2832519d2"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -90,6 +90,21 @@
             "array-with-implicit-length.go": [
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added '4' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -104,58 +119,46 @@
                             {
                                 "start": [
                                     4,
-                                    21
+                                    23
                                 ],
                                 "end": [
                                     4,
-                                    22
+                                    24
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '4' in the [...]int array of the 'main' function"
+                    "summary": "Replaced '1' with '5' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                23
+                                25
                             ],
                             "end": [
                                 4,
-                                24
+                                26
                             ]
                         }
                     },
-                    "summary": "Added '5' in the [...]int array of the 'main' function"
+                    "summary": "Added '6' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    24
-                                ],
-                                "end": [
-                                    4,
-                                    25
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    25
-                                ],
-                                "end": [
-                                    4,
-                                    26
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                4,
+                                24
+                            ],
+                            "end": [
+                                4,
+                                25
+                            ]
+                        }
                     },
-                    "summary": "Replaced '2' with '6' in the [...]int array of the 'main' function"
+                    "summary": "Deleted '2' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
@@ -193,7 +196,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "17e8f1008c39db67963476087bcc325efb2b73b2..2cc8087f56148a938af7da3813e34a58a321b287"
+    "shas": "e6d182dd56724a2fd405ffd71b370bf2832519d2..382a50227fc5f1b12331ab5d4232a1731f313491"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -202,30 +205,18 @@
             "array-with-implicit-length.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    21
-                                ],
-                                "end": [
-                                    4,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    21
-                                ],
-                                "end": [
-                                    4,
-                                    22
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
                     },
-                    "summary": "Replaced '4' with '1' in the [...]int array of the 'main' function"
+                    "summary": "Added '1' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
@@ -244,30 +235,48 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    23
-                                ],
-                                "end": [
-                                    4,
-                                    24
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    27
-                                ],
-                                "end": [
-                                    4,
-                                    28
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                27
+                            ],
+                            "end": [
+                                4,
+                                28
+                            ]
+                        }
                     },
-                    "summary": "Replaced '5' with '3' in the [...]int array of the 'main' function"
+                    "summary": "Added '3' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                21
+                            ],
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '4' in the [...]int array of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                23
+                            ],
+                            "end": [
+                                4,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '5' in the [...]int array of the 'main' function"
                 },
                 {
                     "span": {
@@ -305,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2cc8087f56148a938af7da3813e34a58a321b287..1ac9bd8f7d472e400246863f84922ae5c11b6c82"
+    "shas": "382a50227fc5f1b12331ab5d4232a1731f313491..190ffc6b0a8f43da2d3581593448953279556b72"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -348,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1ac9bd8f7d472e400246863f84922ae5c11b6c82..6391aa786800f3c356fa0d01c559cf3d25a015c6"
+    "shas": "190ffc6b0a8f43da2d3581593448953279556b72..2cf0dfab16568eb6f1f8086b102c7e15811dc0bf"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-teardown-test",
@@ -390,5 +399,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6391aa786800f3c356fa0d01c559cf3d25a015c6..261a5e2932b5820448fae2f0a1afcef36285490f"
+    "shas": "2cf0dfab16568eb6f1f8086b102c7e15811dc0bf..1a4aae0bafb6ad2a25b31b59421b337616dcbfd9"
 }]
