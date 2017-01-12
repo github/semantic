@@ -203,6 +203,8 @@ data Category
   | Literal
   -- | A channel type in Go.
   | ChannelTy
+  -- | A send statement in Go.
+  | Send
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

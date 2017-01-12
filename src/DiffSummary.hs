@@ -185,6 +185,7 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
+  S.Send _ _ -> termNameFromSource term
   S.Ty ty -> termNameFromSource ty
   S.TypeDecl id _ -> toTermName' id
   S.TypeAssertion _ _ -> termNameFromSource term
@@ -461,6 +462,7 @@ instance HasCategory Category where
     C.Element -> "element"
     C.Literal -> "literal"
     C.ChannelTy -> "channel type"
+    C.Send -> "send statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

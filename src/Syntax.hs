@@ -102,6 +102,8 @@ data Syntax a f
   | FieldDecl f (Maybe f)
   -- | A type.
   | Ty f
+  -- | A send statement has a channel and an expression in Go.
+  | Send f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
