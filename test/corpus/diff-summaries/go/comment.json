@@ -1,0 +1,284 @@
+[{
+    "testCaseDescription": "go-comment-setup-test",
+    "expectedResult": {
+        "changes": {
+            "comment.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.go"
+    ],
+    "patch": [
+        "diff --git a/comment.go b/comment.go",
+        "index e69de29..7905807 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3fa2a877f777d74229d56b120b961c0d70c519d7..71012ac5316efa776ae8541ec1eb6b3af83fd3f2"
+}
+,{
+    "testCaseDescription": "go-comment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comment.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '// this is a comment' comment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.go"
+    ],
+    "patch": [
+        "diff --git a/comment.go b/comment.go",
+        "index 7905807..61c10ca 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+// this is a comment",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "71012ac5316efa776ae8541ec1eb6b3af83fd3f2..3b1b670124d948deab3aa2518ba8bb98c55328ec"
+}
+,{
+    "testCaseDescription": "go-comment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comment.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '// this is a comment' comment with the '/*\nthis is a block comment\n*/' comment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.go"
+    ],
+    "patch": [
+        "diff --git a/comment.go b/comment.go",
+        "index 61c10ca..8e149b7 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-// this is a comment",
+        "+/*",
+        "+this is a block comment",
+        "+*/",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "3b1b670124d948deab3aa2518ba8bb98c55328ec..dfbba9c9ed93653c243d4b61379c97cfc4bddb20"
+}
+,{
+    "testCaseDescription": "go-comment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comment.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/*\nthis is a block comment\n*/' comment with the '// this is a comment' comment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.go"
+    ],
+    "patch": [
+        "diff --git a/comment.go b/comment.go",
+        "index 8e149b7..61c10ca 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-/*",
+        "-this is a block comment",
+        "-*/",
+        "+// this is a comment",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "dfbba9c9ed93653c243d4b61379c97cfc4bddb20..431a7f3bfc3381192514d14542bf05a29589064f"
+}
+,{
+    "testCaseDescription": "go-comment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comment.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '// this is a comment' comment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.go"
+    ],
+    "patch": [
+        "diff --git a/comment.go b/comment.go",
+        "index 61c10ca..7905807 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-// this is a comment",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "431a7f3bfc3381192514d14542bf05a29589064f..928fb0d0d1f482c656e700100305e9774fe41967"
+}
+,{
+    "testCaseDescription": "go-comment-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "comment.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.go"
+    ],
+    "patch": [
+        "diff --git a/comment.go b/comment.go",
+        "index 7905807..e69de29 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "928fb0d0d1f482c656e700100305e9774fe41967..9223c0a19450a10aee87e22df37ae11c4715a564"
+}]

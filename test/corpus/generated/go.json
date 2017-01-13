@@ -327,6 +327,12 @@
         "syntax": "struct-field-declarations",
         "insert": "\n  g int\n",
         "replacement": "\n  h, i int\n"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "comment",
+        "insert": "// this is a comment",
+        "replacement": "/*\nthis is a block comment\n*/"
       }
     ]
   }
