@@ -139,6 +139,8 @@ styleName category = "category-" <> case category of
   C.ChannelTy -> "channel_type"
   C.FunctionTy -> "function_type"
   C.Send -> "send_statement"
+  C.IncrementStatement -> "increment_statement"
+  C.DecrementStatement -> "decrement_statement"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

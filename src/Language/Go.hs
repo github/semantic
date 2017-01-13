@@ -114,6 +114,10 @@ termConstructor source sourceSpan name range children _ = case name of
   "function_type" -> do
     params <- withRanges range Params children $ S.Indexed children
     withDefaultInfo $ S.Ty params
+  "inc_statement" -> do
+    withDefaultInfo $ S.Leaf . toText $ slice range source
+  "dec_statement" -> do
+    withDefaultInfo $ S.Leaf . toText $ slice range source
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
@@ -272,4 +276,6 @@ categoryForGoName = \case
   "unary_expression" -> Operator
   "ERROR" -> Error
   "function_type" -> FunctionTy
+  "inc_statement" -> IncrementStatement
+  "dec_statement" -> DecrementStatement
   s -> Other (toS s)

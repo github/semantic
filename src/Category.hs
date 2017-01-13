@@ -209,6 +209,10 @@ data Category
   | IndexExpression
   -- | A function type.
   | FunctionTy
+  -- | An increment statement, e.g. i++ in Go.
+  | IncrementStatement
+  -- | A decrement statement, e.g. i-- in Go.
+  | DecrementStatement
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -313,6 +317,8 @@ instance Arbitrary Category where
     , pure Element
     , pure IndexExpression
     , pure FunctionTy
+    , pure IncrementStatement
+    , pure DecrementStatement
     , Other <$> arbitrary
     ]
 

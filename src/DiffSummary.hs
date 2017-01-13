@@ -465,6 +465,8 @@ instance HasCategory Category where
     C.Send -> "send statement"
     C.IndexExpression -> "index expression"
     C.FunctionTy -> "function type"
+    C.IncrementStatement -> "increment statement"
+    C.DecrementStatement -> "decrement statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
