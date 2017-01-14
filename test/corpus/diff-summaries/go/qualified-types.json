@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2fd04d085d7d971a02047ea702803d98c8613ee7..87a0b274bd953902df577afcb5e071d4a6d07a86"
+    "shas": "97dac1878ab6129d8cc5f48c7dd108356a6ba262..276632f94d5798793fcb989424fe66c509e4b4b9"
 }
 ,{
     "testCaseDescription": "go-qualified-types-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "87a0b274bd953902df577afcb5e071d4a6d07a86..dc0d7c3a7770190dbd5e888cec97b2507747ae34"
+    "shas": "276632f94d5798793fcb989424fe66c509e4b4b9..8c09b026f1abcd4e97884e40f60f9b43eea4d054"
 }
 ,{
     "testCaseDescription": "go-qualified-types-replacement-test",
@@ -113,7 +113,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x type declaration of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the 'x' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -125,7 +125,7 @@
                                 ],
                                 "end": [
                                     4,
-                                    9
+                                    11
                                 ]
                             },
                             {
@@ -135,39 +135,12 @@
                                 ],
                                 "end": [
                                     4,
-                                    9
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the x type declaration of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
                                     11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the x type declaration of the 'main' function"
+                    "summary": "Replaced the 'b.c' qualified identifier with the 'y.z' qualified identifier in the 'x' type declaration of the 'main' function"
                 }
             ]
         },
@@ -190,7 +163,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc0d7c3a7770190dbd5e888cec97b2507747ae34..a5f900bdfd65370176d58e8dd3e369e6d28acaed"
+    "shas": "8c09b026f1abcd4e97884e40f60f9b43eea4d054..6332fae97e5878cab3318aea2c962ea95e65543b"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-replacement-test",
@@ -222,7 +195,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a type declaration of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the 'a' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -234,7 +207,7 @@
                                 ],
                                 "end": [
                                     4,
-                                    9
+                                    11
                                 ]
                             },
                             {
@@ -244,39 +217,12 @@
                                 ],
                                 "end": [
                                     4,
-                                    9
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the a type declaration of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
                                     11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the a type declaration of the 'main' function"
+                    "summary": "Replaced the 'y.z' qualified identifier with the 'b.c' qualified identifier in the 'a' type declaration of the 'main' function"
                 }
             ]
         },
@@ -299,7 +245,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5f900bdfd65370176d58e8dd3e369e6d28acaed..98bf61617324961516fe37f7a20714c3fafa9cfd"
+    "shas": "6332fae97e5878cab3318aea2c962ea95e65543b..18e753ff695624e1dd25f7037643f3fda6479fb3"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-insert-test",
@@ -342,7 +288,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "98bf61617324961516fe37f7a20714c3fafa9cfd..86f5eb8fea3c37c6a10c8cbfa1e3f12ead55338e"
+    "shas": "18e753ff695624e1dd25f7037643f3fda6479fb3..63f5a43ccfbbd874d61bc0bca9bd507993519f8e"
 }
 ,{
     "testCaseDescription": "go-qualified-types-teardown-test",
@@ -384,5 +330,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "86f5eb8fea3c37c6a10c8cbfa1e3f12ead55338e..fd32c102b131d77c141df7ebfbefca3921214b64"
+    "shas": "63f5a43ccfbbd874d61bc0bca9bd507993519f8e..e3cdff1e6a1723aecba4ee8116ae8b30419a85f0"
 }]

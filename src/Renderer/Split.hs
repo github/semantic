@@ -141,6 +141,7 @@ styleName category = "category-" <> case category of
   C.Send -> "send_statement"
   C.IncrementStatement -> "increment_statement"
   C.DecrementStatement -> "decrement_statement"
+  C.QualifiedIdentifier -> "qualified_identifier"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

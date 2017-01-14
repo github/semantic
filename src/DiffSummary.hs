@@ -304,6 +304,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.BeginBlock -> "in a" <+> catName c
       C.EndBlock -> "in an" <+> catName c
       C.Default -> "in a" <+> catName c
+      C.TypeDecl -> "in the" <+> squotes (termName t) <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
@@ -467,6 +468,7 @@ instance HasCategory Category where
     C.FunctionTy -> "function type"
     C.IncrementStatement -> "increment statement"
     C.DecrementStatement -> "decrement statement"
+    C.QualifiedIdentifier -> "qualified identifier"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

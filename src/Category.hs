@@ -213,6 +213,8 @@ data Category
   | IncrementStatement
   -- | A decrement statement, e.g. i-- in Go.
   | DecrementStatement
+  -- | A qualified identifier, e.g. Module.function in Go.
+  | QualifiedIdentifier
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -319,6 +321,7 @@ instance Arbitrary Category where
     , pure FunctionTy
     , pure IncrementStatement
     , pure DecrementStatement
+    , pure QualifiedIdentifier
     , Other <$> arbitrary
     ]
 
