@@ -151,8 +151,8 @@
       {
         "template": "package main\n\nfunc main() {\n{0}\n}",
         "syntax": "type-declarations",
-        "insert": "type a b\ntype (\n a b\n c d\n )",
-        "replacement": "type a' b'\ntype (\n a' b'\n c' d'\n )"
+        "insert": "type a b\ntype (\n  a b\n  c d\n)",
+        "replacement": "type x y\ntype (\n  x y\n  e f\n)"
       },
       {
         "template": "package main\n\nfunc main() {\n{0}\n}",

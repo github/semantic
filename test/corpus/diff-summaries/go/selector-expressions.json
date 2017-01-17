@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e80447717bef244bb9bfd8ca19fa08396a93949..6d6994dd8bd7aa9f2f1ae62106a0a13a3c5cddb7"
+    "shas": "d2341b83a3e744d0d090fe404e74c581dd5676ca..20f716526887e5517ea6aaac4c4dfd40fb3497a2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6d6994dd8bd7aa9f2f1ae62106a0a13a3c5cddb7..f70f444c0575bafe2a43d4cdf141d95fd8c198e2"
+    "shas": "20f716526887e5517ea6aaac4c4dfd40fb3497a2..1d5fc0dabcd4f0c2a229e6934c92aefa296a4a78"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f70f444c0575bafe2a43d4cdf141d95fd8c198e2..048ff2fe202aa2df86987f94fbd3496b1ccb5ae3"
+    "shas": "1d5fc0dabcd4f0c2a229e6934c92aefa296a4a78..e73893d339faff98edd998f8df2c45d32529699e"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "048ff2fe202aa2df86987f94fbd3496b1ccb5ae3..535ab994b8974d503ce26ab64f8d294ab2a75f53"
+    "shas": "e73893d339faff98edd998f8df2c45d32529699e..892dac5b1c6683849973b85c956ccc29f82126cb"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "535ab994b8974d503ce26ab64f8d294ab2a75f53..76275accea3e66b341933ac6f537ac7064204c89"
+    "shas": "892dac5b1c6683849973b85c956ccc29f82126cb..1f215144d5dbce34fdb69f24c0372ba26f791e94"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "76275accea3e66b341933ac6f537ac7064204c89..efcf789858ec7ef3093d8b8c90b40e9590b8a605"
+    "shas": "1f215144d5dbce34fdb69f24c0372ba26f791e94..56edb4292784ca985eea9d0e0571850b7e16740f"
 }]

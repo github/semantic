@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "20fa55e7535a6b1108c324529279f2e8b490ca41..3dd801eb58db16a0c0ad78cdc49ac1c50256f041"
+    "shas": "b2c56ccce1c96d1860ba41249e3a7fb1ce2f916a..7cd15d0ad0cd139504bfcb65557b711246e06d18"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3dd801eb58db16a0c0ad78cdc49ac1c50256f041..c1749b81e7947fa1a2a018431e837bf244933ccc"
+    "shas": "7cd15d0ad0cd139504bfcb65557b711246e06d18..73232e970a8dce969655c390d10ab221cfeccd80"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -292,7 +292,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c1749b81e7947fa1a2a018431e837bf244933ccc..183f8301622c6ef185d5047e7f120a789b8dc8b1"
+    "shas": "73232e970a8dce969655c390d10ab221cfeccd80..b9340f0913b6da493b23619007294b55696a6d69"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -464,7 +464,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "183f8301622c6ef185d5047e7f120a789b8dc8b1..a56b78cc0505be75ec9ed461dc8c1f8d2dddb24e"
+    "shas": "b9340f0913b6da493b23619007294b55696a6d69..d60b342a59f1738d6c70328b0565e4161cd7f69c"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -570,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a56b78cc0505be75ec9ed461dc8c1f8d2dddb24e..488ae20a83705cfe2cf4c8bd37a6a4526d625ccb"
+    "shas": "d60b342a59f1738d6c70328b0565e4161cd7f69c..c0ef1e9e998148153c37afd132e23dd6b74ab1b2"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -612,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "488ae20a83705cfe2cf4c8bd37a6a4526d625ccb..bff82271f316995218c2faaeaf34916b251bd406"
+    "shas": "c0ef1e9e998148153c37afd132e23dd6b74ab1b2..fbd3805851a4e4b50422a0dd3e85d6146355e97c"
 }]

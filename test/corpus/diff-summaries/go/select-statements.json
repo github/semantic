@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fbe6e91c23da3949f63a0e46bb4472bcc7e4286d..94699f5f72698f0e925d06a28c21752d26871ac2"
+    "shas": "c5da8059aa195581e9edac1aa3b04f99c0177030..7e514e78e7765b487dc235fe2d95371507dc966d"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "94699f5f72698f0e925d06a28c21752d26871ac2..c2860c3ff712d34e849c42258ac6a42d3596dbe1"
+    "shas": "7e514e78e7765b487dc235fe2d95371507dc966d..ebe6f1190b9702c45489500e752fb99b391c604c"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c2860c3ff712d34e849c42258ac6a42d3596dbe1..2528910607cf882c62beacf455cfcebd13c0cd23"
+    "shas": "ebe6f1190b9702c45489500e752fb99b391c604c..02363621003f53bac5c1320097f8c63acacd6750"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2528910607cf882c62beacf455cfcebd13c0cd23..919009e39d038df099dd98e7abaf9f8b99c9281a"
+    "shas": "02363621003f53bac5c1320097f8c63acacd6750..8433e4a1b84a7664c2ef2d9e855210ea0d1f225a"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "919009e39d038df099dd98e7abaf9f8b99c9281a..17be2d4cc4bf5281cc3b75e9174d7b579ccbc81e"
+    "shas": "8433e4a1b84a7664c2ef2d9e855210ea0d1f225a..a2803563ddec0fa090a5470ec5a0dd630e96ce1e"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "17be2d4cc4bf5281cc3b75e9174d7b579ccbc81e..5ca6aa307b5684ac4eda03fead620e2d753f2e01"
+    "shas": "a2803563ddec0fa090a5470ec5a0dd630e96ce1e..2cab216751e25d5f5501121ceb51afae8b2f3b8f"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a086622a7f75f3e4448865cd132e37b251f1e189..c70027cf01cd676706c1b1e389de0c42e5c6761c"
+    "shas": "327e2f73e92556b721e5267ed4e74b2cb7a9cfc1..9e6f5676103d09ef627fe211ca4a532b1a7bed08"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-insert-test",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c70027cf01cd676706c1b1e389de0c42e5c6761c..c4d3efcaaf37e305baf4291edb6feb8a28545f5d"
+    "shas": "9e6f5676103d09ef627fe211ca4a532b1a7bed08..49a1eea798e4b4667d6f0dc9878473a6c6ecc327"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-replacement-test",
@@ -154,7 +154,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c4d3efcaaf37e305baf4291edb6feb8a28545f5d..d0ef8fc1b7880068b0149e661e88b62a10ceef63"
+    "shas": "49a1eea798e4b4667d6f0dc9878473a6c6ecc327..9dc7ed0f23b61c887594632ddf94c26481d51022"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-replacement-test",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0ef8fc1b7880068b0149e661e88b62a10ceef63..1fd33d1bf8b0dadc72e2fa1699c051c2f8790a79"
+    "shas": "9dc7ed0f23b61c887594632ddf94c26481d51022..ec922546a4ea831db8d412f7c8625d118499ecd5"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-insert-test",
@@ -270,7 +270,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1fd33d1bf8b0dadc72e2fa1699c051c2f8790a79..5c3a9c2650ab752f66823609287c08d634077495"
+    "shas": "ec922546a4ea831db8d412f7c8625d118499ecd5..6f7cf5b7ce0a2eba996b0f73c2ad5aa0866d0eae"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-teardown-test",
@@ -312,5 +312,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c3a9c2650ab752f66823609287c08d634077495..e3704bedd5da917e83615d76b10a894628b7b1e6"
+    "shas": "6f7cf5b7ce0a2eba996b0f73c2ad5aa0866d0eae..a4042dcd7b69393b372cabe7a4d28d6503e9323c"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb70743c2dadaed8a2d43a98a43b66b8e8798eed..0c67f7bfdf682cad6cdcada688fb69d426d683ae"
+    "shas": "37620065eeca93fa962392215f9a134774090bf8..2b7cedb3023c993dc0bd19c7b42358ff5eabd257"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c67f7bfdf682cad6cdcada688fb69d426d683ae..354ca5c919a2f3436b7c809c282a6532b583a053"
+    "shas": "2b7cedb3023c993dc0bd19c7b42358ff5eabd257..0f86c1f3dc6e0b6c39f7d3e852b7318284ac1e3a"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "354ca5c919a2f3436b7c809c282a6532b583a053..c063900c3d1db9d77acba00634f510be129c9443"
+    "shas": "0f86c1f3dc6e0b6c39f7d3e852b7318284ac1e3a..aaee5523484a4e049ec8a23607dcdbfc49c725c3"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c063900c3d1db9d77acba00634f510be129c9443..45eb8616897c1118d23ebe88feee475446cd610d"
+    "shas": "aaee5523484a4e049ec8a23607dcdbfc49c725c3..68a4bd1aaf2f80234d3499106012a840ca3a2fa7"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "45eb8616897c1118d23ebe88feee475446cd610d..028e81a1060ccaedfc178fa007f17707f4c6312c"
+    "shas": "68a4bd1aaf2f80234d3499106012a840ca3a2fa7..0b0fa3256a3a9a74c8e6f67a3307e7474e27dd22"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "028e81a1060ccaedfc178fa007f17707f4c6312c..1792c5e9f49969317e3f1906a524030fa6b7f07a"
+    "shas": "0b0fa3256a3a9a74c8e6f67a3307e7474e27dd22..1db4b1a32858e21dca33843818fb52cce6906718"
 }]

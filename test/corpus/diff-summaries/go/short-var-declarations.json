@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "225e43a556530b340ec0d61212e59a26a52d143e..9d4f0c21dfaf91e6571f10fdd3fac820b0ae6168"
+    "shas": "5c82206d34207d24d55db76971449ecfb4abc58d..cbc62e2e7f350a8ea9ccbfde833024c9e0e7f1c1"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9d4f0c21dfaf91e6571f10fdd3fac820b0ae6168..4f894a0f43147135c1c62e3287166f94fae91695"
+    "shas": "cbc62e2e7f350a8ea9ccbfde833024c9e0e7f1c1..cf53dfb7ae0461cb4bb570e08dba7e7d94c9943d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4f894a0f43147135c1c62e3287166f94fae91695..ea11877319269fb8be2eae30f12235a13312d877"
+    "shas": "cf53dfb7ae0461cb4bb570e08dba7e7d94c9943d..8950e40128db1c672b4353358410994abcf472f1"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ea11877319269fb8be2eae30f12235a13312d877..ffd51834c6de157feec00a0d5180f42f97e19199"
+    "shas": "8950e40128db1c672b4353358410994abcf472f1..cd34ccb583d0587b29cd4172fce3d58f5b8e14df"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ffd51834c6de157feec00a0d5180f42f97e19199..089b42d327d766e2de44f215d3771fddde58275f"
+    "shas": "cd34ccb583d0587b29cd4172fce3d58f5b8e14df..5e716cd3942629210730d986c4e2ac247e054c30"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "089b42d327d766e2de44f215d3771fddde58275f..2b9cb611dc3d121922e8078cb5a74bac1146c4ea"
+    "shas": "5e716cd3942629210730d986c4e2ac247e054c30..6905e11bdf2a753e6a4ef5da9028d40012c38908"
 }]

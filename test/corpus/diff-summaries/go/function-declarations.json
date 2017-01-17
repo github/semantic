@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "945fb4e6905c2b97bfd8fedd3c016e6f4a8c4fa6..53afff937bb03e5626aefc0b7dfd05db7e167ec5"
+    "shas": "2447c10de3d592533ac7af3d93a7df4255ef916f..cfab3c9febf05ba95db8704916eef84c6d57df47"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53afff937bb03e5626aefc0b7dfd05db7e167ec5..fe8b8c06effbee7c8ea48c251ea6db6788ed5f83"
+    "shas": "cfab3c9febf05ba95db8704916eef84c6d57df47..9399efab9dfcb5ae3b75550c7fa55ccb439d6653"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fe8b8c06effbee7c8ea48c251ea6db6788ed5f83..424c0c02bdf9e5988e55cfa5b980c9d3c2265b5c"
+    "shas": "9399efab9dfcb5ae3b75550c7fa55ccb439d6653..7cdade18f4e18fb370f8bebb5ee38d82a1b1bdd1"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "424c0c02bdf9e5988e55cfa5b980c9d3c2265b5c..cb85a9536cad72b815feeb18731ebbeae8465196"
+    "shas": "7cdade18f4e18fb370f8bebb5ee38d82a1b1bdd1..fd052332be09ea210f15bfb39c82222481d26583"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb85a9536cad72b815feeb18731ebbeae8465196..a6f74271ab157809b28c97eb6da04f69ad8d8814"
+    "shas": "fd052332be09ea210f15bfb39c82222481d26583..f2a3ec4fb2e89259371a3ef8370d69c05acd160f"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a6f74271ab157809b28c97eb6da04f69ad8d8814..6db5b98058f6889a0e2a736415bbd346a877a81d"
+    "shas": "f2a3ec4fb2e89259371a3ef8370d69c05acd160f..96ad1ac78b0e62bab71e0e7b272d13e1775f5673"
 }]

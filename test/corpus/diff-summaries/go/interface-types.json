@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "455468cd0dec3510c76e0db4e450171890bcb2bd..2dfabd25cdb452a47bdd9682465ed19284d1f4b9"
+    "shas": "e93ac678e04315683a008082ea1bb34f6622d2ac..04667b46001ece3c9f51908222974e7d7d183255"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -117,7 +117,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2dfabd25cdb452a47bdd9682465ed19284d1f4b9..921114380da3f18028e89107e2232c72c4e77908"
+    "shas": "04667b46001ece3c9f51908222974e7d7d183255..c2fdb04467df21957d68e05d119477490f558bb5"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -232,7 +232,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "921114380da3f18028e89107e2232c72c4e77908..69718986124fe682b3ad8a5b75cd32b32744c83a"
+    "shas": "c2fdb04467df21957d68e05d119477490f558bb5..0e1a8c03619b30e467dbc8466b00a5229a8dd81b"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -347,7 +347,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "69718986124fe682b3ad8a5b75cd32b32744c83a..4ede55ed0271d6ef42e3211f471fec6a710f85e0"
+    "shas": "0e1a8c03619b30e467dbc8466b00a5229a8dd81b..ff1b4aac88db5a7602880d539aa42e466fdf0615"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ede55ed0271d6ef42e3211f471fec6a710f85e0..8ef05e1c54ee90cc3507bf41b22a8c0eae1fd2dc"
+    "shas": "ff1b4aac88db5a7602880d539aa42e466fdf0615..d6d824e889916ab49573989017b33ce7dcbd9e6c"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ef05e1c54ee90cc3507bf41b22a8c0eae1fd2dc..bb16dfebd2cf22d0a6a4b678def6ab83f4ff7111"
+    "shas": "d6d824e889916ab49573989017b33ce7dcbd9e6c..cf2ff8e03236db7d221b693f1fb1db3180d7f4e3"
 }]
