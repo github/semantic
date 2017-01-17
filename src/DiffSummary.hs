@@ -260,8 +260,8 @@ toTermName source term = case unwrap term of
   S.Negate expr -> toTermName' expr
   S.Struct ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   S.Rescue args _ -> Text.intercalate ", " $ toTermName' <$> args
-  S.Break expr -> toTermName' expr
-  S.Continue expr -> toTermName' expr
+  S.Break expr -> maybe "" toTermName' expr
+  S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
   S.Default children -> termNameFromChildren term children
   S.FieldDecl id expr tag -> termNameFromSource id <> (maybe "" (\expr' -> " " <> termNameFromSource expr') expr) <> (maybe "" ((" " <>) . termNameFromSource) tag)
@@ -297,6 +297,12 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
       C.If -> "in the" <+> squotes (termName t) <+> catName c
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
+      C.Break -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
+      C.Continue -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
       C.Switch -> case t of
         "" -> "in a" <+> catName c
         _ -> "in the" <+> squotes (termName t) <+> catName c

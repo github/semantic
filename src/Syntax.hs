@@ -90,8 +90,8 @@ data Syntax a f
   | TypeConversion f f
   -- | A struct with an optional type.
   | Struct (Maybe f) [f]
-  | Break f
-  | Continue f
+  | Break (Maybe f)
+  | Continue (Maybe f)
   -- | A block statement has an ordered branch of child nodes, e.g. BEGIN {...} or END {...} in Ruby/Perl.
   | BlockStatement [f]
   -- | A parameter declaration with an optional type.

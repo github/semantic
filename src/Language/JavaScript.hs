@@ -106,7 +106,7 @@ termConstructor source sourceSpan name range children allChildren
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
-    ("break_statement", [ expr ] ) -> S.Break expr
+    ("break_statement", [ expr ] ) -> S.Break (Just expr)
     ("yield_statement", _ ) -> S.Yield children
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]

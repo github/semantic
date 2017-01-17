@@ -121,10 +121,21 @@ termConstructor source sourceSpan name range children _ = case name of
     withDefaultInfo $ S.Leaf . toText $ slice range source
   "qualified_identifier" -> do
     withDefaultInfo $ S.Leaf . toText $ slice range source
+  "break_statement" -> toBreak children
+  "continue_statement" -> toContinue children
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
+    toBreak = \case
+      [label] -> withDefaultInfo (S.Break (Just label))
+      [] -> withDefaultInfo (S.Break Nothing)
+      rest -> withCategory Error (S.Error rest)
+    toContinue = \case
+      [label] -> withDefaultInfo (S.Continue (Just label))
+      [] -> withDefaultInfo (S.Continue Nothing)
+      rest -> withCategory Error (S.Error rest)
+
     toStructTy children = do
       fields <- withRanges range FieldDeclarations children (S.Indexed children)
       withDefaultInfo (S.Ty fields)
@@ -191,7 +202,7 @@ termConstructor source sourceSpan name range children _ = case name of
     toVarDecls children = withDefaultInfo (S.Indexed children)
 
     toConsts constSpecs = withDefaultInfo (S.Indexed constSpecs)
-    constSpecToVarAssignment = toVarAssignment . toList . unwrap
+
     toVarAssignment = \case
         [idList, ty] | category (extract ty) == Identifier -> do
           let ids = toList (unwrap idList)
@@ -276,4 +287,6 @@ categoryForGoName = \case
   "inc_statement" -> IncrementStatement
   "dec_statement" -> DecrementStatement
   "qualified_identifier" -> QualifiedIdentifier
+  "break_statement" -> Break
+  "continue_statement" -> Continue
   s -> Other (toS s)
