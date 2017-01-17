@@ -98,8 +98,8 @@ data Syntax a f
   | ParameterDecl (Maybe f) f
   -- | A type declaration has an identifier and a type.
   | TypeDecl f f
-  -- | A field declaration.
-  | FieldDecl f (Maybe f)
+  -- | A field declaration with an optional type, and an optional tag.
+  | FieldDecl f (Maybe f) (Maybe f)
   -- | A type.
   | Ty f
   -- | A send statement has a channel and an expression in Go.

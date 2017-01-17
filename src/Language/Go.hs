@@ -143,9 +143,13 @@ termConstructor source sourceSpan name range children _ = case name of
       [ty, values] -> withCategory Struct (S.Struct (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
     toFieldDecl = \case
-      [identifier, ty] -> withCategory FieldDecl (S.FieldDecl identifier (Just ty))
-      [identifier] -> withCategory FieldDecl (S.FieldDecl identifier Nothing)
-      rest -> withRanges range Error rest $ S.Error rest
+      rest@[identifier, ty] -> case category (extract ty) of
+        Identifier -> withCategory FieldDecl (S.FieldDecl identifier (Just ty) Nothing)
+        StringLiteral -> withCategory FieldDecl (S.FieldDecl identifier Nothing (Just ty))
+        _ -> withRanges range Error rest (S.Error rest)
+      [identifier] -> withCategory FieldDecl (S.FieldDecl identifier Nothing Nothing)
+      [identifier, ty, tag] -> withCategory FieldDecl (S.FieldDecl identifier (Just ty) (Just tag))
+      rest -> withRanges range Error rest (S.Error rest)
 
     toExpression f = \case
       [expr] -> f expr
