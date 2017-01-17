@@ -476,6 +476,7 @@ instance HasCategory Category where
     C.DecrementStatement -> "decrement statement"
     C.QualifiedIdentifier -> "qualified identifier"
     C.FieldDeclarations -> "field declarations"
+    C.RuneLiteral -> "rune literal"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
