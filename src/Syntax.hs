@@ -39,7 +39,7 @@ data Syntax a f
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
-  | VarDecl f
+  | VarDecl f (Maybe f)
   -- | A variable assignment in a variable declaration. var foo = bar;
   | VarAssignment { varId :: f, varValue :: f }
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.

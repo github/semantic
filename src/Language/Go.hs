@@ -195,7 +195,11 @@ termConstructor source sourceSpan name range children _ = case name of
       withDefaultInfo (S.Indexed assignments')
     constSpecToVarAssignment = toVarAssignment . toList . unwrap
     toVarAssignment = \case
-        [idList, expressionList] -> do
+        [idList, ty] | category (extract ty) == Identifier -> do
+          let ids = toList (unwrap idList)
+          idList' <- mapM (\id -> withRanges range VarDecl [id] (S.VarDecl id (Just ty))) ids
+          withRanges range ExpressionStatements idList' (S.Indexed idList')
+        [idList, expressionList] | category (extract expressionList) == Other "expression_list" -> do
           assignments' <- sequenceA $ zipWith (\id expr ->
             withCategory VarAssignment $ S.VarAssignment id expr)
             (toList $ unwrap idList) (toList $ unwrap expressionList)
@@ -204,8 +208,7 @@ termConstructor source sourceSpan name range children _ = case name of
           assignments' <- sequenceA $ zipWith (\id expr ->
             withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           withDefaultInfo (S.Indexed assignments')
-        [idList] -> do
-           withDefaultInfo (S.Indexed [idList])
+        [idList] -> withDefaultInfo (S.Indexed [idList])
         rest -> withRanges range Error rest (S.Error rest)
 
     withRanges originalRange category' terms syntax = do
@@ -238,7 +241,6 @@ categoryForGoName = \case
   "slice_expression" -> Slice
   "parameters" -> Args
   "short_var_declaration" -> VarDecl
-  "var_declaration" -> VarDecl
   "var_spec" -> VarAssignment
   "assignment_statement" -> Assignment
   "source_file" -> Module
