@@ -289,4 +289,5 @@ categoryForGoName = \case
   "qualified_identifier" -> QualifiedIdentifier
   "break_statement" -> Break
   "continue_statement" -> Continue
+  "rune_literal" -> RuneLiteral
   s -> Other (toS s)

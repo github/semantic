@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c82206d34207d24d55db76971449ecfb4abc58d..cbc62e2e7f350a8ea9ccbfde833024c9e0e7f1c1"
+    "shas": "53223ee78e3234b896b2ca4fe65b39e9cf8a036d..6950ca8e27148d76f903836fc1170efb79baf235"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cbc62e2e7f350a8ea9ccbfde833024c9e0e7f1c1..cf53dfb7ae0461cb4bb570e08dba7e7d94c9943d"
+    "shas": "6950ca8e27148d76f903836fc1170efb79baf235..d8dd309a00d816ab7494ae014f03ea33ef70f10a"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cf53dfb7ae0461cb4bb570e08dba7e7d94c9943d..8950e40128db1c672b4353358410994abcf472f1"
+    "shas": "d8dd309a00d816ab7494ae014f03ea33ef70f10a..29e08d83685bf5c08aa75e72c723e75764eb4cb3"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8950e40128db1c672b4353358410994abcf472f1..cd34ccb583d0587b29cd4172fce3d58f5b8e14df"
+    "shas": "29e08d83685bf5c08aa75e72c723e75764eb4cb3..9a46d9377321c67542a0479e8a4fd54d31f44262"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cd34ccb583d0587b29cd4172fce3d58f5b8e14df..5e716cd3942629210730d986c4e2ac247e054c30"
+    "shas": "9a46d9377321c67542a0479e8a4fd54d31f44262..97c481a9ff70fa888490e64bb2044dadbccb434d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5e716cd3942629210730d986c4e2ac247e054c30..6905e11bdf2a753e6a4ef5da9028d40012c38908"
+    "shas": "97c481a9ff70fa888490e64bb2044dadbccb434d..8bedda3f386f592c8dcb7d066e099200da351afc"
 }]

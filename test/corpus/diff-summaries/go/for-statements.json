@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b0be3564899ab025091f121b99927a6f0ca8780f..887d0eda8ed109e23be24c03811dfdb16a056f20"
+    "shas": "96a13e6c221ebdbd9225dfb647cddee550ac90a7..afffd0239799b12c52a4fbaa73b0eea90e48835e"
 }
 ,{
     "testCaseDescription": "go-for-statements-insert-test",
@@ -160,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "887d0eda8ed109e23be24c03811dfdb16a056f20..0103563649841d26747423d0c170d992c484eba7"
+    "shas": "afffd0239799b12c52a4fbaa73b0eea90e48835e..4b4467ba375a48f64cd7f1b733650d6e26434c27"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0103563649841d26747423d0c170d992c484eba7..1f3fe062b9ea4dbd36a1e7230529563a6889cfdc"
+    "shas": "4b4467ba375a48f64cd7f1b733650d6e26434c27..8db886dfa8e60f9d71ac63e3953db583f27112a3"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -399,30 +399,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    10,
-                                    7
-                                ],
-                                "end": [
-                                    10,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    22,
-                                    1
-                                ],
-                                "end": [
-                                    22,
-                                    6
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                10,
+                                7
+                            ],
+                            "end": [
+                                10,
+                                11
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'loop' identifier with the 'break' break_statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'loop' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -512,7 +500,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f3fe062b9ea4dbd36a1e7230529563a6889cfdc..b860e0229e4882ee43ce863afb570ca10a391952"
+    "shas": "8db886dfa8e60f9d71ac63e3953db583f27112a3..eab5550753e6aef0a483f376f8dd8eada1a64b91"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -634,7 +622,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b860e0229e4882ee43ce863afb570ca10a391952..688f795517fcde77d6b43c36f8dd8e036d5f5b7c"
+    "shas": "eab5550753e6aef0a483f376f8dd8eada1a64b91..3f143ed29fd0a0c8d8f415beb3d05b2fc84c8e7f"
 }
 ,{
     "testCaseDescription": "go-for-statements-teardown-test",
@@ -676,5 +664,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "688f795517fcde77d6b43c36f8dd8e036d5f5b7c..2447c10de3d592533ac7af3d93a7df4255ef916f"
+    "shas": "3f143ed29fd0a0c8d8f415beb3d05b2fc84c8e7f..83e407a86fc4bd371e4df8f33e5d080fec65f71a"
 }]

@@ -144,6 +144,7 @@ styleName category = "category-" <> case category of
   C.QualifiedIdentifier -> "qualified_identifier"
   C.IndexExpression -> "index_expression"
   C.FieldDeclarations -> "field_declarations"
+  C.RuneLiteral -> "rune_literal"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

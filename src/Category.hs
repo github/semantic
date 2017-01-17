@@ -216,6 +216,8 @@ data Category
   -- | A qualified identifier, e.g. Module.function in Go.
   | QualifiedIdentifier
   | FieldDeclarations
+  -- | A Go rune literal.
+  | RuneLiteral
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -324,6 +326,7 @@ instance Arbitrary Category where
     , pure DecrementStatement
     , pure QualifiedIdentifier
     , pure FieldDeclarations
+    , pure RuneLiteral
     , Other <$> arbitrary
     ]
 

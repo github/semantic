@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "37620065eeca93fa962392215f9a134774090bf8..2b7cedb3023c993dc0bd19c7b42358ff5eabd257"
+    "shas": "f3589731c303737800c85986374c773a210934ba..dc8ae5271b2445aefe2ec858fafa445baca5b18a"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2b7cedb3023c993dc0bd19c7b42358ff5eabd257..0f86c1f3dc6e0b6c39f7d3e852b7318284ac1e3a"
+    "shas": "dc8ae5271b2445aefe2ec858fafa445baca5b18a..76afa9837be5510776c3510e0101412f59bf975e"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f86c1f3dc6e0b6c39f7d3e852b7318284ac1e3a..aaee5523484a4e049ec8a23607dcdbfc49c725c3"
+    "shas": "76afa9837be5510776c3510e0101412f59bf975e..c00cf2b423272052ba6ca1335486f8418f913e1a"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aaee5523484a4e049ec8a23607dcdbfc49c725c3..68a4bd1aaf2f80234d3499106012a840ca3a2fa7"
+    "shas": "c00cf2b423272052ba6ca1335486f8418f913e1a..b1036ad862af98f0feefeb5f95c8a818366aa7c3"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68a4bd1aaf2f80234d3499106012a840ca3a2fa7..0b0fa3256a3a9a74c8e6f67a3307e7474e27dd22"
+    "shas": "b1036ad862af98f0feefeb5f95c8a818366aa7c3..1b18e0e8eff90aa92c2d7f9153a957c6b08aab1b"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0b0fa3256a3a9a74c8e6f67a3307e7474e27dd22..1db4b1a32858e21dca33843818fb52cce6906718"
+    "shas": "1b18e0e8eff90aa92c2d7f9153a957c6b08aab1b..007ac035ab1e1b2f630044470956d15cb35bbec4"
 }]

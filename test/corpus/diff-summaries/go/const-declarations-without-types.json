@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "02617c92ed6fc757df4fdd1470bdc47588f505fd..a6b761bac574582a763d2643310386871ba9d767"
+    "shas": "fb6c2d8526b9f327bb30b067e848597fd6e1dcea..64ca61cd51e94b95056b96adb1493411221a4669"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a6b761bac574582a763d2643310386871ba9d767..9c80f92086e4aa219dbd70777bb905c3e688cfc2"
+    "shas": "64ca61cd51e94b95056b96adb1493411221a4669..a5c26e490b319c55684fb11975a24697b44977a2"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-replacement-test",
@@ -90,23 +90,58 @@
             "const-declarations-without-types.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                7
-                            ],
-                            "end": [
-                                4,
-                                15
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
-                }
-            ]
-        },
-        "errors": {
-            "const-declarations-without-types.go": [
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    14
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    18
+                                ],
+                                "end": [
+                                    4,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in the one var assignment of the 'main' function"
+                },
                 {
                     "span": {
                         "insert": {
@@ -120,10 +155,11 @@
                             ]
                         }
                     },
-                    "summary": "Added 'one, two = 1, 2' at line 4, column 7 - line 4, column 22 in the main function of the 'main' module"
+                    "summary": "Added the 'two' var assignment in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "const-declarations-without-types.go"
@@ -142,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c80f92086e4aa219dbd70777bb905c3e688cfc2..8c0f06a347794d5801933e6d3128b80bb1e36a9a"
+    "shas": "a5c26e490b319c55684fb11975a24697b44977a2..8b83351be57512d352210eddb52fec81b753538b"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-replacement-test",
@@ -151,23 +187,58 @@
             "const-declarations-without-types.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                7
-                            ],
-                            "end": [
-                                4,
-                                15
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    7
+                                ],
+                                "end": [
+                                    4,
+                                    11
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
-                }
-            ]
-        },
-        "errors": {
-            "const-declarations-without-types.go": [
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    18
+                                ],
+                                "end": [
+                                    4,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    14
+                                ],
+                                "end": [
+                                    4,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in the zero var assignment of the 'main' function"
+                },
                 {
                     "span": {
                         "delete": {
@@ -181,10 +252,11 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'one, two = 1, 2' at line 4, column 7 - line 4, column 22 in the main function of the 'main' module"
+                    "summary": "Deleted the 'two' var assignment in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "const-declarations-without-types.go"
@@ -203,7 +275,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c0f06a347794d5801933e6d3128b80bb1e36a9a..dd62a6862e0657198ef4d1429093dfc3dc3892d7"
+    "shas": "8b83351be57512d352210eddb52fec81b753538b..65122a4a12459bf6afee870a6d2b5e59b06aada6"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-delete-insert-test",
@@ -246,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dd62a6862e0657198ef4d1429093dfc3dc3892d7..7b1f8f6ae1bcdacb1dd57d60b8ed9ca07c2d79b0"
+    "shas": "65122a4a12459bf6afee870a6d2b5e59b06aada6..780604d291b84ec79985cca9590b087c97ab5cb2"
 }
 ,{
     "testCaseDescription": "go-const-declarations-without-types-teardown-test",
@@ -288,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b1f8f6ae1bcdacb1dd57d60b8ed9ca07c2d79b0..a511060ba7bfbfba1fff23947916f93922f63c5c"
+    "shas": "780604d291b84ec79985cca9590b087c97ab5cb2..88e123b8d6693d563fb78df1864897e258509e95"
 }]

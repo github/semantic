@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c5da8059aa195581e9edac1aa3b04f99c0177030..7e514e78e7765b487dc235fe2d95371507dc966d"
+    "shas": "4b6b82d5a44ec573f8b8d5f3e1d7bff9ef206327..0c881896deb976bbb360c293a844f0991a0e3c93"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e514e78e7765b487dc235fe2d95371507dc966d..ebe6f1190b9702c45489500e752fb99b391c604c"
+    "shas": "0c881896deb976bbb360c293a844f0991a0e3c93..5b7b2660b57ed2cc93e0370a47570c76ec3458a8"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ebe6f1190b9702c45489500e752fb99b391c604c..02363621003f53bac5c1320097f8c63acacd6750"
+    "shas": "5b7b2660b57ed2cc93e0370a47570c76ec3458a8..6c3289d07b158b226b7804f18f03066a43d026a3"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "02363621003f53bac5c1320097f8c63acacd6750..8433e4a1b84a7664c2ef2d9e855210ea0d1f225a"
+    "shas": "6c3289d07b158b226b7804f18f03066a43d026a3..be35446eacfd2475d06e30f1995d239458ec2094"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8433e4a1b84a7664c2ef2d9e855210ea0d1f225a..a2803563ddec0fa090a5470ec5a0dd630e96ce1e"
+    "shas": "be35446eacfd2475d06e30f1995d239458ec2094..170310bb7dfb08dc45d5ac84ca7bf56713d6df0a"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2803563ddec0fa090a5470ec5a0dd630e96ce1e..2cab216751e25d5f5501121ceb51afae8b2f3b8f"
+    "shas": "170310bb7dfb08dc45d5ac84ca7bf56713d6df0a..bac6f19f98cebfd3cc2b8825b9a5549a1a241587"
 }]

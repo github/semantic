@@ -205,8 +205,8 @@
       {
         "template": "package main\n{0}",
         "syntax": "rune-literals",
-        "insert": "const (\na = '0'\nb = '\\''\nc = '\\\\'\nc = '\\n'\nc = '\\u0000'\nc = '\\U01234567'\n)",
-        "replacement": "const (\na = '1'\nb = '\\n''\nc = '\\u0011'\nc = '\\\\'\nc = '\\u0022'\nc = '\\U01234568'\n)"
+        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘'\n)",
+        "replacement": "const (\n  a = '©'\n  b = '©'\n  c = '©'\n  d = '©'\n  e = '©'\n  f = '©'\n)"
       },
       {
         "template": "package main\n\nfunc main() {\n{0}\n}",
