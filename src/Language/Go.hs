@@ -25,8 +25,8 @@ termConstructor source sourceSpan name range children _ = case name of
         S.Indexed [id] -> do
           module' <- withCategory Module (S.Module id rest)
           withCategory Program (S.Indexed (comments <> [module']))
-        _ -> withCategory Error (S.Error children)
-    _ -> withCategory Error (S.Error children)
+        _ -> withRanges range Error children (S.Error children)
+    _ -> withRanges range Error children (S.Error children)
   "import_declaration" -> toImports children
   "function_declaration" -> withDefaultInfo $ case children of
     [id, params, block] -> S.Function id (toList $ unwrap params) (toList $ unwrap block)
@@ -161,7 +161,7 @@ termConstructor source sourceSpan name range children _ = case name of
       a : rest -> do
         sliceElement <- withRanges range Element rest $ S.Fixed rest
         withCategory Slice (S.SubscriptAccess a sliceElement)
-      rest -> withDefaultInfo $ S.Error rest
+      rest -> withRanges range Error rest $ S.Error rest
 
     toIfStatement = \case
       [clause, block] ->
@@ -171,18 +171,18 @@ termConstructor source sourceSpan name range children _ = case name of
       [expr, clause, block] -> do
         clause' <- withRanges range If [expr, clause] (S.Indexed [expr, clause])
         withDefaultInfo $ S.If clause' (toList $ unwrap block)
-      rest -> withCategory Error (S.Error rest)
+      rest -> withRanges range Error rest (S.Error rest)
     toTypeDecls types = withDefaultInfo $ S.Indexed types
     toTypeDecl = \case
       [identifier, ty] -> withDefaultInfo $ S.TypeDecl identifier ty
-      rest -> withCategory Error $ S.Error rest
+      rest -> withRanges range Error rest $ S.Error rest
     toImports imports = do
       imports' <- mapM toImport imports
       withDefaultInfo $ S.Indexed (mconcat imports')
       where
         toImport i = case toList (unwrap i) of
           [importName] -> sequenceA [ withCategory Import (S.Import importName []) ]
-          xs@(_:_) -> sequenceA [ withCategory Error (S.Error xs)]
+          rest@(_:_) -> sequenceA [ withRanges range Error rest (S.Error rest)]
           [] -> pure []
 
     toVarDecl varSpec = listToVarDecls (toList $ unwrap varSpec)
@@ -198,7 +198,7 @@ termConstructor source sourceSpan name range children _ = case name of
       idList : _ -> do
          varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
          withDefaultInfo (S.Indexed varDecls)
-      _ -> withCategory Error (S.Error list)
+      rest -> withRanges range Error rest (S.Error rest)
 
     toConsts constSpecs = do
       assignments' <- mapM constSpecToVarAssignment constSpecs
@@ -216,7 +216,7 @@ termConstructor source sourceSpan name range children _ = case name of
           withDefaultInfo (S.Indexed assignments')
         [idList] -> do
            withDefaultInfo (S.Indexed [idList])
-        rest -> withCategory Error (S.Error rest)
+        rest -> withRanges range Error rest (S.Error rest)
 
     withRanges originalRange category' terms syntax = do
       let ranges' = getField . extract <$> terms
