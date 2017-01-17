@@ -89,7 +89,7 @@ termConstructor source sourceSpan name range children _ = case name of
   -- TODO: Handle multiple var specs
   "var_declaration" -> toVarDecls children
   "var_spec" -> toVarAssignment children
-  "short_var_declaration" -> listToVarDecls children
+  "short_var_declaration" -> toVarAssignment children
   "if_statement" -> toIfStatement children
   "call_expression" -> withDefaultInfo $ case children of
     [id] -> S.FunctionCall id []
