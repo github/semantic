@@ -215,6 +215,7 @@ data Category
   | DecrementStatement
   -- | A qualified identifier, e.g. Module.function in Go.
   | QualifiedIdentifier
+  | FieldDeclarations
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -322,6 +323,7 @@ instance Arbitrary Category where
     , pure IncrementStatement
     , pure DecrementStatement
     , pure QualifiedIdentifier
+    , pure FieldDeclarations
     , Other <$> arbitrary
     ]
 

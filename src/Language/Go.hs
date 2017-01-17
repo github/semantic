@@ -42,7 +42,7 @@ termConstructor source sourceSpan name range children _ = case name of
       other -> S.Error other
   "type_declaration" -> toTypeDecls children
   "type_spec" -> toTypeDecl children
-  "struct_type" -> toStruct children
+  "struct_type" -> toStructTy children
   "field_declaration" -> toFieldDecl children
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
@@ -124,6 +124,10 @@ termConstructor source sourceSpan name range children _ = case name of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
+    toStructTy children = do
+      fields <- withRanges range FieldDeclarations children (S.Indexed children)
+      withDefaultInfo (S.Ty fields)
+
     toLiteral = \case
       children@[ty, _] -> case category (extract ty) of
         ArrayTy -> toImplicitArray children
