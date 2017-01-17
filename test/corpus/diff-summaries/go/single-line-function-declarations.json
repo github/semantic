@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/single-line-function-declarations.go",
         "+++ b/single-line-function-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "efb4a57594d20ae6478868b54c3349cf6f800b43..728f0acbc957ecdf04eb79102c926e29334bedd0"
+    "shas": "6db5b98058f6889a0e2a736415bbd346a877a81d..2c161f750f49963b5cdccc4430335c284c390a20"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-insert-test",
@@ -174,7 +174,7 @@
     ],
     "patch": [
         "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
-        "index 7905807..0339b42 100644",
+        "index 79058077..0339b429 100644",
         "--- a/single-line-function-declarations.go",
         "+++ b/single-line-function-declarations.go",
         "@@ -1,5 +1,7 @@",
@@ -188,7 +188,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "728f0acbc957ecdf04eb79102c926e29334bedd0..4705bc9dbb8698f6d9ea2e569b1c45c6000f4ed0"
+    "shas": "2c161f750f49963b5cdccc4430335c284c390a20..e38ecd9064457caa47a81918df9cba3780e1983b"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-replacement-test",
@@ -224,30 +224,33 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    8
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the g2() function call of the 'main' function"
+                    "summary": "Added the 'g2()' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f2()' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -285,7 +288,7 @@
     ],
     "patch": [
         "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
-        "index 0339b42..5bfe23f 100644",
+        "index 0339b429..5bfe23f4 100644",
         "--- a/single-line-function-declarations.go",
         "+++ b/single-line-function-declarations.go",
         "@@ -1,7 +1,7 @@",
@@ -301,7 +304,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4705bc9dbb8698f6d9ea2e569b1c45c6000f4ed0..04207eb8e6fdc09a5e74a145a79632a919b7ff7c"
+    "shas": "e38ecd9064457caa47a81918df9cba3780e1983b..03cd2ea0d245e393c8b18b8f11f054192852e0a5"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-replacement-test",
@@ -337,30 +340,33 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    6
-                                ],
-                                "end": [
-                                    5,
-                                    8
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the f2() function call of the 'main' function"
+                    "summary": "Added the 'f2()' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                6
+                            ],
+                            "end": [
+                                5,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g2()' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -398,7 +404,7 @@
     ],
     "patch": [
         "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
-        "index 5bfe23f..0339b42 100644",
+        "index 5bfe23f4..0339b429 100644",
         "--- a/single-line-function-declarations.go",
         "+++ b/single-line-function-declarations.go",
         "@@ -1,7 +1,7 @@",
@@ -414,7 +420,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "04207eb8e6fdc09a5e74a145a79632a919b7ff7c..46baf0d782767becd51d83d8b45e905f98b83c6b"
+    "shas": "03cd2ea0d245e393c8b18b8f11f054192852e0a5..5882272a60ff8b97c7f1468c49a18554917cb66c"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-delete-insert-test",
@@ -550,7 +556,7 @@
     ],
     "patch": [
         "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
-        "index 0339b42..7905807 100644",
+        "index 0339b429..79058077 100644",
         "--- a/single-line-function-declarations.go",
         "+++ b/single-line-function-declarations.go",
         "@@ -1,7 +1,5 @@",
@@ -564,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "46baf0d782767becd51d83d8b45e905f98b83c6b..dfc63c0380caa3d1c47b3742b845a45f5cff8742"
+    "shas": "5882272a60ff8b97c7f1468c49a18554917cb66c..96e8ac672432d770311f0804173e5c719a086039"
 }
 ,{
     "testCaseDescription": "go-single-line-function-declarations-teardown-test",
@@ -595,7 +601,7 @@
     ],
     "patch": [
         "diff --git a/single-line-function-declarations.go b/single-line-function-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/single-line-function-declarations.go",
         "+++ b/single-line-function-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -606,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfc63c0380caa3d1c47b3742b845a45f5cff8742..7c2e8f39e68df4ae5a362bc9e19f3b476c0e524f"
+    "shas": "96e8ac672432d770311f0804173e5c719a086039..f889c39f6b16e9b46e41c62a86630722d9d746de"
 }]

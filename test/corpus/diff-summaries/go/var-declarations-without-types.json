@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38522d7429c9cfae204c5a1087b0d6906b7d02e4..1570ab84c93b56d50200dc316c116005703da97b"
+    "shas": "6e496e504c93beee0c719d335706c22938bbf519..1bf70d49e22b839d8d7bcf27da35796f285d5b65"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-insert-test",
@@ -50,7 +50,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                5
                             ],
                             "end": [
                                 4,
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' variable in the main function of the 'main' module"
+                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 7905807..64f6074 100644",
+        "index 79058077..64f60746 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1570ab84c93b56d50200dc316c116005703da97b..d1c407cd806f3e628886312c0f82cb57592ed647"
+    "shas": "1bf70d49e22b839d8d7bcf27da35796f285d5b65..c1292e8288934cd1f8b36e74f203416f282a9672"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-replacement-test",
@@ -113,7 +113,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one variable of the 'main' function"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -140,14 +140,14 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the one variable of the 'main' function"
+                    "summary": "Replaced '0' with '1' in the one var assignment of the 'main' function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                5
                             ],
                             "end": [
                                 4,
@@ -155,7 +155,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' variable in the main function of the 'main' module"
+                    "summary": "Added the 'two' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -166,7 +166,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 64f6074..88a72ee 100644",
+        "index 64f60746..88a72ee0 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -178,7 +178,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d1c407cd806f3e628886312c0f82cb57592ed647..d877935794c94850cd5c157778f337e2702666c0"
+    "shas": "c1292e8288934cd1f8b36e74f203416f282a9672..daa0439b6a3b01823afe2b2d285db52a1d55467b"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-replacement-test",
@@ -210,7 +210,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero variable of the 'main' function"
+                    "summary": "Replaced the 'one' identifier with the 'zero' identifier in the zero var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -237,14 +237,14 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in the zero variable of the 'main' function"
+                    "summary": "Replaced '1' with '0' in the zero var assignment of the 'main' function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                5
                             ],
                             "end": [
                                 4,
@@ -252,7 +252,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'two' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -263,7 +263,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 88a72ee..64f6074 100644",
+        "index 88a72ee0..64f60746 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -275,7 +275,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d877935794c94850cd5c157778f337e2702666c0..53b93dfca9030a920e38f37ae8ed03e22611e9d6"
+    "shas": "daa0439b6a3b01823afe2b2d285db52a1d55467b..e1c25c030748d94e54fd3ed16566443e38240de1"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-insert-test",
@@ -287,7 +287,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                5
                             ],
                             "end": [
                                 4,
@@ -295,7 +295,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -306,7 +306,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 64f6074..7905807 100644",
+        "index 64f60746..79058077 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +1,5 @@",
@@ -318,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53b93dfca9030a920e38f37ae8ed03e22611e9d6..d4e9e062bfa08ea01c840441ac147ff998b1e9be"
+    "shas": "e1c25c030748d94e54fd3ed16566443e38240de1..59752550417d59d8e28a37c6a762ebd7e2e7d4f8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-teardown-test",
@@ -349,7 +349,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-without-types.go b/var-declarations-without-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/var-declarations-without-types.go",
         "+++ b/var-declarations-without-types.go",
         "@@ -1,5 +0,0 @@",
@@ -360,5 +360,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d4e9e062bfa08ea01c840441ac147ff998b1e9be..a8a99abb6559cc8ca7744a5477ccdcebaf4d6fa1"
+    "shas": "59752550417d59d8e28a37c6a762ebd7e2e7d4f8..00dc032c69a639c57b39083d073b734044bb0cc0"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "efd0c3cb1a849ee204223f8b2e77cc03fabdd406..743091a8fdbc838ff81ce271132dda84db44ecab"
+    "shas": "20fa55e7535a6b1108c324529279f2e8b490ca41..3dd801eb58db16a0c0ad78cdc49ac1c50256f041"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -129,7 +129,7 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 7905807..072782b 100644",
+        "index 79058077..072782b1 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
         "@@ -1,5 +1,8 @@",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "743091a8fdbc838ff81ce271132dda84db44ecab..c392434eb0cc3a33cce287ced505b978238b07a1"
+    "shas": "3dd801eb58db16a0c0ad78cdc49ac1c50256f041..c1749b81e7947fa1a2a018431e837bf244933ccc"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -207,57 +207,63 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'd' identifier with the 'z' identifier in the z var assignment of the 'main' function"
+                    "summary": "Added the 'z' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'e' identifier with the 'h' identifier in the h var assignment of the 'main' function"
+                    "summary": "Added the 'h' var assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' var assignment in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -268,7 +274,7 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 072782b..2e6b444 100644",
+        "index 072782b1..2e6b444c 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
         "@@ -1,8 +1,8 @@",
@@ -286,7 +292,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c392434eb0cc3a33cce287ced505b978238b07a1..d393634ed2d19d522e50e052aa45fa6583ed713c"
+    "shas": "c1749b81e7947fa1a2a018431e837bf244933ccc..183f8301622c6ef185d5047e7f120a789b8dc8b1"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -349,41 +355,29 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'z' identifier with the 'd' identifier in the d var assignment of the 'main' function"
+                    "summary": "Added the 'd' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    7,
+                                    6,
                                     1
                                 ],
                                 "end": [
-                                    7,
+                                    6,
                                     2
                                 ]
                             },
@@ -399,7 +393,49 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'e' identifier in the e var assignment of the 'main' function"
+                    "summary": "Replaced the 'z' identifier with the 'e' identifier in the e var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '1' in the e var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'h' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -410,7 +446,7 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 2e6b444..072782b 100644",
+        "index 2e6b444c..072782b1 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
         "@@ -1,8 +1,8 @@",
@@ -428,7 +464,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d393634ed2d19d522e50e052aa45fa6583ed713c..70a21ee21e40b085c07e62e8472d2928d6c1ccc9"
+    "shas": "183f8301622c6ef185d5047e7f120a789b8dc8b1..a56b78cc0505be75ec9ed461dc8c1f8d2dddb24e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -519,7 +555,7 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 072782b..7905807 100644",
+        "index 072782b1..79058077 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
         "@@ -1,8 +1,5 @@",
@@ -534,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "70a21ee21e40b085c07e62e8472d2928d6c1ccc9..ae7cc73c3d003fa5e572468f0848343c581c371e"
+    "shas": "a56b78cc0505be75ec9ed461dc8c1f8d2dddb24e..488ae20a83705cfe2cf4c8bd37a6a4526d625ccb"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -565,7 +601,7 @@
     ],
     "patch": [
         "diff --git a/assignment-statements.go b/assignment-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/assignment-statements.go",
         "+++ b/assignment-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -576,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ae7cc73c3d003fa5e572468f0848343c581c371e..dfd75d49293a0503061ad3227ada1bffe53a1801"
+    "shas": "488ae20a83705cfe2cf4c8bd37a6a4526d625ccb..bff82271f316995218c2faaeaf34916b251bd406"
 }]

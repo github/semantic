@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/selector-expressions.go b/selector-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/selector-expressions.go",
         "+++ b/selector-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ddf3ce8b6c6271e3153414e94c2a5ed576525b3f..f65051e093ea9f1b853ad6607b0627bc4b467b71"
+    "shas": "6e80447717bef244bb9bfd8ca19fa08396a93949..6d6994dd8bd7aa9f2f1ae62106a0a13a3c5cddb7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/selector-expressions.go b/selector-expressions.go",
-        "index 7905807..8b4c745 100644",
+        "index 79058077..8b4c745e 100644",
         "--- a/selector-expressions.go",
         "+++ b/selector-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f65051e093ea9f1b853ad6607b0627bc4b467b71..9e976318322531cbe98ab23f961842da2c2fb84a"
+    "shas": "6d6994dd8bd7aa9f2f1ae62106a0a13a3c5cddb7..f70f444c0575bafe2a43d4cdf141d95fd8c198e2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -178,7 +178,7 @@
     ],
     "patch": [
         "diff --git a/selector-expressions.go b/selector-expressions.go",
-        "index 8b4c745..0e519e3 100644",
+        "index 8b4c745e..0e519e3e 100644",
         "--- a/selector-expressions.go",
         "+++ b/selector-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9e976318322531cbe98ab23f961842da2c2fb84a..afd5153ab50147c234de8b3757736f30d7efe411"
+    "shas": "f70f444c0575bafe2a43d4cdf141d95fd8c198e2..048ff2fe202aa2df86987f94fbd3496b1ccb5ae3"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -287,7 +287,7 @@
     ],
     "patch": [
         "diff --git a/selector-expressions.go b/selector-expressions.go",
-        "index 0e519e3..8b4c745 100644",
+        "index 0e519e3e..8b4c745e 100644",
         "--- a/selector-expressions.go",
         "+++ b/selector-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "afd5153ab50147c234de8b3757736f30d7efe411..923206e8a0cd792702477ec1e1e7ab12bc3488c0"
+    "shas": "048ff2fe202aa2df86987f94fbd3496b1ccb5ae3..535ab994b8974d503ce26ab64f8d294ab2a75f53"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -330,7 +330,7 @@
     ],
     "patch": [
         "diff --git a/selector-expressions.go b/selector-expressions.go",
-        "index 8b4c745..7905807 100644",
+        "index 8b4c745e..79058077 100644",
         "--- a/selector-expressions.go",
         "+++ b/selector-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "923206e8a0cd792702477ec1e1e7ab12bc3488c0..322dd4b61decf7a69223fa122f238e7001c5510d"
+    "shas": "535ab994b8974d503ce26ab64f8d294ab2a75f53..76275accea3e66b341933ac6f537ac7064204c89"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -373,7 +373,7 @@
     ],
     "patch": [
         "diff --git a/selector-expressions.go b/selector-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/selector-expressions.go",
         "+++ b/selector-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "322dd4b61decf7a69223fa122f238e7001c5510d..eb22590bba5cac2db7b478012ad0ab6e980f7317"
+    "shas": "76275accea3e66b341933ac6f537ac7064204c89..efcf789858ec7ef3093d8b8c90b40e9590b8a605"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/grouped-import-declarations.go",
         "+++ b/grouped-import-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2be724661b34d7fbc740a5b2d599c03ed0feef47..7a27ed2d0a56f332003a0d30d5a937457b588de4"
+    "shas": "e13c25cd435aead827b8a09d18dfed061d9f8443..2142f8c5ea28d549c3d95d4fbc7240f2a982c798"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
-        "index 7905807..b544dde 100644",
+        "index 79058077..b544dded 100644",
         "--- a/grouped-import-declarations.go",
         "+++ b/grouped-import-declarations.go",
         "@@ -1,5 +1,9 @@",
@@ -85,7 +85,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a27ed2d0a56f332003a0d30d5a937457b588de4..a813dca879346673d61e144227e93349fea91108"
+    "shas": "2142f8c5ea28d549c3d95d4fbc7240f2a982c798..a3dac3f98aa22111a9cc05c861557c94a16424e4"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-replacement-test",
@@ -182,7 +182,7 @@
     ],
     "patch": [
         "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
-        "index b544dde..1fd89e1 100644",
+        "index b544dded..1fd89e1d 100644",
         "--- a/grouped-import-declarations.go",
         "+++ b/grouped-import-declarations.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -199,7 +199,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a813dca879346673d61e144227e93349fea91108..ba09c2a47ebb8573e017bc355576ca899defec60"
+    "shas": "a3dac3f98aa22111a9cc05c861557c94a16424e4..134a7584a9405606aacafeb0fd0598828d1cbf36"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-replacement-test",
@@ -296,7 +296,7 @@
     ],
     "patch": [
         "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
-        "index 1fd89e1..b544dde 100644",
+        "index 1fd89e1d..b544dded 100644",
         "--- a/grouped-import-declarations.go",
         "+++ b/grouped-import-declarations.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -313,7 +313,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ba09c2a47ebb8573e017bc355576ca899defec60..a2916860c251980382dff40dc901e4f4dddb49a9"
+    "shas": "134a7584a9405606aacafeb0fd0598828d1cbf36..9e405fe54879904e09823d1e9b2bbed4e5e9bd3b"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-delete-insert-test",
@@ -344,7 +344,7 @@
     ],
     "patch": [
         "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
-        "index b544dde..7905807 100644",
+        "index b544dded..79058077 100644",
         "--- a/grouped-import-declarations.go",
         "+++ b/grouped-import-declarations.go",
         "@@ -1,9 +1,5 @@",
@@ -360,7 +360,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a2916860c251980382dff40dc901e4f4dddb49a9..6a00b8c3d3b1ea3562446a8c5e01e802d41f0714"
+    "shas": "9e405fe54879904e09823d1e9b2bbed4e5e9bd3b..ea94ca3d950bdcf67eac03b133c7db6786e5a5cc"
 }
 ,{
     "testCaseDescription": "go-grouped-import-declarations-teardown-test",
@@ -391,7 +391,7 @@
     ],
     "patch": [
         "diff --git a/grouped-import-declarations.go b/grouped-import-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/grouped-import-declarations.go",
         "+++ b/grouped-import-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -402,5 +402,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6a00b8c3d3b1ea3562446a8c5e01e802d41f0714..5ba2f3848075790efeeabe7f701b95ad6ee38727"
+    "shas": "ea94ca3d950bdcf67eac03b133c7db6786e5a5cc..c0adc847f9e1b5742d419af6a3cf187f57508649"
 }]

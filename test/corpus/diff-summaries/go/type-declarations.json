@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/type-declarations.go b/type-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/type-declarations.go",
         "+++ b/type-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4350b0252bd440416945effa2baa1821271fefee..f60d4726966bea5bf1f4cf153dd44f6f3ddb3d35"
+    "shas": "326274c668eeea07035e2a234abe09209887b6df..73e52334295672842fa56069a6f364a2d9e371a7"
 }
 ,{
     "testCaseDescription": "go-type-declarations-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/type-declarations.go b/type-declarations.go",
-        "index 7905807..1b2c542 100644",
+        "index 79058077..1b2c5423 100644",
         "--- a/type-declarations.go",
         "+++ b/type-declarations.go",
         "@@ -1,5 +1,9 @@",
@@ -115,7 +115,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f60d4726966bea5bf1f4cf153dd44f6f3ddb3d35..72567b64aeb65ae60464f30cb2d99acb2e7e0f97"
+    "shas": "73e52334295672842fa56069a6f364a2d9e371a7..af6b41726f0617602a88aa22d0a3fb6b54705e6f"
 }
 ,{
     "testCaseDescription": "go-type-declarations-replacement-test",
@@ -124,30 +124,228 @@
             "type-declarations.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    9,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    9,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' function with the 'main' function in the main module"
+                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                5,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                3
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' ' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' type declaration in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' type declaration in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -158,7 +356,7 @@
     ],
     "patch": [
         "diff --git a/type-declarations.go b/type-declarations.go",
-        "index 1b2c542..99b445f 100644",
+        "index 1b2c5423..99b445f9 100644",
         "--- a/type-declarations.go",
         "+++ b/type-declarations.go",
         "@@ -1,9 +1,9 @@",
@@ -176,7 +374,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "72567b64aeb65ae60464f30cb2d99acb2e7e0f97..b6ecb2e97f8e9ae9387c2474cbce6e600ceb2b74"
+    "shas": "af6b41726f0617602a88aa22d0a3fb6b54705e6f..8eaedc4103a4db44d2d39ad3d4d942b6b3be8b34"
 }
 ,{
     "testCaseDescription": "go-type-declarations-delete-replacement-test",
@@ -185,30 +383,228 @@
             "type-declarations.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    9,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    9,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'main' function with the 'main' function in the main module"
+                    "summary": "Added the 'a' type declaration in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' type declaration in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' type declaration in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                6
+                            ],
+                            "end": [
+                                4,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                7
+                            ],
+                            "end": [
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' ' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                5,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                2
+                            ],
+                            "end": [
+                                6,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                3
+                            ],
+                            "end": [
+                                6,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' ' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                5
+                            ],
+                            "end": [
+                                6,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                3
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' ' error in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                5
+                            ],
+                            "end": [
+                                7,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                6
+                            ],
+                            "end": [
+                                8,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' error in the main function of the 'main' module"
                 }
             ]
         },
@@ -219,7 +615,7 @@
     ],
     "patch": [
         "diff --git a/type-declarations.go b/type-declarations.go",
-        "index 99b445f..1b2c542 100644",
+        "index 99b445f9..1b2c5423 100644",
         "--- a/type-declarations.go",
         "+++ b/type-declarations.go",
         "@@ -1,9 +1,9 @@",
@@ -237,7 +633,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b6ecb2e97f8e9ae9387c2474cbce6e600ceb2b74..84746912c0e8f949b85bf35e2fa2689eac7a4818"
+    "shas": "8eaedc4103a4db44d2d39ad3d4d942b6b3be8b34..49788d0a787cfba0de056686a713a0c7700c12f0"
 }
 ,{
     "testCaseDescription": "go-type-declarations-delete-insert-test",
@@ -298,7 +694,7 @@
     ],
     "patch": [
         "diff --git a/type-declarations.go b/type-declarations.go",
-        "index 1b2c542..7905807 100644",
+        "index 1b2c5423..79058077 100644",
         "--- a/type-declarations.go",
         "+++ b/type-declarations.go",
         "@@ -1,9 +1,5 @@",
@@ -314,7 +710,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "84746912c0e8f949b85bf35e2fa2689eac7a4818..1409faa58989d574f26b17ba2bd4906d4a230868"
+    "shas": "49788d0a787cfba0de056686a713a0c7700c12f0..b9cf58e1f6441213ee5aef2bd917f239e3990099"
 }
 ,{
     "testCaseDescription": "go-type-declarations-teardown-test",
@@ -345,7 +741,7 @@
     ],
     "patch": [
         "diff --git a/type-declarations.go b/type-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/type-declarations.go",
         "+++ b/type-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -356,5 +752,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1409faa58989d574f26b17ba2bd4906d4a230868..ec0920b704179f760c0897c96869f2acb3f0bfae"
+    "shas": "b9cf58e1f6441213ee5aef2bd917f239e3990099..d189fd08606f98132afa64428010e6b5d86a0d4b"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f39c7d56a7c3a174293e7c6157c7410c17c654a3..24d4e33b9c81c8f1937fa8dc5b577675de6d4286"
+    "shas": "dfd96daa75b1b404d313721c1f5304a9c39ed793..7cef2d5ea6d3ae2572c83b7eeae8740ad5f0e4be"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 7905807..4f148f4 100644",
+        "index 79058077..4f148f43 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "24d4e33b9c81c8f1937fa8dc5b577675de6d4286..95c6043503f246feeed7a1b26a5868882267f2b8"
+    "shas": "7cef2d5ea6d3ae2572c83b7eeae8740ad5f0e4be..10db8afdd550765758c09c64496206e4914d2d89"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -125,7 +125,7 @@
                                 ],
                                 "end": [
                                     4,
-                                    5
+                                    12
                                 ]
                             },
                             {
@@ -135,39 +135,12 @@
                                 ],
                                 "end": [
                                     4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
                                     9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'z.Person' qualified identifier with the 'c.Dog' qualified identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -178,7 +151,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 4f148f4..e7463b4 100644",
+        "index 4f148f43..e7463b41 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -190,7 +163,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95c6043503f246feeed7a1b26a5868882267f2b8..d25d882307811a8290a3ee83cb3e4cfe8387655a"
+    "shas": "10db8afdd550765758c09c64496206e4914d2d89..953c259a146a96c6651cfab229ceeab7d027e2e6"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -234,7 +207,7 @@
                                 ],
                                 "end": [
                                     4,
-                                    5
+                                    9
                                 ]
                             },
                             {
@@ -244,39 +217,12 @@
                                 ],
                                 "end": [
                                     4,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
                                     12
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'c.Dog' qualified identifier with the 'z.Person' qualified identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -287,7 +233,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index e7463b4..4f148f4 100644",
+        "index e7463b41..4f148f43 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -299,7 +245,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d25d882307811a8290a3ee83cb3e4cfe8387655a..ae276bcda533d9b7467451b4864585c00b5e0fb4"
+    "shas": "953c259a146a96c6651cfab229ceeab7d027e2e6..a47923fde79bfe4fa7c1dd5a930d45ae014492a6"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
@@ -330,7 +276,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 4f148f4..7905807 100644",
+        "index 4f148f43..79058077 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +1,5 @@",
@@ -342,7 +288,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ae276bcda533d9b7467451b4864585c00b5e0fb4..5d341bf39ac6e36b5acad4ce455beb73293b3ea5"
+    "shas": "a47923fde79bfe4fa7c1dd5a930d45ae014492a6..7ab70389e339c876aa749575d4b897aeba2b2a95"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-teardown-test",
@@ -373,7 +319,7 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -384,5 +330,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5d341bf39ac6e36b5acad4ce455beb73293b3ea5..3a8236b9d52638e4cb632f80f594ea015576542d"
+    "shas": "7ab70389e339c876aa749575d4b897aeba2b2a95..68a4f3b62b94d9a47fea178eedcb2614a386054d"
 }]

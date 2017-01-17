@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a4aae0bafb6ad2a25b31b59421b337616dcbfd9..46673b0f84268bdcc0dda8104526874b70b2884c"
+    "shas": "efcf789858ec7ef3093d8b8c90b40e9590b8a605..f69740ac9317c7f1177454ce1e08a67b254bb9b9"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'a[1]' index expression in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -144,7 +144,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 7905807..c2c7693 100644",
+        "index 79058077..c2c76934 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,5 +1,10 @@",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "46673b0f84268bdcc0dda8104526874b70b2884c..32b42936718bd32bec18310648de26048d5c4612"
+    "shas": "f69740ac9317c7f1177454ce1e08a67b254bb9b9..36a0bad549c1bba7a60c59d2773ed420937a6b5b"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -226,7 +226,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'a[1]' index expression in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -267,7 +267,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index c2c7693..68a7634 100644",
+        "index c2c76934..68a76340 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,9 +1,9 @@",
@@ -285,7 +285,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "32b42936718bd32bec18310648de26048d5c4612..9255e00abb10febd00ecfa015fb6e0a9957ee435"
+    "shas": "36a0bad549c1bba7a60c59d2773ed420937a6b5b..4bf1febcaf31ccc283c7f6a436de0503d6ced94f"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -305,7 +305,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Added the 'a[1]' index expression in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -400,7 +400,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 68a7634..c2c7693 100644",
+        "index 68a76340..c2c76934 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,9 +1,9 @@",
@@ -418,7 +418,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9255e00abb10febd00ecfa015fb6e0a9957ee435..2cbaa0c8dbc25e1ed464f14c8e9f7eeda2768112"
+    "shas": "4bf1febcaf31ccc283c7f6a436de0503d6ced94f..7eec09a12df35db5e1152687d5ed7c2ef0c53ff2"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -438,7 +438,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a[1]' subscript access in the main function of the 'main' module"
+                    "summary": "Deleted the 'a[1]' index expression in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -524,7 +524,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index c2c7693..7905807 100644",
+        "index c2c76934..79058077 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,10 +1,5 @@",
@@ -541,7 +541,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2cbaa0c8dbc25e1ed464f14c8e9f7eeda2768112..e019086de4e2d426cb0f65c77fc0386b3d2faaec"
+    "shas": "7eec09a12df35db5e1152687d5ed7c2ef0c53ff2..f1621a2c7b5589d3c476c11201d2769500d891c0"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -572,7 +572,7 @@
     ],
     "patch": [
         "diff --git a/indexing-expressions.go b/indexing-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/indexing-expressions.go",
         "+++ b/indexing-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -583,5 +583,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e019086de4e2d426cb0f65c77fc0386b3d2faaec..aff56e988571d418e1187aa51b5aa4d25cc850e8"
+    "shas": "f1621a2c7b5589d3c476c11201d2769500d891c0..dfd96daa75b1b404d313721c1f5304a9c39ed793"
 }]

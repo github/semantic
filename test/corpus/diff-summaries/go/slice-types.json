@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/slice-types.go b/slice-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/slice-types.go",
         "+++ b/slice-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ffedb66ffa318010e511fa2a7f508d94c0220d98..9e746752812957462281a5d5d9fa3775d4062cad"
+    "shas": "5deab0cac5ff307e66dafda450d81397a6d8b7d9..a5d5c49baed612a8b5bd1b020a3f643d31e20dcd"
 }
 ,{
     "testCaseDescription": "go-slice-types-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/slice-types.go b/slice-types.go",
-        "index 7905807..4880791 100644",
+        "index 79058077..4880791f 100644",
         "--- a/slice-types.go",
         "+++ b/slice-types.go",
         "@@ -1,5 +1,6 @@",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9e746752812957462281a5d5d9fa3775d4062cad..132ee74dbcaf325fd72dc21ffff289fb65a1f701"
+    "shas": "a5d5c49baed612a8b5bd1b020a3f643d31e20dcd..84772b0bb76419d73db3a99504879062d5c9de94"
 }
 ,{
     "testCaseDescription": "go-slice-types-replacement-test",
@@ -117,7 +117,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'p' identifier in the a type declaration of the 'main' function"
+                    "summary": "Added the 'p' identifier in the 'a' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -132,7 +132,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' identifier in the a type declaration of the 'main' function"
+                    "summary": "Deleted the 'b' identifier in the 'a' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -147,7 +147,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier in the c type declaration of the 'main' function"
+                    "summary": "Added the 'y' identifier in the 'c' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -162,7 +162,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd' identifier in the c type declaration of the 'main' function"
+                    "summary": "Deleted the 'd' identifier in the 'c' type declaration of the 'main' function"
                 }
             ]
         },
@@ -173,7 +173,7 @@
     ],
     "patch": [
         "diff --git a/slice-types.go b/slice-types.go",
-        "index 4880791..b48b280 100644",
+        "index 4880791f..b48b280a 100644",
         "--- a/slice-types.go",
         "+++ b/slice-types.go",
         "@@ -1,6 +1,6 @@",
@@ -187,7 +187,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "132ee74dbcaf325fd72dc21ffff289fb65a1f701..1199891ace669587c3598ff7b2a25b8d43c56184"
+    "shas": "84772b0bb76419d73db3a99504879062d5c9de94..87cb792efe733f8b778a1fab0b7de5c8433deb2c"
 }
 ,{
     "testCaseDescription": "go-slice-types-delete-replacement-test",
@@ -207,7 +207,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' identifier in the a type declaration of the 'main' function"
+                    "summary": "Added the 'b' identifier in the 'a' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -222,7 +222,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p' identifier in the a type declaration of the 'main' function"
+                    "summary": "Deleted the 'p' identifier in the 'a' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -237,7 +237,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'd' identifier in the c type declaration of the 'main' function"
+                    "summary": "Added the 'd' identifier in the 'c' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -252,7 +252,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier in the c type declaration of the 'main' function"
+                    "summary": "Deleted the 'y' identifier in the 'c' type declaration of the 'main' function"
                 }
             ]
         },
@@ -263,7 +263,7 @@
     ],
     "patch": [
         "diff --git a/slice-types.go b/slice-types.go",
-        "index b48b280..4880791 100644",
+        "index b48b280a..4880791f 100644",
         "--- a/slice-types.go",
         "+++ b/slice-types.go",
         "@@ -1,6 +1,6 @@",
@@ -277,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1199891ace669587c3598ff7b2a25b8d43c56184..647b2f873f54de33e3e94041a059b2202fa30a39"
+    "shas": "87cb792efe733f8b778a1fab0b7de5c8433deb2c..fdb3add90974e9f84e521404cda2e6e71b52cc39"
 }
 ,{
     "testCaseDescription": "go-slice-types-delete-insert-test",
@@ -323,7 +323,7 @@
     ],
     "patch": [
         "diff --git a/slice-types.go b/slice-types.go",
-        "index 4880791..7905807 100644",
+        "index 4880791f..79058077 100644",
         "--- a/slice-types.go",
         "+++ b/slice-types.go",
         "@@ -1,6 +1,5 @@",
@@ -336,7 +336,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "647b2f873f54de33e3e94041a059b2202fa30a39..32c33c4b6faf99299ea4abe5fc9c280812fcd07e"
+    "shas": "fdb3add90974e9f84e521404cda2e6e71b52cc39..1044889b32a3ace787e9f95183dc18c7d0fe9f26"
 }
 ,{
     "testCaseDescription": "go-slice-types-teardown-test",
@@ -367,7 +367,7 @@
     ],
     "patch": [
         "diff --git a/slice-types.go b/slice-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/slice-types.go",
         "+++ b/slice-types.go",
         "@@ -1,5 +0,0 @@",
@@ -378,5 +378,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "32c33c4b6faf99299ea4abe5fc9c280812fcd07e..65f9b951e0ca2913336697e29d8e82466117d13e"
+    "shas": "1044889b32a3ace787e9f95183dc18c7d0fe9f26..fab1dcdf1ee0c86193d9e8af8a03ed5bb0c006ce"
 }]

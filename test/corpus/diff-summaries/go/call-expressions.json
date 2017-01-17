@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a6d6b87e3b8498575c6a100bd3722f8ce2d30eee..ecb64feb9685dca8e3a1a2caf500a07d110629f9"
+    "shas": "2b9cb611dc3d121922e8078cb5a74bac1146c4ea..64ddded97ef9c2bd0a64b0c3843eb4163bc9c395"
 }
 ,{
     "testCaseDescription": "go-call-expressions-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 7905807..72918e5 100644",
+        "index 79058077..72918e59 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,5 +1,7 @@",
@@ -113,7 +113,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ecb64feb9685dca8e3a1a2caf500a07d110629f9..e679eabd7abb1171b86f17c7118a30a60ac9401e"
+    "shas": "64ddded97ef9c2bd0a64b0c3843eb4163bc9c395..4f359f278ca887ebf0280420ced3f7cc6b13d286"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-test",
@@ -122,84 +122,93 @@
             "call-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a(b, c) function call of the 'main' function"
+                    "summary": "Added the 'a(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b(b, c) function call of the 'main' function"
+                    "summary": "Added the 'b(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c(b, c) function call of the 'main' function"
+                    "summary": "Added the 'c(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z(b, c)' function call in the main function of the 'main' module"
                 }
             ]
         },
@@ -210,7 +219,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 72918e5..2d5e765 100644",
+        "index 72918e59..2d5e765c 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,7 +1,7 @@",
@@ -226,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e679eabd7abb1171b86f17c7118a30a60ac9401e..17af9b349ce778f930c9566cdec742dc1477bb4b"
+    "shas": "4f359f278ca887ebf0280420ced3f7cc6b13d286..5f6c1d63fbd8d56f69ab673686aff144e1b3bba9"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-replacement-test",
@@ -235,84 +244,93 @@
             "call-expressions.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x(b, c) function call of the 'main' function"
+                    "summary": "Added the 'x(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y(b, c) function call of the 'main' function"
+                    "summary": "Added the 'y(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    2
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier in the z(b, c) function call of the 'main' function"
+                    "summary": "Added the 'z(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c(b, c)' function call in the main function of the 'main' module"
                 }
             ]
         },
@@ -323,7 +341,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 2d5e765..72918e5 100644",
+        "index 2d5e765c..72918e59 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,7 +1,7 @@",
@@ -339,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "17af9b349ce778f930c9566cdec742dc1477bb4b..4666ff91d68871a70e66dc234d80bbbe74ba5737"
+    "shas": "5f6c1d63fbd8d56f69ab673686aff144e1b3bba9..e3de42aa6294c0f1cd6f90d2e2dd99fdf5856276"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-insert-test",
@@ -400,7 +418,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 72918e5..7905807 100644",
+        "index 72918e59..79058077 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,7 +1,5 @@",
@@ -414,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4666ff91d68871a70e66dc234d80bbbe74ba5737..22508dbaaf87e757f0d1383438121d63bbfb184d"
+    "shas": "e3de42aa6294c0f1cd6f90d2e2dd99fdf5856276..2df7667af5e4b68fe583ad1cfdf162bed76802d6"
 }
 ,{
     "testCaseDescription": "go-call-expressions-teardown-test",
@@ -445,7 +463,7 @@
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -456,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "22508dbaaf87e757f0d1383438121d63bbfb184d..3e502021cd3d8c7e11e89ade83196888145fb71f"
+    "shas": "2df7667af5e4b68fe583ad1cfdf162bed76802d6..203cd18e8dc697c2d27de5e9d29c1ee480c444d2"
 }]

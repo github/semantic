@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a02b82ed791d6093b557bde927da0db6586a141..9a3f0bd2527843c19792586940c58d9ac7cf1bb1"
+    "shas": "cb70743c2dadaed8a2d43a98a43b66b8e8798eed..0c67f7bfdf682cad6cdcada688fb69d426d683ae"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -49,31 +49,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                5,
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' variable in the main function of the 'main' module"
+                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                6,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                6,
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'one' variable in the main function of the 'main' module"
+                    "summary": "Added the 'one' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index 7905807..cdb45b3 100644",
+        "index 79058077..cdb45b39 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -1,5 +1,8 @@",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a3f0bd2527843c19792586940c58d9ac7cf1bb1..717fee5a815beb76286193913b4bbdb2cbd4997e"
+    "shas": "0c67f7bfdf682cad6cdcada688fb69d426d683ae..354ca5c919a2f3436b7c809c282a6532b583a053"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -131,7 +131,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a variable of the 'main' function"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -158,7 +158,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b variable of the 'main' function"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b var assignment of the 'main' function"
                 }
             ]
         },
@@ -169,7 +169,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index cdb45b3..806a593 100644",
+        "index cdb45b39..806a5935 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "717fee5a815beb76286193913b4bbdb2cbd4997e..d8d436d648e0ccad14a54b275301bd7edbed68e1"
+    "shas": "354ca5c919a2f3436b7c809c282a6532b583a053..c063900c3d1db9d77acba00634f510be129c9443"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -216,7 +216,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero variable of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -243,7 +243,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one variable of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one var assignment of the 'main' function"
                 }
             ]
         },
@@ -254,7 +254,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index 806a593..cdb45b3 100644",
+        "index 806a5935..cdb45b39 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8d436d648e0ccad14a54b275301bd7edbed68e1..41ea7fd4f753108bf67b181d950fc73642316e01"
+    "shas": "c063900c3d1db9d77acba00634f510be129c9443..45eb8616897c1118d23ebe88feee475446cd610d"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -280,31 +280,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                5,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                5,
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                6,
                                 1
                             ],
                             "end": [
-                                7,
-                                2
+                                6,
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'one' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'one' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -315,7 +315,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index cdb45b3..7905807 100644",
+        "index cdb45b39..79058077 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -1,8 +1,5 @@",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "41ea7fd4f753108bf67b181d950fc73642316e01..23ecf547fbb656484104d02b8a712af28b98f248"
+    "shas": "45eb8616897c1118d23ebe88feee475446cd610d..028e81a1060ccaedfc178fa007f17707f4c6312c"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -361,7 +361,7 @@
     ],
     "patch": [
         "diff --git a/grouped-var-declarations.go b/grouped-var-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/grouped-var-declarations.go",
         "+++ b/grouped-var-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "23ecf547fbb656484104d02b8a712af28b98f248..23874e933b13d7ac439111764b1ed1443d0a63b0"
+    "shas": "028e81a1060ccaedfc178fa007f17707f4c6312c..1792c5e9f49969317e3f1906a524030fa6b7f07a"
 }]

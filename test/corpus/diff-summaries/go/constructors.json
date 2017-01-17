@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "31a0236243256b4af2472a2e295e5f0aad75fab8..b018abec281817b98e29353ea26223c98bd35482"
+    "shas": "cb66210a1c475a2552548892206041158edcec3d..125c4121d3dbbbf5f23a6b3649eb21ce46db2146"
 }
 ,{
     "testCaseDescription": "go-constructors-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(…)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'make(chan<- int)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(…, …)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'make(chan<- int, …)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -88,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'make(…, 5, 10)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'make(chan<- int, 5, 10)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -114,7 +114,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 7905807..082e65f 100644",
+        "index 79058077..082e65fd 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,5 +1,8 @@",
@@ -129,7 +129,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b018abec281817b98e29353ea26223c98bd35482..268b285f41fda1deee565dcf60b672a56bb146ee"
+    "shas": "125c4121d3dbbbf5f23a6b3649eb21ce46db2146..986cacbfb59eb59882c6c267dbfe6472f7d77f07"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -161,7 +161,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the make(…) function call of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan<- string channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -188,7 +188,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the make(…, …) function call of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan<- string channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -215,7 +215,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the make(…, 7, 11) function call of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan<- string channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -242,7 +242,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '7' in the make(…, 7, 11) function call of the 'main' function"
+                    "summary": "Replaced '5' with '7' in the make(chan<- string, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -269,7 +269,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '10' with '11' in the make(…, 7, 11) function call of the 'main' function"
+                    "summary": "Replaced '10' with '11' in the make(chan<- string, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -334,7 +334,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 082e65f..e4fdb2e 100644",
+        "index 082e65fd..e4fdb2e9 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,8 +1,8 @@",
@@ -352,7 +352,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "268b285f41fda1deee565dcf60b672a56bb146ee..f77550a23410c58a759303bd127eaf9d363bef8c"
+    "shas": "986cacbfb59eb59882c6c267dbfe6472f7d77f07..9a05ffa21feb0af6a2b60ba7d02b5cc7528a41ba"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
@@ -384,7 +384,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the make(…) function call of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan<- int channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -411,7 +411,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the make(…, …) function call of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan<- int channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -438,7 +438,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the make(…, 5, 10) function call of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan<- int channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -465,7 +465,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '7' with '5' in the make(…, 5, 10) function call of the 'main' function"
+                    "summary": "Replaced '7' with '5' in the make(chan<- int, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -492,7 +492,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '11' with '10' in the make(…, 5, 10) function call of the 'main' function"
+                    "summary": "Replaced '11' with '10' in the make(chan<- int, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
@@ -557,7 +557,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index e4fdb2e..082e65f 100644",
+        "index e4fdb2e9..082e65fd 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,8 +1,8 @@",
@@ -575,7 +575,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f77550a23410c58a759303bd127eaf9d363bef8c..4b32fa386e7e8ed303290c248d6845dac106a7b2"
+    "shas": "9a05ffa21feb0af6a2b60ba7d02b5cc7528a41ba..9f3e1a71be7503bfba14d5f5312c73de0dbb1184"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-insert-test",
@@ -595,7 +595,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(…)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(chan<- int)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -610,7 +610,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(…, …)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(chan<- int, …)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -625,7 +625,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(…, 5, 10)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'make(chan<- int, 5, 10)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -651,7 +651,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 082e65f..7905807 100644",
+        "index 082e65fd..79058077 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,8 +1,5 @@",
@@ -666,7 +666,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4b32fa386e7e8ed303290c248d6845dac106a7b2..35df69d74618d96279caea0d8693d122a355306b"
+    "shas": "9f3e1a71be7503bfba14d5f5312c73de0dbb1184..71fbb39a96a78f9fe468c8de9e0d2f92c4caef6a"
 }
 ,{
     "testCaseDescription": "go-constructors-teardown-test",
@@ -697,7 +697,7 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
         "@@ -1,5 +0,0 @@",
@@ -708,5 +708,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "35df69d74618d96279caea0d8693d122a355306b..ddf3ce8b6c6271e3153414e94c2a5ed576525b3f"
+    "shas": "71fbb39a96a78f9fe468c8de9e0d2f92c4caef6a..6e80447717bef244bb9bfd8ca19fa08396a93949"
 }]

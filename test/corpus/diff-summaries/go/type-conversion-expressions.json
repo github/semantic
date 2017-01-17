@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a8236b9d52638e4cb632f80f594ea015576542d..586a355da1bef3304c4b4dc15288cc858ba7c93b"
+    "shas": "68a4f3b62b94d9a47fea178eedcb2614a386054d..c0b4558e2199a8524547249a71401d248a5bfcc3"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-insert-test",
@@ -114,7 +114,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index 7905807..c6d65a7 100644",
+        "index 79058077..c6d65a70 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,5 +1,8 @@",
@@ -129,7 +129,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "586a355da1bef3304c4b4dc15288cc858ba7c93b..123ff93ebf5396e45fb0cf4f55f4cfb0acb06e42"
+    "shas": "c0b4558e2199a8524547249a71401d248a5bfcc3..1b348d0c9f83f1bcb2f9f7a314eeafbf54f3ad5e"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -146,7 +146,7 @@
                                 ],
                                 "end": [
                                     4,
-                                    4
+                                    6
                                 ]
                             },
                             {
@@ -156,39 +156,12 @@
                                 ],
                                 "end": [
                                     4,
-                                    4
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a.b' qualified identifier with the 'x.y' qualified identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -254,7 +227,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    6
+                                    8
                                 ]
                             },
                             {
@@ -264,39 +237,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'f' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    7
-                                ],
-                                "end": [
-                                    5,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    7
-                                ],
-                                "end": [
-                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'g' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a.b' qualified identifier with the 'f.g' qualified identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -523,7 +469,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index c6d65a7..4c4381a 100644",
+        "index c6d65a70..4c4381a6 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,8 +1,8 @@",
@@ -541,7 +487,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "123ff93ebf5396e45fb0cf4f55f4cfb0acb06e42..1f430d2e2255b6cf6408e865dc0eec0036118aa1"
+    "shas": "1b348d0c9f83f1bcb2f9f7a314eeafbf54f3ad5e..9a4feecc0952d661359d677770be4267f37db250"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -558,7 +504,7 @@
                                 ],
                                 "end": [
                                     4,
-                                    4
+                                    6
                                 ]
                             },
                             {
@@ -568,39 +514,12 @@
                                 ],
                                 "end": [
                                     4,
-                                    4
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    5
-                                ],
-                                "end": [
-                                    4,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'x.y' qualified identifier with the 'a.b' qualified identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -666,7 +585,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    6
+                                    8
                                 ]
                             },
                             {
@@ -676,39 +595,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'f' identifier with the 'a' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    7
-                                ],
-                                "end": [
-                                    5,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    7
-                                ],
-                                "end": [
-                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'b' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'f.g' qualified identifier with the 'a.b' qualified identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -935,7 +827,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index 4c4381a..c6d65a7 100644",
+        "index 4c4381a6..c6d65a70 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,8 +1,8 @@",
@@ -953,7 +845,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f430d2e2255b6cf6408e865dc0eec0036118aa1..68fa0f946bae57d57fbeaaf4052fecd1dcbf0047"
+    "shas": "9a4feecc0952d661359d677770be4267f37db250..d97b0927494147e017cd08eca0bb00ea312bb56a"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -1029,7 +921,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index c6d65a7..7905807 100644",
+        "index c6d65a70..79058077 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,8 +1,5 @@",
@@ -1044,7 +936,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68fa0f946bae57d57fbeaaf4052fecd1dcbf0047..074618a9eb62d1151f9ca2eece7a4082121d2ea6"
+    "shas": "d97b0927494147e017cd08eca0bb00ea312bb56a..9190583f968f268ecfc4c0d0beeb0939dc2526ab"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-teardown-test",
@@ -1075,7 +967,7 @@
     ],
     "patch": [
         "diff --git a/type-conversion-expressions.go b/type-conversion-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/type-conversion-expressions.go",
         "+++ b/type-conversion-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -1086,5 +978,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "074618a9eb62d1151f9ca2eece7a4082121d2ea6..57dd6a9a5bc7d3128095cd106eeac4343aee4433"
+    "shas": "9190583f968f268ecfc4c0d0beeb0939dc2526ab..784458f771551f2a275536f0e69db12d97c73f01"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index e69de29..6aaca9e 100644",
+        "index e69de29b..6aaca9ef 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5baa11113f4c2c8c2339966a5181d4cf9c7968e..52bd77125bac9ce9d832d48a78023ce3f47758fc"
+    "shas": "83cac4414da5f44822d05ce3fde8639f0ab7cf89..c28e61255b094acffb41a776ef86c53589c3dd91"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -129,7 +129,7 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 6aaca9e..e556c01 100644",
+        "index 6aaca9ef..e556c016 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -2,4 +2,4 @@ package main",
@@ -140,7 +140,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52bd77125bac9ce9d832d48a78023ce3f47758fc..cc6919c6926467e5212f149c10ce49e492b9c232"
+    "shas": "c28e61255b094acffb41a776ef86c53589c3dd91..367ed81133123fc6f554020a49189820d0a686f6"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -210,7 +210,7 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index e556c01..1be6d20 100644",
+        "index e556c016..1be6d205 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -2,4 +2,4 @@ package main",
@@ -221,7 +221,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cc6919c6926467e5212f149c10ce49e492b9c232..c0596b127609ef5dc831ef64b82febcdb137df0b"
+    "shas": "367ed81133123fc6f554020a49189820d0a686f6..34681b7f1dc7a52f7d96c35ca557f26c006f5ff0"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -291,7 +291,7 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 1be6d20..e556c01 100644",
+        "index 1be6d205..e556c016 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -2,4 +2,4 @@ package main",
@@ -302,7 +302,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c0596b127609ef5dc831ef64b82febcdb137df0b..734650def0d935f51548199c53e5d69355e12c7c"
+    "shas": "34681b7f1dc7a52f7d96c35ca557f26c006f5ff0..435987041ecbec577e1820a17a84881f83cafd37"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -393,7 +393,7 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index e556c01..6aaca9e 100644",
+        "index e556c016..6aaca9ef 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -2,4 +2,4 @@ package main",
@@ -404,7 +404,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "734650def0d935f51548199c53e5d69355e12c7c..075d8e24f9564e0ca06a9dc98c7c16464ef161a8"
+    "shas": "435987041ecbec577e1820a17a84881f83cafd37..daa8ffc610f5206f356662ab8c7f1ed6127289fb"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -435,7 +435,7 @@
     ],
     "patch": [
         "diff --git a/method-declarations.go b/method-declarations.go",
-        "index 6aaca9e..e69de29 100644",
+        "index 6aaca9ef..e69de29b 100644",
         "--- a/method-declarations.go",
         "+++ b/method-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -446,5 +446,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "075d8e24f9564e0ca06a9dc98c7c16464ef161a8..4350b0252bd440416945effa2baa1821271fefee"
+    "shas": "daa8ffc610f5206f356662ab8c7f1ed6127289fb..326274c668eeea07035e2a234abe09209887b6df"
 }]

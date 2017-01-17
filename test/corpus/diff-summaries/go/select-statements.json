@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/select-statements.go b/select-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/select-statements.go",
         "+++ b/select-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6557aefaee0dae39fcaba063092531417e0c2fb1..7e12ccad2931d6ee11481b4056b571293e3cb6da"
+    "shas": "fbe6e91c23da3949f63a0e46bb4472bcc7e4286d..94699f5f72698f0e925d06a28c21752d26871ac2"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/select-statements.go b/select-statements.go",
-        "index 7905807..6806fa6 100644",
+        "index 79058077..6806fa67 100644",
         "--- a/select-statements.go",
         "+++ b/select-statements.go",
         "@@ -1,5 +1,14 @@",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7e12ccad2931d6ee11481b4056b571293e3cb6da..0413de3947d09ffc83bdb3d1fd9472f1c9c4d3d0"
+    "shas": "94699f5f72698f0e925d06a28c21752d26871ac2..c2860c3ff712d34e849c42258ac6a42d3596dbe1"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -187,7 +187,7 @@
     ],
     "patch": [
         "diff --git a/select-statements.go b/select-statements.go",
-        "index 6806fa6..1ca26fb 100644",
+        "index 6806fa67..1ca26fb9 100644",
         "--- a/select-statements.go",
         "+++ b/select-statements.go",
         "@@ -2,11 +2,11 @@ package main",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0413de3947d09ffc83bdb3d1fd9472f1c9c4d3d0..2fcc4edd40d2da46b748fc4b2fe6ab344c1d3d18"
+    "shas": "c2860c3ff712d34e849c42258ac6a42d3596dbe1..2528910607cf882c62beacf455cfcebd13c0cd23"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -304,7 +304,7 @@
     ],
     "patch": [
         "diff --git a/select-statements.go b/select-statements.go",
-        "index 1ca26fb..6806fa6 100644",
+        "index 1ca26fb9..6806fa67 100644",
         "--- a/select-statements.go",
         "+++ b/select-statements.go",
         "@@ -2,11 +2,11 @@ package main",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2fcc4edd40d2da46b748fc4b2fe6ab344c1d3d18..5005d517b09f07c7ab6725ba85b8d28a5d62bb22"
+    "shas": "2528910607cf882c62beacf455cfcebd13c0cd23..919009e39d038df099dd98e7abaf9f8b99c9281a"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -355,7 +355,7 @@
     ],
     "patch": [
         "diff --git a/select-statements.go b/select-statements.go",
-        "index 6806fa6..7905807 100644",
+        "index 6806fa67..79058077 100644",
         "--- a/select-statements.go",
         "+++ b/select-statements.go",
         "@@ -1,14 +1,5 @@",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5005d517b09f07c7ab6725ba85b8d28a5d62bb22..3921c33629035607180a3fb0f0bce8d21d0fe9d1"
+    "shas": "919009e39d038df099dd98e7abaf9f8b99c9281a..17be2d4cc4bf5281cc3b75e9174d7b579ccbc81e"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -407,7 +407,7 @@
     ],
     "patch": [
         "diff --git a/select-statements.go b/select-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/select-statements.go",
         "+++ b/select-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3921c33629035607180a3fb0f0bce8d21d0fe9d1..4e70785e6ea415366b749118d52feb0fbf26824f"
+    "shas": "17be2d4cc4bf5281cc3b75e9174d7b579ccbc81e..5ca6aa307b5684ac4eda03fead620e2d753f2e01"
 }]

@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca65d40f5449d0d764090c6fc3b7a4a72934eb41..b2043c1fd3484321d535e1faadc80155f010a7f1"
+    "shas": "7e709244cbc4d9615862a904b12d8142fd55c570..ff463eba36d2fe0ea3bd6c638877942179598108"
 }
 ,{
     "testCaseDescription": "go-for-statements-insert-test",
@@ -129,7 +129,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 7905807..66e5f7a 100644",
+        "index 79058077..66e5f7a4 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,5 +1,24 @@",
@@ -160,7 +160,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b2043c1fd3484321d535e1faadc80155f010a7f1..d3ccc80f54827e7f366808698a3a8f18fdefdf72"
+    "shas": "ff463eba36d2fe0ea3bd6c638877942179598108..fe2b343424bb54cdc0bad59c35a5e40101f87ca9"
 }
 ,{
     "testCaseDescription": "go-for-statements-replacement-test",
@@ -169,150 +169,123 @@
             "for-statements.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    1
-                                ],
-                                "end": [
-                                    11,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    1
-                                ],
-                                "end": [
-                                    11,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'i := 0; i < 5; i++' for statement with the 'x := range y' for statement in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                12,
-                                7
+                                8,
+                                1
                             ],
                             "end": [
-                                12,
-                                8
+                                11,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'x := range y' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
                                 12,
-                                11
+                                1
                             ],
                             "end": [
-                                12,
-                                13
+                                15,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted '10' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                15
-                            ],
-                            "end": [
-                                12,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'for ;; {\na()\ncontinue loop2\n}' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 16,
-                                7
+                                1
                             ],
                             "end": [
-                                16,
-                                8
+                                19,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'i < 10; i++' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                16,
-                                11
+                                20,
+                                1
                             ],
                             "end": [
-                                16,
-                                13
+                                23,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added '10' in the main function of the 'main' module"
+                    "summary": "Added the 'for  {\na(x)\nbreak\n}' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
-                                16,
-                                15
+                                8,
+                                1
                             ],
                             "end": [
-                                16,
-                                16
+                                11,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i < 10; i++' for statement in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue\n}' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 20,
-                                5
+                                1
                             ],
                             "end": [
-                                20,
-                                6
+                                23,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                20,
-                                16
-                            ],
-                            "end": [
-                                20,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'x := range y' for statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -323,7 +296,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 66e5f7a..4099658 100644",
+        "index 66e5f7a4..4099658c 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,23 +1,23 @@",
@@ -357,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d3ccc80f54827e7f366808698a3a8f18fdefdf72..298689562c37762a09861d536b2717c8ba2eec94"
+    "shas": "fe2b343424bb54cdc0bad59c35a5e40101f87ca9..049769e522fe8c45975b095d87a4475e0141446a"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-replacement-test",
@@ -366,150 +339,135 @@
             "for-statements.go": [
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                11,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "end": [
+                                15,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i < 10; i++' for statement in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "end": [
+                                19,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'for ;; {\na()\ncontinue\n}' for statement in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                3
+                            ],
+                            "end": [
+                                21,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' identifier in the a(x) function call of the 'main' function"
+                },
+                {
+                    "span": {
                         "replace": [
                             {
                                 "start": [
-                                    8,
-                                    1
+                                    10,
+                                    7
                                 ],
                                 "end": [
-                                    11,
-                                    2
+                                    10,
+                                    11
                                 ]
                             },
                             {
                                 "start": [
-                                    8,
+                                    22,
                                     1
                                 ],
                                 "end": [
-                                    11,
-                                    2
+                                    22,
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x := range y' for statement with the 'i := 0; i < 5; i++' for statement in the main function of the 'main' module"
+                    "summary": "Replaced the 'loop' identifier with the 'break' break_statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 12,
-                                7
+                                1
                             ],
                             "end": [
-                                12,
-                                8
+                                15,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                11
-                            ],
-                            "end": [
-                                12,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added '10' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                15
-                            ],
-                            "end": [
-                                12,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'for ;; {\na()\ncontinue loop2\n}' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 16,
-                                7
+                                1
                             ],
                             "end": [
-                                16,
-                                8
+                                19,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'i < 10; i++' for statement in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                16,
-                                11
+                                20,
+                                1
                             ],
                             "end": [
-                                16,
-                                13
+                                23,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted '10' in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                15
-                            ],
-                            "end": [
-                                16,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                20,
-                                5
-                            ],
-                            "end": [
-                                20,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                20,
-                                16
-                            ],
-                            "end": [
-                                20,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'for  {\na(x)\nbreak\n}' for statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -520,7 +478,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 4099658..66e5f7a 100644",
+        "index 4099658c..66e5f7a4 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,23 +1,23 @@",
@@ -554,7 +512,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "298689562c37762a09861d536b2717c8ba2eec94..3fbb69c772c6e17fe80db070df73c92d72661ee2"
+    "shas": "049769e522fe8c45975b095d87a4475e0141446a..3858942df3583b6af23eaee8570e6f6dd9e4c307"
 }
 ,{
     "testCaseDescription": "go-for-statements-delete-insert-test",
@@ -645,7 +603,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 66e5f7a..7905807 100644",
+        "index 66e5f7a4..79058077 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,24 +1,5 @@",
@@ -676,7 +634,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3fbb69c772c6e17fe80db070df73c92d72661ee2..52ae435552e57cfdc52931ca1274ca04626303eb"
+    "shas": "3858942df3583b6af23eaee8570e6f6dd9e4c307..df5275950482bc646edebd24c9b53c9264f35096"
 }
 ,{
     "testCaseDescription": "go-for-statements-teardown-test",
@@ -707,7 +665,7 @@
     ],
     "patch": [
         "diff --git a/for-statements.go b/for-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/for-statements.go",
         "+++ b/for-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -718,5 +676,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "52ae435552e57cfdc52931ca1274ca04626303eb..afd5b32b49459e888137b0101aaf591a85f8efa5"
+    "shas": "df5275950482bc646edebd24c9b53c9264f35096..945fb4e6905c2b97bfd8fedd3c016e6f4a8c4fa6"
 }]

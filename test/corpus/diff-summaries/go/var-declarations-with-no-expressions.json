@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68b0433ce578c508bea8099328172212102f78f2..39ed5e1b0492718a2f1ee4dd17f673a7b87f4029"
+    "shas": "7f27514fe8e2704be349add10b98e8fe9a70eb2b..68f2c072f86cb2e6282682cf9586b66db9ff95fa"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-insert-test",
@@ -50,11 +50,11 @@
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                5
                             ],
                             "end": [
                                 4,
-                                13
+                                9
                             ]
                         }
                     },
@@ -65,11 +65,11 @@
                         "insert": {
                             "start": [
                                 5,
-                                1
+                                5
                             ],
                             "end": [
                                 5,
-                                20
+                                8
                             ]
                         }
                     },
@@ -80,11 +80,11 @@
                         "insert": {
                             "start": [
                                 5,
-                                1
+                                10
                             ],
                             "end": [
                                 5,
-                                20
+                                13
                             ]
                         }
                     },
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 7905807..fcdc312 100644",
+        "index 79058077..fcdc3127 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,5 +1,6 @@",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "39ed5e1b0492718a2f1ee4dd17f673a7b87f4029..8d69864fc0ecf74a6b6ec4ab93e62e3587d7a899"
+    "shas": "68f2c072f86cb2e6282682cf9586b66db9ff95fa..50525aa58d870bb29ebf2748b0790e3d3389f6bc"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
@@ -209,7 +209,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index fcdc312..8aab74f 100644",
+        "index fcdc3127..8aab74f1 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -223,7 +223,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8d69864fc0ecf74a6b6ec4ab93e62e3587d7a899..008acc104c518fd048963a4b629a63b20c5f6656"
+    "shas": "50525aa58d870bb29ebf2748b0790e3d3389f6bc..92f1dde57fd8b6dc1832eae0799399b8a5959358"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
@@ -320,7 +320,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 8aab74f..fcdc312 100644",
+        "index 8aab74f1..fcdc3127 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -334,7 +334,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "008acc104c518fd048963a4b629a63b20c5f6656..95f4fe834a79d64d1e7fd4b39740543c94ab5b26"
+    "shas": "92f1dde57fd8b6dc1832eae0799399b8a5959358..9b83661f3c9ba6ad69dcd7a4ff5d2f6b48c5afcc"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
@@ -346,11 +346,11 @@
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                5
                             ],
                             "end": [
                                 4,
-                                13
+                                9
                             ]
                         }
                     },
@@ -361,11 +361,11 @@
                         "delete": {
                             "start": [
                                 5,
-                                1
+                                5
                             ],
                             "end": [
                                 5,
-                                20
+                                8
                             ]
                         }
                     },
@@ -376,11 +376,11 @@
                         "delete": {
                             "start": [
                                 5,
-                                1
+                                10
                             ],
                             "end": [
                                 5,
-                                20
+                                13
                             ]
                         }
                     },
@@ -395,7 +395,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index fcdc312..7905807 100644",
+        "index fcdc3127..79058077 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,6 +1,5 @@",
@@ -408,7 +408,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95f4fe834a79d64d1e7fd4b39740543c94ab5b26..1913a11d5073f87e4463e07e2f588125aef87b60"
+    "shas": "9b83661f3c9ba6ad69dcd7a4ff5d2f6b48c5afcc..35de76238d81875c391a6a006ac49df6da62dd7e"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-teardown-test",
@@ -439,7 +439,7 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -450,5 +450,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1913a11d5073f87e4463e07e2f588125aef87b60..9a02b82ed791d6093b557bde927da0db6586a141"
+    "shas": "35de76238d81875c391a6a006ac49df6da62dd7e..cb70743c2dadaed8a2d43a98a43b66b8e8798eed"
 }]

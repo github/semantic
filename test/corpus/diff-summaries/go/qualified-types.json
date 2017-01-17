@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97dac1878ab6129d8cc5f48c7dd108356a6ba262..276632f94d5798793fcb989424fe66c509e4b4b9"
+    "shas": "e8c4a8ad03eecb6092ebec8fd2debf608c6c8b60..4eba15a97391452ef6958223b02bb33f6b645183"
 }
 ,{
     "testCaseDescription": "go-qualified-types-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 7905807..e03cf22 100644",
+        "index 79058077..e03cf221 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "276632f94d5798793fcb989424fe66c509e4b4b9..8c09b026f1abcd4e97884e40f60f9b43eea4d054"
+    "shas": "4eba15a97391452ef6958223b02bb33f6b645183..558a7ed526bb8ff77c23858530ae3cd33e11139a"
 }
 ,{
     "testCaseDescription": "go-qualified-types-replacement-test",
@@ -151,7 +151,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e03cf22..241e526 100644",
+        "index e03cf221..241e5267 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -163,7 +163,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c09b026f1abcd4e97884e40f60f9b43eea4d054..6332fae97e5878cab3318aea2c962ea95e65543b"
+    "shas": "558a7ed526bb8ff77c23858530ae3cd33e11139a..ff51b9f06f18a12c9ef801bb274fec2f96038923"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-replacement-test",
@@ -233,7 +233,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 241e526..e03cf22 100644",
+        "index 241e5267..e03cf221 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -245,7 +245,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6332fae97e5878cab3318aea2c962ea95e65543b..18e753ff695624e1dd25f7037643f3fda6479fb3"
+    "shas": "ff51b9f06f18a12c9ef801bb274fec2f96038923..8d15e865f26e96a3acf6c574f67878375ebe3baf"
 }
 ,{
     "testCaseDescription": "go-qualified-types-delete-insert-test",
@@ -276,7 +276,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index e03cf22..7905807 100644",
+        "index e03cf221..79058077 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +1,5 @@",
@@ -288,7 +288,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "18e753ff695624e1dd25f7037643f3fda6479fb3..63f5a43ccfbbd874d61bc0bca9bd507993519f8e"
+    "shas": "8d15e865f26e96a3acf6c574f67878375ebe3baf..e66dcc2a6f0e3b809bb2401f6fe2d2b826e6b162"
 }
 ,{
     "testCaseDescription": "go-qualified-types-teardown-test",
@@ -319,7 +319,7 @@
     ],
     "patch": [
         "diff --git a/qualified-types.go b/qualified-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/qualified-types.go",
         "+++ b/qualified-types.go",
         "@@ -1,5 +0,0 @@",
@@ -330,5 +330,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "63f5a43ccfbbd874d61bc0bca9bd507993519f8e..e3cdff1e6a1723aecba4ee8116ae8b30419a85f0"
+    "shas": "e66dcc2a6f0e3b809bb2401f6fe2d2b826e6b162..3c029fc4f96030d7f8c57c5253233ec8cead1b0a"
 }]

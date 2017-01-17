@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2bd4831433df7f47de8e29abed25c68de14722f2..415be608bac324625715204a7022f56f0ab362c7"
+    "shas": "d048a98a9a74c54069a496d7e50c481f9bf118df..7f4265f08aa3668bb6326d1bda09f04498af1caa"
 }
 ,{
     "testCaseDescription": "go-send-statements-insert-test",
@@ -54,26 +54,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added '5' in the main function of the 'main' module"
+                    "summary": "Added the 'foo <- 5' send statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -84,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 7905807..5f327d1 100644",
+        "index 79058077..5f327d16 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -96,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "415be608bac324625715204a7022f56f0ab362c7..be80d19d7e5915b9c561d783b72f6968eec75ed2"
+    "shas": "7f4265f08aa3668bb6326d1bda09f04498af1caa..27ad020c6dbc052bfbd065811d28943f2640784a"
 }
 ,{
     "testCaseDescription": "go-send-statements-replacement-test",
@@ -166,7 +151,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 5f327d1..3829478 100644",
+        "index 5f327d16..3829478b 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -178,7 +163,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "be80d19d7e5915b9c561d783b72f6968eec75ed2..6ffc3631ff21cf0235f2b7cfd4753065d6912306"
+    "shas": "27ad020c6dbc052bfbd065811d28943f2640784a..33f3173953ce739300b8a8beac341209cdedf39a"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-replacement-test",
@@ -248,7 +233,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 3829478..5f327d1 100644",
+        "index 3829478b..5f327d16 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -260,7 +245,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ffc3631ff21cf0235f2b7cfd4753065d6912306..d35efb2f4ea672a2ef93693d68904ac8e3db0c7d"
+    "shas": "33f3173953ce739300b8a8beac341209cdedf39a..81da4f5fe9bd19a602341f2260efb875b68cb4b4"
 }
 ,{
     "testCaseDescription": "go-send-statements-delete-insert-test",
@@ -276,26 +261,11 @@
                             ],
                             "end": [
                                 4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted '5' in the main function of the 'main' module"
+                    "summary": "Deleted the 'foo <- 5' send statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -306,7 +276,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 5f327d1..7905807 100644",
+        "index 5f327d16..79058077 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +1,5 @@",
@@ -318,7 +288,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d35efb2f4ea672a2ef93693d68904ac8e3db0c7d..7d59c0e03e14d9ef4519c49c6e88fb1f12896bdf"
+    "shas": "81da4f5fe9bd19a602341f2260efb875b68cb4b4..47beb86d4c325da286e46939e095831ba8b3b699"
 }
 ,{
     "testCaseDescription": "go-send-statements-teardown-test",
@@ -349,7 +319,7 @@
     ],
     "patch": [
         "diff --git a/send-statements.go b/send-statements.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/send-statements.go",
         "+++ b/send-statements.go",
         "@@ -1,5 +0,0 @@",
@@ -360,5 +330,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7d59c0e03e14d9ef4519c49c6e88fb1f12896bdf..c5bc44c5e8be4fa60d6b37aa6bd894dbacb5d2e8"
+    "shas": "47beb86d4c325da286e46939e095831ba8b3b699..4764f0b232e8367debef70ecac0a94929337a68a"
 }]

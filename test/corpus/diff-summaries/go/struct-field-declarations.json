@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
-        "index e69de29..60d13f4 100644",
+        "index e69de29b..60d13f45 100644",
         "--- a/struct-field-declarations.go",
         "+++ b/struct-field-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0243cec6939b070fc3a64358c1e332185a7d1774..3a3b3dfd3c6ee27325081e5ff46e7c39b9499a22"
+    "shas": "a086622a7f75f3e4448865cd132e37b251f1e189..c70027cf01cd676706c1b1e389de0c42e5c6761c"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'g int' field declaration in the s3 type declaration of the 'main' function"
+                    "summary": "Added the 'g int' field declaration in the struct {\n  g int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
-        "index 60d13f4..bc84b14 100644",
+        "index 60d13f45..bc84b146 100644",
         "--- a/struct-field-declarations.go",
         "+++ b/struct-field-declarations.go",
         "@@ -1,5 +1,7 @@",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3a3b3dfd3c6ee27325081e5ff46e7c39b9499a22..e9545b41cab6877440085a7f313a039bad8ce229"
+    "shas": "c70027cf01cd676706c1b1e389de0c42e5c6761c..c4d3efcaaf37e305baf4291edb6feb8a28545f5d"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-replacement-test",
@@ -115,7 +115,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the s3 type declaration of the 'main' function"
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the struct {\n  h, i int\n} struct type of the 'main' function"
                 },
                 {
                     "span": {
@@ -130,7 +130,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i' identifier in the s3 type declaration of the 'main' function"
+                    "summary": "Added the 'i' identifier in the struct {\n  h, i int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -141,7 +141,7 @@
     ],
     "patch": [
         "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
-        "index bc84b14..f3ca9a5 100644",
+        "index bc84b146..f3ca9a51 100644",
         "--- a/struct-field-declarations.go",
         "+++ b/struct-field-declarations.go",
         "@@ -2,6 +2,6 @@ package main",
@@ -154,7 +154,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e9545b41cab6877440085a7f313a039bad8ce229..0473726d6cf870acc191460c76102d505a6881e8"
+    "shas": "c4d3efcaaf37e305baf4291edb6feb8a28545f5d..d0ef8fc1b7880068b0149e661e88b62a10ceef63"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-replacement-test",
@@ -186,7 +186,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the s3 type declaration of the 'main' function"
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the struct {\n  g int\n} struct type of the 'main' function"
                 },
                 {
                     "span": {
@@ -201,7 +201,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i' identifier in the s3 type declaration of the 'main' function"
+                    "summary": "Deleted the 'i' identifier in the struct {\n  g int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -212,7 +212,7 @@
     ],
     "patch": [
         "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
-        "index f3ca9a5..bc84b14 100644",
+        "index f3ca9a51..bc84b146 100644",
         "--- a/struct-field-declarations.go",
         "+++ b/struct-field-declarations.go",
         "@@ -2,6 +2,6 @@ package main",
@@ -225,7 +225,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0473726d6cf870acc191460c76102d505a6881e8..ba6ff6ac9a51a43da1bd92f44ff3de361e631491"
+    "shas": "d0ef8fc1b7880068b0149e661e88b62a10ceef63..1fd33d1bf8b0dadc72e2fa1699c051c2f8790a79"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-insert-test",
@@ -245,7 +245,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'g int' field declaration in the s3 type declaration of the 'main' function"
+                    "summary": "Deleted the 'g int' field declaration in the struct {} struct type of the 'main' function"
                 }
             ]
         },
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
-        "index bc84b14..60d13f4 100644",
+        "index bc84b146..60d13f45 100644",
         "--- a/struct-field-declarations.go",
         "+++ b/struct-field-declarations.go",
         "@@ -1,7 +1,5 @@",
@@ -270,7 +270,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ba6ff6ac9a51a43da1bd92f44ff3de361e631491..69ef4771ea094a8d8ce705a430e17257bfc886c9"
+    "shas": "1fd33d1bf8b0dadc72e2fa1699c051c2f8790a79..5c3a9c2650ab752f66823609287c08d634077495"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-teardown-test",
@@ -301,7 +301,7 @@
     ],
     "patch": [
         "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
-        "index 60d13f4..e69de29 100644",
+        "index 60d13f45..e69de29b 100644",
         "--- a/struct-field-declarations.go",
         "+++ b/struct-field-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -312,5 +312,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "69ef4771ea094a8d8ce705a430e17257bfc886c9..e3716a84312731a0a2987497c714d98eb43215df"
+    "shas": "5c3a9c2650ab752f66823609287c08d634077495..e3704bedd5da917e83615d76b10a894628b7b1e6"
 }]

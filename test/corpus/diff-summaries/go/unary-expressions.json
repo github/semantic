@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "57dd6a9a5bc7d3128095cd106eeac4343aee4433..3ccf27d4492c62a2f6a3b589d82b0ad880412aed"
+    "shas": "784458f771551f2a275536f0e69db12d97c73f01..848ee9085c81d3616afebdd45ce2e585b3a70c04"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-insert-test",
@@ -50,7 +50,7 @@
                         "insert": {
                             "start": [
                                 4,
-                                4
+                                1
                             ],
                             "end": [
                                 4,
@@ -58,14 +58,14 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' identifier in the main function of the 'main' module"
+                    "summary": "Added the '!<-a' operator in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo()' function call in the main function of the 'main' module"
+                    "summary": "Added the '*foo()' operator in the main function of the 'main' module"
                 }
             ]
         },
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index 7905807..bdf9ccc 100644",
+        "index 79058077..bdf9ccc5 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,5 +1,6 @@",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3ccf27d4492c62a2f6a3b589d82b0ad880412aed..562218a598df4f3dc179aef7c1fc97ce86e2d405"
+    "shas": "848ee9085c81d3616afebdd45ce2e585b3a70c04..668f77529b691473446114e20dce225a0f303b04"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-replacement-test",
@@ -167,7 +167,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index bdf9ccc..cf8ed88 100644",
+        "index bdf9ccc5..cf8ed882 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -181,7 +181,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "562218a598df4f3dc179aef7c1fc97ce86e2d405..ecf13586db0209429af9e52ded9cc36b123f6422"
+    "shas": "668f77529b691473446114e20dce225a0f303b04..dac2923d9d179d136287dfb58aac544671b59f56"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-replacement-test",
@@ -251,7 +251,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index cf8ed88..bdf9ccc 100644",
+        "index cf8ed882..bdf9ccc5 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,6 +1,6 @@",
@@ -265,7 +265,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ecf13586db0209429af9e52ded9cc36b123f6422..ebd1b4d6118a59cee4a84142086271f9bce916c0"
+    "shas": "dac2923d9d179d136287dfb58aac544671b59f56..36cfa7b903c9b5ec0562fd17d45c80ce170727c3"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-delete-insert-test",
@@ -277,7 +277,7 @@
                         "delete": {
                             "start": [
                                 4,
-                                4
+                                1
                             ],
                             "end": [
                                 4,
@@ -285,14 +285,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the '!<-a' operator in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                2
+                                1
                             ],
                             "end": [
                                 5,
@@ -300,7 +300,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo()' function call in the main function of the 'main' module"
+                    "summary": "Deleted the '*foo()' operator in the main function of the 'main' module"
                 }
             ]
         },
@@ -311,7 +311,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index bdf9ccc..7905807 100644",
+        "index bdf9ccc5..79058077 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,6 +1,5 @@",
@@ -324,7 +324,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ebd1b4d6118a59cee4a84142086271f9bce916c0..dfa9f8932180f8c141182d0b13166daec38fa45f"
+    "shas": "36cfa7b903c9b5ec0562fd17d45c80ce170727c3..add643bb4481c56a7cb3a5c8a447b6c9bf1ecd4d"
 }
 ,{
     "testCaseDescription": "go-unary-expressions-teardown-test",
@@ -355,7 +355,7 @@
     ],
     "patch": [
         "diff --git a/unary-expressions.go b/unary-expressions.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/unary-expressions.go",
         "+++ b/unary-expressions.go",
         "@@ -1,5 +0,0 @@",
@@ -366,5 +366,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfa9f8932180f8c141182d0b13166daec38fa45f..0a40b22c43aa00db120bff03da0f027e53466491"
+    "shas": "add643bb4481c56a7cb3a5c8a447b6c9bf1ecd4d..f5535c936fcd3af4df3da2046b73161b0f2290cc"
 }]

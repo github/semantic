@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8f9557a132b5ece466963fc5cdfaf89748a45cb..283dedd44a8710088bbd0ce7cedc53934c77e05d"
+    "shas": "225e43a556530b340ec0d61212e59a26a52d143e..9d4f0c21dfaf91e6571f10fdd3fac820b0ae6168"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -58,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable in the main function of the 'main' module"
+                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -73,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable in the main function of the 'main' module"
+                    "summary": "Added the 'b' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 7905807..4ca1ce3 100644",
+        "index 79058077..4ca1ce37 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "283dedd44a8710088bbd0ce7cedc53934c77e05d..5cb96b265326ce1c1baf60d57f45a7e97d261832"
+    "shas": "9d4f0c21dfaf91e6571f10fdd3fac820b0ae6168..4f894a0f43147135c1c62e3287166f94fae91695"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -128,7 +128,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x variable of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -155,7 +155,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '3' in the x variable of the 'main' function"
+                    "summary": "Replaced '1' with '3' in the x var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -182,7 +182,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y variable of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -209,7 +209,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '4' in the y variable of the 'main' function"
+                    "summary": "Replaced '2' with '4' in the y var assignment of the 'main' function"
                 }
             ]
         },
@@ -220,7 +220,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 4ca1ce3..bbbf937 100644",
+        "index 4ca1ce37..bbbf9372 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5cb96b265326ce1c1baf60d57f45a7e97d261832..1cb5c94447506c4c9b9199a13750192f6c304aee"
+    "shas": "4f894a0f43147135c1c62e3287166f94fae91695..ea11877319269fb8be2eae30f12235a13312d877"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -264,7 +264,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a variable of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -291,7 +291,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '1' in the a variable of the 'main' function"
+                    "summary": "Replaced '3' with '1' in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -318,7 +318,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b variable of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -345,7 +345,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '2' in the b variable of the 'main' function"
+                    "summary": "Replaced '4' with '2' in the b var assignment of the 'main' function"
                 }
             ]
         },
@@ -356,7 +356,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index bbbf937..4ca1ce3 100644",
+        "index bbbf9372..4ca1ce37 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1cb5c94447506c4c9b9199a13750192f6c304aee..51ff91a1c7e4affa0475c2a01a4729cd4814d00b"
+    "shas": "ea11877319269fb8be2eae30f12235a13312d877..ffd51834c6de157feec00a0d5180f42f97e19199"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -388,7 +388,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -403,7 +403,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -414,7 +414,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 4ca1ce3..7905807 100644",
+        "index 4ca1ce37..79058077 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +1,5 @@",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "51ff91a1c7e4affa0475c2a01a4729cd4814d00b..556d0ec6cffd519d7213bebed19788116d78d3b5"
+    "shas": "ffd51834c6de157feec00a0d5180f42f97e19199..089b42d327d766e2de44f215d3771fddde58275f"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -457,7 +457,7 @@
     ],
     "patch": [
         "diff --git a/short-var-declarations.go b/short-var-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/short-var-declarations.go",
         "+++ b/short-var-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "556d0ec6cffd519d7213bebed19788116d78d3b5..a6d6b87e3b8498575c6a100bd3722f8ce2d30eee"
+    "shas": "089b42d327d766e2de44f215d3771fddde58275f..2b9cb611dc3d121922e8078cb5a74bac1146c4ea"
 }]

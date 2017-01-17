@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b17f874e5668626df1e610dca63f9a5cdf2d582a..965ecb88c6339b760cf368a25a1226add02c92de"
+    "shas": "bb16dfebd2cf22d0a6a4b678def6ab83f4ff7111..235fbfb81bf1c4bd7549c1b2b5ec684ae24cc3b0"
 }
 ,{
     "testCaseDescription": "go-map-types-insert-test",
@@ -69,7 +69,7 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index 7905807..01004b3 100644",
+        "index 79058077..01004b30 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
         "@@ -1,5 +1,5 @@",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "965ecb88c6339b760cf368a25a1226add02c92de..e46d27cdd70491f0ba360e6ffa66bf29cf76b0ee"
+    "shas": "235fbfb81bf1c4bd7549c1b2b5ec684ae24cc3b0..9fb21621ef7e4f86bad848b919e0004d821dca0d"
 }
 ,{
     "testCaseDescription": "go-map-types-replacement-test",
@@ -113,7 +113,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the m1 type declaration of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the 'm1' type declaration of the 'main' function"
                 }
             ]
         },
@@ -124,7 +124,7 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index 01004b3..a118e92 100644",
+        "index 01004b30..a118e920 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
         "@@ -1,5 +1,5 @@",
@@ -136,7 +136,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e46d27cdd70491f0ba360e6ffa66bf29cf76b0ee..4294a610fcede5e7976f45326e43f526c3589178"
+    "shas": "9fb21621ef7e4f86bad848b919e0004d821dca0d..44cca56715527af24c778e2bd33acbc7df416987"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-replacement-test",
@@ -168,7 +168,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the m1 type declaration of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the 'm1' type declaration of the 'main' function"
                 }
             ]
         },
@@ -179,7 +179,7 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index a118e92..01004b3 100644",
+        "index a118e920..01004b30 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
         "@@ -1,5 +1,5 @@",
@@ -191,7 +191,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4294a610fcede5e7976f45326e43f526c3589178..2dae5dd3c51bde0375a4fe449c2900649090dd7b"
+    "shas": "44cca56715527af24c778e2bd33acbc7df416987..0c11180331a60f5f9e8f9389134eb5b9abae22cd"
 }
 ,{
     "testCaseDescription": "go-map-types-delete-insert-test",
@@ -222,7 +222,7 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index 01004b3..7905807 100644",
+        "index 01004b30..79058077 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
         "@@ -1,5 +1,5 @@",
@@ -234,7 +234,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2dae5dd3c51bde0375a4fe449c2900649090dd7b..90079c2b3c3154dd08c972e41e136af964b30269"
+    "shas": "0c11180331a60f5f9e8f9389134eb5b9abae22cd..cdde337d130053d7fdbcdf6ecf9ff53fc3c7336c"
 }
 ,{
     "testCaseDescription": "go-map-types-teardown-test",
@@ -265,7 +265,7 @@
     ],
     "patch": [
         "diff --git a/map-types.go b/map-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/map-types.go",
         "+++ b/map-types.go",
         "@@ -1,5 +0,0 @@",
@@ -276,5 +276,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90079c2b3c3154dd08c972e41e136af964b30269..865c3f97baa36461f5eb2f76fc7430d414ad1e73"
+    "shas": "cdde337d130053d7fdbcdf6ecf9ff53fc3c7336c..2228b93a5547cbf279232cca2a5e99e5bc8d4a36"
 }]

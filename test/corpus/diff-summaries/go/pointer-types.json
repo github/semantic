@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "865c3f97baa36461f5eb2f76fc7430d414ad1e73..720656a1de060a0e67c516d77ba60f06009d5d29"
+    "shas": "2228b93a5547cbf279232cca2a5e99e5bc8d4a36..893618efbc78d347903eebf0ce5adc6172f004ae"
 }
 ,{
     "testCaseDescription": "go-pointer-types-insert-test",
@@ -84,7 +84,7 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 7905807..98e7b8a 100644",
+        "index 79058077..98e7b8a9 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
         "@@ -1,5 +1,8 @@",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "720656a1de060a0e67c516d77ba60f06009d5d29..f0fd10f5b90c19b0e59a9ac80f26e74834f8cc54"
+    "shas": "893618efbc78d347903eebf0ce5adc6172f004ae..27be8453b86152e3f2e8d220c026a4369e81caa3"
 }
 ,{
     "testCaseDescription": "go-pointer-types-replacement-test",
@@ -131,7 +131,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the p1 type declaration of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the *int pointer type of the 'main' function"
                 },
                 {
                     "span": {
@@ -158,7 +158,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'p1' identifier with the 'p3' identifier in the p2 type declaration of the 'main' function"
+                    "summary": "Replaced the 'p1' identifier with the 'p3' identifier in the *p3 pointer type of the 'main' function"
                 }
             ]
         },
@@ -169,7 +169,7 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 98e7b8a..36eb5ff 100644",
+        "index 98e7b8a9..36eb5ffb 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f0fd10f5b90c19b0e59a9ac80f26e74834f8cc54..3e83a05802ed1a203f5f654f089047788c7dce62"
+    "shas": "27be8453b86152e3f2e8d220c026a4369e81caa3..f6d73da5d1089add2909c2bad9f89e675d3fe46c"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-replacement-test",
@@ -216,7 +216,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the p1 type declaration of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the *string pointer type of the 'main' function"
                 },
                 {
                     "span": {
@@ -243,7 +243,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'p3' identifier with the 'p1' identifier in the p2 type declaration of the 'main' function"
+                    "summary": "Replaced the 'p3' identifier with the 'p1' identifier in the *p1 pointer type of the 'main' function"
                 }
             ]
         },
@@ -254,7 +254,7 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 36eb5ff..98e7b8a 100644",
+        "index 36eb5ffb..98e7b8a9 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
         "@@ -2,7 +2,7 @@ package main",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3e83a05802ed1a203f5f654f089047788c7dce62..0eedf900af78875379b8c006ef139823017a6ac7"
+    "shas": "f6d73da5d1089add2909c2bad9f89e675d3fe46c..01e1a10c962c934a4c56e0298ffcad0d9319e753"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-insert-test",
@@ -315,7 +315,7 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 98e7b8a..7905807 100644",
+        "index 98e7b8a9..79058077 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
         "@@ -1,8 +1,5 @@",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0eedf900af78875379b8c006ef139823017a6ac7..7fda759ce77d878bd117b58c7bcadbafbe47a078"
+    "shas": "01e1a10c962c934a4c56e0298ffcad0d9319e753..070b73ae1ec76471c6a570a2d92d09abde20cf15"
 }
 ,{
     "testCaseDescription": "go-pointer-types-teardown-test",
@@ -361,7 +361,7 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
         "@@ -1,5 +0,0 @@",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7fda759ce77d878bd117b58c7bcadbafbe47a078..af3fb53612885aced55d8501c39d0e09f05a904c"
+    "shas": "070b73ae1ec76471c6a570a2d92d09abde20cf15..93550be30dcd752a72d39e8fcb3ad392ffd0f02b"
 }]

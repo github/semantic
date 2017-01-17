@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index e69de29..c9ecbf5 100644",
+        "index e69de29b..c9ecbf5e 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -0,0 +1,2 @@",
@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5f24adbbe5ff125bd4556844ca38a028a26c1d9..7a6df9c046d4979903eb9508aed8a1a39f958911"
+    "shas": "544e59d0964fe4e59f0711b8d7c0a74002bf1e68..60aa95ba79ac285a459dd0d9ba39c4eff4a5261e"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -110,16 +110,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added 'c = '\\'\nc = '\n'' at line 5, column 1 - line 7, column 2 in the main module"
                 }
             ]
         }
@@ -129,7 +129,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index c9ecbf5..7ecf7d8 100644",
+        "index c9ecbf5e..7ecf7d8d 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,2 +1,10 @@",
@@ -146,7 +146,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a6df9c046d4979903eb9508aed8a1a39f958911..1dfef5cb6692306417c3c4b81016588a78d7a5b9"
+    "shas": "60aa95ba79ac285a459dd0d9ba39c4eff4a5261e..312475bd910f49a3ef01d760e531796056167da1"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -263,31 +263,46 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Added 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added 'b = '\n''\n' at line 4, column 1 - line 6, column 1 in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added 'c = '\\'\nc = '\\u0022'' at line 7, column 1 - line 8, column 13 in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted 'c = '\\'\nc = '\n'' at line 5, column 1 - line 7, column 2 in the main module"
                 }
             ]
         }
@@ -297,7 +312,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 7ecf7d8..cee94e2 100644",
+        "index 7ecf7d8d..cee94e2a 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -319,7 +334,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1dfef5cb6692306417c3c4b81016588a78d7a5b9..28d45aed576ddd125666b516869ea1490901296c"
+    "shas": "312475bd910f49a3ef01d760e531796056167da1..b40790f25f495f39d62174bb9f81d110ff8a21e4"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -436,31 +451,46 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Added 'c = '\\'\nc = '\n'' at line 5, column 1 - line 7, column 2 in the main module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                4,
                                 1
                             ],
                             "end": [
-                                10,
-                                2
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted 'const (\na = '1'\nb = '\n''\nc = '\\u0011'\nc = '\\'\nc = '\\u0022'\nc = '\\U01234568'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted 'b = '\n''\n' at line 4, column 1 - line 6, column 1 in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'c = '\\'\nc = '\\u0022'' at line 7, column 1 - line 8, column 13 in the main module"
                 }
             ]
         }
@@ -470,7 +500,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index cee94e2..7ecf7d8 100644",
+        "index cee94e2a..7ecf7d8d 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,10 +1,10 @@",
@@ -492,7 +522,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "28d45aed576ddd125666b516869ea1490901296c..6c15bd80e744cb8143dbb9704f3161ed66ea723f"
+    "shas": "b40790f25f495f39d62174bb9f81d110ff8a21e4..4f7c54e6c63edd0cbedf9a60a6f30e0224d54e98"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -567,16 +597,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                10,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted 'const (\na = '0'\nb = '\\''\nc = '\\'\nc = '\n'\nc = '\\u0000'\nc = '\\U01234567'\n)' at line 2, column 1 - line 10, column 2 in the main module"
+                    "summary": "Deleted 'c = '\\'\nc = '\n'' at line 5, column 1 - line 7, column 2 in the main module"
                 }
             ]
         }
@@ -586,7 +616,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 7ecf7d8..c9ecbf5 100644",
+        "index 7ecf7d8d..c9ecbf5e 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,10 +1,2 @@",
@@ -603,7 +633,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6c15bd80e744cb8143dbb9704f3161ed66ea723f..a108688385b1639080aef82f4d8019d8fe4230b2"
+    "shas": "4f7c54e6c63edd0cbedf9a60a6f30e0224d54e98..91810e340def500436fb6f43b5b061f1567e6246"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -634,7 +664,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index c9ecbf5..e69de29 100644",
+        "index c9ecbf5e..e69de29b 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,2 +0,0 @@",
@@ -642,5 +672,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a108688385b1639080aef82f4d8019d8fe4230b2..76f08190bffba036fc899c8b7180778ed761c374"
+    "shas": "91810e340def500436fb6f43b5b061f1567e6246..519d5c9573725c473c04fe3120e7034e3e58d60a"
 }]

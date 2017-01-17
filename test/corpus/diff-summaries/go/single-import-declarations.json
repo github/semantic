@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/single-import-declarations.go b/single-import-declarations.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/single-import-declarations.go",
         "+++ b/single-import-declarations.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bf83f554698ce7a18601fd81b74501ff553bcf91..82ed0f64a56dc8cc44eb1fe1eff9ef333737d402"
+    "shas": "e3cdff1e6a1723aecba4ee8116ae8b30419a85f0..a93f888c54ec7619047dd94f045f8101a995814e"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-insert-test",
@@ -159,7 +159,7 @@
     ],
     "patch": [
         "diff --git a/single-import-declarations.go b/single-import-declarations.go",
-        "index 7905807..bf7f515 100644",
+        "index 79058077..bf7f515f 100644",
         "--- a/single-import-declarations.go",
         "+++ b/single-import-declarations.go",
         "@@ -1,5 +1,7 @@",
@@ -173,7 +173,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82ed0f64a56dc8cc44eb1fe1eff9ef333737d402..f971c49f658bfdb4ac5f4bb446544b6b59187dcc"
+    "shas": "a93f888c54ec7619047dd94f045f8101a995814e..d34f33b885ff14ebcb2403eda6bfbfff0058dbb0"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-replacement-test",
@@ -270,7 +270,7 @@
     ],
     "patch": [
         "diff --git a/single-import-declarations.go b/single-import-declarations.go",
-        "index bf7f515..7710f5e 100644",
+        "index bf7f515f..7710f5e3 100644",
         "--- a/single-import-declarations.go",
         "+++ b/single-import-declarations.go",
         "@@ -1,7 +1,7 @@",
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f971c49f658bfdb4ac5f4bb446544b6b59187dcc..dc34e996f3e8d04f5f04c591ffbb7a40995fc1c1"
+    "shas": "d34f33b885ff14ebcb2403eda6bfbfff0058dbb0..ebfec37f4d62416c03bab8ed9696845eb85b5aae"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-replacement-test",
@@ -383,7 +383,7 @@
     ],
     "patch": [
         "diff --git a/single-import-declarations.go b/single-import-declarations.go",
-        "index 7710f5e..bf7f515 100644",
+        "index 7710f5e3..bf7f515f 100644",
         "--- a/single-import-declarations.go",
         "+++ b/single-import-declarations.go",
         "@@ -1,7 +1,7 @@",
@@ -399,7 +399,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc34e996f3e8d04f5f04c591ffbb7a40995fc1c1..d3d126aa0544a58394e9838234ee6ce30bb35116"
+    "shas": "ebfec37f4d62416c03bab8ed9696845eb85b5aae..9cba47bb212d7f1dc489500c760832e2df679c83"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-delete-insert-test",
@@ -520,7 +520,7 @@
     ],
     "patch": [
         "diff --git a/single-import-declarations.go b/single-import-declarations.go",
-        "index bf7f515..7905807 100644",
+        "index bf7f515f..79058077 100644",
         "--- a/single-import-declarations.go",
         "+++ b/single-import-declarations.go",
         "@@ -1,7 +1,5 @@",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d3d126aa0544a58394e9838234ee6ce30bb35116..2a6c5a98bcc065e52a48247c8b3838f7045bd840"
+    "shas": "9cba47bb212d7f1dc489500c760832e2df679c83..1d5875c53cb7248a6a42b0a5e68abd8f17dcf19d"
 }
 ,{
     "testCaseDescription": "go-single-import-declarations-teardown-test",
@@ -565,7 +565,7 @@
     ],
     "patch": [
         "diff --git a/single-import-declarations.go b/single-import-declarations.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/single-import-declarations.go",
         "+++ b/single-import-declarations.go",
         "@@ -1,5 +0,0 @@",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2a6c5a98bcc065e52a48247c8b3838f7045bd840..2be724661b34d7fbc740a5b2d599c03ed0feef47"
+    "shas": "1d5875c53cb7248a6a42b0a5e68abd8f17dcf19d..e13c25cd435aead827b8a09d18dfed061d9f8443"
 }]

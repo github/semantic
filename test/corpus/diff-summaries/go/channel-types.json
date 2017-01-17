@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index e69de29..7905807 100644",
+        "index e69de29b..79058077 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -0,0 +1,5 @@",
@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af3fb53612885aced55d8501c39d0e09f05a904c..0864b46f6889dfe97861651643c2bf7c1e2291e7"
+    "shas": "93550be30dcd752a72d39e8fcb3ad392ffd0f02b..1338c03463c8b881089dd4bd9e1fbf50ed218376"
 }
 ,{
     "testCaseDescription": "go-channel-types-insert-test",
@@ -99,7 +99,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 7905807..1c10bf6 100644",
+        "index 79058077..1c10bf6f 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -1,5 +1,9 @@",
@@ -115,7 +115,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0864b46f6889dfe97861651643c2bf7c1e2291e7..042d5ab1d05f6ca975465fca239496bfd54122c6"
+    "shas": "1338c03463c8b881089dd4bd9e1fbf50ed218376..417aa29be271bd7650c1cf51a235fb3758b8feb4"
 }
 ,{
     "testCaseDescription": "go-channel-types-replacement-test",
@@ -124,57 +124,18 @@
             "channel-types.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    1
-                                ],
-                                "end": [
-                                    5,
-                                    3
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                22
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'c1' identifier with the 'c2' identifier in the c2 type declaration of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    16
-                                ],
-                                "end": [
-                                    5,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    16
-                                ],
-                                "end": [
-                                    5,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the c2 type declaration of the 'main' function"
+                    "summary": "Added the 'c2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -193,18 +154,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                24
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    3
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'c4' type declaration in the main function of the 'main' module"
+                    "summary": "Replaced the 'c1' identifier with the 'c4' identifier in the 'c4' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "end": [
+                                    5,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    18
+                                ],
+                                "end": [
+                                    7,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the <-chan string channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -245,7 +245,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 1c10bf6..196a792 100644",
+        "index 1c10bf6f..196a7928 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -262,7 +262,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "042d5ab1d05f6ca975465fca239496bfd54122c6..07e9422db7119cd8d76ee59e49b4a1d50d47b354"
+    "shas": "417aa29be271bd7650c1cf51a235fb3758b8feb4..4eaa525b58773ac51271119b858f959a75b1f6a1"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-replacement-test",
@@ -286,63 +286,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                18
-                            ],
-                            "end": [
-                                6,
-                                26
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    11
+                                ],
+                                "end": [
+                                    5,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    11
+                                ],
+                                "end": [
+                                    6,
+                                    26
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'struct{}' struct in the c2 type declaration of the 'main' function"
+                    "summary": "Replaced the 'chan string' channel type with the 'chan<- struct{}' channel type in the chan<- chan<- struct{} channel type of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                16
-                            ],
-                            "end": [
-                                5,
-                                22
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    11
+                                ],
+                                "end": [
+                                    6,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    11
+                                ],
+                                "end": [
+                                    7,
+                                    21
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'string' identifier in the c2 type declaration of the 'main' function"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                18
-                            ],
-                            "end": [
-                                7,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier in the c3 type declaration of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                18
-                            ],
-                            "end": [
-                                6,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'struct{}' struct in the c3 type declaration of the 'main' function"
+                    "summary": "Replaced the 'chan<- struct{}' channel type with the '<-chan int' channel type in the chan<- <-chan int channel type of the 'main' function"
                 },
                 {
                     "span": {
@@ -368,7 +362,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 196a792..1c10bf6 100644",
+        "index 196a7928..1c10bf6f 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -2,8 +2,8 @@ package main",
@@ -385,7 +379,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "07e9422db7119cd8d76ee59e49b4a1d50d47b354..e5c9311e6adabe4ca45dfb23ca48e05a2babace5"
+    "shas": "4eaa525b58773ac51271119b858f959a75b1f6a1..4a7ff6b0b7587d3376a812761094fc802a885142"
 }
 ,{
     "testCaseDescription": "go-channel-types-delete-insert-test",
@@ -446,7 +440,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 1c10bf6..7905807 100644",
+        "index 1c10bf6f..79058077 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -1,9 +1,5 @@",
@@ -462,7 +456,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e5c9311e6adabe4ca45dfb23ca48e05a2babace5..7dae13d432ba17af6e725cc3aa16c02a0d0d5978"
+    "shas": "4a7ff6b0b7587d3376a812761094fc802a885142..11e52c6e29023eea88be4ae0c224cce5f5a1ef00"
 }
 ,{
     "testCaseDescription": "go-channel-types-teardown-test",
@@ -493,7 +487,7 @@
     ],
     "patch": [
         "diff --git a/channel-types.go b/channel-types.go",
-        "index 7905807..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/channel-types.go",
         "+++ b/channel-types.go",
         "@@ -1,5 +0,0 @@",
@@ -504,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7dae13d432ba17af6e725cc3aa16c02a0d0d5978..413c986cf068b52f7e7690feecb72a24b039a0f3"
+    "shas": "11e52c6e29023eea88be4ae0c224cce5f5a1ef00..92befbd4bdedf99479632b87e5eca134f821ea30"
 }]

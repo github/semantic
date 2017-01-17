@@ -27,7 +27,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index e69de29..a92cefe 100644",
+        "index e69de29b..a92cefed 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -0,0 +1,6 @@",
@@ -39,7 +39,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c786b1fb33685e71b27253120b0f1650e48a1bb..af3eb853b10ec58da211ffcff96b702f045c200d"
+    "shas": "fd5434c4a598d8b1f6d8bec1f592b6a3204a5111..7b649af522a8f17b3e67fcc948ce2ade2710fa39"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-insert-test",
@@ -70,7 +70,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index a92cefe..ed6bff2 100644",
+        "index a92cefed..ed6bff2d 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,4 +3,5 @@ package main",
@@ -82,7 +82,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "af3eb853b10ec58da211ffcff96b702f045c200d..cd54d1e4fe94ad8e33d125e668de9e5381d95493"
+    "shas": "7b649af522a8f17b3e67fcc948ce2ade2710fa39..5a06e89b52643137486b4f20adae2d986da96674"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-replacement-test",
@@ -206,7 +206,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index ed6bff2..fcb6a30 100644",
+        "index ed6bff2d..fcb6a303 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,5 +3,5 @@ package main",
@@ -218,7 +218,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cd54d1e4fe94ad8e33d125e668de9e5381d95493..ae784c0594e1f664dfbe488e80e0afc80e2203b9"
+    "shas": "5a06e89b52643137486b4f20adae2d986da96674..27f168822a183a342cf72229846441d147078750"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-replacement-test",
@@ -227,30 +227,18 @@
             "parameter-declarations-with-types.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    12
-                                ],
-                                "end": [
-                                    6,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    12
-                                ],
-                                "end": [
-                                    6,
-                                    15
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                6,
+                                10
+                            ],
+                            "end": [
+                                6,
+                                15
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the foo function of the 'main' module"
+                    "summary": "Added the 'a int' parameter declaration in the foo function of the 'main' module"
                 },
                 {
                     "span": {
@@ -263,60 +251,6 @@
                                 "end": [
                                     6,
                                     11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    10
-                                ],
-                                "end": [
-                                    6,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the foo function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    22
-                                ],
-                                "end": [
-                                    6,
-                                    28
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    19
-                                ],
-                                "end": [
-                                    6,
-                                    25
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'uint64' identifier with the 'string' identifier in the foo function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    20
-                                ],
-                                "end": [
-                                    6,
-                                    21
                                 ]
                             },
                             {
@@ -331,7 +265,22 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                20
+                            ],
+                            "end": [
+                                6,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y uint64' parameter declaration in the foo function of the 'main' module"
                 }
             ]
         },
@@ -342,7 +291,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index fcb6a30..ed6bff2 100644",
+        "index fcb6a303..ed6bff2d 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,5 +3,5 @@ package main",
@@ -354,7 +303,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ae784c0594e1f664dfbe488e80e0afc80e2203b9..241197ec3917aeb4bc76bed4cdb9ed0816b5c37f"
+    "shas": "27f168822a183a342cf72229846441d147078750..c61a05221f379541da8a98c2accc0b523d29b7c5"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-insert-test",
@@ -385,7 +334,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index ed6bff2..a92cefe 100644",
+        "index ed6bff2d..a92cefed 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -3,5 +3,4 @@ package main",
@@ -397,7 +346,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "241197ec3917aeb4bc76bed4cdb9ed0816b5c37f..0c1182ceeae7328bd67ca3d2be06e2ebce7e7a91"
+    "shas": "c61a05221f379541da8a98c2accc0b523d29b7c5..47f3e74639087c2440295ea3283d93038622b3bc"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-teardown-test",
@@ -428,7 +377,7 @@
     ],
     "patch": [
         "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
-        "index a92cefe..e69de29 100644",
+        "index a92cefed..e69de29b 100644",
         "--- a/parameter-declarations-with-types.go",
         "+++ b/parameter-declarations-with-types.go",
         "@@ -1,6 +0,0 @@",
@@ -440,5 +389,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c1182ceeae7328bd67ca3d2be06e2ebce7e7a91..d0e8fa28dbe14b07ba2bc419936874f024f1fef7"
+    "shas": "47f3e74639087c2440295ea3283d93038622b3bc..cfba7fb4dab92b06358eb946d4630dd6acfe18d9"
 }]
