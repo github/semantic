@@ -87,7 +87,8 @@ termConstructor source sourceSpan name range children _ = case name of
     [a, b] -> S.TypeConversion a b
     rest -> S.Error rest
   -- TODO: Handle multiple var specs
-  "var_declaration" -> withDefaultInfo . S.Indexed =<< mapM toVarDecl children
+  "var_declaration" -> toVarDecls children
+  "var_spec" -> toVarAssignment children
   "short_var_declaration" -> listToVarDecls children
   "if_statement" -> toIfStatement children
   "call_expression" -> withDefaultInfo $ case children of
@@ -188,7 +189,7 @@ termConstructor source sourceSpan name range children _ = case name of
           rest@(_:_) -> sequenceA [ withRanges range Error rest (S.Error rest)]
           [] -> pure []
 
-    toVarDecl varSpec = listToVarDecls (toList $ unwrap varSpec)
+    toVarDecls children = withDefaultInfo (S.Indexed children)
 
     -- TODO Can we reuse toVarAssignment
     listToVarDecls list = case list of
