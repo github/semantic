@@ -167,19 +167,18 @@ termConstructor source sourceSpan name range children _ = case name of
         withCategory Slice (S.SubscriptAccess a sliceElement)
       rest -> withRanges range Error rest $ S.Error rest
 
-    toIfStatement = \case
-      [clause, block] ->
-        withDefaultInfo $ S.If clause (toList $ unwrap block)
-      [expr, block, elseBlock] | category (extract block) == Other "block" ->
-        withDefaultInfo $ S.If expr (toList (unwrap block) <> toList (unwrap elseBlock))
-      [expr, clause, block] -> do
-        clause' <- withRanges range If [expr, clause] (S.Indexed [expr, clause])
-        withDefaultInfo $ S.If clause' (toList $ unwrap block)
-      rest -> withRanges range Error rest (S.Error rest)
+    toIfStatement children = case Prologue.break ((Other "block" ==) . category . extract) children of
+      (clauses, blocks) -> do
+        clauses' <- withRanges range ExpressionStatements clauses (S.Indexed clauses)
+        let blocks' = foldMap (toList . unwrap) blocks
+        withDefaultInfo (S.If clauses' blocks')
+
     toTypeDecls types = withDefaultInfo $ S.Indexed types
+
     toTypeDecl = \case
       [identifier, ty] -> withDefaultInfo $ S.TypeDecl identifier ty
       rest -> withRanges range Error rest $ S.Error rest
+
     toImports imports = do
       imports' <- mapM toImport imports
       withDefaultInfo $ S.Indexed (mconcat imports')
@@ -190,19 +189,6 @@ termConstructor source sourceSpan name range children _ = case name of
           [] -> pure []
 
     toVarDecls children = withDefaultInfo (S.Indexed children)
-
-    -- TODO Can we reuse toVarAssignment
-    listToVarDecls list = case list of
-      [idList, exprs] | category (extract exprs) == Other "expression_list" -> do
-        assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
-        withDefaultInfo (S.Indexed assignments')
-      [idList, _, exprs] -> do
-        assignments' <- sequenceA $ zipWith (\id expr -> withDefaultInfo $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap exprs)
-        withDefaultInfo (S.Indexed assignments')
-      idList : _ -> do
-         varDecls <- mapM (withDefaultInfo . S.VarDecl) (toList $ unwrap idList)
-         withDefaultInfo (S.Indexed varDecls)
-      rest -> withRanges range Error rest (S.Error rest)
 
     toConsts constSpecs = do
       assignments' <- mapM constSpecToVarAssignment constSpecs
