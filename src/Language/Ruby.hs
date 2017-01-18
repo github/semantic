@@ -15,7 +15,7 @@ operators = ["binary", "unary", "range", "scope_resolution"]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
-  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> SourceSpan -- ^ The span that the term occupies.
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
@@ -135,9 +135,8 @@ termConstructor source sourceSpan name range children allChildren
     _  -> S.Indexed children
   where
     withRecord record syntax = pure $! cofree (record :< syntax)
-    withCategory category syntax = do
-      sourceSpan' <- sourceSpan
-      pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)
+    withCategory category syntax =
+      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
     withDefaultInfo syntax = case syntax of
       S.MethodCall{} -> withCategory MethodCall syntax
       _ -> withCategory (categoryForRubyName name) syntax
