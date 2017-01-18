@@ -56,7 +56,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- Without it, we may not evaluate the range until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
-          range `seq` termConstructor source sourceSpan (toS name) range children allChildren
+          range `seq` sourceSpan `seq` termConstructor source sourceSpan (toS name) range children allChildren
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
         getUnnamedChild node n out = ts_node_p_child node n out >> toTerm out
