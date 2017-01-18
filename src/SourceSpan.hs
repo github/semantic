@@ -6,13 +6,12 @@
 --
 module SourceSpan where
 
-import Prologue
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
-import Test.QuickCheck
-import Data.These
-import Data.Text.Arbitrary()
 import Data.Semigroup
+import Data.These
+import Prologue
+import Test.LeanCheck
 
 -- |
 -- Source position information
@@ -99,10 +98,8 @@ instance A.ToJSON SourceSpans where
     (That span) -> A.pairs $ "insert" .= span
     (These span1 span2) -> A.pairs $ "replace" .= (span1, span2)
 
-instance Arbitrary SourcePos where
-  arbitrary = SourcePos <$> arbitrary <*> arbitrary
-  shrink = genericShrink
+instance Listable SourcePos where
+  tiers = cons2 SourcePos
 
-instance Arbitrary SourceSpan where
-  arbitrary = SourceSpan <$> arbitrary <*> arbitrary
-  shrink = genericShrink
+instance Listable SourceSpan where
+  tiers = cons2 SourceSpan

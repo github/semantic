@@ -18,23 +18,23 @@ module Data.RandomWalkSimilarity
 import Control.Applicative
 import Control.Monad.Random
 import Control.Monad.State
+import Data.Align.Generic
 import Data.Functor.Both hiding (fst, snd)
+import Data.Functor.Listable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
-import Data.Semigroup (Min(..), Option(..))
 import Data.Record
+import Data.Semigroup (Min(..), Option(..))
+import Data.These
 import qualified Data.Vector as Vector
+import Diff
+import Info
 import Patch
 import Prologue as P
-import Term (termSize, zipTerms, Term, TermF)
-import Test.QuickCheck hiding (Fixed)
-import Test.QuickCheck.Random
 import qualified SES
-import Info
-import Data.Align.Generic
-import Data.These
-import Diff
+import Term (termSize, zipTerms, Term, TermF)
+import Test.QuickCheck.Random (mkQCGen)
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 type DiffTerms f fields = Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
@@ -300,11 +300,8 @@ instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
   hash gram = hash (stem gram <> base gram)
 
--- | Construct a generator for arbitrary `Gram`s of size `(p, q)`.
-gramWithPQ :: Arbitrary label => Int -> Int -> Gen (Gram label)
-gramWithPQ p q = Gram <$> vectorOf p arbitrary <*> vectorOf q arbitrary
+instance Listable1 Gram where
+  liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram
 
-instance Arbitrary label => Arbitrary (Gram label) where
-  arbitrary = join $ gramWithPQ <$> arbitrary <*> arbitrary
-
-  shrink (Gram a b) = Gram <$> shrink a <*> shrink b
+instance Listable a => Listable (Gram a) where
+  tiers = tiers1

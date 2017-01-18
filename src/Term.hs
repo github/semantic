@@ -11,7 +11,7 @@ import Data.These
 import Syntax
 
 -- | A Term with an abstract syntax tree and an annotation.
-type Term f annotation = Cofree f annotation
+type Term f = Cofree f
 type TermF = CofreeF
 
 -- | A Term with a Syntax leaf and a record of fields.

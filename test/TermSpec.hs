@@ -1,19 +1,17 @@
+{-# LANGUAGE DataKinds #-}
 module TermSpec where
 
-import Data.Text.Arbitrary ()
+import Category
+import Data.Functor.Listable
+import Data.String (String)
 import Prologue
-import Term.Arbitrary
+import Term
 import Test.Hspec (Spec, describe, parallel)
 import Test.Hspec.Expectations.Pretty
-import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> toTerm a `shouldBe` toTerm (a :: ArbitraryTerm Text ())
-
-  describe "ArbitraryTerm" $ do
-    prop "generates terms of a specific size" . forAll ((arbitrary >>= \ n -> (,) n <$> termOfSize n) `suchThat` ((> 0) . fst)) $
-      \ (n, term) -> arbitraryTermSize (term :: ArbitraryTerm Text ()) `shouldBe` n
+      \ a -> unListableF a `shouldBe` (unListableF a :: SyntaxTerm String '[Category])

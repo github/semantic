@@ -6,13 +6,12 @@ import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
-import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both as Both
+import Data.Functor.Listable
 import Data.List (nub)
 import Data.Monoid hiding ((<>))
 import Data.Record
 import Data.String
-import Data.Text.Arbitrary ()
 import Data.These
 import Patch
 import Prologue hiding (fst, snd)
@@ -24,8 +23,8 @@ import Syntax
 import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
-import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Test.Hspec.LeanCheck
+import Test.LeanCheck
 import GHC.Show (Show(..))
 
 spec :: Spec
@@ -48,7 +47,7 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        join <$> (traverse (modifyJoin (fromThese [] []) . fmap (pure . Prologue.fst)) (alignBranch Prologue.snd children ranges)) `shouldBe` ranges
+        join <$> traverse (modifyJoin (fromThese [] []) . fmap (pure . Prologue.fst)) (alignBranch Prologue.snd children ranges) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
@@ -195,7 +194,7 @@ spec = parallel $ do
 
   describe "numberedRows" $ do
     prop "counts only non-empty values" $
-      \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
+      \ xs -> counts (numberedRows (unListableF <$> xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin . unListableF <$> xs))
 
 data BranchElement
   = Child String (Join These String)
@@ -236,23 +235,23 @@ keysOfAlignedChildren lines = lines >>= these identity identity (<>) . runJoin .
 joinCrosswalk :: Bicrosswalk p => Align f => (a -> f b) -> Join p a -> f (Join p b)
 joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
 
-instance Arbitrary BranchElement where
-  arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
-                    , Margin <$> joinTheseOf margin ]
-    where key = listOf1 (elements (['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']))
-          contents key = wrap key <$> listOf (padding '*')
+instance Listable BranchElement where
+  tiers = oneof [ (\ key -> Child key `mapT` joinTheseOf (contents key)) `concatMapT` key
+                , Margin `mapT` joinTheseOf (pure `mapT` padding '-') ]
+    where key = pure `mapT` [['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']]
+          contents key = (wrap key . pure) `mapT` padding '*'
           wrap key contents = "(" <> key <> contents <> ")" :: String
-          margin = listOf (padding '-')
-          padding char = frequency [ (10, pure char)
-                                   , (1, pure '\n') ]
-          joinTheseOf g = oneof [ Join . This <$> g
-                                , Join . That <$> g
-                                , (Join .) . These <$> g <*> g ]
+          padding :: Char -> [Tier Char]
+          padding char = frequency [ (10, [[char]])
+                                   , (1, [['\n']]) ]
+          joinTheseOf g = oneof [ (Join . This) `mapT` g
+                                , (Join . That) `mapT` g
+                                , productWith ((Join .) . These) g g ]
+          frequency :: [(Int, [Tier a])] -> [Tier a]
+          frequency = concatT . foldr ((\/) . pure . uncurry replicate) []
+          oneof :: [[[a]]] -> [[a]]
+          oneof = frequency . fmap ((,) 1)
 
-  shrink (Child key contents) = Child key <$> joinCrosswalk shrinkContents contents
-    where shrinkContents string = (++ suffix) . (prefix ++) <$> shrinkList (const []) (drop (length prefix) (take (length string - length suffix) string))
-          (prefix, suffix) = ('(' : key, ")" :: String)
-  shrink (Margin contents) = Margin <$> joinCrosswalk (shrinkList (const [])) contents
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))

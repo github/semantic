@@ -18,14 +18,14 @@ library
                      , Arguments
                      , Category
                      , Data.Align.Generic
-                     , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
+                     , Data.Functor.Listable
                      , Data.Mergeable
                      , Data.Mergeable.Generic
                      , Data.RandomWalkSimilarity
                      , Data.Record
+                     , Data.Text.Listable
                      , Diff
-                     , Diff.Arbitrary
                      , Diffing
                      , DiffSummary
                      , Info
@@ -39,7 +39,6 @@ library
                      , Parse
                      , Parser
                      , Patch
-                     , Patch.Arbitrary
                      , Paths_semantic_diff
                      , Prologue
                      , Range
@@ -56,7 +55,6 @@ library
                      , SplitDiff
                      , Syntax
                      , Term
-                     , Term.Arbitrary
                      , TreeSitter
                      , FDoc.Term
                      , FDoc.RecursionSchemes
@@ -81,14 +79,13 @@ library
                      , gitrev
                      , hashable
                      , kdt
+                     , leancheck
                      , MonadRandom
                      , mtl
                      , optparse-applicative
                      , pointed
                      , protolude
                      , QuickCheck >= 2.8.1
-                     , quickcheck-instances
-                     , quickcheck-text
                      , recursion-schemes
                      , regex-compat
                      , semigroups
@@ -144,9 +141,9 @@ benchmark semantic-diff-bench
   build-depends:       base
                      , criterion
                      , directory
+                     , leancheck
                      , monad-par
                      , mtl
-                     , QuickCheck >= 2.8.1
                      , semantic-diff
                      , text >= 1.2.1.3
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O2 -static -pgml=script/g++
@@ -168,17 +165,18 @@ test-suite test
                      , RangeSpec
                      , Source.Spec
                      , TermSpec
+                     , Test.Hspec.LeanCheck
   build-depends:       base
                      , bifunctors
                      , deepseq
                      , filepath
                      , Glob
                      , hspec >= 2.1.10
+                     , hspec-core
                      , hspec-expectations-pretty-diff
+                     , leancheck
                      , mtl
                      , protolude
-                     , QuickCheck >= 2.8.1
-                     , quickcheck-text
                      , recursion-schemes >= 4.1
                      , semantic-diff
                      , text >= 1.2.1.3
