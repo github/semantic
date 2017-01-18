@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-type-assertion-expressions-setup-test",
+    "expectedResult": {
+        "changes": {
+            "type-assertion-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-assertion-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
+        "index e69de29b..79058077 100644",
+        "--- a/type-assertion-expressions.go",
+        "+++ b/type-assertion-expressions.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "e4c6a9b9a1f1cbf3dd7a4ce717333fb847b7fbac..494715cafe3834303fecb34caa2592d77712ab31"
+}
+,{
     "testCaseDescription": "go-type-assertion-expressions-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,16 +49,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'x.(z.Person)' type assertion statement"
+                    "summary": "Added the 'x.(z.Person)' type assertion statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -27,206 +69,19 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index e69de29..0765038 100644",
+        "index 79058077..4f148f43 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
-        "@@ -0,0 +1 @@",
-        "+x.(z.Person)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "47d2e77075bea143df064341695111f434390787..012b1aebf2431d713e5287b10792aa564b72d6bc"
-}
-,{
-    "testCaseDescription": "go-type-assertion-expressions-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "type-assertion-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b.(c.Dog)' type assertion statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x.(z.Person)' type assertion statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x.(z.Person)' type assertion statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x.(z.Person)' type assertion statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "type-assertion-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 0765038..56239fb 100644",
-        "--- a/type-assertion-expressions.go",
-        "+++ b/type-assertion-expressions.go",
-        "@@ -1 +1,3 @@",
-        "+b.(c.Dog)",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+x.(z.Person)",
-        " x.(z.Person)"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "012b1aebf2431d713e5287b10792aa564b72d6bc..65901508a1a56b8fd65f1c704be9ebdb7c0e9962"
-}
-,{
-    "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "type-assertion-expressions.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    2
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'x' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    4
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    4
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'c' identifier with the 'z' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    12
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Dog' identifier with the 'Person' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "type-assertion-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 56239fb..de94018 100644",
-        "--- a/type-assertion-expressions.go",
-        "+++ b/type-assertion-expressions.go",
-        "@@ -1,3 +1,3 @@",
-        "-b.(c.Dog)",
-        "+x.(z.Person)",
-        " x.(z.Person)",
-        " x.(z.Person)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "65901508a1a56b8fd65f1c704be9ebdb7c0e9962..cf149b0f32f8c6e2111d7e24f6384ef8a7465ed3"
+    "shas": "494715cafe3834303fecb34caa2592d77712ab31..57a6ec4effeb9f05a122238d323ce7dcd69df07f"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-replacement-test",
@@ -238,81 +93,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     2
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     1
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'b' identifier"
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     4
                                 ],
                                 "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    4
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'z' identifier with the 'c' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
+                                    4,
                                     12
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
-                                    6
+                                    4,
+                                    4
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Person' identifier with the 'Dog' identifier"
+                    "summary": "Replaced the 'z.Person' qualified identifier with the 'c.Dog' qualified identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -323,17 +151,19 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index de94018..56239fb 100644",
+        "index 4f148f43..e7463b41 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
-        "@@ -1,3 +1,3 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-x.(z.Person)",
         "+b.(c.Dog)",
-        " x.(z.Person)",
-        " x.(z.Person)"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cf149b0f32f8c6e2111d7e24f6384ef8a7465ed3..2785ff758a864fb059f1d3a640356184e685c7ae"
+    "shas": "57a6ec4effeb9f05a122238d323ce7dcd69df07f..0316d3acd42da2101c8d933617d7eeb30eee52d5"
 }
 ,{
     "testCaseDescription": "go-type-assertion-expressions-delete-replacement-test",
@@ -342,48 +172,57 @@
             "type-assertion-expressions.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    2
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'b.(c.Dog)' type assertion statement"
+                    "summary": "Replaced the 'b' identifier with the 'x' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    4
+                                ],
+                                "end": [
+                                    4,
+                                    12
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'x.(z.Person)' type assertion statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b.(c.Dog)' type assertion statement"
+                    "summary": "Replaced the 'c.Dog' qualified identifier with the 'z.Person' qualified identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -394,67 +233,39 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 56239fb..aa7c34c 100644",
+        "index e7463b41..4f148f43 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
-        "@@ -1,3 +1,2 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-b.(c.Dog)",
-        "-x.(z.Person)",
-        " x.(z.Person)",
-        "+b.(c.Dog)"
+        "+x.(z.Person)",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2785ff758a864fb059f1d3a640356184e685c7ae..2747f7daa786f2a814e7e8381120d838050d1d89"
+    "shas": "0316d3acd42da2101c8d933617d7eeb30eee52d5..f7e6434ce30a5b34a67cfe802722b1a51fd24052"
 }
 ,{
-    "testCaseDescription": "go-type-assertion-expressions-delete-test",
+    "testCaseDescription": "go-type-assertion-expressions-delete-insert-test",
     "expectedResult": {
         "changes": {
             "type-assertion-expressions.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b.(c.Dog)' type assertion statement"
-                },
-                {
-                    "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.(z.Person)' type assertion statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b.(c.Dog)' type assertion statement"
+                    "summary": "Deleted the 'x.(z.Person)' type assertion statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -465,18 +276,22 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index aa7c34c..093a081 100644",
+        "index 4f148f43..79058077 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
-        "@@ -1,2 +1 @@",
+        "@@ -1,5 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-x.(z.Person)",
-        " b.(c.Dog)"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2747f7daa786f2a814e7e8381120d838050d1d89..f710680272400bb3cfcdca84cbc9a46dc3e136ba"
+    "shas": "f7e6434ce30a5b34a67cfe802722b1a51fd24052..b4e4fd587390ce7fd5b4b6c95ac01261eb97c17c"
 }
 ,{
-    "testCaseDescription": "go-type-assertion-expressions-delete-rest-test",
+    "testCaseDescription": "go-type-assertion-expressions-teardown-test",
     "expectedResult": {
         "changes": {
             "type-assertion-expressions.go": [
@@ -488,12 +303,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                10
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b.(c.Dog)' type assertion statement"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -504,12 +319,16 @@
     ],
     "patch": [
         "diff --git a/type-assertion-expressions.go b/type-assertion-expressions.go",
-        "index 093a081..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/type-assertion-expressions.go",
         "+++ b/type-assertion-expressions.go",
-        "@@ -1 +0,0 @@",
-        "-b.(c.Dog)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f710680272400bb3cfcdca84cbc9a46dc3e136ba..aa6d103c0bde1c5cd7c122b6a597939f9920694d"
+    "shas": "b4e4fd587390ce7fd5b4b6c95ac01261eb97c17c..d47123e6fd9c69b12607e0236be45289b764ce8b"
 }]

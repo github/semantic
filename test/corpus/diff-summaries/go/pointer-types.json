@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-pointer-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "pointer-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "pointer-types.go"
+    ],
+    "patch": [
+        "diff --git a/pointer-types.go b/pointer-types.go",
+        "index e69de29b..79058077 100644",
+        "--- a/pointer-types.go",
+        "+++ b/pointer-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "2f35db8e0302874790f1e855b1604464a758129c..e0303fed6749f451d05079830f899ce0f494f614"
+}
+,{
     "testCaseDescription": "go-pointer-types-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,61 +49,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
+                                5,
                                 11
                             ]
                         }
                     },
-                    "summary": "Added the 'string' identifier"
+                    "summary": "Added the 'p1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                6,
                                 1
                             ],
                             "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
+                                6,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added the 'p1' identifier"
+                    "summary": "Added the 'p2' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -72,255 +84,22 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index e69de29..05b4659 100644",
+        "index 79058077..98e7b8a9 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
-        "@@ -0,0 +1,4 @@",
-        "+type (",
-        "+p1 *string",
-        "+p2 **p1",
-        "+)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "3cf1fd2c498440d58dd5df34a4f217c00efa71b1..cff34d9b4f8663f9e2a85316a00629c162eaab24"
-}
-,{
-    "testCaseDescription": "go-pointer-types-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "pointer-types.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                5
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p1' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "pointer-types.go"
-    ],
-    "patch": [
-        "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 05b4659..95e685d 100644",
-        "--- a/pointer-types.go",
-        "+++ b/pointer-types.go",
-        "@@ -1,4 +1,12 @@",
-        " type (",
-        "+p1 *int",
-        "+p2 **p3",
-        "+)",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+type (",
         "+p1 *string",
         "+p2 **p1",
         "+)",
-        "+type (",
-        " p1 *string",
-        " p2 **p1",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cff34d9b4f8663f9e2a85316a00629c162eaab24..0a00ceceb6353a9970f1aa9ced5771b5b21883c6"
-}
-,{
-    "testCaseDescription": "go-pointer-types-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "pointer-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'p3' identifier with the 'p1' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "pointer-types.go"
-    ],
-    "patch": [
-        "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 95e685d..74ff673 100644",
-        "--- a/pointer-types.go",
-        "+++ b/pointer-types.go",
-        "@@ -1,6 +1,6 @@",
-        " type (",
-        "-p1 *int",
-        "-p2 **p3",
-        "+p1 *string",
-        "+p2 **p1",
-        " )",
-        " type (",
-        " p1 *string"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "0a00ceceb6353a9970f1aa9ced5771b5b21883c6..2f99a01b337c02263ca4e9399902b16aaba1dedf"
+    "shas": "e0303fed6749f451d05079830f899ce0f494f614..a2a702f361a75afe7a57eca5f42338b32f802f8d"
 }
 ,{
     "testCaseDescription": "go-pointer-types-replacement-test",
@@ -332,54 +111,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     5
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     5
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the *int pointer type of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'p1' identifier with the 'p3' identifier"
+                    "summary": "Replaced the 'p1' identifier with the 'p3' identifier in the *p3 pointer type of the 'main' function"
                 }
             ]
         },
@@ -390,21 +169,22 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 74ff673..95e685d 100644",
+        "index 98e7b8a9..36eb5ffb 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
-        "@@ -1,6 +1,6 @@",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
         " type (",
         "-p1 *string",
         "-p2 **p1",
         "+p1 *int",
         "+p2 **p3",
         " )",
-        " type (",
-        " p1 *string"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f99a01b337c02263ca4e9399902b16aaba1dedf..f13af84d4486664581e87d4a034aef0bad3a207a"
+    "shas": "a2a702f361a75afe7a57eca5f42338b32f802f8d..c29c8cd9b06066a9f9b95f6d90abf0d388121621"
 }
 ,{
     "testCaseDescription": "go-pointer-types-delete-replacement-test",
@@ -413,183 +193,57 @@
             "pointer-types.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'p1' identifier"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the *string pointer type of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                5
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                5
-                            ],
-                            "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                6
-                            ],
-                            "end": [
-                                7,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p3' identifier"
+                    "summary": "Replaced the 'p3' identifier with the 'p1' identifier in the *p1 pointer type of the 'main' function"
                 }
             ]
         },
@@ -600,30 +254,25 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 95e685d..4556eeb 100644",
+        "index 36eb5ffb..98e7b8a9 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
-        "@@ -1,12 +1,8 @@",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
         " type (",
         "-p1 *int",
         "-p2 **p3",
-        "-)",
-        "-type (",
-        " p1 *string",
-        " p2 **p1",
+        "+p1 *string",
+        "+p2 **p1",
         " )",
-        " type (",
-        "-p1 *string",
-        "-p2 **p1",
-        "+p1 *int",
-        "+p2 **p3",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f13af84d4486664581e87d4a034aef0bad3a207a..1dfbf23712676794ded97d5e9a411ce7ce56fc17"
+    "shas": "c29c8cd9b06066a9f9b95f6d90abf0d388121621..dc43d6e290768816185a12d2bfc43db015eb8960"
 }
 ,{
-    "testCaseDescription": "go-pointer-types-delete-test",
+    "testCaseDescription": "go-pointer-types-delete-insert-test",
     "expectedResult": {
         "changes": {
             "pointer-types.go": [
@@ -631,61 +280,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
+                                5,
                                 11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'string' identifier"
+                    "summary": "Deleted the 'p1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                6,
                                 1
                             ],
                             "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
+                                6,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p1' identifier"
+                    "summary": "Deleted the 'p2' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -696,24 +315,25 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 4556eeb..5d13f48 100644",
+        "index 98e7b8a9..79058077 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
-        "@@ -1,8 +1,4 @@",
-        " type (",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-type (",
         "-p1 *string",
         "-p2 **p1",
         "-)",
-        "-type (",
-        " p1 *int",
-        " p2 **p3",
-        " )"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1dfbf23712676794ded97d5e9a411ce7ce56fc17..d8ac0c302b514259999149901eb3c217040e7407"
+    "shas": "dc43d6e290768816185a12d2bfc43db015eb8960..1c982494af2b508fae567a6c441a7a15c54d4a24"
 }
 ,{
-    "testCaseDescription": "go-pointer-types-delete-rest-test",
+    "testCaseDescription": "go-pointer-types-teardown-test",
     "expectedResult": {
         "changes": {
             "pointer-types.go": [
@@ -721,61 +341,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                1,
                                 1
                             ],
                             "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                5
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                3,
-                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p3' identifier"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -786,15 +361,16 @@
     ],
     "patch": [
         "diff --git a/pointer-types.go b/pointer-types.go",
-        "index 5d13f48..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/pointer-types.go",
         "+++ b/pointer-types.go",
-        "@@ -1,4 +0,0 @@",
-        "-type (",
-        "-p1 *int",
-        "-p2 **p3",
-        "-)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8ac0c302b514259999149901eb3c217040e7407..043e40fb43f738d1d0ddd89c38bc83159bcc7a8f"
+    "shas": "1c982494af2b508fae567a6c441a7a15c54d4a24..0ba70ac16df68cc3eb0b6318c3b784d701f4b216"
 }]

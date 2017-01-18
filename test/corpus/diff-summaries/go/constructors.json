@@ -1,435 +1,22 @@
 [{
-    "testCaseDescription": "go-constructors-insert-test",
-    "expectedResult": {
-        "changes": {},
-        "errors": {
-            "constructors.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- int)' at line 1, column 1 - line 1, column 17"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- int, (new - old))' at line 2, column 1 - line 2, column 30"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- int, 5, 10)' at line 3, column 1 - line 3, column 24"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new(map[string]string)' at line 4, column 2 - line 4, column 24"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "constructors.go"
-    ],
-    "patch": [
-        "diff --git a/constructors.go b/constructors.go",
-        "index e69de29..51ab923 100644",
-        "--- a/constructors.go",
-        "+++ b/constructors.go",
-        "@@ -0,0 +1,4 @@",
-        "+make(chan<- int)",
-        "+make(chan<- int, (new - old))",
-        "+make(chan<- int, 5, 10)",
-        "+ new(map[string]string)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "966bee07072f36b83494af4ac7d3c83673e1f3f8..c7bdb07eb72049fd69abdcc143aec04d926f21ce"
-}
-,{
-    "testCaseDescription": "go-constructors-replacement-insert-test",
-    "expectedResult": {
-        "changes": {},
-        "errors": {
-            "constructors.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- string)' at line 1, column 1 - line 1, column 20"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- string, (new - old))' at line 2, column 1 - line 2, column 33"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- string, 7, 11)' at line 3, column 1 - line 3, column 27"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new(map[int]int)' at line 4, column 2 - line 4, column 18"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- int)' at line 5, column 1 - line 5, column 17"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- int, (new - old))' at line 6, column 1 - line 6, column 30"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- int, 5, 10)' at line 7, column 1 - line 7, column 24"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new(map[string]string)' at line 8, column 2 - line 8, column 24"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "constructors.go"
-    ],
-    "patch": [
-        "diff --git a/constructors.go b/constructors.go",
-        "index 51ab923..76b35ec 100644",
-        "--- a/constructors.go",
-        "+++ b/constructors.go",
-        "@@ -1,3 +1,11 @@",
-        "+make(chan<- string)",
-        "+make(chan<- string, (new - old))",
-        "+make(chan<- string, 7, 11)",
-        "+ new(map[int]int)",
-        "+make(chan<- int)",
-        "+make(chan<- int, (new - old))",
-        "+make(chan<- int, 5, 10)",
-        "+ new(map[string]string)",
-        " make(chan<- int)",
-        " make(chan<- int, (new - old))",
-        " make(chan<- int, 5, 10)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "c7bdb07eb72049fd69abdcc143aec04d926f21ce..68ef8db50537542788d5ddc486ef718468df5d09"
-}
-,{
-    "testCaseDescription": "go-constructors-delete-insert-test",
+    "testCaseDescription": "go-constructors-setup-test",
     "expectedResult": {
         "changes": {
             "constructors.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    13
-                                ],
-                                "end": [
-                                    1,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    13
-                                ],
-                                "end": [
-                                    1,
-                                    16
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    13
-                                ],
-                                "end": [
-                                    2,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    13
-                                ],
-                                "end": [
-                                    2,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    13
-                                ],
-                                "end": [
-                                    3,
-                                    19
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    13
-                                ],
-                                "end": [
-                                    3,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    18
-                                ],
-                                "end": [
-                                    3,
-                                    19
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '7' with '5'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    24
-                                ],
-                                "end": [
-                                    3,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    21
-                                ],
-                                "end": [
-                                    3,
-                                    23
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '11' with '10'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    13
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    14
-                                ],
-                                "end": [
-                                    4,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    17
-                                ],
-                                "end": [
-                                    4,
-                                    23
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                    "summary": "Added the 'main' module"
                 }
             ]
         },
@@ -440,24 +27,109 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 76b35ec..b8e9fef 100644",
+        "index e69de29b..79058077 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
-        "@@ -1,7 +1,7 @@",
-        "-make(chan<- string)",
-        "-make(chan<- string, (new - old))",
-        "-make(chan<- string, 7, 11)",
-        "- new(map[int]int)",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "d857a5e809451235a1566b3bd2e315a9cdf9213f..7f3ea3338ef4b4efa3eb722676645b35bf7e2219"
+}
+,{
+    "testCaseDescription": "go-constructors-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructors.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- int)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- int, …)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'make(chan<- int, 5, 10)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                2
+                            ],
+                            "end": [
+                                7,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new(…)' function call in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructors.go"
+    ],
+    "patch": [
+        "diff --git a/constructors.go b/constructors.go",
+        "index 79058077..082e65fd 100644",
+        "--- a/constructors.go",
+        "+++ b/constructors.go",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+make(chan<- int)",
         "+make(chan<- int, (new - old))",
         "+make(chan<- int, 5, 10)",
         "+ new(map[string]string)",
-        " make(chan<- int)",
-        " make(chan<- int, (new - old))",
-        " make(chan<- int, 5, 10)"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "68ef8db50537542788d5ddc486ef718468df5d09..20ffdb2472a383a950316cc2db621c93f16d4cb9"
+    "shas": "7f3ea3338ef4b4efa3eb722676645b35bf7e2219..71ab81613288be4a1bc41470a41213c54fc32d9c"
 }
 ,{
     "testCaseDescription": "go-constructors-replacement-test",
@@ -469,189 +141,189 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     13
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     13
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     19
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan<- string channel type of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     13
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     13
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     19
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan<- string channel type of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     13
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     19
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the chan<- string channel type of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     18
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     19
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '7'"
+                    "summary": "Replaced '5' with '7' in the make(chan<- string, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     21
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     23
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     24
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     26
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '10' with '11'"
+                    "summary": "Replaced '10' with '11' in the make(chan<- string, 7, 11) function call of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    7,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    7,
                                     10
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the new(…) function call of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    4,
+                                    7,
                                     17
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     23
                                 ]
                             },
                             {
                                 "start": [
-                                    4,
+                                    7,
                                     14
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     17
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the new(…) function call of the 'main' function"
                 }
             ]
         },
@@ -662,10 +334,13 @@
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index b8e9fef..76b35ec 100644",
+        "index 082e65fd..e4fdb2e9 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
-        "@@ -1,7 +1,7 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-make(chan<- int)",
         "-make(chan<- int, (new - old))",
         "-make(chan<- int, 5, 10)",
@@ -674,325 +349,329 @@
         "+make(chan<- string, (new - old))",
         "+make(chan<- string, 7, 11)",
         "+ new(map[int]int)",
-        " make(chan<- int)",
-        " make(chan<- int, (new - old))",
-        " make(chan<- int, 5, 10)"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "20ffdb2472a383a950316cc2db621c93f16d4cb9..6e664ada44333ddd3d6d3ecb7763941c96ad59d7"
+    "shas": "71ab81613288be4a1bc41470a41213c54fc32d9c..ab855120e03c61d6936aa3e7d542b3da4bf08754"
 }
 ,{
     "testCaseDescription": "go-constructors-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "constructors.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                20
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    13
+                                ],
+                                "end": [
+                                    4,
+                                    16
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'make(chan<- string)' at line 1, column 1 - line 1, column 20"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan<- int channel type of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                33
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    13
+                                ],
+                                "end": [
+                                    5,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    13
+                                ],
+                                "end": [
+                                    5,
+                                    16
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'make(chan<- string, (new - old))' at line 2, column 1 - line 2, column 33"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan<- int channel type of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                27
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    13
+                                ],
+                                "end": [
+                                    6,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    13
+                                ],
+                                "end": [
+                                    6,
+                                    16
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'make(chan<- string, 7, 11)' at line 3, column 1 - line 3, column 27"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the chan<- int channel type of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    21
+                                ],
+                                "end": [
+                                    6,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    18
+                                ],
+                                "end": [
+                                    6,
+                                    19
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'new(map[int]int)' at line 4, column 2 - line 4, column 18"
+                    "summary": "Replaced '7' with '5' in the make(chan<- int, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                17
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    24
+                                ],
+                                "end": [
+                                    6,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    21
+                                ],
+                                "end": [
+                                    6,
+                                    23
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'make(chan<- int)' at line 5, column 1 - line 5, column 17"
+                    "summary": "Replaced '11' with '10' in the make(chan<- int, 5, 10) function call of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                30
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    10
+                                ],
+                                "end": [
+                                    7,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    10
+                                ],
+                                "end": [
+                                    7,
+                                    16
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'make(chan<- int, (new - old))' at line 6, column 1 - line 6, column 30"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the new(…) function call of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                24
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    14
+                                ],
+                                "end": [
+                                    7,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    17
+                                ],
+                                "end": [
+                                    7,
+                                    23
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'make(chan<- int, 5, 10)' at line 7, column 1 - line 7, column 24"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new(map[string]string)' at line 8, column 2 - line 8, column 24"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- string)' at line 5, column 1 - line 5, column 20"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- string, (new - old))' at line 6, column 1 - line 6, column 33"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'make(chan<- string, 7, 11)' at line 7, column 1 - line 7, column 27"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new(map[int]int)' at line 8, column 2 - line 8, column 18"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the new(…) function call of the 'main' function"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "constructors.go"
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 76b35ec..12f44d5 100644",
+        "index e4fdb2e9..082e65fd 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
-        "@@ -1,12 +1,8 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-make(chan<- string)",
         "-make(chan<- string, (new - old))",
         "-make(chan<- string, 7, 11)",
         "- new(map[int]int)",
-        "-make(chan<- int)",
-        "-make(chan<- int, (new - old))",
-        "-make(chan<- int, 5, 10)",
-        "- new(map[string]string)",
-        " make(chan<- int)",
-        " make(chan<- int, (new - old))",
-        " make(chan<- int, 5, 10)",
-        "  new(map[string]string)",
-        "+make(chan<- string)",
-        "+make(chan<- string, (new - old))",
-        "+make(chan<- string, 7, 11)",
-        "+ new(map[int]int)"
+        "+make(chan<- int)",
+        "+make(chan<- int, (new - old))",
+        "+make(chan<- int, 5, 10)",
+        "+ new(map[string]string)",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e664ada44333ddd3d6d3ecb7763941c96ad59d7..f09151cf0ca950addb02dcd5eb4a5c3175c8d948"
+    "shas": "ab855120e03c61d6936aa3e7d542b3da4bf08754..35d4317a645faac48756c0097ecb2ddee8eb6f6c"
 }
 ,{
-    "testCaseDescription": "go-constructors-delete-test",
+    "testCaseDescription": "go-constructors-delete-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "constructors.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 17
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int)' at line 1, column 1 - line 1, column 17"
+                    "summary": "Deleted the 'make(chan<- int)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
+                                5,
                                 30
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int, (new - old))' at line 2, column 1 - line 2, column 30"
+                    "summary": "Deleted the 'make(chan<- int, …)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                6,
                                 1
                             ],
                             "end": [
-                                3,
+                                6,
                                 24
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- int, 5, 10)' at line 3, column 1 - line 3, column 24"
+                    "summary": "Deleted the 'make(chan<- int, 5, 10)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                7,
                                 2
                             ],
                             "end": [
-                                4,
+                                7,
                                 24
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new(map[string]string)' at line 4, column 2 - line 4, column 24"
+                    "summary": "Deleted the 'new(…)' function call in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "constructors.go"
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 12f44d5..0720537 100644",
+        "index 082e65fd..79058077 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
-        "@@ -1,7 +1,3 @@",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-make(chan<- int)",
         "-make(chan<- int, (new - old))",
         "-make(chan<- int, 5, 10)",
         "- new(map[string]string)",
-        " make(chan<- string)",
-        " make(chan<- string, (new - old))",
-        " make(chan<- string, 7, 11)"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f09151cf0ca950addb02dcd5eb4a5c3175c8d948..97793eb040912a5c749583ac0be44dec6763e577"
+    "shas": "35d4317a645faac48756c0097ecb2ddee8eb6f6c..c4979ddf83c2bf3ef239a79940067fe2af652820"
 }
 ,{
-    "testCaseDescription": "go-constructors-delete-rest-test",
+    "testCaseDescription": "go-constructors-teardown-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "constructors.go": [
                 {
                     "span": {
@@ -1002,75 +681,32 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'make(chan<- string)' at line 1, column 1 - line 1, column 20"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                33
                             ]
                         }
                     },
-                    "summary": "Deleted the 'make(chan<- string, (new - old))' at line 2, column 1 - line 2, column 33"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                27
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'make(chan<- string, 7, 11)' at line 3, column 1 - line 3, column 27"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                2
-                            ],
-                            "end": [
-                                4,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new(map[int]int)' at line 4, column 2 - line 4, column 18"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "constructors.go"
     ],
     "patch": [
         "diff --git a/constructors.go b/constructors.go",
-        "index 0720537..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/constructors.go",
         "+++ b/constructors.go",
-        "@@ -1,4 +0,0 @@",
-        "-make(chan<- string)",
-        "-make(chan<- string, (new - old))",
-        "-make(chan<- string, 7, 11)",
-        "- new(map[int]int)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97793eb040912a5c749583ac0be44dec6763e577..b8520b47d7e23a8b805613ba5e28d123748a7e86"
+    "shas": "c4979ddf83c2bf3ef239a79940067fe2af652820..2e1fbc3488b3a5250246698b500360fa5c6cfcf2"
 }]

@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-switch-statements-setup-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statements.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statements.go"
+    ],
+    "patch": [
+        "diff --git a/switch-statements.go b/switch-statements.go",
+        "index e69de29b..79058077 100644",
+        "--- a/switch-statements.go",
+        "+++ b/switch-statements.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f5fe5786c0b546d3a5a224d7b5875f31f57db459..97371be1b990d91b2ec115a8b644e29f3e8b87a5"
+}
+,{
     "testCaseDescription": "go-switch-statements-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,16 +49,16 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                4,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'branch' switch statement"
+                    "summary": "Added a switch statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -27,273 +69,22 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index e69de29..e444d1e 100644",
+        "index 79058077..5cdd438b 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
-        "@@ -0,0 +1,4 @@",
-        "+switch { case x < y: f1()",
-        "+case x < z: g()",
-        "+case x == 4: h()",
-        "+}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "25238a93bb3b92d4e2609c44f320e44fd9f4b537..fa7dbbfc36d0753d67461de33813be5492beefc2"
-}
-,{
-    "testCaseDescription": "go-switch-statements-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "switch-statements.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'branch' switch statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'branch' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "switch-statements.go"
-    ],
-    "patch": [
-        "diff --git a/switch-statements.go b/switch-statements.go",
-        "index e444d1e..e2e5cf3 100644",
-        "--- a/switch-statements.go",
-        "+++ b/switch-statements.go",
-        "@@ -1,3 +1,11 @@",
-        "+switch { case a < b: f1()",
-        "+case c < d: g()",
-        "+case e == 4: f()",
-        "+}",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+switch { case x < y: f1()",
         "+case x < z: g()",
         "+case x == 4: h()",
         "+}",
-        " switch { case x < y: f1()",
-        " case x < z: g()",
-        " case x == 4: h()"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fa7dbbfc36d0753d67461de33813be5492beefc2..f989edd6b885f1d71d4c0caa94c2f66647dd74d2"
-}
-,{
-    "testCaseDescription": "go-switch-statements-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "switch-statements.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    15
-                                ],
-                                "end": [
-                                    1,
-                                    16
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    15
-                                ],
-                                "end": [
-                                    1,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the 'branch' switch statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    20
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    20
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the 'branch' switch statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'c' identifier with the 'x' identifier in the 'branch' switch statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    10
-                                ],
-                                "end": [
-                                    2,
-                                    11
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    10
-                                ],
-                                "end": [
-                                    2,
-                                    11
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'd' identifier with the 'z' identifier in the 'branch' switch statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'e' identifier with the 'x' identifier in the 'branch' switch statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    14
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    14
-                                ],
-                                "end": [
-                                    3,
-                                    15
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'f' identifier with the 'h' identifier in the h() function call"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "switch-statements.go"
-    ],
-    "patch": [
-        "diff --git a/switch-statements.go b/switch-statements.go",
-        "index e2e5cf3..143707d 100644",
-        "--- a/switch-statements.go",
-        "+++ b/switch-statements.go",
-        "@@ -1,6 +1,6 @@",
-        "-switch { case a < b: f1()",
-        "-case c < d: g()",
-        "-case e == 4: f()",
-        "+switch { case x < y: f1()",
-        "+case x < z: g()",
-        "+case x == 4: h()",
-        " }",
-        " switch { case x < y: f1()",
-        " case x < z: g()"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "f989edd6b885f1d71d4c0caa94c2f66647dd74d2..573eec4554298c107f0fec98c9a0a9447e01419b"
+    "shas": "97371be1b990d91b2ec115a8b644e29f3e8b87a5..49aad18e625ab33b2ed01a02b011d4343ba7e395"
 }
 ,{
     "testCaseDescription": "go-switch-statements-replacement-test",
@@ -305,162 +96,162 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     15
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     16
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     15
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     16
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the 'branch' switch statement"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     19
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     20
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     19
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     20
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the 'branch' switch statement"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'c' identifier in the 'branch' switch statement"
+                    "summary": "Replaced the 'x' identifier with the 'c' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     10
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     11
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     10
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'd' identifier in the 'branch' switch statement"
+                    "summary": "Replaced the 'z' identifier with the 'd' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     7
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     6
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     7
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'e' identifier in the 'branch' switch statement"
+                    "summary": "Replaced the 'x' identifier with the 'e' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     14
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     15
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     14
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     15
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'f' identifier in the f() function call"
+                    "summary": "Replaced the 'h' identifier with the 'f' identifier in the f() function call of the 'main' function"
                 }
             ]
         },
@@ -471,10 +262,13 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 143707d..e2e5cf3 100644",
+        "index 5cdd438b..0b838937 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
-        "@@ -1,6 +1,6 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-switch { case x < y: f1()",
         "-case x < z: g()",
         "-case x == 4: h()",
@@ -482,11 +276,10 @@
         "+case c < d: g()",
         "+case e == 4: f()",
         " }",
-        " switch { case x < y: f1()",
-        " case x < z: g()"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "573eec4554298c107f0fec98c9a0a9447e01419b..a5db4da268b58006496efe5e952f07dc3d2320db"
+    "shas": "49aad18e625ab33b2ed01a02b011d4343ba7e395..3353e64f25a4b4a3b27eabe36f289b7ed2eefa85"
 }
 ,{
     "testCaseDescription": "go-switch-statements-delete-replacement-test",
@@ -495,48 +288,165 @@
             "switch-statements.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    15
+                                ],
+                                "end": [
+                                    4,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    15
+                                ],
+                                "end": [
+                                    4,
+                                    16
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'branch' switch statement"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    19
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    19
+                                ],
+                                "end": [
+                                    4,
+                                    20
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'branch' switch statement"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in a switch statement of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    7
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'branch' switch statement"
+                    "summary": "Replaced the 'c' identifier with the 'x' identifier in a switch statement of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "end": [
+                                    5,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'z' identifier in a switch statement of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'x' identifier in a switch statement of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    14
+                                ],
+                                "end": [
+                                    6,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    14
+                                ],
+                                "end": [
+                                    6,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f' identifier with the 'h' identifier in the h() function call of the 'main' function"
                 }
             ]
         },
@@ -547,31 +457,27 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index e2e5cf3..6989d28 100644",
+        "index 0b838937..5cdd438b 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
-        "@@ -1,12 +1,8 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-switch { case a < b: f1()",
         "-case c < d: g()",
         "-case e == 4: f()",
-        "-}",
-        " switch { case x < y: f1()",
-        " case x < z: g()",
-        " case x == 4: h()",
+        "+switch { case x < y: f1()",
+        "+case x < z: g()",
+        "+case x == 4: h()",
         " }",
-        "-switch { case x < y: f1()",
-        "-case x < z: g()",
-        "-case x == 4: h()",
-        "+switch { case a < b: f1()",
-        "+case c < d: g()",
-        "+case e == 4: f()",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5db4da268b58006496efe5e952f07dc3d2320db..fd7487d4446fc6042d809a0cdb59deee1ff4ae04"
+    "shas": "3353e64f25a4b4a3b27eabe36f289b7ed2eefa85..34bc509ec97b06440974346db573df7f8e93e7e0"
 }
 ,{
-    "testCaseDescription": "go-switch-statements-delete-test",
+    "testCaseDescription": "go-switch-statements-delete-insert-test",
     "expectedResult": {
         "changes": {
             "switch-statements.go": [
@@ -579,16 +485,16 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                4,
+                                7,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'branch' switch statement"
+                    "summary": "Deleted a switch statement in the main function of the 'main' module"
                 }
             ]
         },
@@ -599,23 +505,25 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index 6989d28..eff174f 100644",
+        "index 5cdd438b..79058077 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
-        "@@ -1,7 +1,3 @@",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-switch { case x < y: f1()",
         "-case x < z: g()",
         "-case x == 4: h()",
         "-}",
-        " switch { case a < b: f1()",
-        " case c < d: g()",
-        " case e == 4: f()"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fd7487d4446fc6042d809a0cdb59deee1ff4ae04..e98129fc667415197589dc420de58f3b3d2886fc"
+    "shas": "34bc509ec97b06440974346db573df7f8e93e7e0..c292cdb6883c5306c7f7f46268333b01851ecdd8"
 }
 ,{
-    "testCaseDescription": "go-switch-statements-delete-rest-test",
+    "testCaseDescription": "go-switch-statements-teardown-test",
     "expectedResult": {
         "changes": {
             "switch-statements.go": [
@@ -627,12 +535,12 @@
                                 1
                             ],
                             "end": [
-                                4,
-                                2
+                                6,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'branch' switch statement"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -643,15 +551,16 @@
     ],
     "patch": [
         "diff --git a/switch-statements.go b/switch-statements.go",
-        "index eff174f..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/switch-statements.go",
         "+++ b/switch-statements.go",
-        "@@ -1,4 +0,0 @@",
-        "-switch { case a < b: f1()",
-        "-case c < d: g()",
-        "-case e == 4: f()",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e98129fc667415197589dc420de58f3b3d2886fc..d0a9400c6fb3a520721068d06591be6dba11ccee"
+    "shas": "c292cdb6883c5306c7f7f46268333b01851ecdd8..846045886cec5887a42533f48de771ee58d766a0"
 }]

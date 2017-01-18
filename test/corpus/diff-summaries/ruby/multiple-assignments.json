@@ -1,0 +1,383 @@
+[{
+    "testCaseDescription": "ruby-multiple-assignments-insert-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index e69de29..348cf74 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -0,0 +1 @@",
+        "+x, y, z = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "f6e95f576fdbe837a5fa09bd74b0d87bcca7c856..190bd5e0997a27ffbdff88940136908640908c38"
+}
+,{
+    "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 348cf74..242315a 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1 +1,3 @@",
+        "+x, *y = [10, 20, 30]",
+        "+x, y, z = [10, 20, 30]",
+        " x, y, z = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "190bd5e0997a27ffbdff88940136908640908c38..da6c69115623e17dc7c8eb1304e0cc8e4964f069"
+}
+,{
+    "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier in an assignment to identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'z' identifier in an assignment to identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier in an assignment to identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 242315a..274faf2 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x, *y = [10, 20, 30]",
+        "+x, y, z = [10, 20, 30]",
+        " x, y, z = [10, 20, 30]",
+        " x, y, z = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "da6c69115623e17dc7c8eb1304e0cc8e4964f069..b6afa3cdd73a6c210b364f036298e68565586e64"
+}
+,{
+    "testCaseDescription": "ruby-multiple-assignments-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                5
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' identifier in an assignment to identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y' identifier in an assignment to identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z' identifier in an assignment to identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 274faf2..242315a 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,3 +1,3 @@",
+        "-x, y, z = [10, 20, 30]",
+        "+x, *y = [10, 20, 30]",
+        " x, y, z = [10, 20, 30]",
+        " x, y, z = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "b6afa3cdd73a6c210b364f036298e68565586e64..227d94a55c4f5767d2acf64611ec8f7b43b1684b"
+}
+,{
+    "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'identifier' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'identifier' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'identifier' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 242315a..7ba9487 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,3 +1,2 @@",
+        "-x, *y = [10, 20, 30]",
+        "-x, y, z = [10, 20, 30]",
+        " x, y, z = [10, 20, 30]",
+        "+x, *y = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "227d94a55c4f5767d2acf64611ec8f7b43b1684b..653a9966391e154a4118d956be4fbd034c2a6282"
+}
+,{
+    "testCaseDescription": "ruby-multiple-assignments-delete-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'identifier' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 7ba9487..32cf6a2 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1,2 +1 @@",
+        "-x, y, z = [10, 20, 30]",
+        " x, *y = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "653a9966391e154a4118d956be4fbd034c2a6282..1d61feafbd0c4da519a3e742e8a47d99baa7f596"
+}
+,{
+    "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "multiple-assignments.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'identifier' assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "multiple-assignments.rb"
+    ],
+    "patch": [
+        "diff --git a/multiple-assignments.rb b/multiple-assignments.rb",
+        "index 32cf6a2..e69de29 100644",
+        "--- a/multiple-assignments.rb",
+        "+++ b/multiple-assignments.rb",
+        "@@ -1 +0,0 @@",
+        "-x, *y = [10, 20, 30]"
+    ],
+    "gitDir": "test/corpus/repos/ruby",
+    "shas": "1d61feafbd0c4da519a3e742e8a47d99baa7f596..c38d6e0fc468af7f3198dd33bc2163af92c8a859"
+}]

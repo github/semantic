@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-struct-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "struct-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "struct-types.go"
+    ],
+    "patch": [
+        "diff --git a/struct-types.go b/struct-types.go",
+        "index e69de29b..79058077 100644",
+        "--- a/struct-types.go",
+        "+++ b/struct-types.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "ecc6c1cfaa7cfdb57813875656d848f4eb240af1..857275968bd7cbc1fe5e4e289f89f6663267f0e4"
+}
+,{
     "testCaseDescription": "go-struct-types-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,121 +49,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 6
                             ],
                             "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
+                                4,
                                 18
                             ]
                         }
                     },
-                    "summary": "Added the 'struct {}' struct_type"
+                    "summary": "Added the 's1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 6
                             ],
                             "end": [
-                                2,
-                                8
+                                5,
+                                26
                             ]
                         }
                     },
-                    "summary": "Added the 's2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                18
-                            ],
-                            "end": [
-                                2,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
+                    "summary": "Added the 's2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -131,538 +83,27 @@
                                 6
                             ],
                             "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                3
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 8,
                                 2
-                            ],
-                            "end": [
-                                8,
-                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'h' identifier"
+                    "summary": "Added the 's3' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the `json:\"h\"` string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "struct-types.go"
-    ],
-    "patch": [
-        "diff --git a/struct-types.go b/struct-types.go",
-        "index e69de29..d381002 100644",
-        "--- a/struct-types.go",
-        "+++ b/struct-types.go",
-        "@@ -0,0 +1,9 @@",
-        "+type s1 struct {}",
-        "+type s2 struct { Person }",
-        "+type s3 struct {",
-        "+f, g int",
-        "+}",
-        "+type s4 struct {",
-        "+p.s1",
-        "+ h int `json:\"h\"`",
-        "+}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "1e96ae060f06444539a3cfa853d7de2f58dd8eac..74a2d060c9ba39faf6dd4538f7591b936cb8c393"
-}
-,{
-    "testCaseDescription": "go-struct-types-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "struct-types.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'struct {}' struct_type"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                18
-                            ],
-                            "end": [
-                                2,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                3
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the `json:\"h\"` string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                9
-                            ],
-                            "end": [
-                                10,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'struct {}' struct_type"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                6
-                            ],
-                            "end": [
-                                11,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                18
-                            ],
-                            "end": [
-                                11,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
+                                9,
                                 6
                             ],
                             "end": [
                                 12,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                1
-                            ],
-                            "end": [
-                                13,
                                 2
                             ]
                         }
                     },
-                    "summary": "Added the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                4
-                            ],
-                            "end": [
-                                13,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                6
-                            ],
-                            "end": [
-                                13,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                6
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                3
-                            ],
-                            "end": [
-                                16,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                2
-                            ],
-                            "end": [
-                                17,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                4
-                            ],
-                            "end": [
-                                17,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                8
-                            ],
-                            "end": [
-                                17,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the `json:\"h\"` string"
+                    "summary": "Added the 's4' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -673,19 +114,14 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index d381002..e1f6f1a 100644",
+        "index 79058077..13c82f80 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
-        "@@ -1,3 +1,21 @@",
-        "+type t1 struct {}",
-        "+type t2 struct { Person }",
-        "+type t3 struct {",
-        "+f, g int",
-        "+}",
-        "+type t4 struct {",
-        "+p.s1",
-        "+ h int `json:\"h\"`",
-        "+}",
+        "@@ -1,5 +1,13 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+type s1 struct {}",
         "+type s2 struct { Person }",
         "+type s3 struct {",
@@ -695,155 +131,10 @@
         "+p.s1",
         "+ h int `json:\"h\"`",
         "+}",
-        " type s1 struct {}",
-        " type s2 struct { Person }",
-        " type s3 struct {"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "74a2d060c9ba39faf6dd4538f7591b936cb8c393..acb45029e3efcc743c53e0dee137c1475705dd6c"
-}
-,{
-    "testCaseDescription": "go-struct-types-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "struct-types.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 't1' identifier with the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 't2' identifier with the 's2' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 't3' identifier with the 's3' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    6
-                                ],
-                                "end": [
-                                    6,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    6
-                                ],
-                                "end": [
-                                    6,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 't4' identifier with the 's4' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "struct-types.go"
-    ],
-    "patch": [
-        "diff --git a/struct-types.go b/struct-types.go",
-        "index e1f6f1a..b7798e0 100644",
-        "--- a/struct-types.go",
-        "+++ b/struct-types.go",
-        "@@ -1,9 +1,9 @@",
-        "-type t1 struct {}",
-        "-type t2 struct { Person }",
-        "-type t3 struct {",
-        "+type s1 struct {}",
-        "+type s2 struct { Person }",
-        "+type s3 struct {",
-        " f, g int",
-        " }",
-        "-type t4 struct {",
-        "+type s4 struct {",
-        " p.s1",
-        "  h int `json:\"h\"`",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "acb45029e3efcc743c53e0dee137c1475705dd6c..4200b112a93cbc10c7d98a81f668e5fb8a656e38"
+    "shas": "857275968bd7cbc1fe5e4e289f89f6663267f0e4..20cee4164a3674eca7823cdda7b7f1cc47507e97"
 }
 ,{
     "testCaseDescription": "go-struct-types-replacement-test",
@@ -855,81 +146,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     6
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     6
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 's1' identifier with the 't1' identifier"
+                    "summary": "Replaced the 's1' identifier with the 't1' identifier in the 't1' type declaration of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     6
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 's2' identifier with the 't2' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 's3' identifier with the 't3' identifier"
+                    "summary": "Replaced the 's2' identifier with the 't2' identifier in the 't2' type declaration of the 'main' function"
                 },
                 {
                     "span": {
@@ -956,7 +220,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 's4' identifier with the 't4' identifier"
+                    "summary": "Replaced the 's3' identifier with the 't3' identifier in the 't3' type declaration of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    9,
+                                    6
+                                ],
+                                "end": [
+                                    9,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    6
+                                ],
+                                "end": [
+                                    9,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 's4' identifier with the 't4' identifier in the 't4' type declaration of the 'main' function"
                 }
             ]
         },
@@ -967,10 +258,13 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index b7798e0..e1f6f1a 100644",
+        "index 13c82f80..d73e92a6 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
-        "@@ -1,9 +1,9 @@",
+        "@@ -1,12 +1,12 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type s1 struct {}",
         "-type s2 struct { Person }",
         "-type s3 struct {",
@@ -986,7 +280,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4200b112a93cbc10c7d98a81f668e5fb8a656e38..14dcaa0989582512912726bf4b5b858030a66579"
+    "shas": "20cee4164a3674eca7823cdda7b7f1cc47507e97..4f5bba08d7d526cc668661f48c8394d668da0b15"
 }
 ,{
     "testCaseDescription": "go-struct-types-delete-replacement-test",
@@ -995,633 +289,111 @@
             "struct-types.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 't1' identifier"
+                    "summary": "Replaced the 't1' identifier with the 's1' identifier in the 's1' type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
-                                18
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'struct {}' struct_type"
+                    "summary": "Replaced the 't2' identifier with the 's2' identifier in the 's2' type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 't2' identifier"
+                    "summary": "Replaced the 't3' identifier with the 's3' identifier in the 's3' type declaration of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                18
-                            ],
-                            "end": [
-                                2,
-                                24
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    9,
+                                    6
+                                ],
+                                "end": [
+                                    9,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    9,
+                                    6
+                                ],
+                                "end": [
+                                    9,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 't3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 't4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                3
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the `json:\"h\"` string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                9
-                            ],
-                            "end": [
-                                10,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'struct {}' struct_type"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                6
-                            ],
-                            "end": [
-                                11,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                18
-                            ],
-                            "end": [
-                                11,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                6
-                            ],
-                            "end": [
-                                12,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                1
-                            ],
-                            "end": [
-                                13,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                4
-                            ],
-                            "end": [
-                                13,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                13,
-                                6
-                            ],
-                            "end": [
-                                13,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                15,
-                                6
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                16,
-                                3
-                            ],
-                            "end": [
-                                16,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                2
-                            ],
-                            "end": [
-                                17,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                4
-                            ],
-                            "end": [
-                                17,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                17,
-                                8
-                            ],
-                            "end": [
-                                17,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the `json:\"h\"` string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                6
-                            ],
-                            "end": [
-                                10,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                9
-                            ],
-                            "end": [
-                                10,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'struct {}' struct_type"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                6
-                            ],
-                            "end": [
-                                11,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't2' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                18
-                            ],
-                            "end": [
-                                11,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                6
-                            ],
-                            "end": [
-                                12,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't3' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                1
-                            ],
-                            "end": [
-                                13,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                4
-                            ],
-                            "end": [
-                                13,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                13,
-                                6
-                            ],
-                            "end": [
-                                13,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                15,
-                                6
-                            ],
-                            "end": [
-                                15,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 't4' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                1
-                            ],
-                            "end": [
-                                16,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                16,
-                                3
-                            ],
-                            "end": [
-                                16,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                2
-                            ],
-                            "end": [
-                                17,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                4
-                            ],
-                            "end": [
-                                17,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                17,
-                                8
-                            ],
-                            "end": [
-                                17,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the `json:\"h\"` string"
+                    "summary": "Replaced the 't4' identifier with the 's4' identifier in the 's4' type declaration of the 'main' function"
                 }
             ]
         },
@@ -1632,45 +404,32 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index e1f6f1a..c0626ed 100644",
+        "index d73e92a6..13c82f80 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
-        "@@ -1,12 +1,3 @@",
+        "@@ -1,12 +1,12 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type t1 struct {}",
         "-type t2 struct { Person }",
         "-type t3 struct {",
-        "-f, g int",
-        "-}",
-        "-type t4 struct {",
-        "-p.s1",
-        "- h int `json:\"h\"`",
-        "-}",
-        " type s1 struct {}",
-        " type s2 struct { Person }",
-        " type s3 struct {",
-        "@@ -16,12 +7,12 @@ type s4 struct {",
-        " p.s1",
-        "  h int `json:\"h\"`",
-        " }",
-        "-type s1 struct {}",
-        "-type s2 struct { Person }",
-        "-type s3 struct {",
-        "+type t1 struct {}",
-        "+type t2 struct { Person }",
-        "+type t3 struct {",
+        "+type s1 struct {}",
+        "+type s2 struct { Person }",
+        "+type s3 struct {",
         " f, g int",
         " }",
-        "-type s4 struct {",
-        "+type t4 struct {",
+        "-type t4 struct {",
+        "+type s4 struct {",
         " p.s1",
         "  h int `json:\"h\"`",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "14dcaa0989582512912726bf4b5b858030a66579..27f71766ea6628684fda2682e6ccb923fb658ac8"
+    "shas": "4f5bba08d7d526cc668661f48c8394d668da0b15..accfa3bdac2a03b86dd69edb6f2eae0ad0ac01ee"
 }
 ,{
-    "testCaseDescription": "go-struct-types-delete-test",
+    "testCaseDescription": "go-struct-types-delete-insert-test",
     "expectedResult": {
         "changes": {
             "struct-types.go": [
@@ -1678,121 +437,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 6
                             ],
                             "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
+                                4,
                                 18
                             ]
                         }
                     },
-                    "summary": "Deleted the 'struct {}' struct_type"
+                    "summary": "Deleted the 's1' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 6
                             ],
                             "end": [
-                                2,
-                                8
+                                5,
+                                26
                             ]
                         }
                     },
-                    "summary": "Deleted the 's2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                18
-                            ],
-                            "end": [
-                                2,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
+                    "summary": "Deleted the 's2' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -1802,87 +471,27 @@
                                 6
                             ],
                             "end": [
-                                6,
-                                8
+                                8,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 's4' identifier"
+                    "summary": "Deleted the 's3' type declaration in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                7,
-                                1
+                                9,
+                                6
                             ],
                             "end": [
-                                7,
+                                12,
                                 2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                3
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the `json:\"h\"` string"
+                    "summary": "Deleted the 's4' type declaration in the main function of the 'main' module"
                 }
             ]
         },
@@ -1893,10 +502,13 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index c0626ed..f5a8d63 100644",
+        "index 13c82f80..79058077 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
-        "@@ -1,12 +1,3 @@",
+        "@@ -1,13 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-type s1 struct {}",
         "-type s2 struct { Person }",
         "-type s3 struct {",
@@ -1906,15 +518,14 @@
         "-p.s1",
         "- h int `json:\"h\"`",
         "-}",
-        " type t1 struct {}",
-        " type t2 struct { Person }",
-        " type t3 struct {"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "27f71766ea6628684fda2682e6ccb923fb658ac8..ef94dad925561ab0c9f3f2c196d352f328dc676b"
+    "shas": "accfa3bdac2a03b86dd69edb6f2eae0ad0ac01ee..729aa3b076058bccf9ae611776a8a83f5f0c268f"
 }
 ,{
-    "testCaseDescription": "go-struct-types-delete-rest-test",
+    "testCaseDescription": "go-struct-types-teardown-test",
     "expectedResult": {
         "changes": {
             "struct-types.go": [
@@ -1923,210 +534,15 @@
                         "delete": {
                             "start": [
                                 1,
-                                6
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 't1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                9
-                            ],
-                            "end": [
-                                1,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'struct {}' struct_type"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                6
-                            ],
-                            "end": [
-                                2,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 't2' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                18
-                            ],
-                            "end": [
-                                2,
-                                24
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Person' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                6
-                            ],
-                            "end": [
-                                3,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 't3' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                6
-                            ],
-                            "end": [
-                                4,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 6,
-                                6
-                            ],
-                            "end": [
-                                6,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 't4' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
                                 1
-                            ],
-                            "end": [
-                                7,
-                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'p' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                3
-                            ],
-                            "end": [
-                                7,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 's1' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                2
-                            ],
-                            "end": [
-                                8,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'h' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                4
-                            ],
-                            "end": [
-                                8,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'int' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                8
-                            ],
-                            "end": [
-                                8,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the `json:\"h\"` string"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -2137,20 +553,16 @@
     ],
     "patch": [
         "diff --git a/struct-types.go b/struct-types.go",
-        "index f5a8d63..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/struct-types.go",
         "+++ b/struct-types.go",
-        "@@ -1,9 +0,0 @@",
-        "-type t1 struct {}",
-        "-type t2 struct { Person }",
-        "-type t3 struct {",
-        "-f, g int",
-        "-}",
-        "-type t4 struct {",
-        "-p.s1",
-        "- h int `json:\"h\"`",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ef94dad925561ab0c9f3f2c196d352f328dc676b..4ed9c87ba35fbd154bf71185fe9b0e57561d0a53"
+    "shas": "729aa3b076058bccf9ae611776a8a83f5f0c268f..8b9132202584b9cb77727d35fc5933c26eca6b3c"
 }]

@@ -39,16 +39,18 @@ data Syntax a f
   -- | An operator can be applied to a list of syntaxes.
   | Operator [f]
   -- | A variable declaration. e.g. var foo;
-  | VarDecl f
+  | VarDecl f (Maybe f)
   -- | A variable assignment in a variable declaration. var foo = bar;
   | VarAssignment { varId :: f, varValue :: f }
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
-  | Switch { switchExpr :: f, cases :: [f] }
+  | Switch { switchExpr :: (Maybe f), cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
+  -- | A default case in a switch statement.
+  | DefaultCase [f]
   | Select { cases :: [f] }
-  | Object { keyValues :: [f] }
+  | Object { objectTy :: Maybe f, keyValues :: [f] }
   -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
   -- | A comment.
@@ -66,11 +68,11 @@ data Syntax a f
   -- | TODO: Is it a problem that in Ruby, this pattern can work for method def too?
   | Try { tryBegin :: [f], catchRescue :: [f], beginElse :: Maybe f, finallyEnsure :: Maybe f }
   -- | An array literal with list of children.
-  | Array [f]
+  | Array (Maybe f) [f]
   -- | A class with an identifier, superclass, and a list of definitions.
   | Class f (Maybe f) [f]
-  -- | A method definition with an identifier, params, and a list of expressions.
-  | Method f [f] [f]
+  -- | A method definition with an identifier, optional return type, params, and a list of expressions.
+  | Method f (Maybe f) [f] [f]
   -- | An if statement with an expression and maybe more expression clauses.
   | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
@@ -86,10 +88,22 @@ data Syntax a f
   | Defer f
   | TypeAssertion f f
   | TypeConversion f f
-  | Break f
-  | Continue f
+  -- | A struct with an optional type.
+  | Struct (Maybe f) [f]
+  | Break (Maybe f)
+  | Continue (Maybe f)
   -- | A block statement has an ordered branch of child nodes, e.g. BEGIN {...} or END {...} in Ruby/Perl.
   | BlockStatement [f]
+  -- | A parameter declaration with an optional type.
+  | ParameterDecl (Maybe f) f
+  -- | A type declaration has an identifier and a type.
+  | TypeDecl f f
+  -- | A field declaration with an optional type, and an optional tag.
+  | FieldDecl f (Maybe f) (Maybe f)
+  -- | A type.
+  | Ty f
+  -- | A send statement has a channel and an expression in Go.
+  | Send f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
 
 
@@ -109,13 +123,13 @@ instance Listable2 Syntax where
     \/ liftCons2 recur recur MemberAccess
     \/ liftCons3 recur recur (liftTiers recur) MethodCall
     \/ liftCons1 (liftTiers recur) Operator
-    \/ liftCons1 recur VarDecl
+    \/ liftCons2 recur (liftTiers recur) VarDecl
     \/ liftCons2 recur recur VarAssignment
     \/ liftCons2 recur recur SubscriptAccess
-    \/ liftCons2 recur (liftTiers recur) Switch
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
     \/ liftCons2 recur (liftTiers recur) Case
     \/ liftCons1 (liftTiers recur) Select
-    \/ liftCons1 (liftTiers recur) Syntax.Object
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
     \/ liftCons2 recur recur Pair
     \/ liftCons1 leaf Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
@@ -127,9 +141,9 @@ instance Listable2 Syntax where
     \/ liftCons1 recur Throw
     \/ liftCons1 recur Constructor
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
-    \/ liftCons1 (liftTiers recur) Syntax.Array
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Method
+    \/ liftCons4 recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
     \/ liftCons2 recur (liftTiers recur) Module
     \/ liftCons2 recur (liftTiers recur) Import
@@ -141,9 +155,15 @@ instance Listable2 Syntax where
     \/ liftCons1 recur Defer
     \/ liftCons2 recur recur TypeAssertion
     \/ liftCons2 recur recur TypeConversion
-    \/ liftCons1 recur Break
-    \/ liftCons1 recur Continue
+    \/ liftCons1 (liftTiers recur) Break
+    \/ liftCons1 (liftTiers recur) Continue
     \/ liftCons1 (liftTiers recur) BlockStatement
+    \/ liftCons2 (liftTiers recur) recur ParameterDecl
+    \/ liftCons2 recur recur TypeDecl
+    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
+    \/ liftCons1 recur Ty
+    \/ liftCons2 recur recur Send
+    \/ liftCons1 (liftTiers recur) DefaultCase
 
 instance Listable leaf => Listable1 (Syntax leaf) where
   liftTiers = liftTiers2 tiers

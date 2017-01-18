@@ -1,0 +1,393 @@
+[{
+    "testCaseDescription": "go-parameter-declarations-with-types-setup-test",
+    "expectedResult": {
+        "changes": {
+            "parameter-declarations-with-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "parameter-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
+        "index e69de29b..a92cefed 100644",
+        "--- a/parameter-declarations-with-types.go",
+        "+++ b/parameter-declarations-with-types.go",
+        "@@ -0,0 +1,6 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+}",
+        "+",
+        "+"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "df3298de1cff4cc80875946fc6abeec7bf257f39..932c7e3ec9b93568845977a43626bb4a0fd3b90d"
+}
+,{
+    "testCaseDescription": "go-parameter-declarations-with-types-insert-test",
+    "expectedResult": {
+        "changes": {
+            "parameter-declarations-with-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' function in the main module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "parameter-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
+        "index a92cefed..ed6bff2d 100644",
+        "--- a/parameter-declarations-with-types.go",
+        "+++ b/parameter-declarations-with-types.go",
+        "@@ -3,4 +3,5 @@ package main",
+        " func main() {",
+        " }",
+        " ",
+        "-",
+        "+func foo(a int, b string) {",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "932c7e3ec9b93568845977a43626bb4a0fd3b90d..a1a774045a4b7922d5e0e70622f298763f8fe5d7"
+}
+,{
+    "testCaseDescription": "go-parameter-declarations-with-types-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "parameter-declarations-with-types.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    12
+                                ],
+                                "end": [
+                                    6,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    12
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    10
+                                ],
+                                "end": [
+                                    6,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    10
+                                ],
+                                "end": [
+                                    6,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    19
+                                ],
+                                "end": [
+                                    6,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    22
+                                ],
+                                "end": [
+                                    6,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'string' identifier with the 'uint64' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    17
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    20
+                                ],
+                                "end": [
+                                    6,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the foo function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "parameter-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
+        "index ed6bff2d..fcb6a303 100644",
+        "--- a/parameter-declarations-with-types.go",
+        "+++ b/parameter-declarations-with-types.go",
+        "@@ -3,5 +3,5 @@ package main",
+        " func main() {",
+        " }",
+        " ",
+        "-func foo(a int, b string) {",
+        "+func foo(x string, y uint64) {",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a1a774045a4b7922d5e0e70622f298763f8fe5d7..54ff8e688514bd1a0ee7e588fffff1be0ce47645"
+}
+,{
+    "testCaseDescription": "go-parameter-declarations-with-types-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "parameter-declarations-with-types.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                10
+                            ],
+                            "end": [
+                                6,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a int' parameter declaration in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    10
+                                ],
+                                "end": [
+                                    6,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    17
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the foo function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                20
+                            ],
+                            "end": [
+                                6,
+                                28
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y uint64' parameter declaration in the foo function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "parameter-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
+        "index fcb6a303..ed6bff2d 100644",
+        "--- a/parameter-declarations-with-types.go",
+        "+++ b/parameter-declarations-with-types.go",
+        "@@ -3,5 +3,5 @@ package main",
+        " func main() {",
+        " }",
+        " ",
+        "-func foo(x string, y uint64) {",
+        "+func foo(a int, b string) {",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "54ff8e688514bd1a0ee7e588fffff1be0ce47645..ca8a328836cd4073670d5fbb553d60a2d5da5149"
+}
+,{
+    "testCaseDescription": "go-parameter-declarations-with-types-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "parameter-declarations-with-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' function in the main module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "parameter-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
+        "index ed6bff2d..a92cefed 100644",
+        "--- a/parameter-declarations-with-types.go",
+        "+++ b/parameter-declarations-with-types.go",
+        "@@ -3,5 +3,4 @@ package main",
+        " func main() {",
+        " }",
+        " ",
+        "-func foo(a int, b string) {",
+        "-}",
+        "+"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "ca8a328836cd4073670d5fbb553d60a2d5da5149..17afa32d5d35d9b2169715bf8e3cf7b6c8dbfd74"
+}
+,{
+    "testCaseDescription": "go-parameter-declarations-with-types-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "parameter-declarations-with-types.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "parameter-declarations-with-types.go"
+    ],
+    "patch": [
+        "diff --git a/parameter-declarations-with-types.go b/parameter-declarations-with-types.go",
+        "index a92cefed..e69de29b 100644",
+        "--- a/parameter-declarations-with-types.go",
+        "+++ b/parameter-declarations-with-types.go",
+        "@@ -1,6 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-}",
+        "-",
+        "-"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "17afa32d5d35d9b2169715bf8e3cf7b6c8dbfd74..ef1ac04aeb5238b9f803a01487634a5dbb904dd2"
+}]

@@ -1,247 +1,386 @@
 [{
+    "testCaseDescription": "go-function-declarations-setup-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/function-declarations.go b/function-declarations.go",
+        "index e69de29b..79058077 100644",
+        "--- a/function-declarations.go",
+        "+++ b/function-declarations.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "6cbe8d53838858e6ff83e2890cd6d51da63e06dd..c9165a22e802c84a4c84603433208209bf8ecd58"
+}
+,{
     "testCaseDescription": "go-function-declarations-insert-test",
     "expectedResult": {
         "changes": {
             "function-declarations.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    6,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    8,
+                                    1
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f1' function"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
-        "errors": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func f2(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func f2() (int, error) {}' at line 3, column 1 - line 3, column 26"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func f2() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "function-declarations.go"
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index e69de29..21da2ea 100644",
+        "index 79058077..2a1e7b86 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
-        "@@ -0,0 +1,4 @@",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+func f1() {}",
         "+func f2(a int, b, c, d string) int {}",
         "+func f2() (int, error) {}",
-        "+func f2() (result int, err error) {}"
+        "+func f2() (result int, err error) {}",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1cfc4770f33afe51641b5c1ed9683984d1ac4ae5..b8ea4fd0800ac92d14585218798b6958a31c0fc7"
+    "shas": "c9165a22e802c84a4c84603433208209bf8ecd58..14ddaf5c44b68da54ac1e6080f651683b00abd0d"
 }
 ,{
-    "testCaseDescription": "go-function-declarations-replacement-insert-test",
+    "testCaseDescription": "go-function-declarations-replacement-test",
     "expectedResult": {
         "changes": {
             "function-declarations.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'fa' function"
+                    "summary": "Replaced the 'f1' identifier with the 'fa' identifier in the fa() function call of the 'main' function"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'f1' function"
+                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier in the main module"
                 }
             ]
         },
-        "errors": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func fb(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func fc() (int, error) {}' at line 3, column 1 - line 3, column 26"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func fd() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func f2(a int, b, c, d string) int {}' at line 6, column 1 - line 6, column 38"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func f2() (int, error) {}' at line 7, column 1 - line 7, column 26"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func f2() (result int, err error) {}' at line 8, column 1 - line 8, column 37"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "function-declarations.go"
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 21da2ea..768679a 100644",
+        "index 2a1e7b86..10d0b496 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
-        "@@ -1,3 +1,11 @@",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-func f1() {}",
+        "-func f2(a int, b, c, d string) int {}",
+        "-func f2() (int, error) {}",
+        "-func f2() (result int, err error) {}",
         "+func fa() {}",
         "+func fb(a int, b, c, d string) int {}",
         "+func fc() (int, error) {}",
         "+func fd() (result int, err error) {}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "14ddaf5c44b68da54ac1e6080f651683b00abd0d..da31b44611dfde41b3500e215d049e0ae08decd1"
+}
+,{
+    "testCaseDescription": "go-function-declarations-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-declarations.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    6
+                                ],
+                                "end": [
+                                    4,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fa' identifier with the 'f1' identifier in the f1() function call of the 'main' function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    6
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    6
+                                ],
+                                "end": [
+                                    6,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    6
+                                ],
+                                "end": [
+                                    7,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier in the main module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-declarations.go"
+    ],
+    "patch": [
+        "diff --git a/function-declarations.go b/function-declarations.go",
+        "index 10d0b496..2a1e7b86 100644",
+        "--- a/function-declarations.go",
+        "+++ b/function-declarations.go",
+        "@@ -1,8 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-func fa() {}",
+        "-func fb(a int, b, c, d string) int {}",
+        "-func fc() (int, error) {}",
+        "-func fd() (result int, err error) {}",
         "+func f1() {}",
         "+func f2(a int, b, c, d string) int {}",
         "+func f2() (int, error) {}",
         "+func f2() (result int, err error) {}",
-        " func f1() {}",
-        " func f2(a int, b, c, d string) int {}",
-        " func f2() (int, error) {}"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b8ea4fd0800ac92d14585218798b6958a31c0fc7..fcf6ccf0f476627c8abc746a558adb081ed9d7fa"
+    "shas": "da31b44611dfde41b3500e215d049e0ae08decd1..cd07dffb2fde011ff7d80b7e9fe6319aadafcba7"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -254,107 +393,26 @@
                             {
                                 "start": [
                                     1,
-                                    6
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    8
+                                    8,
+                                    1
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    6
+                                    1
                                 ],
                                 "end": [
-                                    1,
-                                    8
+                                    6,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fa' identifier with the 'f1' identifier in the f1 function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier"
+                    "summary": "Replaced the 'main' module with the 'main' module"
                 }
             ]
         },
@@ -365,137 +423,42 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 768679a..da899b5 100644",
+        "index 2a1e7b86..79058077 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
-        "@@ -1,7 +1,7 @@",
-        "-func fa() {}",
-        "-func fb(a int, b, c, d string) int {}",
-        "-func fc() (int, error) {}",
-        "-func fd() (result int, err error) {}",
-        "+func f1() {}",
-        "+func f2(a int, b, c, d string) int {}",
-        "+func f2() (int, error) {}",
-        "+func f2() (result int, err error) {}",
-        " func f1() {}",
-        " func f2(a int, b, c, d string) int {}",
-        " func f2() (int, error) {}"
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-func f1() {}",
+        "-func f2(a int, b, c, d string) int {}",
+        "-func f2() (int, error) {}",
+        "-func f2() (result int, err error) {}",
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fcf6ccf0f476627c8abc746a558adb081ed9d7fa..94fb4817ecc9299b9e1dd90ac05f48c53f5f984a"
+    "shas": "cd07dffb2fde011ff7d80b7e9fe6319aadafcba7..15310f0e4a692c1ebd2a48e7512e71ae63cbd02f"
 }
 ,{
-    "testCaseDescription": "go-function-declarations-replacement-test",
+    "testCaseDescription": "go-function-declarations-teardown-test",
     "expectedResult": {
         "changes": {
             "function-declarations.go": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'fa' identifier in the fa function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    6
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    6
-                                ],
-                                "end": [
-                                    3,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    6
-                                ],
-                                "end": [
-                                    4,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -506,424 +469,16 @@
     ],
     "patch": [
         "diff --git a/function-declarations.go b/function-declarations.go",
-        "index da899b5..768679a 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/function-declarations.go",
         "+++ b/function-declarations.go",
-        "@@ -1,7 +1,7 @@",
-        "-func f1() {}",
-        "-func f2(a int, b, c, d string) int {}",
-        "-func f2() (int, error) {}",
-        "-func f2() (result int, err error) {}",
-        "+func fa() {}",
-        "+func fb(a int, b, c, d string) int {}",
-        "+func fc() (int, error) {}",
-        "+func fd() (result int, err error) {}",
-        " func f1() {}",
-        " func f2(a int, b, c, d string) int {}",
-        " func f2() (int, error) {}"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "94fb4817ecc9299b9e1dd90ac05f48c53f5f984a..b60b66e9fa94b50e4756d060078a0804547be3d9"
-}
-,{
-    "testCaseDescription": "go-function-declarations-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fa' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1' function"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'fa' function"
-                }
-            ]
-        },
-        "errors": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func fb(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func fc() (int, error) {}' at line 3, column 1 - line 3, column 26"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func fd() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func f2(a int, b, c, d string) int {}' at line 6, column 1 - line 6, column 38"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func f2() (int, error) {}' at line 7, column 1 - line 7, column 26"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func f2() (result int, err error) {}' at line 8, column 1 - line 8, column 37"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func fb(a int, b, c, d string) int {}' at line 6, column 1 - line 6, column 38"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func fc() (int, error) {}' at line 7, column 1 - line 7, column 26"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'func fd() (result int, err error) {}' at line 8, column 1 - line 8, column 37"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "function-declarations.go"
-    ],
-    "patch": [
-        "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 768679a..306f918 100644",
-        "--- a/function-declarations.go",
-        "+++ b/function-declarations.go",
-        "@@ -1,12 +1,8 @@",
-        "-func fa() {}",
-        "-func fb(a int, b, c, d string) int {}",
-        "-func fc() (int, error) {}",
-        "-func fd() (result int, err error) {}",
-        "-func f1() {}",
-        "-func f2(a int, b, c, d string) int {}",
-        "-func f2() (int, error) {}",
-        "-func f2() (result int, err error) {}",
-        " func f1() {}",
-        " func f2(a int, b, c, d string) int {}",
-        " func f2() (int, error) {}",
-        " func f2() (result int, err error) {}",
-        "+func fa() {}",
-        "+func fb(a int, b, c, d string) int {}",
-        "+func fc() (int, error) {}",
-        "+func fd() (result int, err error) {}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "b60b66e9fa94b50e4756d060078a0804547be3d9..9677cee90e50ac019d16f74a7499da0d81896c91"
-}
-,{
-    "testCaseDescription": "go-function-declarations-delete-test",
-    "expectedResult": {
-        "changes": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f1' function"
-                }
-            ]
-        },
-        "errors": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func f2(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func f2() (int, error) {}' at line 3, column 1 - line 3, column 26"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func f2() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "function-declarations.go"
-    ],
-    "patch": [
-        "diff --git a/function-declarations.go b/function-declarations.go",
-        "index 306f918..cc84bb3 100644",
-        "--- a/function-declarations.go",
-        "+++ b/function-declarations.go",
-        "@@ -1,7 +1,3 @@",
-        "-func f1() {}",
-        "-func f2(a int, b, c, d string) int {}",
-        "-func f2() (int, error) {}",
-        "-func f2() (result int, err error) {}",
-        " func fa() {}",
-        " func fb(a int, b, c, d string) int {}",
-        " func fc() (int, error) {}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "9677cee90e50ac019d16f74a7499da0d81896c91..3847a6a7099687b768bdfc04aad517f2df75bf47"
-}
-,{
-    "testCaseDescription": "go-function-declarations-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'fa' function"
-                }
-            ]
-        },
-        "errors": {
-            "function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func fb(a int, b, c, d string) int {}' at line 2, column 1 - line 2, column 38"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                26
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func fc() (int, error) {}' at line 3, column 1 - line 3, column 26"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'func fd() (result int, err error) {}' at line 4, column 1 - line 4, column 37"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "function-declarations.go"
-    ],
-    "patch": [
-        "diff --git a/function-declarations.go b/function-declarations.go",
-        "index cc84bb3..e69de29 100644",
-        "--- a/function-declarations.go",
-        "+++ b/function-declarations.go",
-        "@@ -1,4 +0,0 @@",
-        "-func fa() {}",
-        "-func fb(a int, b, c, d string) int {}",
-        "-func fc() (int, error) {}",
-        "-func fd() (result int, err error) {}"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "3847a6a7099687b768bdfc04aad517f2df75bf47..03191e600093d2810fbd1457b8ce453f3a9696bf"
+    "shas": "15310f0e4a692c1ebd2a48e7512e71ae63cbd02f..15dbaf1c2f3cba362af5abba2a6aa9d2f1a92990"
 }]

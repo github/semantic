@@ -5,11 +5,10 @@ module Prologue
 , (***)
 , hylo, cata, para, ana
 , module Data.Hashable
-, last
 ) where
 
 import Protolude as X
-import Data.List (lookup, last)
+import Data.List (lookup)
 
 import Control.Comonad.Trans.Cofree as X
 import Control.Monad.Trans.Free as X

@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-label-statements-setup-test",
+    "testCaseDescription": "go-struct-field-declarations-setup-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "struct-field-declarations.go": [
                 {
                     "span": {
                         "insert": {
@@ -23,28 +23,28 @@
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "struct-field-declarations.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index e69de29b..79058077 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index e69de29b..60d13f45 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
         "@@ -0,0 +1,5 @@",
         "+package main",
         "+",
         "+func main() {",
-        "+",
+        "+ type s3 struct {} ",
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f9136e3be46a93bc0e0b6dc467c7b9ced1b97894..d7212f336c9c60b14c59e8e94e1ecd4aede3cc09"
+    "shas": "5deef7045822271505960ed4cec253dedf122c38..62f0f3e2454b8e3a44f76f779c28deb62c42fd62"
 }
 ,{
-    "testCaseDescription": "go-label-statements-insert-test",
+    "testCaseDescription": "go-struct-field-declarations-insert-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "struct-field-declarations.go": [
                 {
                     "span": {
                         "insert": {
@@ -54,42 +54,42 @@
                             ],
                             "end": [
                                 5,
-                                15
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'g int' field declaration in the struct {\n  g int\n} struct type of the 'main' function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "struct-field-declarations.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index 79058077..b0a29697 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index 60d13f45..bc84b146 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
         "@@ -1,5 +1,7 @@",
         " package main",
         " ",
         " func main() {",
-        "-",
-        "+{",
-        "+  insert_label:",
-        "+}",
+        "- type s3 struct {} ",
+        "+ type s3 struct {",
+        "+  g int",
+        "+} ",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d7212f336c9c60b14c59e8e94e1ecd4aede3cc09..0f74fcb7d75eeebfc2e1a28388fa94535683467b"
+    "shas": "62f0f3e2454b8e3a44f76f779c28deb62c42fd62..03c576b5debd2c48337432cb2de75b1188457088"
 }
 ,{
-    "testCaseDescription": "go-label-statements-replacement-test",
+    "testCaseDescription": "go-struct-field-declarations-replacement-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "struct-field-declarations.go": [
                 {
                     "span": {
                         "replace": [
@@ -100,7 +100,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    15
+                                    8
                                 ]
                             },
                             {
@@ -110,42 +110,42 @@
                                 ],
                                 "end": [
                                     5,
-                                    20
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'insert_label' identifier with the 'replacement_label' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'g int' field declaration with the 'h, i int' field declaration in the struct {\n  h, i int\n} struct type of the 'main' function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "struct-field-declarations.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index b0a29697..3d3cf164 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index bc84b146..f3ca9a51 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
         "@@ -2,6 +2,6 @@ package main",
         " ",
         " func main() {",
-        " {",
-        "-  insert_label:",
-        "+  replacement_label:",
-        " }",
+        "  type s3 struct {",
+        "-  g int",
+        "+  h, i int",
+        " } ",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f74fcb7d75eeebfc2e1a28388fa94535683467b..a34375d5b52b45a8d48f0540b89d62710a4c6be1"
+    "shas": "03c576b5debd2c48337432cb2de75b1188457088..b565b45f613603ee651612ec4f5015000d30e207"
 }
 ,{
-    "testCaseDescription": "go-label-statements-delete-replacement-test",
+    "testCaseDescription": "go-struct-field-declarations-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "struct-field-declarations.go": [
                 {
                     "span": {
                         "replace": [
@@ -156,7 +156,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    20
+                                    11
                                 ]
                             },
                             {
@@ -166,42 +166,42 @@
                                 ],
                                 "end": [
                                     5,
-                                    15
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'replacement_label' identifier with the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'h, i int' field declaration with the 'g int' field declaration in the struct {\n  g int\n} struct type of the 'main' function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "struct-field-declarations.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index 3d3cf164..b0a29697 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index f3ca9a51..bc84b146 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
         "@@ -2,6 +2,6 @@ package main",
         " ",
         " func main() {",
-        " {",
-        "-  replacement_label:",
-        "+  insert_label:",
-        " }",
+        "  type s3 struct {",
+        "-  h, i int",
+        "+  g int",
+        " } ",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a34375d5b52b45a8d48f0540b89d62710a4c6be1..60dc5a9a3a91da069f329c5ae369d80c47e9cc42"
+    "shas": "b565b45f613603ee651612ec4f5015000d30e207..2276d09f9b7b1fa0729ea0fddcdfebff360c8f5d"
 }
 ,{
-    "testCaseDescription": "go-label-statements-delete-insert-test",
+    "testCaseDescription": "go-struct-field-declarations-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "struct-field-declarations.go": [
                 {
                     "span": {
                         "delete": {
@@ -211,42 +211,42 @@
                             ],
                             "end": [
                                 5,
-                                15
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'g int' field declaration in the struct {} struct type of the 'main' function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "struct-field-declarations.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index b0a29697..79058077 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index bc84b146..60d13f45 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
         "@@ -1,7 +1,5 @@",
         " package main",
         " ",
         " func main() {",
-        "-{",
-        "-  insert_label:",
-        "-}",
-        "+",
+        "- type s3 struct {",
+        "-  g int",
+        "-} ",
+        "+ type s3 struct {} ",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "60dc5a9a3a91da069f329c5ae369d80c47e9cc42..5a07dfd5ebb6f9aac2fc62a67df29e9f002ae2fb"
+    "shas": "2276d09f9b7b1fa0729ea0fddcdfebff360c8f5d..0e91f39b4267ac56153c02a6ce70ca1bd9e98919"
 }
 ,{
-    "testCaseDescription": "go-label-statements-teardown-test",
+    "testCaseDescription": "go-struct-field-declarations-teardown-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "struct-field-declarations.go": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +267,20 @@
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "struct-field-declarations.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index 79058077..e69de29b 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/struct-field-declarations.go b/struct-field-declarations.go",
+        "index 60d13f45..e69de29b 100644",
+        "--- a/struct-field-declarations.go",
+        "+++ b/struct-field-declarations.go",
         "@@ -1,5 +0,0 @@",
         "-package main",
         "-",
         "-func main() {",
-        "-",
+        "- type s3 struct {} ",
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5a07dfd5ebb6f9aac2fc62a67df29e9f002ae2fb..e8a0a2912cf6fee72c6e0cc0d96c5babf1cd4df1"
+    "shas": "0e91f39b4267ac56153c02a6ce70ca1bd9e98919..2ff7aeec9c5efbeaf3a7b681f718640926ca1f90"
 }]

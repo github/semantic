@@ -55,7 +55,7 @@ termConstructor source sourceSpan name range children allChildren
     -- Let it fall through to generate an Indexed syntax.
     ("optional_parameter", [ k, v ] ) -> S.Pair k v
     ("optional_parameter", _ ) -> S.Error children
-    ("array", _ ) -> S.Array children
+    ("array", _ ) -> S.Array Nothing children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("assignment", _ ) -> S.Error children
     ("begin", _ ) -> case partition (\x -> category (extract x) == Rescue) children of
@@ -70,7 +70,7 @@ termConstructor source sourceSpan name range children allChildren
           [ elseBlock ] | Else <- category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
           [ ensure ] | Ensure <- category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    ("case", expr : body ) -> S.Switch expr body
+    ("case", expr : body ) -> S.Switch (Just expr) body
     ("case", _ ) -> S.Error children
     ("when", condition : body ) -> S.Case condition body
     ("when", _ ) -> S.Error children
@@ -94,7 +94,7 @@ termConstructor source sourceSpan name range children allChildren
       [ body ] -> S.AnonymousFunction [] [body]
       ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
       _ -> S.Error children
-    ("hash", _ ) -> S.Object $ foldMap toTuple children
+    ("hash", _ ) -> S.Object Nothing $ foldMap toTuple children
     ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_modifier", _ ) -> S.Error children
     ("if", condition : body ) -> S.If condition body
@@ -110,8 +110,8 @@ termConstructor source sourceSpan name range children allChildren
     ("call", [ base, property ]) -> S.MemberAccess base property
     ("call", _ ) -> S.Error children
     ("method", _ ) -> case children of
-      identifier : params : body | Params <- category (extract params) -> S.Method identifier (toList (unwrap params)) body
-      identifier : body -> S.Method identifier [] body
+      identifier : params : body | Params <- category (extract params) -> S.Method identifier Nothing (toList (unwrap params)) body
+      identifier : body -> S.Method identifier Nothing [] body
       _ -> S.Error children
     ("module", constant : body ) -> S.Module constant body
     ("module", _ ) -> S.Error children

@@ -103,7 +103,7 @@ sourceSpanToRange source SourceSpan{..} = Range start end
 rangeToSourceSpan :: Source Char -> Range -> SourceSpan
 rangeToSourceSpan source range@Range{} = SourceSpan startPos endPos
   where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
-        endPos = toEndPos (length lineRanges) (last lineRanges)
+        endPos = toEndPos (length lineRanges) (fromMaybe (rangeAt 0) (snd <$> unsnoc lineRanges))
         lineRanges = actualLineRanges range source
         toStartPos line range = SourcePos line (start range)
         toEndPos line range = SourcePos line (end range)

@@ -1,7 +1,8 @@
 [{
     "testCaseDescription": "ruby-when-setup-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "when.rb": [
                 {
                     "span": {
@@ -12,31 +13,29 @@
                             ],
                             "end": [
                                 3,
-                                4
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' case statement"
+                    "summary": "Added 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "when.rb"
     ],
     "patch": [
         "diff --git a/when.rb b/when.rb",
-        "index e69de29..f43e020 100644",
+        "index e69de29..ee23477 100644",
         "--- a/when.rb",
         "+++ b/when.rb",
-        "@@ -0,0 +1,3 @@",
+        "@@ -0,0 +1,2 @@",
         "+case foo",
-        "+when quux",
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6320f83c8822c0efc1ee3f921342eb41977e9fb8..74481b83f4aaaca4705cd56d25d4e0159eabf9f3"
+    "shas": "0f3ddff0899d7aea39733b5f21639fca68bd0b51..688d83e8dd2a73f66d21ccfce933e10c231db208"
 }
 ,{
     "testCaseDescription": "ruby-when-insert-test",
@@ -45,18 +44,30 @@
             "when.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                1
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'bar' when comparison in the 'foo' case statement"
+                    "summary": "Replaced 'case foo\nend\n' at line 1, column 1 - line 3, column 1 with the 'foo' case statement"
                 }
             ]
         },
@@ -67,17 +78,16 @@
     ],
     "patch": [
         "diff --git a/when.rb b/when.rb",
-        "index f43e020..404ec25 100644",
+        "index ee23477..92a40ca 100644",
         "--- a/when.rb",
         "+++ b/when.rb",
-        "@@ -1,3 +1,4 @@",
+        "@@ -1,2 +1,3 @@",
         " case foo",
-        " when quux",
         "+when bar",
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "74481b83f4aaaca4705cd56d25d4e0159eabf9f3..3af728dfa3c929198a7b5f92b1326eef3e79c4e0"
+    "shas": "688d83e8dd2a73f66d21ccfce933e10c231db208..4fc5f74c0f83584a712eb4c81b86a5e18bff4cd8"
 }
 ,{
     "testCaseDescription": "ruby-when-replacement-test",
@@ -88,11 +98,11 @@
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                3,
                                 3
                             ],
                             "end": [
-                                4,
+                                3,
                                 6
                             ]
                         }
@@ -108,18 +118,17 @@
     ],
     "patch": [
         "diff --git a/when.rb b/when.rb",
-        "index 404ec25..7fb75f1 100644",
+        "index 92a40ca..3c8eff2 100644",
         "--- a/when.rb",
         "+++ b/when.rb",
-        "@@ -1,4 +1,5 @@",
+        "@@ -1,3 +1,4 @@",
         " case foo",
-        " when quux",
         " when bar",
         "+  baz",
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "3af728dfa3c929198a7b5f92b1326eef3e79c4e0..e1127e3df1d1ca4cd0a0b1424e1eed2bb185a34f"
+    "shas": "4fc5f74c0f83584a712eb4c81b86a5e18bff4cd8..6597dc28377e7f366fabfc00a5ec9596e81022f0"
 }
 ,{
     "testCaseDescription": "ruby-when-delete-replacement-test",
@@ -130,11 +139,11 @@
                     "span": {
                         "delete": {
                             "start": [
-                                4,
+                                3,
                                 3
                             ],
                             "end": [
-                                4,
+                                3,
                                 6
                             ]
                         }
@@ -150,18 +159,17 @@
     ],
     "patch": [
         "diff --git a/when.rb b/when.rb",
-        "index 7fb75f1..404ec25 100644",
+        "index 3c8eff2..92a40ca 100644",
         "--- a/when.rb",
         "+++ b/when.rb",
-        "@@ -1,5 +1,4 @@",
+        "@@ -1,4 +1,3 @@",
         " case foo",
-        " when quux",
         " when bar",
         "-  baz",
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e1127e3df1d1ca4cd0a0b1424e1eed2bb185a34f..715d399400e789e7b9fe8d6298cb768670ddc619"
+    "shas": "6597dc28377e7f366fabfc00a5ec9596e81022f0..0adf2abade0a22431a3d9a4c80b35936108c716f"
 }
 ,{
     "testCaseDescription": "ruby-when-delete-insert-test",
@@ -170,18 +178,30 @@
             "when.rb": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                1
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    1
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'bar' when comparison in the 'foo' case statement"
+                    "summary": "Replaced the 'foo' case statement with 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
                 }
             ]
         },
@@ -192,22 +212,22 @@
     ],
     "patch": [
         "diff --git a/when.rb b/when.rb",
-        "index 404ec25..f43e020 100644",
+        "index 92a40ca..ee23477 100644",
         "--- a/when.rb",
         "+++ b/when.rb",
-        "@@ -1,4 +1,3 @@",
+        "@@ -1,3 +1,2 @@",
         " case foo",
-        " when quux",
         "-when bar",
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "715d399400e789e7b9fe8d6298cb768670ddc619..eb4e7c3c86b8e2410ba8cbde1a08156eb6ceded7"
+    "shas": "0adf2abade0a22431a3d9a4c80b35936108c716f..d048b73ffb507bbc82b93b1519eb91a54d3ed65d"
 }
 ,{
     "testCaseDescription": "ruby-when-teardown-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "when.rb": [
                 {
                     "span": {
@@ -218,29 +238,27 @@
                             ],
                             "end": [
                                 3,
-                                4
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' case statement"
+                    "summary": "Deleted 'case foo\nend\n' at line 1, column 1 - line 3, column 1"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "when.rb"
     ],
     "patch": [
         "diff --git a/when.rb b/when.rb",
-        "index f43e020..e69de29 100644",
+        "index ee23477..e69de29 100644",
         "--- a/when.rb",
         "+++ b/when.rb",
-        "@@ -1,3 +0,0 @@",
+        "@@ -1,2 +0,0 @@",
         "-case foo",
-        "-when quux",
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "eb4e7c3c86b8e2410ba8cbde1a08156eb6ceded7..2ffce3d30f77b7bd24e702013e47f91050c0ed06"
+    "shas": "d048b73ffb507bbc82b93b1519eb91a54d3ed65d..c80a3d65f93f8306d95a0cdb9104f7ee5cce403d"
 }]

@@ -1,124 +1,50 @@
 [{
+    "testCaseDescription": "go-call-expressions-setup-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index e69de29b..79058077 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "20ca91d3f69487f7d530b334333fdfe2a3743e03..f28c3d5ee5b66191bb89061bd551b60a74ac7c7c"
+}
+,{
     "testCaseDescription": "go-call-expressions-insert-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "call-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "call-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/call-expressions.go b/call-expressions.go",
-        "index e69de29..ecd7132 100644",
-        "--- a/call-expressions.go",
-        "+++ b/call-expressions.go",
-        "@@ -0,0 +1,3 @@",
-        "+x(b, c...)",
-        "+y(b, c,)",
-        "+z(b,c...,)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "b47f159a4e69c481019748b1b4451ca5480b48ac..c8763d16606cda825fb974369f9a2b519439e29e"
-}
-,{
-    "testCaseDescription": "go-call-expressions-replacement-insert-test",
-    "expectedResult": {
-        "changes": {},
-        "errors": {
-            "call-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
-                },
                 {
                     "span": {
                         "insert": {
@@ -132,7 +58,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x(b, c...)' at line 4, column 1 - line 4, column 11"
+                    "summary": "Added the 'x(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -147,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y(b, c,)' at line 5, column 1 - line 5, column 9"
+                    "summary": "Added the 'y(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -162,373 +88,162 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'z(b,c...,)' at line 6, column 1 - line 6, column 11"
+                    "summary": "Added the 'z(b, c)' function call in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "call-expressions.go"
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index ecd7132..d979c0a 100644",
+        "index 79058077..72918e59 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
-        "@@ -1,3 +1,9 @@",
-        "+a(b, c...)",
-        "+b(b, c,)",
-        "+c(b,c...,)",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+x(b, c...)",
         "+y(b, c,)",
         "+z(b,c...,)",
-        " x(b, c...)",
-        " y(b, c,)",
-        " z(b,c...,)"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c8763d16606cda825fb974369f9a2b519439e29e..efeb7a0f095a0f9412a310203ec9147cc43a093a"
-}
-,{
-    "testCaseDescription": "go-call-expressions-delete-insert-test",
-    "expectedResult": {
-        "changes": {},
-        "errors": {
-            "call-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "call-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/call-expressions.go b/call-expressions.go",
-        "index d979c0a..a3950ff 100644",
-        "--- a/call-expressions.go",
-        "+++ b/call-expressions.go",
-        "@@ -1,6 +1,6 @@",
-        "-a(b, c...)",
-        "-b(b, c,)",
-        "-c(b,c...,)",
-        "+x(b, c...)",
-        "+y(b, c,)",
-        "+z(b,c...,)",
-        " x(b, c...)",
-        " y(b, c,)",
-        " z(b,c...,)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "efeb7a0f095a0f9412a310203ec9147cc43a093a..9c07ff15f6bdc008d045bbaebae934200a2a6734"
+    "shas": "f28c3d5ee5b66191bb89061bd551b60a74ac7c7c..4bf42888f808e158884d8ba275440c1044ac7d9c"
 }
 ,{
     "testCaseDescription": "go-call-expressions-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "call-expressions.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 11
                             ]
                         }
                     },
-                    "summary": "Added the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
+                    "summary": "Added the 'a(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
+                    "summary": "Added the 'b(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
+                                6,
                                 1
                             ],
                             "end": [
-                                3,
+                                6,
                                 11
                             ]
                         }
                     },
-                    "summary": "Added the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
+                    "summary": "Added the 'c(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                1,
+                                4,
                                 11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
+                    "summary": "Deleted the 'x(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
+                                5,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
+                    "summary": "Deleted the 'y(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                3,
+                                6,
                                 1
                             ],
                             "end": [
-                                3,
+                                6,
                                 11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
+                    "summary": "Deleted the 'z(b, c)' function call in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "call-expressions.go"
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index a3950ff..d979c0a 100644",
+        "index 72918e59..2d5e765c 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
-        "@@ -1,6 +1,6 @@",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-x(b, c...)",
         "-y(b, c,)",
         "-z(b,c...,)",
         "+a(b, c...)",
         "+b(b, c,)",
         "+c(b,c...,)",
-        " x(b, c...)",
-        " y(b, c,)",
-        " z(b,c...,)"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9c07ff15f6bdc008d045bbaebae934200a2a6734..a1710da50116f9380b25e096b698eec1b03325f6"
+    "shas": "4bf42888f808e158884d8ba275440c1044ac7d9c..65d3fd0c110b229fa26172815f243a53541e4f0b"
 }
 ,{
     "testCaseDescription": "go-call-expressions-delete-replacement-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "call-expressions.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x(b, c...)' at line 4, column 1 - line 4, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y(b, c,)' at line 5, column 1 - line 5, column 9"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z(b,c...,)' at line 6, column 1 - line 6, column 11"
-                },
-                {
-                    "span": {
                         "insert": {
                             "start": [
                                 4,
@@ -540,7 +255,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a(b, c...)' at line 4, column 1 - line 4, column 11"
+                    "summary": "Added the 'x(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -555,7 +270,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b(b, c,)' at line 5, column 1 - line 5, column 9"
+                    "summary": "Added the 'y(b, c)' function call in the main function of the 'main' module"
                 },
                 {
                     "span": {
@@ -570,41 +285,159 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c(b,c...,)' at line 6, column 1 - line 6, column 11"
+                    "summary": "Added the 'z(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c(b, c)' function call in the main function of the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "call-expressions.go"
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index d979c0a..589914d 100644",
+        "index 2d5e765c..72918e59 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
-        "@@ -1,9 +1,6 @@",
+        "@@ -1,7 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-a(b, c...)",
         "-b(b, c,)",
         "-c(b,c...,)",
+        "+x(b, c...)",
+        "+y(b, c,)",
+        "+z(b,c...,)",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "65d3fd0c110b229fa26172815f243a53541e4f0b..6bf993afa56c99144a874460c89325303fc54b21"
+}
+,{
+    "testCaseDescription": "go-call-expressions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "call-expressions.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y(b, c)' function call in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'z(b, c)' function call in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "call-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/call-expressions.go b/call-expressions.go",
+        "index 72918e59..79058077 100644",
+        "--- a/call-expressions.go",
+        "+++ b/call-expressions.go",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-x(b, c...)",
         "-y(b, c,)",
         "-z(b,c...,)",
-        " x(b, c...)",
-        " y(b, c,)",
-        " z(b,c...,)",
-        "+a(b, c...)",
-        "+b(b, c,)",
-        "+c(b,c...,)"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1710da50116f9380b25e096b698eec1b03325f6..a1c6a59603e72f43ab5a830e99818da54d6fb95b"
+    "shas": "6bf993afa56c99144a874460c89325303fc54b21..88b0afbe7ddf59f5ced55be27ce159f7899afd6b"
 }
 ,{
-    "testCaseDescription": "go-call-expressions-delete-test",
+    "testCaseDescription": "go-call-expressions-teardown-test",
     "expectedResult": {
-        "changes": {},
-        "errors": {
+        "changes": {
             "call-expressions.go": [
                 {
                     "span": {
@@ -614,132 +447,32 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z(b,c...,)' at line 3, column 1 - line 3, column 11"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
         "call-expressions.go"
     ],
     "patch": [
         "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 589914d..1dc566c 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/call-expressions.go",
         "+++ b/call-expressions.go",
-        "@@ -1,6 +1,3 @@",
-        "-x(b, c...)",
-        "-y(b, c,)",
-        "-z(b,c...,)",
-        " a(b, c...)",
-        " b(b, c,)",
-        " c(b,c...,)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a1c6a59603e72f43ab5a830e99818da54d6fb95b..9293baf00488ad7785e23a8b78ab5f95342ebab3"
-}
-,{
-    "testCaseDescription": "go-call-expressions-delete-rest-test",
-    "expectedResult": {
-        "changes": {},
-        "errors": {
-            "call-expressions.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a(b, c...)' at line 1, column 1 - line 1, column 11"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b(b, c,)' at line 2, column 1 - line 2, column 9"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c(b,c...,)' at line 3, column 1 - line 3, column 11"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "call-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/call-expressions.go b/call-expressions.go",
-        "index 1dc566c..e69de29 100644",
-        "--- a/call-expressions.go",
-        "+++ b/call-expressions.go",
-        "@@ -1,3 +0,0 @@",
-        "-a(b, c...)",
-        "-b(b, c,)",
-        "-c(b,c...,)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "9293baf00488ad7785e23a8b78ab5f95342ebab3..8cef11ced56e7aed74af10acde19377ccfe0b6af"
+    "shas": "88b0afbe7ddf59f5ced55be27ce159f7899afd6b..ef42f9e80388d7180896d3d04b0140b1760b8cde"
 }]

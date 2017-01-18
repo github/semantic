@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-var-declarations-with-no-expressions-setup-test",
+    "expectedResult": {
+        "changes": {
+            "var-declarations-with-no-expressions.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declarations-with-no-expressions.go"
+    ],
+    "patch": [
+        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
+        "index e69de29b..79058077 100644",
+        "--- a/var-declarations-with-no-expressions.go",
+        "+++ b/var-declarations-with-no-expressions.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "6f294740ad6a127c66874266a39c55d6f279067a..28fd7c1aac60275cc6e07250ce2bf9f7f2f34af8"
+}
+,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,160 +49,46 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
-                                1
+                                4,
+                                5
                             ],
                             "end": [
-                                1,
-                                13
+                                4,
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' variable"
+                    "summary": "Added the 'zero' variable in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                1
+                                5,
+                                5
                             ],
                             "end": [
-                                2,
-                                20
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'one' variable"
+                    "summary": "Added the 'one' variable in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "var-declarations-with-no-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index e69de29..f156385 100644",
-        "--- a/var-declarations-with-no-expressions.go",
-        "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -0,0 +1,2 @@",
-        "+var zero int",
-        "+var one, two uint64"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "934c5da727053121abad016b81bcf0c4b922d4a9..cfdfa4a251864bbaee89d4be2a5ba16eba0f98f8"
-}
-,{
-    "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "var-declarations-with-no-expressions.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
+                                5,
                                 10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
                             ],
                             "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
+                                5,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'one' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'two' variable"
+                    "summary": "Added the 'two' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -171,129 +99,20 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index f156385..f696db9 100644",
+        "index 79058077..fcdc3127 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -1,2 +1,6 @@",
-        "+var a int",
-        "+var b, c uint64",
+        "@@ -1,5 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+var zero int",
         "+var one, two uint64",
-        " var zero int",
-        " var one, two uint64"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cfdfa4a251864bbaee89d4be2a5ba16eba0f98f8..4af9f85b09daf7d4a3067911981a2cae680b660d"
-}
-,{
-    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "var-declarations-with-no-expressions.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    9
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    8
-                                ],
-                                "end": [
-                                    2,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    10
-                                ],
-                                "end": [
-                                    2,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "var-declarations-with-no-expressions.go"
-    ],
-    "patch": [
-        "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index f696db9..e5e3183 100644",
-        "--- a/var-declarations-with-no-expressions.go",
-        "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -1,5 +1,5 @@",
-        "-var a int",
-        "-var b, c uint64",
-        "+var zero int",
-        "+var one, two uint64",
-        " var zero int",
-        " var one, two uint64",
-        " var zero int"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "4af9f85b09daf7d4a3067911981a2cae680b660d..f6f49bc348b0a2c0217811c9c49e27e46d4e6eb8"
+    "shas": "28fd7c1aac60275cc6e07250ce2bf9f7f2f34af8..94444d86a80c26e413cef05550efcfc2e5903dac"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-replacement-test",
@@ -305,81 +124,81 @@
                         "replace": [
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     5
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     9
                                 ]
                             },
                             {
                                 "start": [
-                                    1,
+                                    4,
                                     5
                                 ],
                                 "end": [
-                                    1,
+                                    4,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     5
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     5
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     10
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     13
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     8
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -390,20 +209,21 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index e5e3183..f696db9 100644",
+        "index fcdc3127..8aab74f1 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -1,5 +1,5 @@",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-var zero int",
         "-var one, two uint64",
         "+var a int",
         "+var b, c uint64",
-        " var zero int",
-        " var one, two uint64",
-        " var zero int"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f6f49bc348b0a2c0217811c9c49e27e46d4e6eb8..0f680098c076258ec348362f0f263dca661c617c"
+    "shas": "94444d86a80c26e413cef05550efcfc2e5903dac..d18dd508ad93803291e3fef6826b53a24261361c"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-no-expressions-delete-replacement-test",
@@ -412,138 +232,84 @@
             "var-declarations-with-no-expressions.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    5
+                                ],
+                                "end": [
+                                    4,
+                                    9
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'b' variable"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the main function of the 'main' module"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    8
+                                ],
+                                "end": [
+                                    5,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "end": [
+                                    5,
+                                    13
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'c' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'one' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' variable"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the main function of the 'main' module"
                 }
             ]
         },
@@ -554,24 +320,24 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index f696db9..137ee10 100644",
+        "index 8aab74f1..fcdc3127 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -1,6 +1,4 @@",
+        "@@ -1,6 +1,6 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-var a int",
         "-var b, c uint64",
-        "-var zero int",
-        "-var one, two uint64",
-        " var zero int",
-        " var one, two uint64",
-        "+var a int",
-        "+var b, c uint64"
+        "+var zero int",
+        "+var one, two uint64",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f680098c076258ec348362f0f263dca661c617c..b91d6b8dacfdb7c32799fd65a844cd65f999e6f5"
+    "shas": "d18dd508ad93803291e3fef6826b53a24261361c..cddc950eb862c4f5f4ef826268ce03055ef4941e"
 }
 ,{
-    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-insert-test",
     "expectedResult": {
         "changes": {
             "var-declarations-with-no-expressions.go": [
@@ -579,46 +345,46 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                1
+                                4,
+                                5
                             ],
                             "end": [
-                                1,
+                                4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                5
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'one' variable in the main function of the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                10
+                            ],
+                            "end": [
+                                5,
                                 13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'one' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                20
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' variable"
+                    "summary": "Deleted the 'two' variable in the main function of the 'main' module"
                 }
             ]
         },
@@ -629,20 +395,23 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 137ee10..443ec9e 100644",
+        "index fcdc3127..79058077 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -1,4 +1,2 @@",
+        "@@ -1,6 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
         "-var zero int",
         "-var one, two uint64",
-        " var a int",
-        " var b, c uint64"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b91d6b8dacfdb7c32799fd65a844cd65f999e6f5..7cbf36fbf74f4985dd2e5bc76f72956bd197f095"
+    "shas": "cddc950eb862c4f5f4ef826268ce03055ef4941e..fca013c75804ecc36f13bf1bccee63f21c15119d"
 }
 ,{
-    "testCaseDescription": "go-var-declarations-with-no-expressions-delete-rest-test",
+    "testCaseDescription": "go-var-declarations-with-no-expressions-teardown-test",
     "expectedResult": {
         "changes": {
             "var-declarations-with-no-expressions.go": [
@@ -654,42 +423,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                16
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                16
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -700,13 +439,16 @@
     ],
     "patch": [
         "diff --git a/var-declarations-with-no-expressions.go b/var-declarations-with-no-expressions.go",
-        "index 443ec9e..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/var-declarations-with-no-expressions.go",
         "+++ b/var-declarations-with-no-expressions.go",
-        "@@ -1,2 +0,0 @@",
-        "-var a int",
-        "-var b, c uint64"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7cbf36fbf74f4985dd2e5bc76f72956bd197f095..87119afd9d847041735cf640ecc066ad2804a85f"
+    "shas": "fca013c75804ecc36f13bf1bccee63f21c15119d..784a2032a8b3f1926b4874446b0dc9672ace15be"
 }]

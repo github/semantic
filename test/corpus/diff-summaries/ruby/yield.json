@@ -34,7 +34,7 @@
         "+yield foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e9e47a7e8dfaea6fade11176891263b27322f29d..d3c71a8b9429b7706728aaf0e2ab22580c5a7409"
+    "shas": "a60beed250baf3ff01e9f1d71d51d1eee16b3d18..3556774b6dc5c1a7533eceee366394528ecdf473"
 }
 ,{
     "testCaseDescription": "ruby-yield-replacement-insert-test",
@@ -89,7 +89,7 @@
         " yield foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d3c71a8b9429b7706728aaf0e2ab22580c5a7409..72ab3af267ac70da88be18c80d66436faa4d4631"
+    "shas": "3556774b6dc5c1a7533eceee366394528ecdf473..db88b503a8458bf2c6a3e237c00d22563a05b602"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-insert-test",
@@ -130,7 +130,7 @@
         " yield foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "72ab3af267ac70da88be18c80d66436faa4d4631..b4c41867bc41e284d0edc33e675ee3717fb1d913"
+    "shas": "db88b503a8458bf2c6a3e237c00d22563a05b602..e41afc85a464e1cff658229120995f673b1a6b99"
 }
 ,{
     "testCaseDescription": "ruby-yield-replacement-test",
@@ -171,7 +171,7 @@
         " yield foo"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b4c41867bc41e284d0edc33e675ee3717fb1d913..45587e828108c8da4b0ed81e4e9eba811537864c"
+    "shas": "e41afc85a464e1cff658229120995f673b1a6b99..917be227b3772aa81cbb429c1f371351af2bdb1a"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-replacement-test",
@@ -242,7 +242,7 @@
         "+yield"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "45587e828108c8da4b0ed81e4e9eba811537864c..2174ca8275e9a78b58f66ad3b64a5cae11f83be0"
+    "shas": "917be227b3772aa81cbb429c1f371351af2bdb1a..3b157e8f1b36071ba23fb1c2823e4852c2afe775"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-test",
@@ -281,7 +281,7 @@
         " yield"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "2174ca8275e9a78b58f66ad3b64a5cae11f83be0..ded54423d631ab67007dd284c87a8628935009ce"
+    "shas": "3b157e8f1b36071ba23fb1c2823e4852c2afe775..42b45e4916eac44a57f89712d87393f8c52c282d"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-rest-test",
@@ -319,5 +319,5 @@
         "-yield"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ded54423d631ab67007dd284c87a8628935009ce..0ea1cbaad545a54267144f11a8d792fca30cf547"
+    "shas": "42b45e4916eac44a57f89712d87393f8c52c282d..eff0c95214265fb70e340d8da1ee09db4f4d7df9"
 }]

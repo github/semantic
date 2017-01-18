@@ -58,11 +58,11 @@ termConstructor source sourceSpan name range children allChildren
     ("var_assignment", _ ) -> S.Error children
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
     ("trailing_var_declaration", _) -> S.Indexed $ toVarDecl <$> children
-    ("switch_statement", expr : rest) -> S.Switch expr rest
+    ("switch_statement", expr : rest) -> S.Switch (Just expr) rest
     ("switch_statement", _ ) -> S.Error children
     ("case", [ expr, body ]) -> S.Case expr [body]
     ("case", _ ) -> S.Error children
-    ("object", _) -> S.Object $ foldMap toTuple children
+    ("object", _) -> S.Object Nothing $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("if_statement", expr : rest ) -> S.If expr rest
@@ -91,9 +91,9 @@ termConstructor source sourceSpan name range children allChildren
         | Catch <- category (extract catch)
         , Finally <- category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
       _ -> S.Error children
-    ("array", _) -> S.Array children
-    ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
-    ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
+    ("array", _) -> S.Array Nothing children
+    ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
+    ("method_definition", [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
     ("method_definition", _ ) -> S.Error children
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
@@ -106,7 +106,7 @@ termConstructor source sourceSpan name range children allChildren
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
     ("export_statement", _ ) -> S.Error children
-    ("break_statement", [ expr ] ) -> S.Break expr
+    ("break_statement", [ expr ] ) -> S.Break (Just expr)
     ("yield_statement", _ ) -> S.Yield children
     _ | name `elem` forStatements -> case unsnoc children of
           Just (exprs, body) -> S.For exprs [body]
@@ -160,6 +160,7 @@ categoryForJavaScriptProductionName name = case name of
   "string" -> StringLiteral
   "integer" -> IntegerLiteral
   "number" -> NumberLiteral
+  "float" -> FloatLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
   "function" -> Function

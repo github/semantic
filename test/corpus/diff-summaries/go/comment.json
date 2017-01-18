@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-map-types-setup-test",
+    "testCaseDescription": "go-comment-setup-test",
     "expectedResult": {
         "changes": {
-            "map-types.go": [
+            "comment.go": [
                 {
                     "span": {
                         "insert": {
@@ -23,13 +23,13 @@
         "errors": {}
     },
     "filePaths": [
-        "map-types.go"
+        "comment.go"
     ],
     "patch": [
-        "diff --git a/map-types.go b/map-types.go",
+        "diff --git a/comment.go b/comment.go",
         "index e69de29b..79058077 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
+        "--- a/comment.go",
+        "+++ b/comment.go",
         "@@ -0,0 +1,5 @@",
         "+package main",
         "+",
@@ -38,209 +38,213 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "537b856e670ab8ae8aa4d420943369b4ba180c16..9ae70588c8e1d6409ce49d3c7e81096bfc7a1d40"
+    "shas": "2ff7aeec9c5efbeaf3a7b681f718640926ca1f90..74e82f0e6d4689ed73a303f79e35a56f42fd47d2"
 }
 ,{
-    "testCaseDescription": "go-map-types-insert-test",
+    "testCaseDescription": "go-comment-insert-test",
     "expectedResult": {
         "changes": {
-            "map-types.go": [
+            "comment.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                6
+                                1
                             ],
                             "end": [
                                 4,
-                                25
+                                21
                             ]
                         }
                     },
-                    "summary": "Added the 'm1' type declaration in the main function of the 'main' module"
+                    "summary": "Added the '// this is a comment' comment in the main function of the 'main' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "map-types.go"
+        "comment.go"
     ],
     "patch": [
-        "diff --git a/map-types.go b/map-types.go",
-        "index 79058077..01004b30 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
+        "diff --git a/comment.go b/comment.go",
+        "index 79058077..61c10ca2 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
         "@@ -1,5 +1,5 @@",
         " package main",
         " ",
         " func main() {",
         "-",
-        "+type m1 map[string]error",
+        "+// this is a comment",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ae70588c8e1d6409ce49d3c7e81096bfc7a1d40..44568c991c3070bcb1d05df16e1decb8ef8405f8"
+    "shas": "74e82f0e6d4689ed73a303f79e35a56f42fd47d2..0d4ddf5fe3e61320b81f8c2392116951ac63bc19"
 }
 ,{
-    "testCaseDescription": "go-map-types-replacement-test",
+    "testCaseDescription": "go-comment-replacement-test",
     "expectedResult": {
         "changes": {
-            "map-types.go": [
+            "comment.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     4,
-                                    13
+                                    1
                                 ],
                                 "end": [
                                     4,
-                                    19
+                                    21
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    13
+                                    1
                                 ],
                                 "end": [
-                                    4,
-                                    16
+                                    6,
+                                    3
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the 'm1' type declaration of the 'main' function"
+                    "summary": "Replaced the '// this is a comment' comment with the '/*\nthis is a block comment\n*/' comment in the main function of the 'main' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "map-types.go"
+        "comment.go"
     ],
     "patch": [
-        "diff --git a/map-types.go b/map-types.go",
-        "index 01004b30..a118e920 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
-        "@@ -1,5 +1,5 @@",
+        "diff --git a/comment.go b/comment.go",
+        "index 61c10ca2..8e149b7b 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,5 +1,7 @@",
         " package main",
         " ",
         " func main() {",
-        "-type m1 map[string]error",
-        "+type m1 map[int]error",
+        "-// this is a comment",
+        "+/*",
+        "+this is a block comment",
+        "+*/",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44568c991c3070bcb1d05df16e1decb8ef8405f8..b67e615d6f6edf3c3f181556c6a1bf9d77b80e88"
+    "shas": "0d4ddf5fe3e61320b81f8c2392116951ac63bc19..910896385d213cb7c06e2ead55a4b9abba069a36"
 }
 ,{
-    "testCaseDescription": "go-map-types-delete-replacement-test",
+    "testCaseDescription": "go-comment-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "map-types.go": [
+            "comment.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     4,
-                                    13
+                                    1
                                 ],
                                 "end": [
-                                    4,
-                                    16
+                                    6,
+                                    3
                                 ]
                             },
                             {
                                 "start": [
                                     4,
-                                    13
+                                    1
                                 ],
                                 "end": [
                                     4,
-                                    19
+                                    21
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the 'm1' type declaration of the 'main' function"
+                    "summary": "Replaced the '/*\nthis is a block comment\n*/' comment with the '// this is a comment' comment in the main function of the 'main' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "map-types.go"
+        "comment.go"
     ],
     "patch": [
-        "diff --git a/map-types.go b/map-types.go",
-        "index a118e920..01004b30 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
-        "@@ -1,5 +1,5 @@",
+        "diff --git a/comment.go b/comment.go",
+        "index 8e149b7b..61c10ca2 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
+        "@@ -1,7 +1,5 @@",
         " package main",
         " ",
         " func main() {",
-        "-type m1 map[int]error",
-        "+type m1 map[string]error",
+        "-/*",
+        "-this is a block comment",
+        "-*/",
+        "+// this is a comment",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b67e615d6f6edf3c3f181556c6a1bf9d77b80e88..8adfcb96271210db7e6ff4d4f8e9614e18a7ea2d"
+    "shas": "910896385d213cb7c06e2ead55a4b9abba069a36..f129ff19da478611e72dc4a472f1fe440e32d7a8"
 }
 ,{
-    "testCaseDescription": "go-map-types-delete-insert-test",
+    "testCaseDescription": "go-comment-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "map-types.go": [
+            "comment.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                6
+                                1
                             ],
                             "end": [
                                 4,
-                                25
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'm1' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the '// this is a comment' comment in the main function of the 'main' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "map-types.go"
+        "comment.go"
     ],
     "patch": [
-        "diff --git a/map-types.go b/map-types.go",
-        "index 01004b30..79058077 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
+        "diff --git a/comment.go b/comment.go",
+        "index 61c10ca2..79058077 100644",
+        "--- a/comment.go",
+        "+++ b/comment.go",
         "@@ -1,5 +1,5 @@",
         " package main",
         " ",
         " func main() {",
-        "-type m1 map[string]error",
+        "-// this is a comment",
         "+",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8adfcb96271210db7e6ff4d4f8e9614e18a7ea2d..d71ece556522fb22d8dce8a04232dd7b084db88a"
+    "shas": "f129ff19da478611e72dc4a472f1fe440e32d7a8..9db6c10b7cd6aeeda4a153ac070d38768258f376"
 }
 ,{
-    "testCaseDescription": "go-map-types-teardown-test",
+    "testCaseDescription": "go-comment-teardown-test",
     "expectedResult": {
         "changes": {
-            "map-types.go": [
+            "comment.go": [
                 {
                     "span": {
                         "delete": {
@@ -261,13 +265,13 @@
         "errors": {}
     },
     "filePaths": [
-        "map-types.go"
+        "comment.go"
     ],
     "patch": [
-        "diff --git a/map-types.go b/map-types.go",
+        "diff --git a/comment.go b/comment.go",
         "index 79058077..e69de29b 100644",
-        "--- a/map-types.go",
-        "+++ b/map-types.go",
+        "--- a/comment.go",
+        "+++ b/comment.go",
         "@@ -1,5 +0,0 @@",
         "-package main",
         "-",
@@ -276,5 +280,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d71ece556522fb22d8dce8a04232dd7b084db88a..2f35db8e0302874790f1e855b1604464a758129c"
+    "shas": "9db6c10b7cd6aeeda4a153ac070d38768258f376..96429faca853f0301df4b0d4d43ce26e3011129c"
 }]

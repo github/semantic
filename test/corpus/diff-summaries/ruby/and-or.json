@@ -34,7 +34,7 @@
         "+foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "48bff6bf54e74bb5709add925c8101431133d29b..718a1f41b48403cdcb927be311af138014047e2a"
+    "shas": "760d160893f207bd4480bd4cdbf9225479c045c8..7cc07c9bd56c68a9fd52504dc6c34e6097472cc7"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-insert-test",
@@ -105,7 +105,7 @@
         " foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "718a1f41b48403cdcb927be311af138014047e2a..b7e04363c991e6a2cd1df38c5f20aa8e9ff7e337"
+    "shas": "7cc07c9bd56c68a9fd52504dc6c34e6097472cc7..8f8ad308a601afec6fedb6a643c43f402355bc47"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-insert-test",
@@ -174,7 +174,7 @@
         " foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b7e04363c991e6a2cd1df38c5f20aa8e9ff7e337..82a2a103e2f86084de0d80d198270d87f02eda63"
+    "shas": "8f8ad308a601afec6fedb6a643c43f402355bc47..6fd584c9522117801bb5565763f5b16c9148d89c"
 }
 ,{
     "testCaseDescription": "ruby-and-or-replacement-test",
@@ -243,7 +243,7 @@
         " foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "82a2a103e2f86084de0d80d198270d87f02eda63..d10ab6a75880a64eef54c3aa82d677def1938901"
+    "shas": "6fd584c9522117801bb5565763f5b16c9148d89c..85540cf719adb2e06da1aaa2bdf7d65020cbafa0"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-replacement-test",
@@ -285,7 +285,7 @@
         "-foo and bar"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d10ab6a75880a64eef54c3aa82d677def1938901..f4fa4f7622bdfac02faa1feecd7993e7201467b2"
+    "shas": "85540cf719adb2e06da1aaa2bdf7d65020cbafa0..ab50c272197758505577449e768972f0cdd5eb59"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-test",
@@ -325,7 +325,7 @@
         " a or b and c"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f4fa4f7622bdfac02faa1feecd7993e7201467b2..9971253676f78cad3cc69fd652b087501fb4c0bc"
+    "shas": "ab50c272197758505577449e768972f0cdd5eb59..749204b420120020a89e45437c441208244effde"
 }
 ,{
     "testCaseDescription": "ruby-and-or-delete-rest-test",
@@ -379,5 +379,5 @@
         "-a or b and c"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9971253676f78cad3cc69fd652b087501fb4c0bc..e29d844a20e10103ff1197d78c6639bba8fc6e8a"
+    "shas": "749204b420120020a89e45437c441208244effde..276112ad3f93ee93fa30985c16b91d38d36f4e32"
 }]

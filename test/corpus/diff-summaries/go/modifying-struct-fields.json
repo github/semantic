@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "go-label-statements-setup-test",
+    "testCaseDescription": "go-modifying-struct-fields-setup-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "modifying-struct-fields.go": [
                 {
                     "span": {
                         "insert": {
@@ -23,13 +23,13 @@
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "modifying-struct-fields.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
         "index e69de29b..79058077 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
         "@@ -0,0 +1,5 @@",
         "+package main",
         "+",
@@ -38,215 +38,215 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f9136e3be46a93bc0e0b6dc467c7b9ced1b97894..d7212f336c9c60b14c59e8e94e1ecd4aede3cc09"
+    "shas": "96429faca853f0301df4b0d4d43ce26e3011129c..327d46912a0379199ca874a02de94cbd4822e017"
 }
 ,{
-    "testCaseDescription": "go-label-statements-insert-test",
+    "testCaseDescription": "go-modifying-struct-fields-insert-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "modifying-struct-fields.go": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
-                                3
+                                4,
+                                1
                             ],
                             "end": [
-                                5,
-                                15
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'ctx' var assignment in the main function of the 'main' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "modifying-struct-fields.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index 79058077..b0a29697 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 79058077..8b8c10e6 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
         "@@ -1,5 +1,7 @@",
         " package main",
         " ",
         " func main() {",
         "-",
-        "+{",
-        "+  insert_label:",
+        "+ctx := &uploadContext{",
+        "+   Remote: remote",
         "+}",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d7212f336c9c60b14c59e8e94e1ecd4aede3cc09..0f74fcb7d75eeebfc2e1a28388fa94535683467b"
+    "shas": "327d46912a0379199ca874a02de94cbd4822e017..edbdc72526206b55a5a68574067653f9a012139e"
 }
 ,{
-    "testCaseDescription": "go-label-statements-replacement-test",
+    "testCaseDescription": "go-modifying-struct-fields-replacement-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "modifying-struct-fields.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     5,
-                                    3
+                                    4
                                 ],
                                 "end": [
                                     5,
-                                    15
+                                    18
                                 ]
                             },
                             {
                                 "start": [
                                     5,
-                                    3
+                                    4
                                 ],
                                 "end": [
                                     5,
-                                    20
+                                    35
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'insert_label' identifier with the 'replacement_label' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'Remote: remote' pair with the 'trackedLocksMu: new(sync.Mutex)' pair in the ctx var assignment of the 'main' function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "modifying-struct-fields.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index b0a29697..3d3cf164 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 8b8c10e6..e16cd243 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
         "@@ -2,6 +2,6 @@ package main",
         " ",
         " func main() {",
-        " {",
-        "-  insert_label:",
-        "+  replacement_label:",
+        " ctx := &uploadContext{",
+        "-   Remote: remote",
+        "+   trackedLocksMu: new(sync.Mutex)",
         " }",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0f74fcb7d75eeebfc2e1a28388fa94535683467b..a34375d5b52b45a8d48f0540b89d62710a4c6be1"
+    "shas": "edbdc72526206b55a5a68574067653f9a012139e..d297555f9562fdc2f07263c0d3f4448a2d993af6"
 }
 ,{
-    "testCaseDescription": "go-label-statements-delete-replacement-test",
+    "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "modifying-struct-fields.go": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     5,
-                                    3
+                                    4
                                 ],
                                 "end": [
                                     5,
-                                    20
+                                    35
                                 ]
                             },
                             {
                                 "start": [
                                     5,
-                                    3
+                                    4
                                 ],
                                 "end": [
                                     5,
-                                    15
+                                    18
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'replacement_label' identifier with the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'trackedLocksMu: new(sync.Mutex)' pair with the 'Remote: remote' pair in the ctx var assignment of the 'main' function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "modifying-struct-fields.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index 3d3cf164..b0a29697 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index e16cd243..8b8c10e6 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
         "@@ -2,6 +2,6 @@ package main",
         " ",
         " func main() {",
-        " {",
-        "-  replacement_label:",
-        "+  insert_label:",
+        " ctx := &uploadContext{",
+        "-   trackedLocksMu: new(sync.Mutex)",
+        "+   Remote: remote",
         " }",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a34375d5b52b45a8d48f0540b89d62710a4c6be1..60dc5a9a3a91da069f329c5ae369d80c47e9cc42"
+    "shas": "d297555f9562fdc2f07263c0d3f4448a2d993af6..0424e6283242743718ac65313bf399f22e87003f"
 }
 ,{
-    "testCaseDescription": "go-label-statements-delete-insert-test",
+    "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "modifying-struct-fields.go": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                5,
-                                3
+                                4,
+                                1
                             ],
                             "end": [
-                                5,
-                                15
+                                6,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'ctx' var assignment in the main function of the 'main' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "modifying-struct-fields.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
-        "index b0a29697..79058077 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 8b8c10e6..79058077 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
         "@@ -1,7 +1,5 @@",
         " package main",
         " ",
         " func main() {",
-        "-{",
-        "-  insert_label:",
+        "-ctx := &uploadContext{",
+        "-   Remote: remote",
         "-}",
         "+",
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "60dc5a9a3a91da069f329c5ae369d80c47e9cc42..5a07dfd5ebb6f9aac2fc62a67df29e9f002ae2fb"
+    "shas": "0424e6283242743718ac65313bf399f22e87003f..1e8d55f993118e8493fd77e4029b4126ca55ea76"
 }
 ,{
-    "testCaseDescription": "go-label-statements-teardown-test",
+    "testCaseDescription": "go-modifying-struct-fields-teardown-test",
     "expectedResult": {
         "changes": {
-            "label-statements.go": [
+            "modifying-struct-fields.go": [
                 {
                     "span": {
                         "delete": {
@@ -267,13 +267,13 @@
         "errors": {}
     },
     "filePaths": [
-        "label-statements.go"
+        "modifying-struct-fields.go"
     ],
     "patch": [
-        "diff --git a/label-statements.go b/label-statements.go",
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
         "index 79058077..e69de29b 100644",
-        "--- a/label-statements.go",
-        "+++ b/label-statements.go",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
         "@@ -1,5 +0,0 @@",
         "-package main",
         "-",
@@ -282,5 +282,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5a07dfd5ebb6f9aac2fc62a67df29e9f002ae2fb..e8a0a2912cf6fee72c6e0cc0d96c5babf1cd4df1"
+    "shas": "1e8d55f993118e8493fd77e4029b4126ca55ea76..cabeb4be978509ff8b604c14a85f64a96314cd7a"
 }]

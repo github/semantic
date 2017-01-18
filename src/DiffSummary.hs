@@ -60,7 +60,11 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Switch{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
+          S.Array ty _ -> maybe Unidentifiable (const Identifiable) ty
+          S.Object ty _ -> maybe Unidentifiable (const Identifiable) ty
           S.BlockStatement{} -> Identifiable
+          S.TypeDecl{} -> Identifiable
+          S.Ty{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -167,6 +171,7 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
       C.EndBlock -> categoryName'
       C.Yield | Text.null termName -> categoryName'
       C.Return | Text.null termName -> categoryName'
+      C.Switch | Text.null termName -> categoryName'
       _ -> "the" <+> squotes (toDoc termName) <+> toDoc categoryName
       where
         termAndCategoryName = "the" <+> toDoc termName <+> toDoc categoryName
@@ -180,6 +185,9 @@ toLeafInfos LeafInfo{..} = pure $ JSONSummary (summary leafCategory termName) so
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
+  S.Send _ _ -> termNameFromSource term
+  S.Ty _ -> termNameFromSource term
+  S.TypeDecl id _ -> toTermName' id
   S.TypeAssertion _ _ -> termNameFromSource term
   S.TypeConversion _ _ -> termNameFromSource term
   S.Go expr -> toTermName' expr
@@ -190,6 +198,7 @@ toTermName source term = case unwrap term of
   Leaf leaf -> toS leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
+  S.ParameterDecl _ _ -> termNameFromSource term
   S.FunctionCall i args -> case unwrap i of
     S.AnonymousFunction params _ ->
       -- Omit a function call's arguments if it's arguments match the underlying
@@ -211,17 +220,20 @@ toTermName source term = case unwrap term of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' element <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' element
     (_, S.FunctionCall{}) -> toTermName' base <> "[" <> toTermName' element <> "()" <> "]"
+    (S.Indexed _, _) -> case category . extract $ base of
+      SliceTy -> termNameFromSource base <> toTermName' element
+      _ -> toTermName' base <> "[" <> toTermName' element <> "]"
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
   S.VarAssignment varId _ -> toTermName' varId
-  S.VarDecl decl -> toTermName' decl
+  S.VarDecl decl _ -> toTermName' decl
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> termNameFromSource expr
-  S.Switch expr _ -> toTermName' expr
+  S.Switch expr _ -> maybe "" toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object kvs -> "{ " <> Text.intercalate ", " (toTermName' <$> kvs) <> " }"
+  S.Object ty kvs -> maybe ("{ " <> Text.intercalate ", " (toTermName' <$> kvs) <> " }") termNameFromSource ty
   S.Pair k v -> toKeyName k <> toArgName v
   S.Return children -> Text.intercalate ", " (termNameFromSource <$> children)
   S.Yield children -> Text.intercalate ", " (termNameFromSource <$> children)
@@ -234,9 +246,9 @@ toTermName source term = case unwrap term of
   S.Constructor expr -> toTermName' expr
   S.Try clauses _ _ _ -> termNameFromChildren term clauses
   S.Select clauses -> termNameFromChildren term clauses
-  S.Array _ -> termNameFromSource term
+  S.Array ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   S.Class identifier _ _ -> toTermName' identifier
-  S.Method identifier args _ -> toTermName' identifier <> paramsToArgNames args
+  S.Method identifier _ args _ -> toTermName' identifier <> paramsToArgNames args
   S.Comment a -> toS a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
@@ -246,10 +258,13 @@ toTermName source term = case unwrap term of
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> Text.intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   S.Negate expr -> toTermName' expr
+  S.Struct ty _ -> maybe (termNameFromSource term) termNameFromSource ty
   S.Rescue args _ -> Text.intercalate ", " $ toTermName' <$> args
-  S.Break expr -> toTermName' expr
-  S.Continue expr -> toTermName' expr
+  S.Break expr -> maybe "" toTermName' expr
+  S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
+  S.DefaultCase children -> termNameFromChildren term children
+  S.FieldDecl id expr tag -> termNameFromSource id <> (maybe "" (\expr' -> " " <> termNameFromSource expr') expr) <> (maybe "" ((" " <>) . termNameFromSource) tag)
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -282,10 +297,20 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
       C.If -> "in the" <+> squotes (termName t) <+> catName c
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
-      C.Switch -> "in the" <+> squotes (termName t) <+> catName c
+      C.Break -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
+      C.Continue -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
+      C.Switch -> case t of
+        "" -> "in a" <+> catName c
+        _ -> "in the" <+> squotes (termName t) <+> catName c
       C.When -> "in a" <+> catName c
       C.BeginBlock -> "in a" <+> catName c
       C.EndBlock -> "in an" <+> catName c
+      C.DefaultCase -> "in a" <+> catName c
+      C.TypeDecl -> "in the" <+> squotes (termName t) <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
     catName = toDoc . toCategoryName
@@ -364,6 +389,7 @@ instance HasCategory Category where
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     NumberLiteral -> "number"
+    FloatLiteral -> "float"
     Other s -> s
     C.Pair -> "pair"
     C.Params -> "params"
@@ -409,7 +435,7 @@ instance HasCategory Category where
     C.Negate -> "negate"
     C.Select -> "select statement"
     C.Go -> "go statement"
-    C.Slice -> "slice expression"
+    C.Slice -> "slice literal"
     C.Defer -> "defer statement"
     C.TypeAssertion -> "type assertion statement"
     C.TypeConversion -> "type conversion expression"
@@ -419,6 +445,10 @@ instance HasCategory Category where
     C.SplatParameter -> "parameter"
     C.HashSplatParameter -> "parameter"
     C.BlockParameter -> "parameter"
+    C.ArrayTy -> "array type"
+    C.DictionaryTy -> "dictionary type"
+    C.StructTy -> "struct type"
+    C.Struct -> "struct"
     C.Break -> "break statement"
     C.Continue -> "continue statement"
     C.Binary -> "binary statement"
@@ -430,6 +460,23 @@ instance HasCategory Category where
     C.ScopeOperator -> "scope operator"
     C.BeginBlock -> "BEGIN block"
     C.EndBlock -> "END block"
+    C.ParameterDecl -> "parameter declaration"
+    C.DefaultCase -> "default statement"
+    C.TypeDecl -> "type declaration"
+    C.PointerTy -> "pointer type"
+    C.FieldDecl -> "field declaration"
+    C.SliceTy -> "slice type"
+    C.Element -> "element"
+    C.Literal -> "literal"
+    C.ChannelTy -> "channel type"
+    C.Send -> "send statement"
+    C.IndexExpression -> "index expression"
+    C.FunctionTy -> "function type"
+    C.IncrementStatement -> "increment statement"
+    C.DecrementStatement -> "decrement statement"
+    C.QualifiedIdentifier -> "qualified identifier"
+    C.FieldDeclarations -> "field declarations"
+    C.RuneLiteral -> "rune literal"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

@@ -110,12 +110,12 @@ syntaxToTermField syntax = case syntax of
   S.MemberAccess identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.MethodCall identifier methodIdentifier parameters -> [ "identifier" .= identifier ] <> [ "methodIdentifier" .= methodIdentifier ] <> [ "parameters" .= parameters ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
-  S.VarDecl declaration -> [ "declaration" .= declaration ]
+  S.VarDecl declaration ty -> [ "declaration" .= declaration ] <> [ "type" .= ty]
   S.VarAssignment identifier value -> [ "identifier" .= identifier ] <> [ "value" .= value ]
   S.SubscriptAccess identifier property -> [ "identifier" .= identifier ] <> [ "property" .= property ]
   S.Switch expression cases -> [ "expression" .= expression ] <> [ "cases" .= cases ]
   S.Case expression statements -> [ "expression" .= expression ] <> [ "statements" .= statements ]
-  S.Object keyValuePairs -> childrenFields keyValuePairs
+  S.Object ty keyValuePairs -> [ "type" .= ty ] <> childrenFields keyValuePairs
   S.Pair a b -> childrenFields [a, b]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
@@ -127,9 +127,9 @@ syntaxToTermField syntax = case syntax of
   S.Throw c -> [ "expression" .= c ]
   S.Constructor expression -> [ "expression" .= expression ]
   S.Try body catchExpression elseExpression finallyExpression -> [ "body" .= body ] <> [ "catchExpression" .= catchExpression ] <> [ "elseExpression" .= elseExpression ] <> [ "finallyExpression" .= finallyExpression ]
-  S.Array c -> childrenFields c
+  S.Array ty c -> [ "type" .= ty ] <> childrenFields c
   S.Class identifier superclass definitions -> [ "identifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
-  S.Method identifier parameters definitions -> [ "identifier" .= identifier ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
+  S.Method identifier ty parameters definitions -> [ "identifier" .= identifier ] <> [ "type" .= ty ] <> [ "parameters" .= parameters ] <> [ "definitions" .= definitions ]
   S.If expression clauses -> [ "expression" .= expression ] <> childrenFields clauses
   S.Module identifier definitions-> [ "identifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier statements -> [ "identifier" .= identifier ] <> [ "statements" .= statements ]
@@ -142,7 +142,14 @@ syntaxToTermField syntax = case syntax of
   S.Defer cases -> childrenFields cases
   S.TypeAssertion a b -> childrenFields [a, b]
   S.TypeConversion a b -> childrenFields [a, b]
+  S.Struct ty fields -> [ "type" .= ty ] <> childrenFields fields
   S.Break expr -> [ "expression" .= expr ]
   S.Continue expr -> [ "expression" .= expr ]
   S.BlockStatement c -> childrenFields c
+  S.ParameterDecl ty field -> [ "type" .= ty ] <> [ "identifier" .= field ]
+  S.DefaultCase c -> childrenFields c
+  S.TypeDecl id ty -> [ "type" .= ty ] <> [ "identifier" .= id ]
+  S.FieldDecl id ty tag -> [ "type" .= ty ] <> [ "identifier" .= id ] <> [ "tag" .= tag]
+  S.Ty ty -> [ "type" .= ty ]
+  S.Send channel expr -> [ "channel" .= channel ] <> [ "expression" .= expr ]
   where childrenFields c = [ "children" .= c ]

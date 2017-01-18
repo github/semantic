@@ -159,6 +159,16 @@ data Category
   | HashSplatParameter
   -- | A block parameter, e.g. def foo(&block) in Ruby.
   | BlockParameter
+  -- | A float literal.
+  | FloatLiteral
+  -- | An array type declaration, e.g. [2]string in Go.
+  | ArrayTy
+  -- | A dictionary type declaration, e.g. map[string] in Go.
+  | DictionaryTy
+  -- | A Struct type declaration, struct Foo {..} in Go.
+  | StructTy
+  -- | A Struct constructor, e.g. foo = Foo {..} in Go.
+  | Struct
   -- | A break statement, e.g. break; in JavaScript.
   | Break
   -- | A continue statement, e.g. continue; in JavaScript.
@@ -181,6 +191,37 @@ data Category
   | BeginBlock
   -- | An END {} block of statements.
   | EndBlock
+  | ParameterDecl
+  -- | A default case in a switch statement.
+  | DefaultCase
+  -- | A type declaration.
+  | TypeDecl
+  | PointerTy
+  -- | A field declaration.
+  | FieldDecl
+  -- | A slice type, e.g. []string{"hello"} in Go.
+  | SliceTy
+  -- | An element of a slice literal.
+  | Element
+  -- | A literal value.
+  | Literal
+  -- | A channel type in Go.
+  | ChannelTy
+  -- | A send statement in Go.
+  | Send
+  -- | An Index expression, e.g. x[1] in Go.
+  | IndexExpression
+  -- | A function type.
+  | FunctionTy
+  -- | An increment statement, e.g. i++ in Go.
+  | IncrementStatement
+  -- | A decrement statement, e.g. i-- in Go.
+  | DecrementStatement
+  -- | A qualified identifier, e.g. Module.function in Go.
+  | QualifiedIdentifier
+  | FieldDeclarations
+  -- | A Go rune literal.
+  | RuneLiteral
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -224,9 +265,11 @@ instance Listable Category where
     \/ cons0 DoWhile
     \/ cons0 While
     \/ cons0 Switch
+    \/ cons0 If
     \/ cons0 Ternary
     \/ cons0 Case
     \/ cons0 Operator
+    \/ cons0 CommaOperator
     \/ cons0 Object
     \/ cons0 Throw
     \/ cons0 Constructor
@@ -235,9 +278,13 @@ instance Listable Category where
     \/ cons0 Finally
     \/ cons0 Class
     \/ cons0 Method
+    \/ cons0 Comment
+    \/ cons0 RelationalOperator
+    \/ cons0 Empty
     \/ cons0 Module
     \/ cons0 Import
     \/ cons0 Export
+    \/ cons0 AnonymousFunction
     \/ cons0 Interpolation
     \/ cons0 Subshell
     \/ cons0 OperatorAssignment
@@ -266,6 +313,11 @@ instance Listable Category where
     \/ cons0 SplatParameter
     \/ cons0 HashSplatParameter
     \/ cons0 BlockParameter
+    \/ cons0 FloatLiteral
+    \/ cons0 ArrayTy
+    \/ cons0 DictionaryTy
+    \/ cons0 StructTy
+    \/ cons0 Struct
     \/ cons0 Break
     \/ cons0 Continue
     \/ cons0 Binary
@@ -273,4 +325,25 @@ instance Listable Category where
     \/ cons0 Constant
     \/ cons0 Superclass
     \/ cons0 SingletonClass
+    \/ cons0 RangeExpression
+    \/ cons0 ScopeOperator
+    \/ cons0 BeginBlock
+    \/ cons0 EndBlock
+    \/ cons0 ParameterDecl
+    \/ cons0 DefaultCase
+    \/ cons0 TypeDecl
+    \/ cons0 PointerTy
+    \/ cons0 FieldDecl
+    \/ cons0 SliceTy
+    \/ cons0 Element
+    \/ cons0 Literal
+    \/ cons0 ChannelTy
+    \/ cons0 Send
+    \/ cons0 IndexExpression
+    \/ cons0 FunctionTy
+    \/ cons0 IncrementStatement
+    \/ cons0 DecrementStatement
+    \/ cons0 QualifiedIdentifier
+    \/ cons0 FieldDeclarations
+    \/ cons0 RuneLiteral
     \/ cons1 (Other . unListableText)

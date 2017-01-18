@@ -49,10 +49,11 @@ diffComparableTerms construct comparable cost getLabel = recur
           | otherwise = Nothing
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff)
+algorithmWithTerms :: Applicative diff
+                   => (TermF (Syntax leaf) (Both a) (diff (Patch (Term (Syntax leaf) a))) -> diff (Patch (Term (Syntax leaf) a)))
                    -> Term (Syntax leaf) a
                    -> Term (Syntax leaf) a
-                   -> Algorithm (Term (Syntax leaf) a) diff diff
+                   -> Algorithm (Term (Syntax leaf) a) (diff (Patch (Term (Syntax leaf) a))) (diff (Patch (Term (Syntax leaf) a)))
 algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) ->
     Just $ Indexed <$> bySimilarity a b
@@ -62,23 +63,40 @@ algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $
     S.FunctionCall <$> recursively identifierA identifierB
                    <*> bySimilarity argsA argsB
   (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
-    S.Switch <$> recursively exprA exprB
+    S.Switch <$> maybeRecursively exprA exprB
              <*> bySimilarity casesA casesB
-  (S.Object a, S.Object b) -> Just $ S.Object <$> bySimilarity a b
+  (S.Object tyA a, S.Object tyB b) -> Just $
+    S.Object <$> maybeRecursively tyA tyB
+             <*> bySimilarity a b
   (Commented commentsA a, Commented commentsB b) -> Just $
     Commented <$> bySimilarity commentsA commentsB
-              <*> sequenceA (recursively <$> a <*> b)
-  (Array a, Array b) -> Just $ Array <$> bySimilarity a b
+              <*> maybeRecursively a b
+  (Array tyA a, Array tyB b) -> Just $
+    Array <$> maybeRecursively tyA tyB
+          <*> bySimilarity a b
   (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
     S.Class <$> recursively identifierA identifierB
-            <*> sequenceA (recursively <$> paramsA <*> paramsB)
+            <*> maybeRecursively paramsA paramsB
             <*> bySimilarity expressionsA expressionsB
-  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> Just $
+  (S.Method identifierA tyA paramsA expressionsA, S.Method identifierB tyB paramsB expressionsB) -> Just $
     S.Method <$> recursively identifierA identifierB
+             <*> maybeRecursively tyA tyB
              <*> bySimilarity paramsA paramsB
              <*> bySimilarity expressionsA expressionsB
+  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
+    S.Function <$> recursively idA idB
+               <*> bySimilarity paramsA paramsB
+               <*> bySimilarity bodyA bodyB
   _ -> Nothing
-  where annotate = construct . (both (extract t1) (extract t2) :<)
+  where
+    annotate = construct . (both (extract t1) (extract t2) :<)
+
+    maybeRecursively :: Applicative f => Maybe a -> Maybe a -> Algorithm a (f (Patch a)) (Maybe (f (Patch a)))
+    maybeRecursively a b = sequenceA $ case (a, b) of
+      (Just a, Just b) -> Just $ recursively a b
+      (Nothing, Just b) -> Just $ pure (inserting b)
+      (Just a, Nothing) -> Just $ pure (deleting a)
+      (Nothing, Nothing) -> Nothing
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (GAlign f, HasField fields Category, Eq (f (Cofree f Category)), Traversable f, Hashable label)

@@ -1,4 +1,46 @@
 [{
+    "testCaseDescription": "go-string-literals-setup-test",
+    "expectedResult": {
+        "changes": {
+            "string-literals.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string-literals.go"
+    ],
+    "patch": [
+        "diff --git a/string-literals.go b/string-literals.go",
+        "index e69de29b..79058077 100644",
+        "--- a/string-literals.go",
+        "+++ b/string-literals.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "29b7d780794e2ee8d37771310cebb2000b677aec..286e0bd256ddfafc7c560e9c2669787b66381d46"
+}
+,{
     "testCaseDescription": "go-string-literals-insert-test",
     "expectedResult": {
         "changes": {
@@ -7,117 +49,31 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string-literals.go"
-    ],
-    "patch": [
-        "diff --git a/string-literals.go b/string-literals.go",
-        "index e69de29..90ac543 100644",
-        "--- a/string-literals.go",
-        "+++ b/string-literals.go",
-        "@@ -0,0 +1,4 @@",
-        "+const (",
-        "+a = \"0\"",
-        "+b = \"hello world\"",
-        "+)"
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "740c6c6b1390c86d2f179d9d31f010916292861a..9698847d1ada590968dad5fc427c1758590173f2"
-}
-,{
-    "testCaseDescription": "go-string-literals-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 5,
                                 1
                             ],
                             "end": [
-                                8,
-                                2
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'a' variable"
+                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                6,
                                 1
                             ],
                             "end": [
-                                8,
-                                2
+                                6,
+                                18
                             ]
                         }
                     },
-                    "summary": "Added the 'b' variable"
+                    "summary": "Added the 'b' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -128,109 +84,22 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 90ac543..a781ce7 100644",
+        "index 79058077..9a69966c 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,4 +1,12 @@",
-        " const (",
-        "+a = \"2\"",
-        "+b = \"hi\"",
-        "+)",
+        "@@ -1,5 +1,8 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
         "+const (",
         "+a = \"0\"",
         "+b = \"hello world\"",
         "+)",
-        "+const (",
-        " a = \"0\"",
-        " b = \"hello world\"",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9698847d1ada590968dad5fc427c1758590173f2..e8867a66d6757f4af01fd07689f3c8a879acdc80"
-}
-,{
-    "testCaseDescription": "go-string-literals-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "string-literals.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    5
-                                ],
-                                "end": [
-                                    2,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"2\" string with the \"0\" string in the a variable"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    5
-                                ],
-                                "end": [
-                                    3,
-                                    9
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    5
-                                ],
-                                "end": [
-                                    3,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the b variable"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string-literals.go"
-    ],
-    "patch": [
-        "diff --git a/string-literals.go b/string-literals.go",
-        "index a781ce7..e7b83ba 100644",
-        "--- a/string-literals.go",
-        "+++ b/string-literals.go",
-        "@@ -1,6 +1,6 @@",
-        " const (",
-        "-a = \"2\"",
-        "-b = \"hi\"",
-        "+a = \"0\"",
-        "+b = \"hello world\"",
-        " )",
-        " const (",
-        " a = \"0\""
-    ],
-    "gitDir": "test/corpus/repos/go",
-    "shas": "e8867a66d6757f4af01fd07689f3c8a879acdc80..afb562067673bb91dc8df3e801ccb22827b8061e"
+    "shas": "286e0bd256ddfafc7c560e9c2669787b66381d46..b8f816256c7413358be4f5ff760a9cd7d826b702"
 }
 ,{
     "testCaseDescription": "go-string-literals-replacement-test",
@@ -242,54 +111,54 @@
                         "replace": [
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     5
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     8
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
+                                    5,
                                     5
                                 ],
                                 "end": [
-                                    2,
+                                    5,
                                     8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"0\" string with the \"2\" string in the a variable"
+                    "summary": "Replaced the \"0\" string with the \"2\" string in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     18
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    6,
                                     5
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the b variable"
+                    "summary": "Replaced the \"hello world\" string with the \"hi\" string in the b var assignment of the 'main' function"
                 }
             ]
         },
@@ -300,21 +169,22 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index e7b83ba..a781ce7 100644",
+        "index 9a69966c..fbbdb93e 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,6 +1,6 @@",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "-a = \"0\"",
         "-b = \"hello world\"",
         "+a = \"2\"",
         "+b = \"hi\"",
         " )",
-        " const (",
-        " a = \"0\""
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "afb562067673bb91dc8df3e801ccb22827b8061e..5345aa6a6eba226eb0cc8bce11c1073b3afea305"
+    "shas": "b8f816256c7413358be4f5ff760a9cd7d826b702..00903da3545a103befa3655622e1b972f3da1a46"
 }
 ,{
     "testCaseDescription": "go-string-literals-delete-replacement-test",
@@ -323,93 +193,57 @@
             "string-literals.go": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    5
+                                ],
+                                "end": [
+                                    5,
+                                    8
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Replaced the \"2\" string with the \"0\" string in the a var assignment of the 'main' function"
                 },
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                2
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    5
+                                ],
+                                "end": [
+                                    6,
+                                    18
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'b' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' variable"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'b' variable"
+                    "summary": "Replaced the \"hi\" string with the \"hello world\" string in the b var assignment of the 'main' function"
                 }
             ]
         },
@@ -420,30 +254,25 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index a781ce7..38c651f 100644",
+        "index fbbdb93e..9a69966c 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,12 +1,8 @@",
+        "@@ -2,7 +2,7 @@ package main",
+        " ",
+        " func main() {",
         " const (",
         "-a = \"2\"",
         "-b = \"hi\"",
-        "-)",
-        "-const (",
-        " a = \"0\"",
-        " b = \"hello world\"",
+        "+a = \"0\"",
+        "+b = \"hello world\"",
         " )",
-        " const (",
-        "-a = \"0\"",
-        "-b = \"hello world\"",
-        "+a = \"2\"",
-        "+b = \"hi\"",
-        " )"
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5345aa6a6eba226eb0cc8bce11c1073b3afea305..38c2ea7acc57af4f85190210c284999e77853ab5"
+    "shas": "00903da3545a103befa3655622e1b972f3da1a46..c1868273a476bcafa2067beb8a0b93f46627f003"
 }
 ,{
-    "testCaseDescription": "go-string-literals-delete-test",
+    "testCaseDescription": "go-string-literals-delete-insert-test",
     "expectedResult": {
         "changes": {
             "string-literals.go": [
@@ -451,31 +280,31 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                5,
                                 1
                             ],
                             "end": [
-                                4,
-                                2
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' variable"
+                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
+                                6,
                                 1
                             ],
                             "end": [
-                                4,
-                                2
+                                6,
+                                18
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable"
+                    "summary": "Deleted the 'b' var assignment in the main function of the 'main' module"
                 }
             ]
         },
@@ -486,24 +315,25 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index 38c651f..f70bc80 100644",
+        "index 9a69966c..79058077 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,8 +1,4 @@",
-        " const (",
+        "@@ -1,8 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-const (",
         "-a = \"0\"",
         "-b = \"hello world\"",
         "-)",
-        "-const (",
-        " a = \"2\"",
-        " b = \"hi\"",
-        " )"
+        "+",
+        " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38c2ea7acc57af4f85190210c284999e77853ab5..4fb5f349e5afea8321390fc01cd64c5e894a987c"
+    "shas": "c1868273a476bcafa2067beb8a0b93f46627f003..e059052145abd6701de2673af30bfa861b2b3382"
 }
 ,{
-    "testCaseDescription": "go-string-literals-delete-rest-test",
+    "testCaseDescription": "go-string-literals-teardown-test",
     "expectedResult": {
         "changes": {
             "string-literals.go": [
@@ -515,27 +345,12 @@
                                 1
                             ],
                             "end": [
-                                4,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
+                                6,
                                 1
-                            ],
-                            "end": [
-                                4,
-                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' variable"
+                    "summary": "Deleted the 'main' module"
                 }
             ]
         },
@@ -546,15 +361,16 @@
     ],
     "patch": [
         "diff --git a/string-literals.go b/string-literals.go",
-        "index f70bc80..e69de29 100644",
+        "index 79058077..e69de29b 100644",
         "--- a/string-literals.go",
         "+++ b/string-literals.go",
-        "@@ -1,4 +0,0 @@",
-        "-const (",
-        "-a = \"2\"",
-        "-b = \"hi\"",
-        "-)"
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4fb5f349e5afea8321390fc01cd64c5e894a987c..d7c85b9aedcbd3af69fdfe6a30e249364113d5e2"
+    "shas": "e059052145abd6701de2673af30bfa861b2b3382..bd87198971225ff85fa587a26c2dd6deb8510b32"
 }]
