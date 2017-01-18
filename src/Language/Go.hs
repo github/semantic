@@ -12,7 +12,7 @@ import SourceSpan (unionSourceSpansFrom)
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
-  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> SourceSpan -- ^ The span that the term occupies.
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
@@ -67,7 +67,7 @@ termConstructor source sourceSpan name range children _ = case name of
   "assignment_statement" -> toVarAssignment children
   "type_switch_statement" ->
     case Prologue.break isCaseClause children of
-      (clauses, cases) -> do
+      (clauses, cases) ->
         withDefaultInfo $ case clauses of
           [id] -> S.Switch (Just id) cases
           _ -> S.Error children
@@ -250,15 +250,14 @@ termConstructor source sourceSpan name range children _ = case name of
         [idList] -> withDefaultInfo (S.Indexed [idList])
         rest -> withRanges range Error rest (S.Error rest)
 
-    withRanges originalRange category' terms syntax = do
+    withRanges originalRange category' terms syntax =
       let ranges' = getField . extract <$> terms
-      sourceSpan' <- sourceSpan
-      let sourceSpans' = getField . extract <$> terms
-      pure $! cofree ((unionRangesFrom originalRange ranges' .: category' .: unionSourceSpansFrom sourceSpan' sourceSpans' .: RNil) :< syntax)
+          sourceSpans' = getField . extract <$> terms
+      in
+      pure $! cofree ((unionRangesFrom originalRange ranges' .: category' .: unionSourceSpansFrom sourceSpan sourceSpans' .: RNil) :< syntax)
 
-    withCategory category syntax = do
-      sourceSpan' <- sourceSpan
-      pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)
+    withCategory category syntax =
+      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
 
     withDefaultInfo = withCategory (categoryForGoName name)
 
