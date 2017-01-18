@@ -60,8 +60,8 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Switch{} -> Identifiable
           S.Rescue{} -> Identifiable
           S.Pair{} -> Identifiable
-          S.Array ty _ -> if isJust ty then Identifiable else Unidentifiable
-          S.Object ty _ -> if isJust ty then Identifiable else Unidentifiable
+          S.Array ty _ -> maybe Unidentifiable (const Identifiable) ty
+          S.Object ty _ -> maybe Unidentifiable (const Identifiable) ty
           S.BlockStatement{} -> Identifiable
           S.TypeDecl{} -> Identifiable
           S.Ty{} -> Identifiable
