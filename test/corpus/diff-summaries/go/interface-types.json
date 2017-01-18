@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71498e0be86ee47314b55f0a690d497e0e761d5e..6457e1ca38db2be7290dc60839c4683796261e40"
+    "shas": "8b9132202584b9cb77727d35fc5933c26eca6b3c..05f174ca0361352203a7d61ff484d16b59f7a35a"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -117,7 +117,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6457e1ca38db2be7290dc60839c4683796261e40..8413f246b3dbc246126780d1acb1a677c7e2900a"
+    "shas": "05f174ca0361352203a7d61ff484d16b59f7a35a..a33a0d6ca8ca62b9272edab5ea3d7c95f0abecd3"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -232,7 +232,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8413f246b3dbc246126780d1acb1a677c7e2900a..9b6c28d89f787d92f1d1b540baa97530d280ba75"
+    "shas": "a33a0d6ca8ca62b9272edab5ea3d7c95f0abecd3..8e1af67f8e4799d33dda9790076d3ebd0f992ae9"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -347,7 +347,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b6c28d89f787d92f1d1b540baa97530d280ba75..c0c7c8a8f8b9ff05484aef1d8d86d8f9c9d88bb2"
+    "shas": "8e1af67f8e4799d33dda9790076d3ebd0f992ae9..d38eef21ef5c858651ded42d3546f79843ba436e"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c0c7c8a8f8b9ff05484aef1d8d86d8f9c9d88bb2..e65ee652c3ba5847fedb4955afb89b767e25171a"
+    "shas": "d38eef21ef5c858651ded42d3546f79843ba436e..c3779f6bce6cf4a13e0e123647ff20ecb94a941d"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e65ee652c3ba5847fedb4955afb89b767e25171a..3e91ee46c052443af8abe661088cf8eabd8c56b5"
+    "shas": "c3779f6bce6cf4a13e0e123647ff20ecb94a941d..537b856e670ab8ae8aa4d420943369b4ba180c16"
 }]

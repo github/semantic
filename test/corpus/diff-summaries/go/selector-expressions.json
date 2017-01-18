@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3f9752a910c5ed199b0f5db3820c20ac2b6f2c78..555d5896dafda64f23dcfafb6221a84009b533ef"
+    "shas": "2e1fbc3488b3a5250246698b500360fa5c6cfcf2..e42a971b5a20ca75eb3c72bde201c371aa234e47"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "555d5896dafda64f23dcfafb6221a84009b533ef..eee17d82da6c0bd4dcbadf6536113444f7ddb8c6"
+    "shas": "e42a971b5a20ca75eb3c72bde201c371aa234e47..aca59151a934c5b7d22a87aa964022b68a778cb1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eee17d82da6c0bd4dcbadf6536113444f7ddb8c6..3f5bd3e00e0cde78960fc50f8e7479edad92c28c"
+    "shas": "aca59151a934c5b7d22a87aa964022b68a778cb1..dc7fcc07a9355e4a2ec338447082958991a735e2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3f5bd3e00e0cde78960fc50f8e7479edad92c28c..46caca376ae47df045f6c3158ea6eaeed086e47b"
+    "shas": "dc7fcc07a9355e4a2ec338447082958991a735e2..7b10b01b498546d1d3e0e6c9b28fdfeb6a1087f7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "46caca376ae47df045f6c3158ea6eaeed086e47b..dfbcceca127cb5fe4adca3e8b28dd58192626eb7"
+    "shas": "7b10b01b498546d1d3e0e6c9b28fdfeb6a1087f7..a909f7c3616574addb8ffea18320f3bb8d50c85e"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfbcceca127cb5fe4adca3e8b28dd58192626eb7..7e65c3a864d842f6e821a2fe8c559b7180a2f52b"
+    "shas": "a909f7c3616574addb8ffea18320f3bb8d50c85e..584515bfe655665166b3a9a5db100a4bd4ae398b"
 }]

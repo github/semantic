@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca808648111bc7e9d6f1e5951618c95fb6b0d161..12ab48de8fc2eee5e67ef3b5afbff210479a1f2f"
+    "shas": "6cbe8d53838858e6ff83e2890cd6d51da63e06dd..c9165a22e802c84a4c84603433208209bf8ecd58"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "12ab48de8fc2eee5e67ef3b5afbff210479a1f2f..3666c52bda3c0dbda23b6bf36ff2baff6af2bdee"
+    "shas": "c9165a22e802c84a4c84603433208209bf8ecd58..14ddaf5c44b68da54ac1e6080f651683b00abd0d"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3666c52bda3c0dbda23b6bf36ff2baff6af2bdee..b5c2d5e190fc5980937a02e3277354163df40273"
+    "shas": "14ddaf5c44b68da54ac1e6080f651683b00abd0d..da31b44611dfde41b3500e215d049e0ae08decd1"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b5c2d5e190fc5980937a02e3277354163df40273..ca1de4b0e5be139bc7c1083117814089ecdeb3bf"
+    "shas": "da31b44611dfde41b3500e215d049e0ae08decd1..cd07dffb2fde011ff7d80b7e9fe6319aadafcba7"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ca1de4b0e5be139bc7c1083117814089ecdeb3bf..579dda33b481786913cd1fa30e6a8961f4625767"
+    "shas": "cd07dffb2fde011ff7d80b7e9fe6319aadafcba7..15310f0e4a692c1ebd2a48e7512e71ae63cbd02f"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "579dda33b481786913cd1fa30e6a8961f4625767..28a20f27e991224c4658903e99d662f4d5b25a0f"
+    "shas": "15310f0e4a692c1ebd2a48e7512e71ae63cbd02f..15dbaf1c2f3cba362af5abba2a6aa9d2f1a92990"
 }]
