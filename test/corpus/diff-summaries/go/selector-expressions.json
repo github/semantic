@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ee8a621a19927e6673de23ad19267fbef943336..034ab6bf720b1edf45c62692756f1d399998d3a9"
+    "shas": "326e7ec102c20907c6f31337ed132a4ad9b9910d..9efaa0a8dc26e4d08c0be8bffd28cc83bebe923f"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "034ab6bf720b1edf45c62692756f1d399998d3a9..6eb915179875201379243d9943f80fd321972dd0"
+    "shas": "9efaa0a8dc26e4d08c0be8bffd28cc83bebe923f..1187667bc99f69b2d1731ebd57b29aa95c0831a6"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6eb915179875201379243d9943f80fd321972dd0..7a7ba400980b5c49288c9d40c02831d62c644e8a"
+    "shas": "1187667bc99f69b2d1731ebd57b29aa95c0831a6..838512a9b3b38888767a0532dcb09ce322a5c79a"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7a7ba400980b5c49288c9d40c02831d62c644e8a..5c6e412a68e7993bd577c1fc3802b286ac7bd07a"
+    "shas": "838512a9b3b38888767a0532dcb09ce322a5c79a..dc3885becfc34c1cd3f3b0b1b09c359c16d2b0f9"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5c6e412a68e7993bd577c1fc3802b286ac7bd07a..ccfa8b3039eb41009a1310b01097e9d0428d8bdc"
+    "shas": "dc3885becfc34c1cd3f3b0b1b09c359c16d2b0f9..0cd56934562310cb12eb651b13f1fe0df2cfb177"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ccfa8b3039eb41009a1310b01097e9d0428d8bdc..3940c9d261d075b070f8d8d3068160173109f2dc"
+    "shas": "0cd56934562310cb12eb651b13f1fe0df2cfb177..e63783524f04f58e0ee0e76c3939b33c9a3357f6"
 }]

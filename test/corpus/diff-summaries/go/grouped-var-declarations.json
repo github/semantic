@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f3589731c303737800c85986374c773a210934ba..dc8ae5271b2445aefe2ec858fafa445baca5b18a"
+    "shas": "265cd5c07998bd4dfccc7a320e182f71e10a85ae..966493f966e33600c395a58287f64d421ef7ccc5"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-insert-test",
@@ -99,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc8ae5271b2445aefe2ec858fafa445baca5b18a..76afa9837be5510776c3510e0101412f59bf975e"
+    "shas": "966493f966e33600c395a58287f64d421ef7ccc5..1258968ec73ff56aba27f4831545703137233023"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-replacement-test",
@@ -184,7 +184,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "76afa9837be5510776c3510e0101412f59bf975e..c00cf2b423272052ba6ca1335486f8418f913e1a"
+    "shas": "1258968ec73ff56aba27f4831545703137233023..59e3fce2e38bc9198fe952bdde89fcd779622be4"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-replacement-test",
@@ -269,7 +269,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c00cf2b423272052ba6ca1335486f8418f913e1a..b1036ad862af98f0feefeb5f95c8a818366aa7c3"
+    "shas": "59e3fce2e38bc9198fe952bdde89fcd779622be4..332105d831b594b77407351e3e100984b5298fd0"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-delete-insert-test",
@@ -330,7 +330,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1036ad862af98f0feefeb5f95c8a818366aa7c3..1b18e0e8eff90aa92c2d7f9153a957c6b08aab1b"
+    "shas": "332105d831b594b77407351e3e100984b5298fd0..13924dac4e2fd15282585ac5eb64b1f92458e07f"
 }
 ,{
     "testCaseDescription": "go-grouped-var-declarations-teardown-test",
@@ -372,5 +372,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1b18e0e8eff90aa92c2d7f9153a957c6b08aab1b..007ac035ab1e1b2f630044470956d15cb35bbec4"
+    "shas": "13924dac4e2fd15282585ac5eb64b1f92458e07f..8ee3f9d7ecedf1d162580097af3f1408c6fd2054"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3bf279abddb2ff1be05defe1acc0a84f1ad20cb3..93b74d9e44f66870379fc4510e25c5527798aca1"
+    "shas": "b13b8100361e4845134ab1389ca092165ab8c6d4..ac791fa63ad20c43f591972481421b0c385649c4"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "93b74d9e44f66870379fc4510e25c5527798aca1..9761a505ff83bfaa915316075afaafd157b26c32"
+    "shas": "ac791fa63ad20c43f591972481421b0c385649c4..1526d3920476e9c22be29cf09a50dfa44c5319d1"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -292,7 +292,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9761a505ff83bfaa915316075afaafd157b26c32..42f351129de73451ed9828ef33bf57f4c0771056"
+    "shas": "1526d3920476e9c22be29cf09a50dfa44c5319d1..fb9fe258ca465f299a2de589b0074fdb9131fc61"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -464,7 +464,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "42f351129de73451ed9828ef33bf57f4c0771056..0c6cd0da0998b7e1814fd2c0af400457372e9683"
+    "shas": "fb9fe258ca465f299a2de589b0074fdb9131fc61..74516ff568d0cc0456bcca34f1885635493c4bc0"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -570,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c6cd0da0998b7e1814fd2c0af400457372e9683..2dc5d982cc0f5d6bf6ab42996b0829f47232ae5c"
+    "shas": "74516ff568d0cc0456bcca34f1885635493c4bc0..b15fbf19a0d8fc5b4877db317fb6130fae70cc5a"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -612,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2dc5d982cc0f5d6bf6ab42996b0829f47232ae5c..b41749d95bc66f80f9f39b56585718af8fc77656"
+    "shas": "b15fbf19a0d8fc5b4877db317fb6130fae70cc5a..adb5255d7368c7eaac8ceaf41ae1af21e95c0550"
 }]

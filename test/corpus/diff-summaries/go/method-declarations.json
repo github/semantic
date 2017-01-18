@@ -38,7 +38,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "96c8951d3711535761aa37bd1754734ad8040c72..44c79890676b595c10f99c1528725fd903bf6f76"
+    "shas": "08349bf5d571aa7f202bb4680c98506c5e95f323..a836b1b0c0306688cbaf52d39bef7c3bc26660f5"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -140,7 +140,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44c79890676b595c10f99c1528725fd903bf6f76..ad38c8567a51006a6397680051fe3192ec255fd1"
+    "shas": "a836b1b0c0306688cbaf52d39bef7c3bc26660f5..fdd29e232579ca21a138b98a49cd8de15da82129"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -221,7 +221,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ad38c8567a51006a6397680051fe3192ec255fd1..fca491deb20a664ffdedafc2c7cba49f87a984c9"
+    "shas": "fdd29e232579ca21a138b98a49cd8de15da82129..acb368cf84594c19a9627c6f4a81c23341357755"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -302,7 +302,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fca491deb20a664ffdedafc2c7cba49f87a984c9..790aaff97110b8c55b1d5e09d198f82237408133"
+    "shas": "acb368cf84594c19a9627c6f4a81c23341357755..910787dea3bf209d2da35658f2628be93d656c07"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -404,7 +404,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "790aaff97110b8c55b1d5e09d198f82237408133..c84740ab0e5ee063694bcbefab7c6a74df324ff8"
+    "shas": "910787dea3bf209d2da35658f2628be93d656c07..7e911f937db0584765c1bbf3693e040bce6115e2"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -446,5 +446,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c84740ab0e5ee063694bcbefab7c6a74df324ff8..8a6a92aa859d5ff6f5d5d7339de511e495f3fb32"
+    "shas": "7e911f937db0584765c1bbf3693e040bce6115e2..8a36349033d918277fe962d113040a59ca3e4719"
 }]

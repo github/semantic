@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4b6b82d5a44ec573f8b8d5f3e1d7bff9ef206327..0c881896deb976bbb360c293a844f0991a0e3c93"
+    "shas": "37a5b9434c4cb8dc9a02da712f02e9a6d44c223b..bd735526c1ba619b1f1ceaa27e8d1952dfbcbaba"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c881896deb976bbb360c293a844f0991a0e3c93..5b7b2660b57ed2cc93e0370a47570c76ec3458a8"
+    "shas": "bd735526c1ba619b1f1ceaa27e8d1952dfbcbaba..16d9b031e1bd033ad8dee8f256158c9e55d09be9"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b7b2660b57ed2cc93e0370a47570c76ec3458a8..6c3289d07b158b226b7804f18f03066a43d026a3"
+    "shas": "16d9b031e1bd033ad8dee8f256158c9e55d09be9..388cf4bfaf745715899721810848a1b69dab283a"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6c3289d07b158b226b7804f18f03066a43d026a3..be35446eacfd2475d06e30f1995d239458ec2094"
+    "shas": "388cf4bfaf745715899721810848a1b69dab283a..b325132fdb67e6f6a6957d0f47b53ae0451466bb"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "be35446eacfd2475d06e30f1995d239458ec2094..170310bb7dfb08dc45d5ac84ca7bf56713d6df0a"
+    "shas": "b325132fdb67e6f6a6957d0f47b53ae0451466bb..cfa9c1d71c7112558eba9e7cd56640f6bae94108"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "170310bb7dfb08dc45d5ac84ca7bf56713d6df0a..bac6f19f98cebfd3cc2b8825b9a5549a1a241587"
+    "shas": "cfa9c1d71c7112558eba9e7cd56640f6bae94108..31d5c38fec253fcf9de204abac17930d4b944b58"
 }]

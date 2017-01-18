@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "53223ee78e3234b896b2ca4fe65b39e9cf8a036d..6950ca8e27148d76f903836fc1170efb79baf235"
+    "shas": "35164423c9790e6d08f6210070936c12bdc6d495..304f3d098ecafcd2510051342d806bbf2582d19a"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6950ca8e27148d76f903836fc1170efb79baf235..d8dd309a00d816ab7494ae014f03ea33ef70f10a"
+    "shas": "304f3d098ecafcd2510051342d806bbf2582d19a..ce8156507c7b8d7ec113555f0d40e74cb30aca3b"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8dd309a00d816ab7494ae014f03ea33ef70f10a..29e08d83685bf5c08aa75e72c723e75764eb4cb3"
+    "shas": "ce8156507c7b8d7ec113555f0d40e74cb30aca3b..4cf18cb5bb0431510778697fc4a225bbd0a7870d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "29e08d83685bf5c08aa75e72c723e75764eb4cb3..9a46d9377321c67542a0479e8a4fd54d31f44262"
+    "shas": "4cf18cb5bb0431510778697fc4a225bbd0a7870d..83a5e4cf17ea2e034e4ad70b4eb82f4d1f6c75a0"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a46d9377321c67542a0479e8a4fd54d31f44262..97c481a9ff70fa888490e64bb2044dadbccb434d"
+    "shas": "83a5e4cf17ea2e034e4ad70b4eb82f4d1f6c75a0..2853cb4370180ef392d2a7a836371363d36be4fa"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97c481a9ff70fa888490e64bb2044dadbccb434d..8bedda3f386f592c8dcb7d066e099200da351afc"
+    "shas": "2853cb4370180ef392d2a7a836371363d36be4fa..16a9bf3266ddc88a4e5b400eaf53780c80818151"
 }]

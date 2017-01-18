@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aa5394a1d9c99dc8a4a626e7d1a44526842bafa8..b4531052da12ca78ee258bfd15a2a3f2bc10c638"
+    "shas": "296a79280a372cb521b3294615899849095e72e4..1ace3b23c8913dc6196992acaeacd5c4ba44c5db"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -157,7 +157,7 @@
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4531052da12ca78ee258bfd15a2a3f2bc10c638..a670a4224076168e9635f82f4540bc25310824b2"
+    "shas": "1ace3b23c8913dc6196992acaeacd5c4ba44c5db..d52d52b6d220efc984ddf1314194516164db6f8c"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -189,7 +189,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''δ'' rune_literal with the ''©'' rune_literal in the a var assignment of the 'main' module"
+                    "summary": "Replaced the ''δ'' rune literal with the ''©'' rune literal in the a var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -216,7 +216,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune_literal with the ''©'' rune_literal in the b var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the b var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -243,7 +243,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune_literal with the ''©'' rune_literal in the c var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the c var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -270,7 +270,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune_literal with the ''©'' rune_literal in the d var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the d var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -297,7 +297,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune_literal with the ''©'' rune_literal in the e var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the e var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -324,7 +324,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''⌘'' rune_literal with the ''©'' rune_literal in the f var assignment of the 'main' module"
+                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the f var assignment of the 'main' module"
                 }
             ]
         },
@@ -356,7 +356,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a670a4224076168e9635f82f4540bc25310824b2..65d81151dcb35688a9ad9081de5878d310cb85ab"
+    "shas": "d52d52b6d220efc984ddf1314194516164db6f8c..6837519f61136939dc1cf9e2e698a2dc2f93ca85"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -388,7 +388,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune_literal with the ''δ'' rune_literal in the a var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''δ'' rune literal in the a var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -415,7 +415,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune_literal with the ''⌘'' rune_literal in the b var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the b var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -442,7 +442,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune_literal with the ''⌘'' rune_literal in the c var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the c var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -469,7 +469,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune_literal with the ''⌘'' rune_literal in the d var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the d var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -496,7 +496,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune_literal with the ''⌘'' rune_literal in the e var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the e var assignment of the 'main' module"
                 },
                 {
                     "span": {
@@ -523,7 +523,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the ''©'' rune_literal with the ''⌘'' rune_literal in the f var assignment of the 'main' module"
+                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the f var assignment of the 'main' module"
                 }
             ]
         },
@@ -555,7 +555,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "65d81151dcb35688a9ad9081de5878d310cb85ab..b5def3acb1d4faf3bd679f52059be65c50c4f43b"
+    "shas": "6837519f61136939dc1cf9e2e698a2dc2f93ca85..7eb278e0e7c5fe1de647734a78a67edf4866603b"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -677,7 +677,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b5def3acb1d4faf3bd679f52059be65c50c4f43b..0d7e7ef6fa6b5210199aebe2202f098797eeca56"
+    "shas": "7eb278e0e7c5fe1de647734a78a67edf4866603b..8855725d372d44d7a70114711b8839bf3acbd5a5"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -716,5 +716,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0d7e7ef6fa6b5210199aebe2202f098797eeca56..53287b07836de843db2c96aea609ec9f936aa9df"
+    "shas": "8855725d372d44d7a70114711b8839bf3acbd5a5..9a89cf94db18f7f67803c1055434f48ee65d8cc6"
 }]
