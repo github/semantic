@@ -263,7 +263,7 @@ toTermName source term = case unwrap term of
   S.Break expr -> maybe "" toTermName' expr
   S.Continue expr -> maybe "" toTermName' expr
   S.BlockStatement children -> termNameFromChildren term children
-  S.Default children -> termNameFromChildren term children
+  S.DefaultCase children -> termNameFromChildren term children
   S.FieldDecl id expr tag -> termNameFromSource id <> (maybe "" (\expr' -> " " <> termNameFromSource expr') expr) <> (maybe "" ((" " <>) . termNameFromSource) tag)
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
@@ -309,7 +309,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.When -> "in a" <+> catName c
       C.BeginBlock -> "in a" <+> catName c
       C.EndBlock -> "in an" <+> catName c
-      C.Default -> "in a" <+> catName c
+      C.DefaultCase -> "in a" <+> catName c
       C.TypeDecl -> "in the" <+> squotes (termName t) <+> catName c
       _ -> "in the" <+> termName t <+> catName c
     annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
@@ -461,7 +461,7 @@ instance HasCategory Category where
     C.BeginBlock -> "BEGIN block"
     C.EndBlock -> "END block"
     C.ParameterDecl -> "parameter declaration"
-    C.Default -> "default statement"
+    C.DefaultCase -> "default statement"
     C.TypeDecl -> "type declaration"
     C.PointerTy -> "pointer type"
     C.FieldDecl -> "field declaration"

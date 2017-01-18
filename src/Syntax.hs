@@ -48,7 +48,7 @@ data Syntax a f
   | Switch { switchExpr :: (Maybe f), cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
   -- | A default case in a switch statement.
-  | Default [f]
+  | DefaultCase [f]
   | Select { cases :: [f] }
   | Object { objectTy :: Maybe f, keyValues :: [f] }
   -- | A pair in an Object. e.g. foo: bar or foo => bar
@@ -163,6 +163,7 @@ instance Listable2 Syntax where
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
     \/ liftCons1 recur Ty
     \/ liftCons2 recur recur Send
+    \/ liftCons1 (liftTiers recur) DefaultCase
 
 instance Listable leaf => Listable1 (Syntax leaf) where
   liftTiers = liftTiers2 tiers

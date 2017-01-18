@@ -57,7 +57,7 @@ termConstructor source sourceSpan name range children _ = case name of
         toCase clause = case toList (unwrap clause) of
           clause' : rest -> case toList (unwrap clause') of
             [clause''] -> withCategory Case $ S.Case clause'' rest
-            [] -> withCategory Default $ S.Default rest
+            [] -> withCategory DefaultCase $ S.DefaultCase rest
             rest -> withCategory Error $ S.Error rest
           [] -> withCategory Error $ S.Error [clause]
   "parameter_declaration" -> withDefaultInfo $ case children of

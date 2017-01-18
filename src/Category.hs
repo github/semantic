@@ -40,6 +40,8 @@ data Category
   | Args
   -- | A string literal.
   | StringLiteral
+  -- | An integer literal.
+  | IntegerLiteral
   -- | A regex literal.
   | Regex
   -- | A return statement.
@@ -191,7 +193,7 @@ data Category
   | EndBlock
   | ParameterDecl
   -- | A default case in a switch statement.
-  | Default
+  | DefaultCase
   -- | A type declaration.
   | TypeDecl
   | PointerTy
@@ -328,7 +330,7 @@ instance Listable Category where
     \/ cons0 BeginBlock
     \/ cons0 EndBlock
     \/ cons0 ParameterDecl
-    \/ cons0 Default
+    \/ cons0 DefaultCase
     \/ cons0 TypeDecl
     \/ cons0 PointerTy
     \/ cons0 FieldDecl

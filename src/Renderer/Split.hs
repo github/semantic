@@ -129,7 +129,7 @@ styleName category = "category-" <> case category of
   C.BeginBlock -> "begin_block"
   C.EndBlock -> "end_block"
   C.ParameterDecl -> "parameter_declaration"
-  C.Default -> "default_statement"
+  C.DefaultCase -> "default_statement"
   C.TypeDecl -> "type_declaration"
   C.PointerTy -> "pointer_type"
   C.FieldDecl -> "field_declaration"
