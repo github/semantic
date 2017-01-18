@@ -77,8 +77,9 @@ algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $
     S.Class <$> recursively identifierA identifierB
             <*> sequenceA (recursively <$> paramsA <*> paramsB)
             <*> bySimilarity expressionsA expressionsB
-  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> Just $
+  (S.Method identifierA tyA paramsA expressionsA, S.Method identifierB tyB paramsB expressionsB) -> Just $
     S.Method <$> recursively identifierA identifierB
+            <*> sequenceA (recursively <$> tyA <*> tyB)
              <*> bySimilarity paramsA paramsB
              <*> bySimilarity expressionsA expressionsB
   (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $

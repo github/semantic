@@ -110,8 +110,8 @@ termConstructor source sourceSpan name range children allChildren
     ("call", [ base, property ]) -> S.MemberAccess base property
     ("call", _ ) -> S.Error children
     ("method", _ ) -> case children of
-      identifier : params : body | Params <- category (extract params) -> S.Method identifier (toList (unwrap params)) body
-      identifier : body -> S.Method identifier [] body
+      identifier : params : body | Params <- category (extract params) -> S.Method identifier Nothing (toList (unwrap params)) body
+      identifier : body -> S.Method identifier Nothing [] body
       _ -> S.Error children
     ("module", constant : body ) -> S.Module constant body
     ("module", _ ) -> S.Error children

@@ -92,8 +92,8 @@ termConstructor source sourceSpan name range children allChildren
         , Finally <- category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
       _ -> S.Error children
     ("array", _) -> S.Array Nothing children
-    ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
-    ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
+    ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
+    ("method_definition", [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
     ("method_definition", _ ) -> S.Error children
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))

@@ -124,10 +124,24 @@ termConstructor source sourceSpan name range children _ = case name of
   "break_statement" -> toBreak children
   "continue_statement" -> toContinue children
   "keyed_element" -> toPair children
+  "method_declaration" -> toMethod children
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
+    toMethod = \case
+      [params, name, fun] -> withDefaultInfo (S.Method name Nothing (toList $ unwrap params) (toList $ unwrap fun))
+      [params, name, outParams, fun] -> do
+        let params' = toList (unwrap params)
+            outParams' = toList (unwrap outParams)
+            allParams = params' <> outParams'
+        withDefaultInfo (S.Method name Nothing allParams (toList $ unwrap fun))
+      [params, name, outParams, ty, fun] -> do
+        let params' = toList (unwrap params)
+            outParams' = toList (unwrap outParams)
+            allParams = params' <> outParams'
+        withDefaultInfo (S.Method name (Just ty) allParams (toList $ unwrap fun))
+      rest -> withCategory Error (S.Error rest)
     toPair = \case
       [key, value] -> withDefaultInfo (S.Pair key value)
       rest -> withCategory Error (S.Error rest)
@@ -306,4 +320,5 @@ categoryForGoName = \case
   "break_statement" -> Break
   "continue_statement" -> Continue
   "rune_literal" -> RuneLiteral
+  "method_declaration" -> Method
   s -> Other (toS s)
