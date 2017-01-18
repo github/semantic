@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "326e7ec102c20907c6f31337ed132a4ad9b9910d..9efaa0a8dc26e4d08c0be8bffd28cc83bebe923f"
+    "shas": "0c427a8f032c83b79308e49881a756a562e84789..0a4db4052402c02b59903ce43e136c6fd4f874e8"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9efaa0a8dc26e4d08c0be8bffd28cc83bebe923f..1187667bc99f69b2d1731ebd57b29aa95c0831a6"
+    "shas": "0a4db4052402c02b59903ce43e136c6fd4f874e8..5b7362d2a6798347b629f3bd8208b5a4d36450b9"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1187667bc99f69b2d1731ebd57b29aa95c0831a6..838512a9b3b38888767a0532dcb09ce322a5c79a"
+    "shas": "5b7362d2a6798347b629f3bd8208b5a4d36450b9..8bd5ddd498e86191d38737819316195c578421c1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "838512a9b3b38888767a0532dcb09ce322a5c79a..dc3885becfc34c1cd3f3b0b1b09c359c16d2b0f9"
+    "shas": "8bd5ddd498e86191d38737819316195c578421c1..84c0775e517d32b6775e503cf2819f6a93a365c1"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc3885becfc34c1cd3f3b0b1b09c359c16d2b0f9..0cd56934562310cb12eb651b13f1fe0df2cfb177"
+    "shas": "84c0775e517d32b6775e503cf2819f6a93a365c1..19cd95260b98113cdaae440831dd756d519fa837"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0cd56934562310cb12eb651b13f1fe0df2cfb177..e63783524f04f58e0ee0e76c3939b33c9a3357f6"
+    "shas": "19cd95260b98113cdaae440831dd756d519fa837..0247664c34d33fa74809a86157f1fa6b5b66b30d"
 }]

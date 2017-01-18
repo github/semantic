@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "35164423c9790e6d08f6210070936c12bdc6d495..304f3d098ecafcd2510051342d806bbf2582d19a"
+    "shas": "0e7b4a571d564014710d306e2fe922eab3a132f6..67c1ab5a00cd30bc969cff8079457088bd32f1f0"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "304f3d098ecafcd2510051342d806bbf2582d19a..ce8156507c7b8d7ec113555f0d40e74cb30aca3b"
+    "shas": "67c1ab5a00cd30bc969cff8079457088bd32f1f0..d52b6498fd82ccdcaf0ad1ffa0ed22ed955f129c"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ce8156507c7b8d7ec113555f0d40e74cb30aca3b..4cf18cb5bb0431510778697fc4a225bbd0a7870d"
+    "shas": "d52b6498fd82ccdcaf0ad1ffa0ed22ed955f129c..0d895e44e44a21ded5d2b673aba2d7c0ff3a38b2"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4cf18cb5bb0431510778697fc4a225bbd0a7870d..83a5e4cf17ea2e034e4ad70b4eb82f4d1f6c75a0"
+    "shas": "0d895e44e44a21ded5d2b673aba2d7c0ff3a38b2..a5b2c57e753a220cfb289ef17308b168091cfa84"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "83a5e4cf17ea2e034e4ad70b4eb82f4d1f6c75a0..2853cb4370180ef392d2a7a836371363d36be4fa"
+    "shas": "a5b2c57e753a220cfb289ef17308b168091cfa84..a351f016065b824a43f698f042740cc37ef49968"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2853cb4370180ef392d2a7a836371363d36be4fa..16a9bf3266ddc88a4e5b400eaf53780c80818151"
+    "shas": "a351f016065b824a43f698f042740cc37ef49968..4831542d669ac6521f2ff1c352041177bb637377"
 }]

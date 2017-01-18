@@ -123,10 +123,14 @@ termConstructor source sourceSpan name range children _ = case name of
     withDefaultInfo $ S.Leaf . toText $ slice range source
   "break_statement" -> toBreak children
   "continue_statement" -> toContinue children
+  "keyed_element" -> toPair children
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
+    toPair = \case
+      [key, value] -> withDefaultInfo (S.Pair key value)
+      rest -> withCategory Error (S.Error rest)
     toBreak = \case
       [label] -> withDefaultInfo (S.Break (Just label))
       [] -> withDefaultInfo (S.Break Nothing)

@@ -1,0 +1,346 @@
+[{
+    "testCaseDescription": "go-modifying-struct-fields-setup-test",
+    "expectedResult": {
+        "changes": {
+            "modifying-struct-fields.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "modifying-struct-fields.go"
+    ],
+    "patch": [
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index e69de29b..79058077 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
+        "+",
+        "+func main() {",
+        "+",
+        "+}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "cb1d3031a839fca7b0372b76cd3393de641da8c0..f59896024400c5876aeab9b715a00c10bcd547f7"
+}
+,{
+    "testCaseDescription": "go-modifying-struct-fields-insert-test",
+    "expectedResult": {
+        "changes": {
+            "modifying-struct-fields.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'ctx' var assignment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "modifying-struct-fields.go"
+    ],
+    "patch": [
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 79058077..8b8c10e6 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
+        "@@ -1,5 +1,7 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-",
+        "+ctx := &uploadContext{",
+        "+   Remote: remote",
+        "+}",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f59896024400c5876aeab9b715a00c10bcd547f7..9b2dfb2e1f8d175f88f5adbbeba3cb3ec7c93e4f"
+}
+,{
+    "testCaseDescription": "go-modifying-struct-fields-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "modifying-struct-fields.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    4
+                                ],
+                                "end": [
+                                    5,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    4
+                                ],
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'Remote' identifier with the 'trackedLocksMu' identifier in the ctx var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                20
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new(sync.Mutex)' function call in the ctx var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'remote' identifier in the ctx var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "modifying-struct-fields.go"
+    ],
+    "patch": [
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 8b8c10e6..e16cd243 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
+        " ctx := &uploadContext{",
+        "-   Remote: remote",
+        "+   trackedLocksMu: new(sync.Mutex)",
+        " }",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "9b2dfb2e1f8d175f88f5adbbeba3cb3ec7c93e4f..f7f2e017ea220a8e76850e81567f9b7e159cf00f"
+}
+,{
+    "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "modifying-struct-fields.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    4
+                                ],
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    4
+                                ],
+                                "end": [
+                                    5,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'trackedLocksMu' identifier with the 'Remote' identifier in the ctx var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                12
+                            ],
+                            "end": [
+                                5,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'remote' identifier in the ctx var assignment of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                20
+                            ],
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new(sync.Mutex)' function call in the ctx var assignment of the 'main' function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "modifying-struct-fields.go"
+    ],
+    "patch": [
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index e16cd243..8b8c10e6 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
+        "@@ -2,6 +2,6 @@ package main",
+        " ",
+        " func main() {",
+        " ctx := &uploadContext{",
+        "-   trackedLocksMu: new(sync.Mutex)",
+        "+   Remote: remote",
+        " }",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "f7f2e017ea220a8e76850e81567f9b7e159cf00f..a4c28470d2652dba5eaae2a85d98439f6fc45acf"
+}
+,{
+    "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "modifying-struct-fields.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'ctx' var assignment in the main function of the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "modifying-struct-fields.go"
+    ],
+    "patch": [
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 8b8c10e6..79058077 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
+        "@@ -1,7 +1,5 @@",
+        " package main",
+        " ",
+        " func main() {",
+        "-ctx := &uploadContext{",
+        "-   Remote: remote",
+        "-}",
+        "+",
+        " }"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "a4c28470d2652dba5eaae2a85d98439f6fc45acf..71be35001981fc1e7097a216831df4c7278b5c0b"
+}
+,{
+    "testCaseDescription": "go-modifying-struct-fields-teardown-test",
+    "expectedResult": {
+        "changes": {
+            "modifying-struct-fields.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "modifying-struct-fields.go"
+    ],
+    "patch": [
+        "diff --git a/modifying-struct-fields.go b/modifying-struct-fields.go",
+        "index 79058077..e69de29b 100644",
+        "--- a/modifying-struct-fields.go",
+        "+++ b/modifying-struct-fields.go",
+        "@@ -1,5 +0,0 @@",
+        "-package main",
+        "-",
+        "-func main() {",
+        "-",
+        "-}"
+    ],
+    "gitDir": "test/corpus/repos/go",
+    "shas": "71be35001981fc1e7097a216831df4c7278b5c0b..123a2086698184c3a0e6f7eebd222c9273448df9"
+}]

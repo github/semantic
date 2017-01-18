@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "80a8a4b6fc7113c135bdf6f37b7bc2e37be82a30..bf1f0ac873f16ffdfa8385170a8934d266bb9f72"
+    "shas": "c22c577a580a3c89ace48fdd1c5267508a07d822..a33a97280d1487d58c6b9fb35992b570ab356140"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bf1f0ac873f16ffdfa8385170a8934d266bb9f72..27b5653e9ae53db23ee10bb5b961604de0595d2b"
+    "shas": "a33a97280d1487d58c6b9fb35992b570ab356140..990a6344bb8f22f1c074cd7ca547f27c982d4f6b"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "27b5653e9ae53db23ee10bb5b961604de0595d2b..1a6e3a1f0b9afc19cea481a3f9b8033177b0a055"
+    "shas": "990a6344bb8f22f1c074cd7ca547f27c982d4f6b..402128fdeb46866400b691424e4f8b4968e3011b"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a6e3a1f0b9afc19cea481a3f9b8033177b0a055..2455af11db2e63743911c4684853fdfb23dcfffc"
+    "shas": "402128fdeb46866400b691424e4f8b4968e3011b..90272b1f66da7ab9e30d721b88cd76fcd4566461"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2455af11db2e63743911c4684853fdfb23dcfffc..886d85caaafd56888a162300c8806b80662123d5"
+    "shas": "90272b1f66da7ab9e30d721b88cd76fcd4566461..84dbc8845cddcce8f576b0a03c80c9eb88b78f40"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "886d85caaafd56888a162300c8806b80662123d5..1550ddb002f97cfd9242bce040f19198ffed0d46"
+    "shas": "84dbc8845cddcce8f576b0a03c80c9eb88b78f40..c86997a464ea8939db6c8d67490f3baf3970fd87"
 }]

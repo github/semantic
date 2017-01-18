@@ -35,7 +35,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "296a79280a372cb521b3294615899849095e72e4..1ace3b23c8913dc6196992acaeacd5c4ba44c5db"
+    "shas": "4ad24c7c0759cfce3416df9088ba128facb9980e..f87b743fe6de37cb0b149bd74a1a88dfc60c9fe6"
 }
 ,{
     "testCaseDescription": "go-rune-literals-insert-test",
@@ -126,11 +126,56 @@
                             ],
                             "end": [
                                 8,
-                                10
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'f' var assignment in the main module"
+                    "summary": "Added the 'f' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                7
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''⌘' error in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'jjjj' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' error in the main module"
                 }
             ]
         },
@@ -141,7 +186,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index c9ecbf5e..e97de4c1 100644",
+        "index c9ecbf5e..7d2b6610 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,2 +1,9 @@",
@@ -153,11 +198,11 @@
         "+  c = '⌘'",
         "+  d = '⌘'",
         "+  e = '⌘'",
-        "+  f = '⌘'",
+        "+  f = '⌘jjjj'",
         "+)"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1ace3b23c8913dc6196992acaeacd5c4ba44c5db..d52d52b6d220efc984ddf1314194516164db6f8c"
+    "shas": "f87b743fe6de37cb0b149bd74a1a88dfc60c9fe6..4ae78d5d637087b6931292f502b805f51d95664f"
 }
 ,{
     "testCaseDescription": "go-rune-literals-replacement-test",
@@ -301,30 +346,78 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    7
-                                ],
-                                "end": [
-                                    8,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    7
-                                ],
-                                "end": [
-                                    8,
-                                    10
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                8,
+                                3
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ''⌘'' rune literal with the ''©'' rune literal in the f var assignment of the 'main' module"
+                    "summary": "Added the 'f' var assignment in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                3
+                            ],
+                            "end": [
+                                8,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                7
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''⌘' error in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'jjjj' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' error in the main module"
                 }
             ]
         },
@@ -335,7 +428,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index e97de4c1..346d5d96 100644",
+        "index 7d2b6610..346d5d96 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,9 +1,9 @@",
@@ -346,7 +439,7 @@
         "-  c = '⌘'",
         "-  d = '⌘'",
         "-  e = '⌘'",
-        "-  f = '⌘'",
+        "-  f = '⌘jjjj'",
         "+  a = '©'",
         "+  b = '©'",
         "+  c = '©'",
@@ -356,7 +449,7 @@
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d52d52b6d220efc984ddf1314194516164db6f8c..6837519f61136939dc1cf9e2e698a2dc2f93ca85"
+    "shas": "4ae78d5d637087b6931292f502b805f51d95664f..a66bb1fe1b52ab4322ab774e0d6512ac556bdfa1"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-replacement-test",
@@ -500,30 +593,78 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    7
-                                ],
-                                "end": [
-                                    8,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    7
-                                ],
-                                "end": [
-                                    8,
-                                    10
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                8,
+                                3
+                            ],
+                            "end": [
+                                8,
+                                4
+                            ]
+                        }
                     },
-                    "summary": "Replaced the ''©'' rune literal with the ''⌘'' rune literal in the f var assignment of the 'main' module"
+                    "summary": "Added the 'f' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                7
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''⌘' error in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'jjjj' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the ''\n' error in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                3
+                            ],
+                            "end": [
+                                8,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f' var assignment in the main module"
                 }
             ]
         },
@@ -534,7 +675,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index 346d5d96..e97de4c1 100644",
+        "index 346d5d96..7d2b6610 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,9 +1,9 @@",
@@ -551,11 +692,11 @@
         "+  c = '⌘'",
         "+  d = '⌘'",
         "+  e = '⌘'",
-        "+  f = '⌘'",
+        "+  f = '⌘jjjj'",
         " )"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6837519f61136939dc1cf9e2e698a2dc2f93ca85..7eb278e0e7c5fe1de647734a78a67edf4866603b"
+    "shas": "a66bb1fe1b52ab4322ab774e0d6512ac556bdfa1..cf8654def7f684474c9e6f0801217acbd4c5a846"
 }
 ,{
     "testCaseDescription": "go-rune-literals-delete-insert-test",
@@ -646,11 +787,56 @@
                             ],
                             "end": [
                                 8,
-                                10
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'f' var assignment in the main module"
+                    "summary": "Deleted the 'f' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                7
+                            ],
+                            "end": [
+                                8,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''⌘' error in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                9
+                            ],
+                            "end": [
+                                8,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'jjjj' identifier in the main module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                13
+                            ],
+                            "end": [
+                                9,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ''\n' error in the main module"
                 }
             ]
         },
@@ -661,7 +847,7 @@
     ],
     "patch": [
         "diff --git a/rune-literals.go b/rune-literals.go",
-        "index e97de4c1..c9ecbf5e 100644",
+        "index 7d2b6610..c9ecbf5e 100644",
         "--- a/rune-literals.go",
         "+++ b/rune-literals.go",
         "@@ -1,9 +1,2 @@",
@@ -672,12 +858,12 @@
         "-  c = '⌘'",
         "-  d = '⌘'",
         "-  e = '⌘'",
-        "-  f = '⌘'",
+        "-  f = '⌘jjjj'",
         "-)",
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7eb278e0e7c5fe1de647734a78a67edf4866603b..8855725d372d44d7a70114711b8839bf3acbd5a5"
+    "shas": "cf8654def7f684474c9e6f0801217acbd4c5a846..acabb9bfee30bde265349695727d5b20eb80980e"
 }
 ,{
     "testCaseDescription": "go-rune-literals-teardown-test",
@@ -716,5 +902,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8855725d372d44d7a70114711b8839bf3acbd5a5..9a89cf94db18f7f67803c1055434f48ee65d8cc6"
+    "shas": "acabb9bfee30bde265349695727d5b20eb80980e..afd867e6c76bceeb1cb04abe0908cd689f4e765e"
 }]

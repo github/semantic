@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b13b8100361e4845134ab1389ca092165ab8c6d4..ac791fa63ad20c43f591972481421b0c385649c4"
+    "shas": "6709f7ea3a7eb4c8df561158382d51f0b8476ece..a19388b39d8494c29b990140af9130b739a1e2c8"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ac791fa63ad20c43f591972481421b0c385649c4..1526d3920476e9c22be29cf09a50dfa44c5319d1"
+    "shas": "a19388b39d8494c29b990140af9130b739a1e2c8..926d665952d7968d87a029d618cd0de52be9ef44"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -292,7 +292,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1526d3920476e9c22be29cf09a50dfa44c5319d1..fb9fe258ca465f299a2de589b0074fdb9131fc61"
+    "shas": "926d665952d7968d87a029d618cd0de52be9ef44..dfd4b56bbd6c59aa86c25ab41d1d870f7e82bfc0"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -464,7 +464,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fb9fe258ca465f299a2de589b0074fdb9131fc61..74516ff568d0cc0456bcca34f1885635493c4bc0"
+    "shas": "dfd4b56bbd6c59aa86c25ab41d1d870f7e82bfc0..5d066e40174fcd36e26f9530c53e885419631886"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -570,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "74516ff568d0cc0456bcca34f1885635493c4bc0..b15fbf19a0d8fc5b4877db317fb6130fae70cc5a"
+    "shas": "5d066e40174fcd36e26f9530c53e885419631886..cf24886a16f779d2f8851697197b393d8a3bc2c6"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -612,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b15fbf19a0d8fc5b4877db317fb6130fae70cc5a..adb5255d7368c7eaac8ceaf41ae1af21e95c0550"
+    "shas": "cf24886a16f779d2f8851697197b393d8a3bc2c6..7278b500248eccae92e9a3eb898c7c3fc9070d91"
 }]

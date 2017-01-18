@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "31d5c38fec253fcf9de204abac17930d4b944b58..b2f53669b39bbdd2e7764838fcf47203b00f4d66"
+    "shas": "5d81800686e1584ca92ab3bc9b97c3b4c4a014af..3aa0858d83485c74018e88fcaea16c0de2c21bb5"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b2f53669b39bbdd2e7764838fcf47203b00f4d66..39d4e2e1aac2e070238757ab50b96cbfd7130100"
+    "shas": "3aa0858d83485c74018e88fcaea16c0de2c21bb5..ed019fdb2ca78fe6eb2d5f72510fa375a5a26563"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "39d4e2e1aac2e070238757ab50b96cbfd7130100..03973fd3b204c8b2e46c57c1e9dc66503c3b80aa"
+    "shas": "ed019fdb2ca78fe6eb2d5f72510fa375a5a26563..b15813efcc1b20132d6495d3362a93a309c1d714"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "03973fd3b204c8b2e46c57c1e9dc66503c3b80aa..d0954d07081f77a422754040fb4a88f2209656a4"
+    "shas": "b15813efcc1b20132d6495d3362a93a309c1d714..a71f998d4554c00b573de391325d45103dd6af4a"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d0954d07081f77a422754040fb4a88f2209656a4..9ff24a205f71e95547e42fbfa2e6a4a1a561cafc"
+    "shas": "a71f998d4554c00b573de391325d45103dd6af4a..5eb4e001966b257b66f1a0e3d8d2987f91dca995"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ff24a205f71e95547e42fbfa2e6a4a1a561cafc..9894aaf44f2b1a1dd39f5df9278a1daef5bb3a4e"
+    "shas": "5eb4e001966b257b66f1a0e3d8d2987f91dca995..6097f0ef5c25ba53a977e9665fd4c07bca9a1025"
 }]

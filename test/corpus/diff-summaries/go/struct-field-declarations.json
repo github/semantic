@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5e355cc24a0a0ebdef3044e9f5ed84357c23a0a2..da82c9fc1d9cf62ca8026bd562de988a68dbeaee"
+    "shas": "5bf39526f909b46112084337773329c1dc640121..6cc42eb1c6d6948bf9494ad3d3f4608b855f167b"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-insert-test",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "da82c9fc1d9cf62ca8026bd562de988a68dbeaee..ed73b9c702415c2e5621405866687073732024a0"
+    "shas": "6cc42eb1c6d6948bf9494ad3d3f4608b855f167b..a909c33260934dd23cd06ee453754690c64545a3"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-replacement-test",
@@ -100,7 +100,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    4
+                                    8
                                 ]
                             },
                             {
@@ -110,27 +110,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    4
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'h' identifier in the struct {\n  h, i int\n} struct type of the 'main' function"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' identifier in the struct {\n  h, i int\n} struct type of the 'main' function"
+                    "summary": "Replaced the 'g int' field declaration with the 'h, i int' field declaration in the struct {\n  h, i int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -154,7 +139,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ed73b9c702415c2e5621405866687073732024a0..704915801032772d7709daf857c3d0c52c093fc0"
+    "shas": "a909c33260934dd23cd06ee453754690c64545a3..c23e257943dcae3b54ee47c5b36208cb5ac547f9"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-replacement-test",
@@ -171,7 +156,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    4
+                                    11
                                 ]
                             },
                             {
@@ -181,27 +166,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    4
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'g' identifier in the struct {\n  g int\n} struct type of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' identifier in the struct {\n  g int\n} struct type of the 'main' function"
+                    "summary": "Replaced the 'h, i int' field declaration with the 'g int' field declaration in the struct {\n  g int\n} struct type of the 'main' function"
                 }
             ]
         },
@@ -225,7 +195,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "704915801032772d7709daf857c3d0c52c093fc0..97993ce4c70fce85b06643239514d5dd7da82d11"
+    "shas": "c23e257943dcae3b54ee47c5b36208cb5ac547f9..b8999ef6ca51e2c961cfadc68fd6aa4dbdf9747e"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-delete-insert-test",
@@ -270,7 +240,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "97993ce4c70fce85b06643239514d5dd7da82d11..495f8deabc3907e090eca4c655248b23955a0aa8"
+    "shas": "b8999ef6ca51e2c961cfadc68fd6aa4dbdf9747e..a61b3ac81659e7ab0a3791e769e0c3f99fa8682b"
 }
 ,{
     "testCaseDescription": "go-struct-field-declarations-teardown-test",
@@ -312,5 +282,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "495f8deabc3907e090eca4c655248b23955a0aa8..d490557467004ad26a2a53890f6a434ae51a505d"
+    "shas": "a61b3ac81659e7ab0a3791e769e0c3f99fa8682b..297f141d87cd1a6762a9b910bb8960bf1b503a8f"
 }]

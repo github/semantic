@@ -205,7 +205,7 @@
       {
         "template": "package main\n{0}",
         "syntax": "rune-literals",
-        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘'\n)",
+        "insert": "const (\n  a = 'δ'\n  b = '⌘'\n  c = '⌘'\n  d = '⌘'\n  e = '⌘'\n  f = '⌘jjjj'\n)",
         "replacement": "const (\n  a = '©'\n  b = '©'\n  c = '©'\n  d = '©'\n  e = '©'\n  f = '©'\n)"
       },
       {
@@ -333,6 +333,12 @@
         "syntax": "comment",
         "insert": "// this is a comment",
         "replacement": "/*\nthis is a block comment\n*/"
+      },
+      {
+        "template": "package main\n\nfunc main() {\n{0}\n}",
+        "syntax": "modifying-struct-fields",
+        "insert": "ctx := &uploadContext{\n   Remote: remote\n}",
+        "replacement": "ctx := &uploadContext{\n   trackedLocksMu: new(sync.Mutex)\n}"
       }
     ]
   }
