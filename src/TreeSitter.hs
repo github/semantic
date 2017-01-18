@@ -53,7 +53,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           let allChildren = filter isNonEmpty <$> traverse (alloca . getUnnamedChild node) (take (fromIntegral allChildrenCount) [0..])
 
           -- Note: The strict application here is semantically important.
-          -- Without it, we may not evaluate the range until after we’ve exited
+          -- Without it, we may not evaluate the value until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
           range `seq` sourceSpan `seq` termConstructor source sourceSpan (toS name) range children allChildren
