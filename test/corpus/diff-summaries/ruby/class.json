@@ -36,7 +36,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "105fc798315eac4b228aaaee17d1538d42e24e38..39c32601c53574d532f0bea4e8ba013694113029"
+    "shas": "75b2149bd93e8ed1bc13c8ce825af9f9c36e86fb..4c5ec22783fb80988369a5f46cb0ffe71a114958"
 }
 ,{
     "testCaseDescription": "ruby-class-replacement-insert-test",
@@ -97,12 +97,30 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "39c32601c53574d532f0bea4e8ba013694113029..1c332772ae8c548d6c209c3b11978969a4907014"
+    "shas": "4c5ec22783fb80988369a5f46cb0ffe71a114958..b4880a4c91fd48b40fd3388d1db02187d4610c15"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-insert-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                13
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Super' identifier in the Foo class"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -121,12 +139,30 @@
         " class Foo < Super"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1c332772ae8c548d6c209c3b11978969a4907014..cbeed5a547f539934a6a57987c251d74b37cd3d5"
+    "shas": "b4880a4c91fd48b40fd3388d1db02187d4610c15..1c870f885c0ec96634773eb3e8f4a95b68431401"
 }
 ,{
     "testCaseDescription": "ruby-class-replacement-test",
     "expectedResult": {
-        "changes": {},
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                13
+                            ],
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Super' identifier in the Foo class"
+                }
+            ]
+        },
         "errors": {}
     },
     "filePaths": [
@@ -145,7 +181,7 @@
         " class Foo < Super"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "cbeed5a547f539934a6a57987c251d74b37cd3d5..7c65f18aeecae9c240ebe0431bb5202b1ba8dc04"
+    "shas": "1c870f885c0ec96634773eb3e8f4a95b68431401..c2951ab0e42d016ccd5be9d0f5454eeddf67f453"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-replacement-test",
@@ -222,7 +258,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7c65f18aeecae9c240ebe0431bb5202b1ba8dc04..36a3d088f00c07da6815da26dcab3e2a9c664eef"
+    "shas": "c2951ab0e42d016ccd5be9d0f5454eeddf67f453..7bc8dce5e4669bf807fb30a5f430f64ed5da3b69"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-test",
@@ -265,7 +301,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "36a3d088f00c07da6815da26dcab3e2a9c664eef..36139d63db76a65f7134f8d269b9f4f4dec06078"
+    "shas": "7bc8dce5e4669bf807fb30a5f430f64ed5da3b69..57e04d9bc9fbfaeb79f921d3c766836ecd4038da"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-rest-test",
@@ -305,5 +341,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "36139d63db76a65f7134f8d269b9f4f4dec06078..b1ed6280f4f7422beeb48a63ceda8a6cc873b362"
+    "shas": "57e04d9bc9fbfaeb79f921d3c766836ecd4038da..d63de2fb6eda05f9608358a70d03f1c7bf96831f"
 }]

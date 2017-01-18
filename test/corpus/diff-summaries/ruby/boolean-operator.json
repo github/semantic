@@ -34,7 +34,7 @@
         "+a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "1ff4601a166d78743c85dba523065e31a5264033..b75e9f7218b20c7964eb31ae31ae5e6b5f9093a8"
+    "shas": "b80afce8ef924e3fa88cd988aede2c3e0933b0f0..332c929e350c4411c99c459d355d219311374ebb"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-replacement-insert-test",
@@ -89,7 +89,7 @@
         " a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b75e9f7218b20c7964eb31ae31ae5e6b5f9093a8..35d3383ded9a4ae609352ffc16e048d5331d1d5d"
+    "shas": "332c929e350c4411c99c459d355d219311374ebb..db22e048ef798fa66844a19bde62e7c9b26d4ac8"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-insert-test",
@@ -142,7 +142,7 @@
         " a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "35d3383ded9a4ae609352ffc16e048d5331d1d5d..e3532e0fbf45237d7287d0fc020b00479ebbe477"
+    "shas": "db22e048ef798fa66844a19bde62e7c9b26d4ac8..4a6bead9a0b288ed8ef2e77a304098b2e7b5db0c"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-replacement-test",
@@ -195,7 +195,7 @@
         " a || b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e3532e0fbf45237d7287d0fc020b00479ebbe477..a8db8b305a4a179c5bc4547f89c04f557671d934"
+    "shas": "4a6bead9a0b288ed8ef2e77a304098b2e7b5db0c..54d9b27bc205ac3c7ab0a203561ba46657ce087b"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-replacement-test",
@@ -266,7 +266,7 @@
         "+a && b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a8db8b305a4a179c5bc4547f89c04f557671d934..abf6b461c58ff7d013954ce3e992f52cc953ab48"
+    "shas": "54d9b27bc205ac3c7ab0a203561ba46657ce087b..ae17f6f7bf4e210bea0a86f41a3579fc92e9354b"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-test",
@@ -305,7 +305,7 @@
         " a && b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "abf6b461c58ff7d013954ce3e992f52cc953ab48..4ffa7df22283c90aed2debfa5390513761d0939b"
+    "shas": "ae17f6f7bf4e210bea0a86f41a3579fc92e9354b..87248c15c234b15234c4cbfca7c97c8efebd9c18"
 }
 ,{
     "testCaseDescription": "ruby-boolean-operator-delete-rest-test",
@@ -343,5 +343,5 @@
         "-a && b"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4ffa7df22283c90aed2debfa5390513761d0939b..88429f0be2cb1dafc9c8b1339ae88968f72b0acd"
+    "shas": "87248c15c234b15234c4cbfca7c97c8efebd9c18..1eeb33de6dfe113a1eee8896e6d1ccbef35e4a7a"
 }]

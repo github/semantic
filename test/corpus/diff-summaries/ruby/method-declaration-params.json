@@ -35,7 +35,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "af1d10926db4f35ee0fe5003c21bb97fc06c6c1f..611db308d06c0cb292ee3f0c92848184c65940e8"
+    "shas": "736d6bc8ce63af9896847e05f68b2751778293c2..e81239ad80f0cf5fc027bc0d1e0fb7626a2ee294"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-insert-test",
@@ -75,7 +75,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "611db308d06c0cb292ee3f0c92848184c65940e8..42e3ebe54b6bd0f9bf11c540e659ea927c7eda6c"
+    "shas": "e81239ad80f0cf5fc027bc0d1e0fb7626a2ee294..094ac1af26888f1b27c55c16c24818dec97aa274"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-replacement-test",
@@ -130,7 +130,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "42e3ebe54b6bd0f9bf11c540e659ea927c7eda6c..71a129540563133b74145da767611cf9602b5109"
+    "shas": "094ac1af26888f1b27c55c16c24818dec97aa274..d4a120484565fe256c6b0819b3eb065578f3ae54"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
@@ -185,7 +185,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "71a129540563133b74145da767611cf9602b5109..f5fb44656a1cca25948b814af5c0730e9405d605"
+    "shas": "d4a120484565fe256c6b0819b3eb065578f3ae54..ada1b2cd5c5cad2af431a2e45fbc44793a84a64f"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
@@ -225,7 +225,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f5fb44656a1cca25948b814af5c0730e9405d605..4ab5f12c25811f6c64eab028858587268bb8017f"
+    "shas": "ada1b2cd5c5cad2af431a2e45fbc44793a84a64f..bba0260d203103c8a8fb0e488dfeeceac8626d8e"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-teardown-test",
@@ -264,5 +264,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4ab5f12c25811f6c64eab028858587268bb8017f..505976fd1d7aef853d3614703f993daa63e17e12"
+    "shas": "bba0260d203103c8a8fb0e488dfeeceac8626d8e..5d8e0f7de84695c978a9803933c5bacb01da6ba1"
 }]

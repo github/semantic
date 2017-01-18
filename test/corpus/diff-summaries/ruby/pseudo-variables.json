@@ -82,7 +82,7 @@
         "+true"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "414359cbc371782f44c8d0194f2da04cab694899..9bf5038af2ee347c681202fb716bb0f7e55aac49"
+    "shas": "172a7a33fb1c881be170059c79565963bc032393..46707e2010a6bde7a03df3354bb8c174fabbd6d9"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-replacement-insert-test",
@@ -235,7 +235,7 @@
         " false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9bf5038af2ee347c681202fb716bb0f7e55aac49..eb825b55fb61038c20823e4f55bc7fe6c32eab1d"
+    "shas": "46707e2010a6bde7a03df3354bb8c174fabbd6d9..aee4d95decd52085f7317653c06789471e18baab"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-insert-test",
@@ -354,7 +354,7 @@
         " false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "eb825b55fb61038c20823e4f55bc7fe6c32eab1d..5690c3761db9fce645033dbaf252aa8429514b17"
+    "shas": "aee4d95decd52085f7317653c06789471e18baab..a6d0fad1f0ed1beeb8f056a01b624d255e6eb067"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-replacement-test",
@@ -473,7 +473,7 @@
         " false"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "5690c3761db9fce645033dbaf252aa8429514b17..a3104e3b4d5b736e381bf5f2b9019576d348be6b"
+    "shas": "a6d0fad1f0ed1beeb8f056a01b624d255e6eb067..22934b41de681711c81e67f59f0e152b07213d7f"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-replacement-test",
@@ -660,7 +660,7 @@
         "+FALSE"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "a3104e3b4d5b736e381bf5f2b9019576d348be6b..58f76eb106be0c659f3456a0fa22e431139337d0"
+    "shas": "22934b41de681711c81e67f59f0e152b07213d7f..1b1a2f2042bf0d0e5f08125a3b812eb48cbe68ec"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-test",
@@ -749,7 +749,7 @@
         " TRUE"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "58f76eb106be0c659f3456a0fa22e431139337d0..e4255111fb0e45ed91667b07b8fe9d09041529e0"
+    "shas": "1b1a2f2042bf0d0e5f08125a3b812eb48cbe68ec..e2a4ba72bcfd5f04a48b6241f91dec91bac9db68"
 }
 ,{
     "testCaseDescription": "ruby-pseudo-variables-delete-rest-test",
@@ -835,5 +835,5 @@
         "-FALSE"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e4255111fb0e45ed91667b07b8fe9d09041529e0..2b87a0ce9eaee310f329b9954156c555ba523d79"
+    "shas": "e2a4ba72bcfd5f04a48b6241f91dec91bac9db68..e8d27e5b1fabc0241182900ccf3272c05895478b"
 }]
