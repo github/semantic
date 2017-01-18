@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5d81800686e1584ca92ab3bc9b97c3b4c4a014af..3aa0858d83485c74018e88fcaea16c0de2c21bb5"
+    "shas": "10340b1777c15a7170bab25f9f501df4bca6a510..a965c981bf735ac1e8079c3ba9a90b3f99ed8988"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -97,7 +97,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3aa0858d83485c74018e88fcaea16c0de2c21bb5..ed019fdb2ca78fe6eb2d5f72510fa375a5a26563"
+    "shas": "a965c981bf735ac1e8079c3ba9a90b3f99ed8988..00fb026cd2565587e4e1370891caf7162a0a14b4"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +235,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ed019fdb2ca78fe6eb2d5f72510fa375a5a26563..b15813efcc1b20132d6495d3362a93a309c1d714"
+    "shas": "00fb026cd2565587e4e1370891caf7162a0a14b4..7a7a0dfc741bbc689b95eb9b023eeca28a02d31e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +373,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b15813efcc1b20132d6495d3362a93a309c1d714..a71f998d4554c00b573de391325d45103dd6af4a"
+    "shas": "7a7a0dfc741bbc689b95eb9b023eeca28a02d31e..479b7e2d2d456a1f69035b532768c54ac75350a8"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -432,7 +432,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a71f998d4554c00b573de391325d45103dd6af4a..5eb4e001966b257b66f1a0e3d8d2987f91dca995"
+    "shas": "479b7e2d2d456a1f69035b532768c54ac75350a8..d4fd0c918e4170c6c16b117e7242e4fe6e2c6833"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -474,5 +474,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5eb4e001966b257b66f1a0e3d8d2987f91dca995..6097f0ef5c25ba53a977e9665fd4c07bca9a1025"
+    "shas": "d4fd0c918e4170c6c16b117e7242e4fe6e2c6833..594dbe27b52a8fbfb0fba6360bd8c55695e8bf80"
 }]

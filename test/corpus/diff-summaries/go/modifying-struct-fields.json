@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cb1d3031a839fca7b0372b76cd3393de641da8c0..f59896024400c5876aeab9b715a00c10bcd547f7"
+    "shas": "f5d371156ad6d67616019fb12f4541e488515c6d..3d2c2e69cb2f2b26bec5e4b8e3ff64c2cbbc8390"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f59896024400c5876aeab9b715a00c10bcd547f7..9b2dfb2e1f8d175f88f5adbbeba3cb3ec7c93e4f"
+    "shas": "3d2c2e69cb2f2b26bec5e4b8e3ff64c2cbbc8390..a865f82965a2a434842423adee56b1356ebf652e"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -100,7 +100,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    10
+                                    18
                                 ]
                             },
                             {
@@ -110,42 +110,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    18
+                                    35
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'Remote' identifier with the 'trackedLocksMu' identifier in the ctx var assignment of the 'main' function"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                20
-                            ],
-                            "end": [
-                                5,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'new(sync.Mutex)' function call in the ctx var assignment of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'remote' identifier in the ctx var assignment of the 'main' function"
+                    "summary": "Replaced the 'Remote: remote' pair with the 'trackedLocksMu: new(sync.Mutex)' pair in the ctx var assignment of the 'main' function"
                 }
             ]
         },
@@ -169,7 +139,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9b2dfb2e1f8d175f88f5adbbeba3cb3ec7c93e4f..f7f2e017ea220a8e76850e81567f9b7e159cf00f"
+    "shas": "a865f82965a2a434842423adee56b1356ebf652e..fb30e92bc881f62fe14b571e001bf3fe221e7cf0"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -186,7 +156,7 @@
                                 ],
                                 "end": [
                                     5,
-                                    18
+                                    35
                                 ]
                             },
                             {
@@ -196,42 +166,12 @@
                                 ],
                                 "end": [
                                     5,
-                                    10
+                                    18
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'trackedLocksMu' identifier with the 'Remote' identifier in the ctx var assignment of the 'main' function"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
-                                18
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'remote' identifier in the ctx var assignment of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                20
-                            ],
-                            "end": [
-                                5,
-                                35
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'new(sync.Mutex)' function call in the ctx var assignment of the 'main' function"
+                    "summary": "Replaced the 'trackedLocksMu: new(sync.Mutex)' pair with the 'Remote: remote' pair in the ctx var assignment of the 'main' function"
                 }
             ]
         },
@@ -255,7 +195,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f7f2e017ea220a8e76850e81567f9b7e159cf00f..a4c28470d2652dba5eaae2a85d98439f6fc45acf"
+    "shas": "fb30e92bc881f62fe14b571e001bf3fe221e7cf0..e857c6ae92f4119e3de6483932611e17e9ecf7d9"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -300,7 +240,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a4c28470d2652dba5eaae2a85d98439f6fc45acf..71be35001981fc1e7097a216831df4c7278b5c0b"
+    "shas": "e857c6ae92f4119e3de6483932611e17e9ecf7d9..204d194bd7eff63fd1355ef184752dec10253d11"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -342,5 +282,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71be35001981fc1e7097a216831df4c7278b5c0b..123a2086698184c3a0e6f7eebd222c9273448df9"
+    "shas": "204d194bd7eff63fd1355ef184752dec10253d11..af763902e530bed278bc8bd2365c849366e38e1e"
 }]

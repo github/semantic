@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c22c577a580a3c89ace48fdd1c5267508a07d822..a33a97280d1487d58c6b9fb35992b570ab356140"
+    "shas": "ca808648111bc7e9d6f1e5951618c95fb6b0d161..12ab48de8fc2eee5e67ef3b5afbff210479a1f2f"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a33a97280d1487d58c6b9fb35992b570ab356140..990a6344bb8f22f1c074cd7ca547f27c982d4f6b"
+    "shas": "12ab48de8fc2eee5e67ef3b5afbff210479a1f2f..3666c52bda3c0dbda23b6bf36ff2baff6af2bdee"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "990a6344bb8f22f1c074cd7ca547f27c982d4f6b..402128fdeb46866400b691424e4f8b4968e3011b"
+    "shas": "3666c52bda3c0dbda23b6bf36ff2baff6af2bdee..b5c2d5e190fc5980937a02e3277354163df40273"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "402128fdeb46866400b691424e4f8b4968e3011b..90272b1f66da7ab9e30d721b88cd76fcd4566461"
+    "shas": "b5c2d5e190fc5980937a02e3277354163df40273..ca1de4b0e5be139bc7c1083117814089ecdeb3bf"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "90272b1f66da7ab9e30d721b88cd76fcd4566461..84dbc8845cddcce8f576b0a03c80c9eb88b78f40"
+    "shas": "ca1de4b0e5be139bc7c1083117814089ecdeb3bf..579dda33b481786913cd1fa30e6a8961f4625767"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "84dbc8845cddcce8f576b0a03c80c9eb88b78f40..c86997a464ea8939db6c8d67490f3baf3970fd87"
+    "shas": "579dda33b481786913cd1fa30e6a8961f4625767..28a20f27e991224c4658903e99d662f4d5b25a0f"
 }]

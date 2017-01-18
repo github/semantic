@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6709f7ea3a7eb4c8df561158382d51f0b8476ece..a19388b39d8494c29b990140af9130b739a1e2c8"
+    "shas": "a414cf20ddc67a0cba51f43970b9020e575fc41d..b60ead3cf05c8581967b1bb336ddb12031448557"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a19388b39d8494c29b990140af9130b739a1e2c8..926d665952d7968d87a029d618cd0de52be9ef44"
+    "shas": "b60ead3cf05c8581967b1bb336ddb12031448557..94368e384320025870411842a2f1d95b34261ae1"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -292,7 +292,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "926d665952d7968d87a029d618cd0de52be9ef44..dfd4b56bbd6c59aa86c25ab41d1d870f7e82bfc0"
+    "shas": "94368e384320025870411842a2f1d95b34261ae1..a2796a528780a075510c12252973828c2ddcbe59"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -464,7 +464,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dfd4b56bbd6c59aa86c25ab41d1d870f7e82bfc0..5d066e40174fcd36e26f9530c53e885419631886"
+    "shas": "a2796a528780a075510c12252973828c2ddcbe59..d564330c8667a8dd60a92b7e10ef66da77295c6c"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -570,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5d066e40174fcd36e26f9530c53e885419631886..cf24886a16f779d2f8851697197b393d8a3bc2c6"
+    "shas": "d564330c8667a8dd60a92b7e10ef66da77295c6c..16c6e00df7c5edfb56ed2fad7a49af3944fa309e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -612,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cf24886a16f779d2f8851697197b393d8a3bc2c6..7278b500248eccae92e9a3eb898c7c3fc9070d91"
+    "shas": "16c6e00df7c5edfb56ed2fad7a49af3944fa309e..7036a0833af811cd428009c760acce8b342cc0ae"
 }]

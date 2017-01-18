@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "256269de815c523e6bd13c790a94e7ab1d280e1f..3d2bd60b8d52aa267035cb42575ac38e265a11c4"
+    "shas": "111cfad4a93470f7dffecc5201b01ae25f140340..451ade3b08c060a076464882a62820064d070ef3"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3d2bd60b8d52aa267035cb42575ac38e265a11c4..7af9f656a77a28a82a94ea48adedf78b4b3800b3"
+    "shas": "451ade3b08c060a076464882a62820064d070ef3..efb0a9a6cd31b1e36c3d9e1bc33afcd1b65a25ac"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7af9f656a77a28a82a94ea48adedf78b4b3800b3..085246b097bb3f75ff345898c895ea7a5f367f7f"
+    "shas": "efb0a9a6cd31b1e36c3d9e1bc33afcd1b65a25ac..a38daa573d4b04f44142aafdbf816f61dbfbbde9"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "085246b097bb3f75ff345898c895ea7a5f367f7f..d960fcbe87e85d05b81af87a9cf4f61be948865c"
+    "shas": "a38daa573d4b04f44142aafdbf816f61dbfbbde9..8f69e8b905ecd05778b6f86f70f918aafb381395"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d960fcbe87e85d05b81af87a9cf4f61be948865c..0a9b9daffdf659c2867310e0f5ad7b30d2c4c77e"
+    "shas": "8f69e8b905ecd05778b6f86f70f918aafb381395..60969d6b643c100984c00844033268209d76ddb1"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a9b9daffdf659c2867310e0f5ad7b30d2c4c77e..5d81800686e1584ca92ab3bc9b97c3b4c4a014af"
+    "shas": "60969d6b643c100984c00844033268209d76ddb1..10340b1777c15a7170bab25f9f501df4bca6a510"
 }]

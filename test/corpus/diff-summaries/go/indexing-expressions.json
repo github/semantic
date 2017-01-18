@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0247664c34d33fa74809a86157f1fa6b5b66b30d..2edcdbce7350c6e0545e414d40a6fd31e35b0dff"
+    "shas": "7e65c3a864d842f6e821a2fe8c559b7180a2f52b..ccc1e43fbcb0e6226807e98975a575e8a2977cf4"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2edcdbce7350c6e0545e414d40a6fd31e35b0dff..5b39cd9199c32bcd11d818dc7be25b28ef17d50d"
+    "shas": "ccc1e43fbcb0e6226807e98975a575e8a2977cf4..a51315cf1bccd2403ee70704fe4924b601d258fb"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -285,7 +285,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b39cd9199c32bcd11d818dc7be25b28ef17d50d..3c21408df3b9a1597f66485746d9e29fe822a5cd"
+    "shas": "a51315cf1bccd2403ee70704fe4924b601d258fb..582219d6eb9863fcd80857198a51f2fede8615b3"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -418,7 +418,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c21408df3b9a1597f66485746d9e29fe822a5cd..a009465b1ecd331dac0862795a868555a98bf4af"
+    "shas": "582219d6eb9863fcd80857198a51f2fede8615b3..b92f026611d14049ca77735da2a6c8f441fdb31c"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -541,7 +541,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a009465b1ecd331dac0862795a868555a98bf4af..95b4553c26030cae2dec51f9748aca91fb710473"
+    "shas": "b92f026611d14049ca77735da2a6c8f441fdb31c..6e89ecd29fae906d7a850e569adf56972ddd11f6"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -583,5 +583,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95b4553c26030cae2dec51f9748aca91fb710473..5c7cab94d93979a6015f4008ab1c710743772a2e"
+    "shas": "6e89ecd29fae906d7a850e569adf56972ddd11f6..62acda2d065b687b1a5e6e7abd16190285ceabed"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cab660acd54f2f46e36d22fcbfa612d8129347da..c4a19005aa96dbea7b91646072c66e39b0e1bc82"
+    "shas": "e838e9902cf224a0dee7607076c1acae9d08d510..20750702aa0a2224e99a5afb9c0908548bc66ff2"
 }
 ,{
     "testCaseDescription": "go-map-literals-insert-test",
@@ -84,7 +84,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c4a19005aa96dbea7b91646072c66e39b0e1bc82..c5880e4530cf7f0803c84c41f7e998afc7fb97e3"
+    "shas": "20750702aa0a2224e99a5afb9c0908548bc66ff2..a2a3886dcf5aa06f79b9432cc186c0b975d4d829"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-test",
@@ -127,26 +127,11 @@
                             ],
                             "end": [
                                 5,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the \"foo\" string in the map[string]int dictionary of the 'main' function"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                8
-                            ],
-                            "end": [
-                                5,
                                 13
                             ]
                         }
                     },
-                    "summary": "Added the \"bar\" string in the map[string]int dictionary of the 'main' function"
+                    "summary": "Added the '\"foo\": \"bar\"' pair in the map[string]int dictionary of the 'main' function"
                 },
                 {
                     "span": {
@@ -173,7 +158,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the map[string]int dictionary of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"baz\" string in the \"baz\": \"hello\" pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -184,26 +169,11 @@
                             ],
                             "end": [
                                 6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the \"bye\" string in the map[string]int dictionary of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                8
-                            ],
-                            "end": [
-                                6,
                                 17
                             ]
                         }
                     },
-                    "summary": "Deleted the \"goodbye\" string in the map[string]int dictionary of the 'main' function"
+                    "summary": "Deleted the '\"bye\": \"goodbye\"' pair in the map[string]int dictionary of the 'main' function"
                 }
             ]
         },
@@ -231,7 +201,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c5880e4530cf7f0803c84c41f7e998afc7fb97e3..5df3fc908ea5452c6061c51ff9debd46596f85cd"
+    "shas": "a2a3886dcf5aa06f79b9432cc186c0b975d4d829..00acd5542e53b24433e5b677bac99fbda7ca5d50"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-replacement-test",
@@ -290,7 +260,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the map[string]string dictionary of the 'main' function"
+                    "summary": "Replaced the \"foo\" string with the \"hi\" string in the \"hi\": \"hello\" pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -317,7 +287,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the map[string]string dictionary of the 'main' function"
+                    "summary": "Replaced the \"bar\" string with the \"hello\" string in the \"hi\": \"hello\" pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -344,7 +314,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the map[string]string dictionary of the 'main' function"
+                    "summary": "Replaced the \"baz\" string with the \"bye\" string in the \"bye\": \"goodbye\" pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -371,7 +341,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the map[string]string dictionary of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"goodbye\" string in the \"bye\": \"goodbye\" pair of the 'main' function"
                 }
             ]
         },
@@ -399,7 +369,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5df3fc908ea5452c6061c51ff9debd46596f85cd..5497decc84ae38129c7d19f24814d70ced6fccf7"
+    "shas": "00acd5542e53b24433e5b677bac99fbda7ca5d50..26ffb42a1f92eed063d05463056a02d5c56affe0"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-insert-test",
@@ -445,7 +415,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5497decc84ae38129c7d19f24814d70ced6fccf7..2101c73f9c711b94c56b8eb8274ade9eb2fb4287"
+    "shas": "26ffb42a1f92eed063d05463056a02d5c56affe0..8f83b4b589dccf7498edc42259707c88e07faf68"
 }
 ,{
     "testCaseDescription": "go-map-literals-teardown-test",
@@ -487,5 +457,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2101c73f9c711b94c56b8eb8274ade9eb2fb4287..6e5cb5bf929141191cac5b763446692bc7507f50"
+    "shas": "8f83b4b589dccf7498edc42259707c88e07faf68..42798e094a7b54602c02e57ed28f95c0e36804d9"
 }]

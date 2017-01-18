@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0e7b4a571d564014710d306e2fe922eab3a132f6..67c1ab5a00cd30bc969cff8079457088bd32f1f0"
+    "shas": "44a4f5e13671aebdc4a74395aa29daf2b27100ba..3e6028fd1ae67ecb9edef11a979ff4b41e0d8543"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "67c1ab5a00cd30bc969cff8079457088bd32f1f0..d52b6498fd82ccdcaf0ad1ffa0ed22ed955f129c"
+    "shas": "3e6028fd1ae67ecb9edef11a979ff4b41e0d8543..3c5da8e606712777baf3b50761d15c25a0f00011"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d52b6498fd82ccdcaf0ad1ffa0ed22ed955f129c..0d895e44e44a21ded5d2b673aba2d7c0ff3a38b2"
+    "shas": "3c5da8e606712777baf3b50761d15c25a0f00011..c6137908ae8897b108be16d1da4d85f6e3b0556f"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0d895e44e44a21ded5d2b673aba2d7c0ff3a38b2..a5b2c57e753a220cfb289ef17308b168091cfa84"
+    "shas": "c6137908ae8897b108be16d1da4d85f6e3b0556f..79465a342d404d8cb847108235d6745af64e3c71"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a5b2c57e753a220cfb289ef17308b168091cfa84..a351f016065b824a43f698f042740cc37ef49968"
+    "shas": "79465a342d404d8cb847108235d6745af64e3c71..3def7829f666f6074cf5b8b7f140f7be0f2e4e2d"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a351f016065b824a43f698f042740cc37ef49968..4831542d669ac6521f2ff1c352041177bb637377"
+    "shas": "3def7829f666f6074cf5b8b7f140f7be0f2e4e2d..f2293df7d6bc68a6e204d330eb95c795398fc842"
 }]

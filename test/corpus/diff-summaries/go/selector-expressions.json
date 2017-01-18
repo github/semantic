@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0c427a8f032c83b79308e49881a756a562e84789..0a4db4052402c02b59903ce43e136c6fd4f874e8"
+    "shas": "3f9752a910c5ed199b0f5db3820c20ac2b6f2c78..555d5896dafda64f23dcfafb6221a84009b533ef"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a4db4052402c02b59903ce43e136c6fd4f874e8..5b7362d2a6798347b629f3bd8208b5a4d36450b9"
+    "shas": "555d5896dafda64f23dcfafb6221a84009b533ef..eee17d82da6c0bd4dcbadf6536113444f7ddb8c6"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b7362d2a6798347b629f3bd8208b5a4d36450b9..8bd5ddd498e86191d38737819316195c578421c1"
+    "shas": "eee17d82da6c0bd4dcbadf6536113444f7ddb8c6..3f5bd3e00e0cde78960fc50f8e7479edad92c28c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8bd5ddd498e86191d38737819316195c578421c1..84c0775e517d32b6775e503cf2819f6a93a365c1"
+    "shas": "3f5bd3e00e0cde78960fc50f8e7479edad92c28c..46caca376ae47df045f6c3158ea6eaeed086e47b"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "84c0775e517d32b6775e503cf2819f6a93a365c1..19cd95260b98113cdaae440831dd756d519fa837"
+    "shas": "46caca376ae47df045f6c3158ea6eaeed086e47b..dfbcceca127cb5fe4adca3e8b28dd58192626eb7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "19cd95260b98113cdaae440831dd756d519fa837..0247664c34d33fa74809a86157f1fa6b5b66b30d"
+    "shas": "dfbcceca127cb5fe4adca3e8b28dd58192626eb7..7e65c3a864d842f6e821a2fe8c559b7180a2f52b"
 }]

@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6e5cb5bf929141191cac5b763446692bc7507f50..e31f53f7b127e0c4179d7471d9a64d905cffab31"
+    "shas": "42798e094a7b54602c02e57ed28f95c0e36804d9..9db6222d2924ba70911764cbd8d6fcd0846974ca"
 }
 ,{
     "testCaseDescription": "go-struct-literals-insert-test",
@@ -116,7 +116,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e31f53f7b127e0c4179d7471d9a64d905cffab31..71698d9ca0dfaf2d3b2c2dd843d73ae9415f01ac"
+    "shas": "9db6222d2924ba70911764cbd8d6fcd0846974ca..f51a8114f5adfadb879c9b1f04096bd957c0cbac"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
@@ -202,7 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the s2 var assignment of the 'main' function"
+                    "summary": "Replaced the 'i' identifier with the 'j' identifier in the j: 6 pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -229,7 +229,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '6' in the s2 var assignment of the 'main' function"
+                    "summary": "Replaced '5' with '6' in the j: 6 pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -286,7 +286,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "71698d9ca0dfaf2d3b2c2dd843d73ae9415f01ac..2492c2459880cdf11070d063b1d53b87a9d19f89"
+    "shas": "f51a8114f5adfadb879c9b1f04096bd957c0cbac..07fbe3735630b31173c99a8beabbbb3ca004a3b7"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
@@ -372,7 +372,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the s2 var assignment of the 'main' function"
+                    "summary": "Replaced the 'j' identifier with the 'i' identifier in the i: 5 pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -399,7 +399,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '5' in the s2 var assignment of the 'main' function"
+                    "summary": "Replaced '6' with '5' in the i: 5 pair of the 'main' function"
                 },
                 {
                     "span": {
@@ -456,7 +456,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2492c2459880cdf11070d063b1d53b87a9d19f89..95e612a61280753ff98a38ccb11d15adf2ec3f25"
+    "shas": "07fbe3735630b31173c99a8beabbbb3ca004a3b7..0f213757189dcc1ed3e3c6c1df2a4a434b0067e6"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
@@ -534,7 +534,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "95e612a61280753ff98a38ccb11d15adf2ec3f25..3357e27bd37f415b0e3d4d19a3df61225dbc33e9"
+    "shas": "0f213757189dcc1ed3e3c6c1df2a4a434b0067e6..c78d2a619aabbeeb63d8d7d983aace32d13b86f0"
 }
 ,{
     "testCaseDescription": "go-struct-literals-teardown-test",
@@ -576,5 +576,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3357e27bd37f415b0e3d4d19a3df61225dbc33e9..1af1d4abe8a3eb4b325dd2e1785dad74f6bda406"
+    "shas": "c78d2a619aabbeeb63d8d7d983aace32d13b86f0..04d62456867a5968c64e22fbc23684980d027819"
 }]
