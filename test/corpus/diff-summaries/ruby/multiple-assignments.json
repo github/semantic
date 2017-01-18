@@ -34,7 +34,7 @@
         "+x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "dee262035ba9c95609eb53834297475b075eed93..912c2083a48d6d1bee829b574663f2199ba59b95"
+    "shas": "f6e95f576fdbe837a5fa09bd74b0d87bcca7c856..190bd5e0997a27ffbdff88940136908640908c38"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-insert-test",
@@ -89,7 +89,7 @@
         " x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "912c2083a48d6d1bee829b574663f2199ba59b95..e6e4a3cae03ab26d78db92c7f9b9eeaa8cbcf927"
+    "shas": "190bd5e0997a27ffbdff88940136908640908c38..da6c69115623e17dc7c8eb1304e0cc8e4964f069"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-insert-test",
@@ -160,7 +160,7 @@
         " x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e6e4a3cae03ab26d78db92c7f9b9eeaa8cbcf927..60f573d091a1300ff4772b88ab87a7660616c521"
+    "shas": "da6c69115623e17dc7c8eb1304e0cc8e4964f069..b6afa3cdd73a6c210b364f036298e68565586e64"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-replacement-test",
@@ -231,7 +231,7 @@
         " x, y, z = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "60f573d091a1300ff4772b88ab87a7660616c521..df95d49fc4f6cca212a914c8ad45799c93fd1caa"
+    "shas": "b6afa3cdd73a6c210b364f036298e68565586e64..227d94a55c4f5767d2acf64611ec8f7b43b1684b"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-replacement-test",
@@ -302,7 +302,7 @@
         "+x, *y = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "df95d49fc4f6cca212a914c8ad45799c93fd1caa..294c672d94ed1e9cdfa80ce31caa862dcfa41e83"
+    "shas": "227d94a55c4f5767d2acf64611ec8f7b43b1684b..653a9966391e154a4118d956be4fbd034c2a6282"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-test",
@@ -341,7 +341,7 @@
         " x, *y = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "294c672d94ed1e9cdfa80ce31caa862dcfa41e83..4ec684b418e687bf134a9daca60b02d53d000323"
+    "shas": "653a9966391e154a4118d956be4fbd034c2a6282..1d61feafbd0c4da519a3e742e8a47d99baa7f596"
 }
 ,{
     "testCaseDescription": "ruby-multiple-assignments-delete-rest-test",
@@ -379,5 +379,5 @@
         "-x, *y = [10, 20, 30]"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "4ec684b418e687bf134a9daca60b02d53d000323..172a7a33fb1c881be170059c79565963bc032393"
+    "shas": "1d61feafbd0c4da519a3e742e8a47d99baa7f596..c38d6e0fc468af7f3198dd33bc2163af92c8a859"
 }]

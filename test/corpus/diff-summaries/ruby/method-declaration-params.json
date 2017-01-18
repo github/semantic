@@ -35,7 +35,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "736d6bc8ce63af9896847e05f68b2751778293c2..e81239ad80f0cf5fc027bc0d1e0fb7626a2ee294"
+    "shas": "f1b6bbddd7c59150a9f8c15746168a84eb3d12cd..9c67c3d54b1988f9dc9d36d133263fb55392f5a5"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-insert-test",
@@ -75,7 +75,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "e81239ad80f0cf5fc027bc0d1e0fb7626a2ee294..094ac1af26888f1b27c55c16c24818dec97aa274"
+    "shas": "9c67c3d54b1988f9dc9d36d133263fb55392f5a5..fa52999f22ea2db5ec6279edc1ce6923b03fa112"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-replacement-test",
@@ -130,7 +130,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "094ac1af26888f1b27c55c16c24818dec97aa274..d4a120484565fe256c6b0819b3eb065578f3ae54"
+    "shas": "fa52999f22ea2db5ec6279edc1ce6923b03fa112..0066f7111989f8c16984b561886143c96ccfc653"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
@@ -185,7 +185,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "d4a120484565fe256c6b0819b3eb065578f3ae54..ada1b2cd5c5cad2af431a2e45fbc44793a84a64f"
+    "shas": "0066f7111989f8c16984b561886143c96ccfc653..f6bbfebf7315403e68eeeb74b59c36c02d96aca7"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
@@ -225,7 +225,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "ada1b2cd5c5cad2af431a2e45fbc44793a84a64f..bba0260d203103c8a8fb0e488dfeeceac8626d8e"
+    "shas": "f6bbfebf7315403e68eeeb74b59c36c02d96aca7..b3f6954afea9828fb56e8dc8bd2f11fc3385f827"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-teardown-test",
@@ -264,5 +264,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "bba0260d203103c8a8fb0e488dfeeceac8626d8e..5d8e0f7de84695c978a9803933c5bacb01da6ba1"
+    "shas": "b3f6954afea9828fb56e8dc8bd2f11fc3385f827..90b769d2ee1bd1b62ce2da0ff8b1574c43cca4ec"
 }]
