@@ -40,8 +40,6 @@ data Category
   | Args
   -- | A string literal.
   | StringLiteral
-  -- | An integer literal.
-  | IntegerLiteral
   -- | A regex literal.
   | Regex
   -- | A return statement.
@@ -161,9 +159,13 @@ data Category
   | BlockParameter
   -- | A float literal.
   | FloatLiteral
+  -- | An array type declaration, e.g. [2]string in Go.
   | ArrayTy
+  -- | A dictionary type declaration, e.g. map[string] in Go.
   | DictionaryTy
+  -- | A Struct type declaration, struct Foo {..} in Go.
   | StructTy
+  -- | A Struct constructor, e.g. foo = Foo {..} in Go.
   | Struct
   -- | A break statement, e.g. break; in JavaScript.
   | Break
