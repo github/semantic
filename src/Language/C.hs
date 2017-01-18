@@ -10,7 +10,7 @@ import Term
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
-  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> SourceSpan -- ^ The span that the term occupies.
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
@@ -22,9 +22,7 @@ termConstructor source sourceSpan name range children _
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where
-    withDefaultInfo syntax = do
-      sourceSpan' <- sourceSpan
-      pure $! cofree ((range .: categoryForCProductionName name .: sourceSpan' .: RNil) :< syntax)
+    withDefaultInfo syntax = pure $! cofree ((range .: categoryForCProductionName name .: sourceSpan .: RNil) :< syntax)
 
 categoryForCProductionName :: Text -> Category
 categoryForCProductionName name = Other name
