@@ -74,18 +74,18 @@ rws compare getLabel as bs
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
       foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
         Pure (Right (Delete term)) ->
-          (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure Nil)
+          (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
         Pure (Right (Insert term)) ->
           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
         syntax -> let diff' = free syntax >>= either identity pure in
           (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
       ) ([], [], 0, 0, [], []) sesDiffs
 
-    findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields)
+    findNearestNeighbourToDiff :: TermOrIndexOrNone (UnmappedTerm f fields)
                                -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
                                         (Maybe (These Int Int, Diff f (Record fields)))
     findNearestNeighbourToDiff termThing = case termThing of
-      Nil -> pure Nothing
+      None -> pure Nothing
       Term term -> Just <$> findNearestNeighbourTo term
       Index i -> do
         (_, unA, unB) <- get
@@ -224,7 +224,7 @@ data UnmappedTerm f fields = UnmappedTerm {
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
-data TermOrIndexOrNil term = Term term | Index Int | Nil
+data TermOrIndexOrNone term = Term term | Index Int | None
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
