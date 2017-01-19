@@ -151,7 +151,6 @@ categoryForRubyName = \case
   "elsif" -> Elsif
   "end_block" -> EndBlock
   "ensure" -> Ensure
-  "ERROR" -> Error
   "exception_variable" -> RescuedException
   "exceptions" -> RescueArgs
   "false" -> Boolean

@@ -138,7 +138,6 @@ categoryForJavaScriptProductionName name = case name of
   "trailing_if_statement" -> If
   "empty_statement" -> Empty
   "program" -> Program
-  "ERROR" -> Error
   "function_call" -> FunctionCall
   "pair" -> Pair
   "string" -> StringLiteral

@@ -293,7 +293,6 @@ categoryForGoName = \case
   "channel_type" -> ChannelTy
   "send_statement" -> Send
   "unary_expression" -> Operator
-  "ERROR" -> Error
   "function_type" -> FunctionTy
   "inc_statement" -> IncrementStatement
   "dec_statement" -> DecrementStatement
