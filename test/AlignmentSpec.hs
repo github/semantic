@@ -260,7 +260,7 @@ align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term (Syntax Str
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
-info start end = Range start end .: RNil
+info start end = Range start end :. Nil
 
 prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term (Syntax String) (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff (Syntax String) (Record '[Range]))
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))

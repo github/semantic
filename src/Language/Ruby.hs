@@ -50,7 +50,7 @@ termConstructor source sourceSpan name range children allChildren
     ("argument_pair", [ k, v ] ) -> S.Pair k v
     ("argument_pair", _ ) -> S.Error children
     ("keyword_parameter", [ k, v ] ) -> S.Pair k v
-    -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g.:
+    -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g:.
     --    def foo(name:); end
     -- Let it fall through to generate an Indexed syntax.
     ("optional_parameter", [ k, v ] ) -> S.Pair k v
@@ -136,7 +136,7 @@ termConstructor source sourceSpan name range children allChildren
   where
     withRecord record syntax = pure $! cofree (record :< syntax)
     withCategory category syntax =
-      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+      pure $! cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
     withDefaultInfo syntax = case syntax of
       S.MethodCall{} -> withCategory MethodCall syntax
       _ -> withCategory (categoryForRubyName name) syntax
