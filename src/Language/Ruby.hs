@@ -166,7 +166,7 @@ categoryForRubyName = \case
   "hash_splat_parameter" -> HashSplatParameter
   "hash" -> Object
   "identifier" -> Identifier
-  "if_modifier" -> If
+  "if_modifier" -> Modifier If
   "if" -> If
   "instance_variable" -> Identifier
   "integer" -> IntegerLiteral
@@ -182,7 +182,7 @@ categoryForRubyName = \case
   "program" -> Program
   "range" -> RangeExpression
   "regex" -> Regex
-  "rescue_modifier" -> RescueModifier
+  "rescue_modifier" -> Modifier Rescue
   "rescue" -> Rescue
   "return" -> Return
   "scope_resolution" -> ScopeOperator
@@ -195,12 +195,12 @@ categoryForRubyName = \case
   "symbol" -> SymbolLiteral
   "true" -> Boolean
   "unary" -> Unary
-  "unless_modifier" -> Unless
+  "unless_modifier" -> Modifier Unless
   "unless" -> Unless
-  "until_modifier" -> Until
+  "until_modifier" -> Modifier Until
   "until" -> Until
   "when" -> When
-  "while_modifier" -> While
+  "while_modifier" -> Modifier While
   "while" -> While
   "yield" -> Yield
   s -> Other s
