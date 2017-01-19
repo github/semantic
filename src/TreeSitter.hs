@@ -57,14 +57,14 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- Without it, we may not evaluate the value until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
-          range `seq` sourceSpan `seq` assignTerm language source sourceSpan (categoryForLanguageProductionName language (toS name)) range children allChildren
+          range `seq` sourceSpan `seq` assignTerm language source (range :. categoryForLanguageProductionName language (toS name) :. sourceSpan :. Nil) children allChildren
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
         getUnnamedChild node n out = ts_node_p_child node n out >> toTerm out
         {-# INLINE getUnnamedChild #-}
         isNonEmpty child = category (extract child) /= Empty
 
-assignTerm :: Language -> Source Char -> SourceSpan -> Category -> Range -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
+assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm = \case
   JavaScript -> JS.termConstructor
   C -> C.termConstructor

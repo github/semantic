@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, GADTs #-}
 module Language where
 
 import Data.Record
@@ -43,13 +43,11 @@ languageForType mediaType = case mediaType of
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
-  -> SourceSpan -- ^ The span that the term occupies.
-  -> Category -- ^ The node’s Category.
-  -> Range -- ^ The character range that the term occupies.
+  -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan category range children _ =
+termConstructor source (range :. category :. sourceSpan :. Nil) children _ =
   withDefaultInfo $ case (category, children) of
     (Error, _) -> S.Error children
     (_, []) -> S.Leaf (toText $ slice range source)

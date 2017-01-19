@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, GADTs #-}
 module Language.JavaScript where
 
 import Data.Record
@@ -14,13 +14,11 @@ operators = [ Operator, BooleanOperator, MathOperator, RelationalOperator, Bitwi
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
-  -> SourceSpan -- ^ The span that the term occupies.
-  -> Category -- ^ The node’s Category.
-  -> Range -- ^ The character range that the term occupies.
+  -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan category range children allChildren
+termConstructor source (range :. category :. sourceSpan :. Nil) children allChildren
   | category == Error = withDefaultInfo (S.Error children)
   | category `elem` operators = do
     allChildren' <- allChildren
