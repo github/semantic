@@ -78,19 +78,11 @@ termConstructor source sourceSpan category range children allChildren
     (If, [ lhs, condition ]) -> S.If condition [lhs]
     (If, condition : body ) -> S.If condition body
     (If, _ ) -> S.Error children
-    (Unless, [lhs, rhs]) ->
-        let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
-        in S.If condition [lhs]
-    (Unless, expr : rest) ->
-        let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
-        in S.If condition rest
+    (Unless, [lhs, rhs]) -> S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Unless, expr : rest) -> S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
     (Unless, _) -> S.Error children
-    (Until, [ lhs, rhs ]) ->
-        let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
-        in S.While condition [lhs]
-    (Until, expr : rest) ->
-        let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
-        in S.While condition rest
+    (Until, [ lhs, rhs ]) -> S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Until, expr : rest) -> S.While (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
     (Until, _) -> S.Error children
     (Elsif, condition : body ) -> S.If condition body
     (Elsif, _ ) -> S.Error children
