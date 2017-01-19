@@ -476,6 +476,7 @@ instance HasCategory Category where
     C.QualifiedIdentifier -> "qualified identifier"
     C.FieldDeclarations -> "field declarations"
     C.RuneLiteral -> "rune literal"
+    C.Modifier Rescue -> "rescue modifier"
     C.Modifier c -> toCategoryName c <> " modifier"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
