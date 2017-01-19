@@ -17,12 +17,12 @@ type DefaultFields fields = (HasField fields Category, HasField fields Range, Ha
 -- |
 -- | This is heavily inspired by Aaron Levin’s [Extensible Effects in the van Laarhoven Free Monad](http://aaronlevin.ca/post/136494428283/extensible-effects-in-the-van-laarhoven-free-monad).
 data Record :: [*] -> * where
-  RNil :: Record '[]
+  Nil :: Record '[]
   RCons :: h -> Record t -> Record (h ': t)
 
 infixr 0 .:
 
--- | Infix synonym for `RCons`: `a .: b .: RNil == RCons a (RCons b RNil)`.
+-- | Infix synonym for `RCons`: `a .: b .: Nil == RCons a (RCons b Nil)`.
 (.:) :: h -> Record t -> Record (h ': t)
 (.:) = RCons
 
@@ -60,7 +60,7 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
   showsPrec n (RCons h t) = showParen (n > 0) $ showsPrec 1 h . (" .: " <>) . shows t
 
 instance Show (Record '[]) where
-  showsPrec n RNil = showParen (n > 0) ("RNil" <>)
+  showsPrec n Nil = showParen (n > 0) ("Nil" <>)
 
 instance (ToJSON h, ToJSONList (Record t)) => ToJSON (Record (h ': t)) where
   toJSON r = toJSONList (toJSONValues r)
@@ -97,4 +97,4 @@ instance (Listable head, Listable (Record tail)) => Listable (Record (head ': ta
   tiers = cons2 RCons
 
 instance Listable (Record '[]) where
-  tiers = cons0 RNil
+  tiers = cons0 Nil

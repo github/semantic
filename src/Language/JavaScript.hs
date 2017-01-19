@@ -121,8 +121,8 @@ termConstructor source sourceSpan name range children allChildren
   where
     withDefaultInfo syntax =
       pure $! case syntax of
-        S.MethodCall{} -> cofree ((range .:  MethodCall .: sourceSpan .: RNil) :< syntax)
-        _ -> cofree ((range .: categoryForJavaScriptProductionName name .: sourceSpan .: RNil) :< syntax)
+        S.MethodCall{} -> cofree ((range .:  MethodCall .: sourceSpan .: Nil) :< syntax)
+        _ -> cofree ((range .: categoryForJavaScriptProductionName name .: sourceSpan .: Nil) :< syntax)
 
 categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of

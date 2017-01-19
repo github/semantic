@@ -26,14 +26,14 @@ Example (from GHCi):
 
 > let leaf = leafTermF "example"
 > headF leaf
-> Range {start = 1, end = 10} .: MethodCall .: RNil
+> Range {start = 1, end = 10} .: MethodCall .: Nil
 > tailF leaf
 > Leaf "example"
 
 -}
 
 leafTermF :: leaf -> TermF (Syntax leaf) (Record '[Range, Category]) b
-leafTermF leaf = (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf leaf
+leafTermF leaf = (Range 1 10 .: Category.MethodCall .: Nil) :< Leaf leaf
 
 {-
 
@@ -52,7 +52,7 @@ Example (from GHCi):
 
 > let leaf = leafTerm "example"
 > extract leaf
-> Range {start = 1, end = 10} .: MethodCall .: RNil
+> Range {start = 1, end = 10} .: MethodCall .: Nil
 > unwrap leaf
 > Leaf "example"
 
@@ -61,7 +61,7 @@ leafTerm :: leaf -> Cofree (Syntax leaf) (Record '[Range, Category])
 leafTerm = cofree . leafTermF
 
 indexedTermF :: [leaf] -> TermF (Syntax leaf) (Record '[Range, Category]) (Term (Syntax leaf) (Record '[Range, Category]))
-indexedTermF leaves = (Range 1 10 .: Category.MethodCall .: RNil) :< (Indexed (leafTerm <$> leaves))
+indexedTermF leaves = (Range 1 10 .: Category.MethodCall .: Nil) :< (Indexed (leafTerm <$> leaves))
 
 indexedTerm :: [leaf] -> Term (Syntax leaf) (Record '[Range, Category])
 indexedTerm leaves = cofree $ indexedTermF leaves
