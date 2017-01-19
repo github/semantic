@@ -428,7 +428,6 @@ instance HasCategory Category where
     C.Elsif -> "elsif block"
     C.Ensure -> "ensure block"
     C.Rescue -> "rescue block"
-    C.RescueModifier -> "rescue modifier"
     C.When -> "when comparison"
     C.RescuedException -> "last exception"
     C.RescueArgs -> "arguments"

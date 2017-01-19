@@ -96,7 +96,6 @@ styleName category = "category-" <> case category of
   C.Elsif -> "elsif_block"
   C.Ensure -> "ensure_block"
   C.Rescue -> "rescue_block"
-  C.RescueModifier -> "rescue_modifier"
   C.When -> "when_block"
   C.RescuedException -> "last_exception"
   C.RescueArgs -> "rescue_args"
