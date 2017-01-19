@@ -36,12 +36,12 @@ spec = parallel $ do
     prop "produces correct diffs" $
       \ (as, bs) -> let tas = decorate <$> (unListableF <$> as :: [SyntaxTerm String '[Category]])
                         tbs = decorate <$> (unListableF <$> bs :: [SyntaxTerm String '[Category]])
-                        root = cofree . ((Program .: RNil) :<) . Indexed
-                        diff = wrap (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare getLabel tas tbs)) in
+                        root = cofree . ((Program :. Nil) :<) . Indexed
+                        diff = wrap (pure (Program :. Nil) :< Indexed (stripDiff <$> rws compare getLabel tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
-      let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf ("a" :: Text)) ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
+      let (a, b) = (decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf ("a" :: Text)) ])), decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf "b") ]))) in
       fmap stripDiff (rws compare getLabel [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
 
   where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))

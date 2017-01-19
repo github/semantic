@@ -22,7 +22,7 @@ termConstructor source sourceSpan category range children _
   [] -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where
-    withDefaultInfo syntax = pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+    withDefaultInfo syntax = pure $! cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
 categoryForCProductionName :: Text -> Category
 categoryForCProductionName = Other

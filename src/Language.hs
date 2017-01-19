@@ -56,7 +56,7 @@ termConstructor source sourceSpan category range children _ =
     _ -> S.Indexed children
   where
     withDefaultInfo syntax =
-      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+      pure $! cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child Nothing

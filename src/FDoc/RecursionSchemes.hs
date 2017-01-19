@@ -28,7 +28,7 @@ The example below adds a new field to the `Record` fields.
 indexedTermAna :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Category])
 indexedTermAna childrenLeaves = ana coalgebra (indexedTerm childrenLeaves)
   where
-    coalgebra term = (NewField .: (extract term)) :< unwrap term
+    coalgebra term = (NewField :. (extract term)) :< unwrap term
 
 {-
 Catamorphism example -- add a new field to each term's Record fields
@@ -47,7 +47,7 @@ indexedTermCata :: [leaf] -> Term (Syntax leaf) (Record '[NewField, Range, Categ
 indexedTermCata childrenLeaves = cata algebra (indexedTerm childrenLeaves)
   where
     algebra :: CofreeF f (Record t) (Cofree f (Record (NewField : t))) -> Cofree f (Record (NewField : t))
-    algebra term = cofree $ (NewField .: (headF term)) :< tailF term
+    algebra term = cofree $ (NewField :. (headF term)) :< tailF term
 
 {-
 Anamorphism -- construct a Term from a string
@@ -58,25 +58,25 @@ representation.
 Example usage:
 
 stringToTermAna "indexed" =>
-  CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil)
+  CofreeT (Identity ( (Range {start = 1, end = 10} :. MethodCall :. Nil)
                       :<
                       Indexed
-                        [ CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf1" ) )
-                        , CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf2" ) )
-                        , CofreeT (Identity ( (Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf3" ) )
+                        [ CofreeT (Identity ( (Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf1" ) )
+                        , CofreeT (Identity ( (Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf2" ) )
+                        , CofreeT (Identity ( (Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf3" ) )
                         ] ))
 
   First step is to match against the "indexed" string and begin building up a Cofree Indexed structure:
 
-  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"] ) )
+  CofreeT (Identity ( (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed ["leaf1", "leaf2", "leaf3"] ) )
 
   While building up the `Indexed` structure, we continue to recurse over the
   `Indexed` terms ["leaf1", "leaf2", "leaf3"]. These are pattern matched using
   the catch all `_` and default to `Leaf` Syntax shapes:
 
-  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf1" ) )
-  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf2" ) )
-  CofreeT (Identity ( (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "leaf3" ) )
+  CofreeT (Identity ( (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf "leaf1" ) )
+  CofreeT (Identity ( (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf "leaf2" ) )
+  CofreeT (Identity ( (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf "leaf3" ) )
 
   These structures are substituted in place of ["leaf1", "leaf2", "leaf3"] in
   the new cofree `Indexed` structure, resulting in a expansion of all possible
@@ -86,8 +86,8 @@ stringToTermAna :: String -> Term (Syntax String) (Record '[Range, Category])
 stringToTermAna = ana coalgebra
   where
     coalgebra representation = case representation of
-      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"]
-      _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf representation
+      "indexed" -> (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed ["leaf1", "leaf2", "leaf3"]
+      _ -> (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf representation
 
 {-
 Catamorphism -- construct a list of Strings from a recursive Term structure.
@@ -131,8 +131,8 @@ stringTermHylo = hylo algebra coalgebra
       (_ :< Indexed values) -> ["indexed"] <> Prologue.concat values
       _ -> ["unknown"]
     coalgebra stringRepresentation = case stringRepresentation of
-      "indexed" -> (Range 1 10 .: Category.MethodCall .: RNil) :< Indexed ["leaf1", "leaf2", "leaf3"]
-      _ -> (Range 1 10 .: Category.MethodCall .: RNil) :< Leaf stringRepresentation
+      "indexed" -> (Range 1 10 :. Category.MethodCall :. Nil) :< Indexed ["leaf1", "leaf2", "leaf3"]
+      _ -> (Range 1 10 :. Category.MethodCall :. Nil) :< Leaf stringRepresentation
 
 {-
 Paramorphism -- primitive recursion that maintains a reference to the original value and its computed value.
@@ -158,22 +158,22 @@ Example Usage:
 let terms = indexedTerm ["leaf1", "leaf2", "leaf3"]
 termPara terms = Recurse over the structure to start at the leaves (bottom up traversal):
 
-tuple3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf3")), "leaf3" ) : []
+tuple3 = ( CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf3")), "leaf3" ) : []
 
 Continue the traversal from leaves to root:
 
-tuple2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf2")), "leaf2") : tuple3
+tuple2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf2")), "leaf2") : tuple3
 
-tuple1:2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf1" )), "leaf1") : tuple2:3
+tuple1:2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf1" )), "leaf1") : tuple2:3
 
 Compute the root:
-tupleIndexed:1:2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Indexed [])), "indexed" ) : tuple1:2:3
+tupleIndexed:1:2:3 = ( CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Indexed [])), "indexed" ) : tuple1:2:3
 
 Final shape:
-[ (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Indexed []))  , "indexed")
-, (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf1")), "leaf1")
-, (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf2")), "leaf2")
-, (CofreeT (Identity ((Range {start = 1, end = 10} .: MethodCall .: RNil) :< Leaf "leaf3")), "leaf3")
+[ (CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Indexed []))  , "indexed")
+, (CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf1")), "leaf1")
+, (CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf2")), "leaf2")
+, (CofreeT (Identity ((Range {start = 1, end = 10} :. MethodCall :. Nil) :< Leaf "leaf3")), "leaf3")
 ]
 
 -}
@@ -183,4 +183,4 @@ termPara = para algebra
     algebra term = case term of
       (annotation :< Leaf representation) -> [(cofree (annotation :< Leaf representation), representation)]
       (annotation :< Indexed values) -> [(cofree (annotation :< Indexed []), "indexed")] <> (values >>= Prelude.snd)
-      _ -> [(cofree ((Range 1 10 .: Category.MethodCall .: RNil) :< Leaf "unknown"), "unknown")]
+      _ -> [(cofree ((Range 1 10 :. Category.MethodCall :. Nil) :< Leaf "unknown"), "unknown")]

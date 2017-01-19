@@ -124,7 +124,7 @@ termConstructor source sourceSpan category range children allChildren
   where
     withRecord record syntax = cofree (record :< syntax)
     withCategory category syntax =
-      cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+      cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
     withDefaultInfo syntax = case syntax of
       S.MethodCall{} -> withCategory MethodCall syntax
       _ -> withCategory category syntax
