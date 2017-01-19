@@ -135,6 +135,7 @@ data Category
   | Elsif
   | Ensure
   | Rescue
+  | RescueModifier
   | RescuedException
   | RescueArgs
   | When
@@ -297,6 +298,7 @@ instance Listable Category where
     \/ cons0 Elsif
     \/ cons0 Ensure
     \/ cons0 Rescue
+    \/ cons0 RescueModifier
     \/ cons0 RescuedException
     \/ cons0 RescueArgs
     \/ cons0 When
