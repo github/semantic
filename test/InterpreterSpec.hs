@@ -2,7 +2,7 @@
 module InterpreterSpec where
 
 import Category
-import Data.Functor.Foldable
+import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
 import Data.RandomWalkSimilarity
 import Data.Record
