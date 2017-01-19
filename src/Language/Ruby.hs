@@ -10,127 +10,120 @@ import Language
 import qualified Syntax as S
 import Term
 
-operators :: [Text]
-operators = ["binary", "unary", "range", "scope_resolution"]
+operators :: [Category]
+operators = [ Binary, Unary, RangeExpression, ScopeOperator ]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> SourceSpan -- ^ The span that the term occupies.
-  -> Text -- ^ The name of the production for this node.
+  -> Category -- ^ The node’s Category.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children allChildren
-  | name == "ERROR" = withDefaultInfo (S.Error children)
-  | name == "unless_modifier" = case children of
+termConstructor source sourceSpan category range children allChildren
+  | category == Error = withDefaultInfo (S.Error children)
+  | category == Unless = case children of
     [ lhs, rhs ] -> do
       condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
       withDefaultInfo $ S.If condition [lhs]
-    _ -> withDefaultInfo $ S.Error children
-  | name == "unless" = case children of
     ( expr : rest ) -> do
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.If condition rest
     _ -> withDefaultInfo $ S.Error children
-  | name == "until_modifier" = case children of
+  | category == Until = case children of
     [ lhs, rhs ] -> do
       condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
       withDefaultInfo $ S.While condition [lhs]
-    _ -> withDefaultInfo $ S.Error children
-  | name == "until" = case children of
     ( expr : rest ) -> do
       condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
       withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
-  | name `elem` operators = do
+  | category `elem` operators = do
     allChildren' <- allChildren
     withDefaultInfo $ S.Operator allChildren'
-  | otherwise = withDefaultInfo $ case (name, children) of
-    ("argument_pair", [ k, v ] ) -> S.Pair k v
-    ("argument_pair", _ ) -> S.Error children
-    ("keyword_parameter", [ k, v ] ) -> S.Pair k v
+  | otherwise = withDefaultInfo $ case (category, children) of
+    (ArgumentPair, [ k, v ] ) -> S.Pair k v
+    (ArgumentPair, _ ) -> S.Error children
+    (KeywordParameter, [ k, v ] ) -> S.Pair k v
     -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g.:
     --    def foo(name:); end
     -- Let it fall through to generate an Indexed syntax.
-    ("optional_parameter", [ k, v ] ) -> S.Pair k v
-    ("optional_parameter", _ ) -> S.Error children
-    ("array", _ ) -> S.Array Nothing children
-    ("assignment", [ identifier, value ]) -> S.Assignment identifier value
-    ("assignment", _ ) -> S.Error children
-    ("begin", _ ) -> case partition (\x -> category (extract x) == Rescue) children of
-      (rescues, rest) -> case partition (\x -> category (extract x) == Ensure || category (extract x) == Else) rest of
+    (OptionalParameter, [ k, v ] ) -> S.Pair k v
+    (OptionalParameter, _ ) -> S.Error children
+    (ArrayLiteral, _ ) -> S.Array Nothing children
+    (Assignment, [ identifier, value ]) -> S.Assignment identifier value
+    (Assignment, _ ) -> S.Error children
+    (Begin, _ ) -> case partition (\x -> Info.category (extract x) == Rescue) children of
+      (rescues, rest) -> case partition (\x -> Info.category (extract x) == Ensure || Info.category (extract x) == Else) rest of
         (ensureElse, body) -> case ensureElse of
           [ elseBlock, ensure ]
-            | Else <- category (extract elseBlock)
-            , Ensure <- category (extract ensure) -> S.Try body rescues (Just elseBlock) (Just ensure)
+            | Else <- Info.category (extract elseBlock)
+            , Ensure <- Info.category (extract ensure) -> S.Try body rescues (Just elseBlock) (Just ensure)
           [ ensure, elseBlock ]
-            | Ensure <- category (extract ensure)
-            , Else <- category (extract elseBlock) -> S.Try body rescues (Just elseBlock) (Just ensure)
-          [ elseBlock ] | Else <- category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
-          [ ensure ] | Ensure <- category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
+            | Ensure <- Info.category (extract ensure)
+            , Else <- Info.category (extract elseBlock) -> S.Try body rescues (Just elseBlock) (Just ensure)
+          [ elseBlock ] | Else <- Info.category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
+          [ ensure ] | Ensure <- Info.category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    ("case", expr : body ) -> S.Switch (Just expr) body
-    ("case", _ ) -> S.Error children
-    ("when", condition : body ) -> S.Case condition body
-    ("when", _ ) -> S.Error children
-    ("class", constant : rest ) -> case rest of
-      ( superclass : body ) | Superclass <- category (extract superclass) -> S.Class constant (Just superclass) body
+    (Case, expr : body ) -> S.Switch (Just expr) body
+    (Case, _ ) -> S.Error children
+    (When, condition : body ) -> S.Case condition body
+    (When, _ ) -> S.Error children
+    (Class, constant : rest ) -> case rest of
+      ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
-    ("class", _ ) -> S.Error children
-    ("singleton_class", identifier : rest ) -> S.Class identifier Nothing rest
-    ("singleton_class", _ ) -> S.Error children
-    ("comment", _ ) -> S.Comment . toText $ slice range source
-    ("conditional", condition : cases) -> S.Ternary condition cases
-    ("conditional", _ ) -> S.Error children
-    ("constant", _ ) -> S.Fixed children
-    ("method_call", _ ) -> case children of
-      member : args | MemberAccess <- category (extract member) -> case toList (unwrap member) of
+    (Class, _ ) -> S.Error children
+    (SingletonClass, identifier : rest ) -> S.Class identifier Nothing rest
+    (SingletonClass, _ ) -> S.Error children
+    (Comment, _ ) -> S.Comment . toText $ slice range source
+    (Ternary, condition : cases) -> S.Ternary condition cases
+    (Ternary, _ ) -> S.Error children
+    (Constant, _ ) -> S.Fixed children
+    (MethodCall, _ ) -> case children of
+      member : args | MemberAccess <- Info.category (extract member) -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
         _ -> S.Error children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
-    ("lambda", _) -> case children of
+    (Other "lambda", _) -> case children of
       [ body ] -> S.AnonymousFunction [] [body]
       ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
       _ -> S.Error children
-    ("hash", _ ) -> S.Object Nothing $ foldMap toTuple children
-    ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
-    ("if_modifier", _ ) -> S.Error children
-    ("if", condition : body ) -> S.If condition body
-    ("if", _ ) -> S.Error children
-    ("elsif", condition : body ) -> S.If condition body
-    ("elsif", _ ) -> S.Error children
-    ("element_reference", [ base, element ]) -> S.SubscriptAccess base element
-    ("element_reference", _ ) -> S.Error children
-    ("for", lhs : expr : rest ) -> S.For [lhs, expr] rest
-    ("for", _ ) -> S.Error children
-    ("operator_assignment", [ identifier, value ]) -> S.OperatorAssignment identifier value
-    ("operator_assignment", _ ) -> S.Error children
-    ("call", [ base, property ]) -> S.MemberAccess base property
-    ("call", _ ) -> S.Error children
-    ("method", _ ) -> case children of
-      identifier : params : body | Params <- category (extract params) -> S.Method identifier Nothing (toList (unwrap params)) body
+    (Object, _ ) -> S.Object Nothing $ foldMap toTuple children
+    (If, [ lhs, condition ]) -> S.If condition [lhs]
+    (If, condition : body ) -> S.If condition body
+    (If, _ ) -> S.Error children
+    (Elsif, condition : body ) -> S.If condition body
+    (Elsif, _ ) -> S.Error children
+    (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
+    (SubscriptAccess, _ ) -> S.Error children
+    (For, lhs : expr : rest ) -> S.For [lhs, expr] rest
+    (For, _ ) -> S.Error children
+    (OperatorAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
+    (OperatorAssignment, _ ) -> S.Error children
+    (MemberAccess, [ base, property ]) -> S.MemberAccess base property
+    (MemberAccess, _ ) -> S.Error children
+    (Method, _ ) -> case children of
+      identifier : params : body | Params <- Info.category (extract params) -> S.Method identifier Nothing (toList (unwrap params)) body
       identifier : body -> S.Method identifier Nothing [] body
       _ -> S.Error children
-    ("module", constant : body ) -> S.Module constant body
-    ("module", _ ) -> S.Error children
-    ("rescue", _ ) -> case children of
+    (Module, constant : body ) -> S.Module constant body
+    (Module, _ ) -> S.Error children
+    (Rescue, [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
+    (Rescue, _ ) -> case children of
       exceptions : exceptionVar : rest
-        | RescueArgs <- category (extract exceptions)
-        , RescuedException <- category (extract exceptionVar) -> S.Rescue (toList (unwrap exceptions) <> [exceptionVar]) rest
-      exceptionVar : rest | RescuedException <- category (extract exceptionVar) -> S.Rescue [exceptionVar] rest
-      exceptions : body | RescueArgs <- category (extract exceptions) -> S.Rescue (toList (unwrap exceptions)) body
+        | RescueArgs <- Info.category (extract exceptions)
+        , RescuedException <- Info.category (extract exceptionVar) -> S.Rescue (toList (unwrap exceptions) <> [exceptionVar]) rest
+      exceptionVar : rest | RescuedException <- Info.category (extract exceptionVar) -> S.Rescue [exceptionVar] rest
+      exceptions : body | RescueArgs <- Info.category (extract exceptions) -> S.Rescue (toList (unwrap exceptions)) body
       body -> S.Rescue [] body
-    ("rescue_modifier", [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
-    ("rescue_modifier", _ ) -> S.Error children
-    ("return", _ ) -> S.Return children
-    ("while_modifier", [ lhs, condition ]) -> S.While condition [lhs]
-    ("while_modifier", _ ) -> S.Error children
-    ("while", expr : rest ) -> S.While expr rest
-    ("while", _ ) -> S.Error children
-    ("yield", _ ) -> S.Yield children
-    _ | name `elem` ["begin_block", "end_block"] -> S.BlockStatement children
+    (Return, _ ) -> S.Return children
+    (While, [ lhs, condition ]) -> S.While condition [lhs]
+    (While, expr : rest ) -> S.While expr rest
+    (While, _ ) -> S.Error children
+    (Yield, _ ) -> S.Yield children
+    _ | category `elem` [ BeginBlock, EndBlock ] -> S.BlockStatement children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -139,7 +132,7 @@ termConstructor source sourceSpan name range children allChildren
       pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
     withDefaultInfo syntax = case syntax of
       S.MethodCall{} -> withCategory MethodCall syntax
-      _ -> withCategory (categoryForRubyName name) syntax
+      _ -> withCategory category syntax
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case

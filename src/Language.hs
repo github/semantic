@@ -44,19 +44,19 @@ languageForType mediaType = case mediaType of
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> SourceSpan -- ^ The span that the term occupies.
-  -> Text -- ^ The name of the production for this node.
+  -> Category -- ^ The node’s Category.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children _ =
-  withDefaultInfo $ case (name, children) of
-    ("ERROR", _) -> S.Error children
+termConstructor source sourceSpan category range children _ =
+  withDefaultInfo $ case (category, children) of
+    (Error, _) -> S.Error children
     (_, []) -> S.Leaf (toText $ slice range source)
     _ -> S.Indexed children
   where
     withDefaultInfo syntax =
-      pure $! cofree ((range .: Other name .: sourceSpan .: RNil) :< syntax)
+      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child Nothing
