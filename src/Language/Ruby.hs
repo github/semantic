@@ -75,13 +75,16 @@ termConstructor source sourceSpan category range children allChildren
       ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
       _ -> S.Error children
     (Object, _ ) -> S.Object Nothing $ foldMap toTuple children
-    (If, [ lhs, condition ]) -> S.If condition [lhs]
+    (Modifier If, [ lhs, condition ]) -> S.If condition [lhs]
+    (Modifier If, _) -> S.Error children
     (If, condition : body ) -> S.If condition body
     (If, _ ) -> S.Error children
-    (Unless, [lhs, rhs]) -> S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Modifier Unless, [lhs, rhs]) -> S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Modifier Unless, _) -> S.Error children
     (Unless, expr : rest) -> S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
     (Unless, _) -> S.Error children
-    (Until, [ lhs, rhs ]) -> S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Modifier Until, [ lhs, rhs ]) -> S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Modifier Until, _) -> S.Error children
     (Until, expr : rest) -> S.While (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
     (Until, _) -> S.Error children
     (Elsif, condition : body ) -> S.If condition body
@@ -100,7 +103,8 @@ termConstructor source sourceSpan category range children allChildren
       _ -> S.Error children
     (Module, constant : body ) -> S.Module constant body
     (Module, _ ) -> S.Error children
-    (Rescue, [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
+    (Modifier Rescue, [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
+    (Modifier Rescue, _) -> S.Error children
     (Rescue, _ ) -> case children of
       exceptions : exceptionVar : rest
         | RescueArgs <- Info.category (extract exceptions)
@@ -109,7 +113,8 @@ termConstructor source sourceSpan category range children allChildren
       exceptions : body | RescueArgs <- Info.category (extract exceptions) -> S.Rescue (toList (unwrap exceptions)) body
       body -> S.Rescue [] body
     (Return, _ ) -> S.Return children
-    (While, [ lhs, condition ]) -> S.While condition [lhs]
+    (Modifier While, [ lhs, condition ]) -> S.While condition [lhs]
+    (Modifier While, _) -> S.Error children
     (While, expr : rest ) -> S.While expr rest
     (While, _ ) -> S.Error children
     (Yield, _ ) -> S.Yield children
