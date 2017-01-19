@@ -294,7 +294,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Rescue -> case t of
         "" -> "in a" <+> catName c
         _ -> "in the" <+> squotes (termName t) <+> catName c
-      C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
+      C.Modifier C.Rescue -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
       C.If -> "in the" <+> squotes (termName t) <+> catName c
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
       C.Break -> case t of
