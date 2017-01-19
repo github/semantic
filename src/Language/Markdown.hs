@@ -19,7 +19,7 @@ cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) (rangeToSourceSpa
             range = maybe within (sourceSpanToRange source . toSpan) position
             span = maybe withinSpan toSpan position
           in
-            cofree $ (range .: toCategory t .: span .: Nil) :< case t of
+            cofree $ (range :. toCategory t :. span :. Nil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text

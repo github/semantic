@@ -25,8 +25,8 @@ spec = parallel $ do
     let decorate = defaultFeatureVectorDecorator (category . headF)
     let compare = (==) `on` category . extract
     it "returns a replacement when comparing two unicode equivalent terms" $
-      let termA = cofree $ (StringLiteral .: Nil) :< Leaf ("t\776" :: String)
-          termB = cofree $ (StringLiteral .: Nil) :< Leaf "\7831" in
+      let termA = cofree $ (StringLiteral :. Nil) :< Leaf ("t\776" :: String)
+          termB = cofree $ (StringLiteral :. Nil) :< Leaf "\7831" in
           stripDiff (diffTerms wrap compare diffCost getLabel (decorate termA) (decorate termB)) `shouldBe` replacing termA termB
 
     prop "produces correct diffs" $
@@ -39,6 +39,6 @@ spec = parallel $ do
                  diffCost diff `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
-      let term s = decorate (cofree ((StringLiteral .: Nil) :< Indexed [ cofree ((StringLiteral .: Nil) :< Leaf s) ]))
-          root = cofree . ((pure 0 .: Program .: Nil) :<) . Indexed in
-      stripDiff (diffTerms wrap compare diffCost getLabel (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program .: Nil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])
+      let term s = decorate (cofree ((StringLiteral :. Nil) :< Indexed [ cofree ((StringLiteral :. Nil) :< Leaf s) ]))
+          root = cofree . ((pure 0 :. Program :. Nil) :<) . Indexed in
+      stripDiff (diffTerms wrap compare diffCost getLabel (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program :. Nil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])

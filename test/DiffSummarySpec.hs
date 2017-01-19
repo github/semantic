@@ -27,10 +27,10 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
 arrayInfo :: Record '[Category, Range, SourceSpan]
-arrayInfo = ArrayLiteral .: Range 0 3 .: sourceSpanBetween (1, 1) (1, 5) .: Nil
+arrayInfo = ArrayLiteral :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
 
 literalInfo :: Record '[Category, Range, SourceSpan]
-literalInfo = StringLiteral .: Range 1 2 .: sourceSpanBetween (1, 2) (1, 4) .: Nil
+literalInfo = StringLiteral :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 testDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])

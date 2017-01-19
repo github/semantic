@@ -20,11 +20,7 @@ data Record :: [*] -> * where
   Nil :: Record '[]
   (:.) :: h -> Record t -> Record (h ': t)
 
-infixr 0 .:
-
--- | Synonym for '(:.)': @a .: b .: Nil == a :. b :. Nil@.
-(.:) :: h -> Record t -> Record (h ': t)
-(.:) = (:.)
+infixr 0 :.
 
 -- | Get the first element of a non-empty record.
 rhead :: Record (head ': tail) -> head
@@ -57,7 +53,7 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
 
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
-  showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . (" .: " <>) . shows t
+  showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . (" :. " <>) . shows t
 
 instance Show (Record '[]) where
   showsPrec n Nil = showParen (n > 0) ("Nil" <>)
