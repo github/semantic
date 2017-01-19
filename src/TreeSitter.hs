@@ -70,9 +70,12 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         isNonEmpty child = category (extract child) /= Empty
 
 categoryForLanguageProductionName :: Language -> Text -> Category
-categoryForLanguageProductionName = \case
+categoryForLanguageProductionName = withDefaults . \case
   JavaScript -> JS.categoryForJavaScriptProductionName
   C -> C.categoryForCProductionName
   Ruby -> Ruby.categoryForRubyName
   Language.Go -> Go.categoryForGoName
   _ -> Other
+  where withDefaults productionMap = \case
+          "ERROR" -> Error
+          s -> productionMap s
