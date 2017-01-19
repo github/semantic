@@ -18,13 +18,13 @@ termConstructor
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children _ = case name of
+termConstructor source sourceSpan name range children _ = pure $! case name of
   "return_statement" -> withDefaultInfo $ S.Return children
   "source_file" -> case Prologue.break (\node -> category (extract node) == Other "package_clause") children of
     (comments, packageName : rest) -> case unwrap packageName of
-        S.Indexed [id] -> do
-          module' <- withCategory Module (S.Module id rest)
-          withCategory Program (S.Indexed (comments <> [module']))
+        S.Indexed [id] ->
+          let module' = withCategory Module (S.Module id rest)
+          in withCategory Program (S.Indexed (comments <> [module']))
         _ -> withRanges range Error children (S.Error children)
     _ -> withRanges range Error children (S.Error children)
   "import_declaration" -> toImports children
@@ -46,12 +46,12 @@ termConstructor source sourceSpan name range children _ = case name of
   "field_declaration" -> toFieldDecl children
   "expression_switch_statement" ->
     case Prologue.break isCaseClause children of
-      (clauses, cases) -> do
-        clauses' <- case clauses of
-          [] -> pure Nothing
-          clauses'' -> Just <$> (withCategory ExpressionStatements (S.Indexed clauses''))
-        cases' <- sequenceA $ toCase <$> cases
-        withDefaultInfo $ S.Switch clauses' cases'
+      (clauses, cases) ->
+        let clauses' = case clauses of
+              [] -> Nothing
+              _ -> Just (withCategory ExpressionStatements (S.Indexed clauses))
+            cases' = toCase <$> cases
+        in withDefaultInfo $ S.Switch clauses' cases'
       where
         isCaseClause = (== Other "expression_case_clause") . category . extract
         toCase clause = case toList (unwrap clause) of
@@ -112,14 +112,14 @@ termConstructor source sourceSpan name range children _ = case name of
     [channel, expr] -> S.Send channel expr
     rest -> S.Error rest
   "unary_expression" -> withDefaultInfo $ S.Operator children
-  "function_type" -> do
-    params <- withRanges range Params children $ S.Indexed children
-    withDefaultInfo $ S.Ty params
-  "inc_statement" -> do
+  "function_type" ->
+    let params = withRanges range Params children $ S.Indexed children
+    in withDefaultInfo $ S.Ty params
+  "inc_statement" ->
     withDefaultInfo $ S.Leaf . toText $ slice range source
-  "dec_statement" -> do
+  "dec_statement" ->
     withDefaultInfo $ S.Leaf . toText $ slice range source
-  "qualified_identifier" -> do
+  "qualified_identifier" ->
     withDefaultInfo $ S.Leaf . toText $ slice range source
   "break_statement" -> toBreak children
   "continue_statement" -> toContinue children
@@ -131,16 +131,16 @@ termConstructor source sourceSpan name range children _ = case name of
   where
     toMethod = \case
       [params, name, fun] -> withDefaultInfo (S.Method name Nothing (toList $ unwrap params) (toList $ unwrap fun))
-      [params, name, outParams, fun] -> do
+      [params, name, outParams, fun] ->
         let params' = toList (unwrap params)
             outParams' = toList (unwrap outParams)
             allParams = params' <> outParams'
-        withDefaultInfo (S.Method name Nothing allParams (toList $ unwrap fun))
-      [params, name, outParams, ty, fun] -> do
+        in withDefaultInfo (S.Method name Nothing allParams (toList $ unwrap fun))
+      [params, name, outParams, ty, fun] ->
         let params' = toList (unwrap params)
             outParams' = toList (unwrap outParams)
             allParams = params' <> outParams'
-        withDefaultInfo (S.Method name (Just ty) allParams (toList $ unwrap fun))
+        in withDefaultInfo (S.Method name (Just ty) allParams (toList $ unwrap fun))
       rest -> withCategory Error (S.Error rest)
     toPair = \case
       [key, value] -> withDefaultInfo (S.Pair key value)
@@ -154,9 +154,8 @@ termConstructor source sourceSpan name range children _ = case name of
       [] -> withDefaultInfo (S.Continue Nothing)
       rest -> withCategory Error (S.Error rest)
 
-    toStructTy children = do
-      fields <- withRanges range FieldDeclarations children (S.Indexed children)
-      withDefaultInfo (S.Ty fields)
+    toStructTy children =
+      withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
 
     toLiteral = \case
       children@[ty, _] -> case category (extract ty) of
@@ -177,22 +176,19 @@ termConstructor source sourceSpan name range children _ = case name of
       [ty, values] -> withCategory Struct (S.Struct (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
     toFieldDecl = \case
-      [idList, ty] -> do
-        ident' <- toIdent (toList $ unwrap idList)
+      [idList, ty] ->
         case category (extract ty) of
-          StringLiteral -> withCategory FieldDecl (S.FieldDecl ident' Nothing (Just ty))
-          _ -> withCategory FieldDecl (S.FieldDecl ident' (Just ty) Nothing)
-      [idList] -> do
-        ident' <- toIdent (toList $ unwrap idList)
-        withCategory FieldDecl (S.FieldDecl ident' Nothing Nothing)
-      [idList, ty, tag] -> do
-        ident' <- toIdent (toList $ unwrap idList)
-        withCategory FieldDecl (S.FieldDecl ident' (Just ty) (Just tag))
+          StringLiteral -> withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) Nothing (Just ty))
+          _ -> withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) (Just ty) Nothing)
+      [idList] ->
+        withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) Nothing Nothing)
+      [idList, ty, tag] ->
+        withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) (Just ty) (Just tag))
       rest -> withRanges range Error rest (S.Error rest)
 
       where
         toIdent = \case
-          [ident] -> pure ident
+          [ident] -> ident
           rest -> withRanges range Error rest (S.Error rest)
 
 
@@ -203,16 +199,16 @@ termConstructor source sourceSpan name range children _ = case name of
       [a, b] -> S.SubscriptAccess a b
       rest -> S.Error rest
     sliceToSubscriptAccess = \case
-      a : rest -> do
-        sliceElement <- withRanges range Element rest $ S.Fixed rest
-        withCategory Slice (S.SubscriptAccess a sliceElement)
+      a : rest ->
+        let sliceElement = withRanges range Element rest $ S.Fixed rest
+        in withCategory Slice (S.SubscriptAccess a sliceElement)
       rest -> withRanges range Error rest $ S.Error rest
 
     toIfStatement children = case Prologue.break ((Other "block" ==) . category . extract) children of
-      (clauses, blocks) -> do
-        clauses' <- withRanges range ExpressionStatements clauses (S.Indexed clauses)
-        let blocks' = foldMap (toList . unwrap) blocks
-        withDefaultInfo (S.If clauses' blocks')
+      (clauses, blocks) ->
+        let clauses' = withRanges range ExpressionStatements clauses (S.Indexed clauses)
+            blocks' = foldMap (toList . unwrap) blocks
+        in withDefaultInfo (S.If clauses' blocks')
 
     toTypeDecls types = withDefaultInfo $ S.Indexed types
 
@@ -220,33 +216,32 @@ termConstructor source sourceSpan name range children _ = case name of
       [identifier, ty] -> withDefaultInfo $ S.TypeDecl identifier ty
       rest -> withRanges range Error rest $ S.Error rest
 
-    toImports imports = do
-      imports' <- mapM toImport imports
-      withDefaultInfo $ S.Indexed (mconcat imports')
+    toImports imports =
+      withDefaultInfo $ S.Indexed (imports >>= toImport)
       where
         toImport i = case toList (unwrap i) of
-          [importName] -> sequenceA [ withCategory Import (S.Import importName []) ]
-          rest@(_:_) -> sequenceA [ withRanges range Error rest (S.Error rest)]
-          [] -> pure []
+          [importName] -> [ withCategory Import (S.Import importName []) ]
+          rest@(_:_) -> [ withRanges range Error rest (S.Error rest)]
+          [] -> []
 
     toVarDecls children = withDefaultInfo (S.Indexed children)
 
     toConsts constSpecs = withDefaultInfo (S.Indexed constSpecs)
 
     toVarAssignment = \case
-        [idList, ty] | category (extract ty) == Identifier -> do
+        [idList, ty] | category (extract ty) == Identifier ->
           let ids = toList (unwrap idList)
-          idList' <- mapM (\id -> withRanges range VarDecl [id] (S.VarDecl id (Just ty))) ids
-          withRanges range ExpressionStatements idList' (S.Indexed idList')
-        [idList, expressionList] | category (extract expressionList) == Other "expression_list" -> do
-          assignments' <- sequenceA $ zipWith (\id expr ->
-            withCategory VarAssignment $ S.VarAssignment id expr)
-            (toList $ unwrap idList) (toList $ unwrap expressionList)
-          withRanges range ExpressionStatements assignments' (S.Indexed assignments')
-        [idList, _, expressionList] -> do
-          assignments' <- sequenceA $ zipWith (\id expr ->
-            withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
-          withRanges range ExpressionStatements assignments' (S.Indexed assignments')
+              idList' = (\id -> withRanges range VarDecl [id] (S.VarDecl id (Just ty))) <$> ids
+          in withRanges range ExpressionStatements idList' (S.Indexed idList')
+        [idList, expressionList] | category (extract expressionList) == Other "expression_list" ->
+          let assignments' = zipWith (\id expr ->
+                withCategory VarAssignment $ S.VarAssignment id expr)
+                (toList $ unwrap idList) (toList $ unwrap expressionList)
+          in withRanges range ExpressionStatements assignments' (S.Indexed assignments')
+        [idList, _, expressionList] ->
+          let assignments' = zipWith (\id expr ->
+                withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+          in withRanges range ExpressionStatements assignments' (S.Indexed assignments')
         [idList] -> withDefaultInfo (S.Indexed [idList])
         rest -> withRanges range Error rest (S.Error rest)
 
@@ -254,10 +249,10 @@ termConstructor source sourceSpan name range children _ = case name of
       let ranges' = getField . extract <$> terms
           sourceSpans' = getField . extract <$> terms
       in
-      pure $! cofree ((unionRangesFrom originalRange ranges' .: category' .: unionSourceSpansFrom sourceSpan sourceSpans' .: RNil) :< syntax)
+      cofree ((unionRangesFrom originalRange ranges' .: category' .: unionSourceSpansFrom sourceSpan sourceSpans' .: RNil) :< syntax)
 
     withCategory category syntax =
-      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+      cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
 
     withDefaultInfo = withCategory (categoryForGoName name)
 
