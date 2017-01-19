@@ -15,6 +15,7 @@ import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String
+import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 import SourceSpan
@@ -56,18 +57,20 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           -- Without it, we may not evaluate the value until after we’ve exited
           -- the scope that `node` was allocated within, meaning `alloca` will
           -- free it & other stack data may overwrite it.
-          range `seq` sourceSpan `seq` termConstructor source sourceSpan (categoryForLanguageProductionName language (toS name)) range children allChildren
+          range `seq` sourceSpan `seq` TreeSitter.termConstructor language source sourceSpan (categoryForLanguageProductionName language (toS name)) range children allChildren
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
         getUnnamedChild node n out = ts_node_p_child node n out >> toTerm out
         {-# INLINE getUnnamedChild #-}
-        termConstructor = case language of
-          JavaScript -> JS.termConstructor
-          C -> C.termConstructor
-          Language.Go -> Go.termConstructor
-          Ruby -> Ruby.termConstructor
-          _ -> Language.termConstructor
         isNonEmpty child = category (extract child) /= Empty
+
+termConstructor :: Language -> Source Char -> SourceSpan -> Category -> Range -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
+termConstructor = \case
+  JavaScript -> JS.termConstructor
+  C -> C.termConstructor
+  Language.Go -> Go.termConstructor
+  Ruby -> Ruby.termConstructor
+  _ -> Language.termConstructor
 
 categoryForLanguageProductionName :: Language -> Text -> Category
 categoryForLanguageProductionName = withDefaults . \case
