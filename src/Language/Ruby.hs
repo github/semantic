@@ -22,27 +22,27 @@ termConstructor
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan category range children allChildren
-  | category == Error = withDefaultInfo (S.Error children)
-  | category == Unless = case children of
-    [ lhs, rhs ] -> do
-      condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
-      withDefaultInfo $ S.If condition [lhs]
-    ( expr : rest ) -> do
-      condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
-      withDefaultInfo $ S.If condition rest
+  | category == Error = pure $! withDefaultInfo (S.Error children)
+  | category == Unless = pure $! case children of
+    [ lhs, rhs ] ->
+      let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
+      in withDefaultInfo $ S.If condition [lhs]
+    ( expr : rest ) ->
+      let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
+      in withDefaultInfo $ S.If condition rest
     _ -> withDefaultInfo $ S.Error children
-  | category == Until = case children of
-    [ lhs, rhs ] -> do
-      condition <- withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
-      withDefaultInfo $ S.While condition [lhs]
-    ( expr : rest ) -> do
-      condition <- withRecord (setCategory (extract expr) Negate) (S.Negate expr)
-      withDefaultInfo $ S.While condition rest
+  | category == Until = pure $! case children of
+    [ lhs, rhs ] ->
+      let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
+      in withDefaultInfo $ S.While condition [lhs]
+    ( expr : rest ) ->
+      let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
+      in withDefaultInfo $ S.While condition rest
     _ -> withDefaultInfo $ S.Error children
   | category `elem` operators = do
     allChildren' <- allChildren
-    withDefaultInfo $ S.Operator allChildren'
-  | otherwise = withDefaultInfo $ case (category, children) of
+    pure $! withDefaultInfo $ S.Operator allChildren'
+  | otherwise = pure . withDefaultInfo $ case (category, children) of
     (ArgumentPair, [ k, v ] ) -> S.Pair k v
     (ArgumentPair, _ ) -> S.Error children
     (KeywordParameter, [ k, v ] ) -> S.Pair k v
@@ -127,9 +127,9 @@ termConstructor source sourceSpan category range children allChildren
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
-    withRecord record syntax = pure $! cofree (record :< syntax)
+    withRecord record syntax = cofree (record :< syntax)
     withCategory category syntax =
-      pure $! cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+      cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
     withDefaultInfo syntax = case syntax of
       S.MethodCall{} -> withCategory MethodCall syntax
       _ -> withCategory category syntax
