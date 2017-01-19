@@ -23,22 +23,6 @@ termConstructor
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan category range children allChildren
   | category == Error = pure $! withDefaultInfo (S.Error children)
-  | category == Unless = pure $! case children of
-    [ lhs, rhs ] ->
-      let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
-      in withDefaultInfo $ S.If condition [lhs]
-    ( expr : rest ) ->
-      let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
-      in withDefaultInfo $ S.If condition rest
-    _ -> withDefaultInfo $ S.Error children
-  | category == Until = pure $! case children of
-    [ lhs, rhs ] ->
-      let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
-      in withDefaultInfo $ S.While condition [lhs]
-    ( expr : rest ) ->
-      let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
-      in withDefaultInfo $ S.While condition rest
-    _ -> withDefaultInfo $ S.Error children
   | category `elem` operators = do
     allChildren' <- allChildren
     pure $! withDefaultInfo $ S.Operator allChildren'
@@ -94,6 +78,20 @@ termConstructor source sourceSpan category range children allChildren
     (If, [ lhs, condition ]) -> S.If condition [lhs]
     (If, condition : body ) -> S.If condition body
     (If, _ ) -> S.Error children
+    (Unless, [lhs, rhs]) ->
+        let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
+        in S.If condition [lhs]
+    (Unless, expr : rest) ->
+        let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
+        in S.If condition rest
+    (Unless, _) -> S.Error children
+    (Until, [ lhs, rhs ]) ->
+        let condition = withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)
+        in S.While condition [lhs]
+    (Until, expr : rest) ->
+        let condition = withRecord (setCategory (extract expr) Negate) (S.Negate expr)
+        in S.While condition rest
+    (Until, _) -> S.Error children
     (Elsif, condition : body ) -> S.If condition body
     (Elsif, _ ) -> S.Error children
     (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
