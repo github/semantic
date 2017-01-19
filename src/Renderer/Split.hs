@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-deprecations #-}
+-- Disabling deprecation warnings due to pattern match against RescueModifier.
 module Renderer.Split (split) where
 
 import Alignment

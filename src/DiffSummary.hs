@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
+-- Disabling deprecation warnings due to pattern match against RescueModifier.
 
 module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
