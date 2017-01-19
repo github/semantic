@@ -480,7 +480,7 @@ instance HasCategory Category where
     C.FieldDeclarations -> "field declarations"
     C.RuneLiteral -> "rune literal"
     C.Modifier C.Rescue -> "rescue modifier"
-    C.Modifier c -> toCategoryName c <> " modifier"
+    C.Modifier c -> toCategoryName c
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
