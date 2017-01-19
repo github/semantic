@@ -236,10 +236,10 @@ termConstructor source sourceSpan category range children _ = pure $! case categ
       let ranges' = getField . extract <$> terms
           sourceSpans' = getField . extract <$> terms
       in
-      cofree ((unionRangesFrom originalRange ranges' .: category' .: unionSourceSpansFrom sourceSpan sourceSpans' .: RNil) :< syntax)
+      cofree ((unionRangesFrom originalRange ranges' :. category' :. unionSourceSpansFrom sourceSpan sourceSpans' :. Nil) :< syntax)
 
     withCategory category syntax =
-      cofree ((range .: category .: sourceSpan .: RNil) :< syntax)
+      cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
     withDefaultInfo = withCategory category
 

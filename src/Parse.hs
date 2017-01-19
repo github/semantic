@@ -81,7 +81,7 @@ parserForType mediaType = case languageForType mediaType of
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
 decorateTerm :: (Functor f) => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
-decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) .: headF term) :< tailF term)
+decorateTerm decorator = cata $ \ term -> cofree ((decorator (extract <$> term) :. headF term) :< tailF term)
 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
 type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
@@ -101,8 +101,8 @@ lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLea
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines source
-    root children = (Range 0 (length source) .: Program .: rangeToSourceSpan source (Range 0 (length source)) .: RNil) :< Indexed children
-    leaf charIndex line = (Range charIndex (charIndex + T.length line) .: Program .: rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) .: RNil) :< Leaf line
+    root children = (Range 0 (length source) :. Program :. rangeToSourceSpan source (Range 0 (length source)) :. Nil) :< Indexed children
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) :. Program :. rangeToSourceSpan source (Range charIndex (charIndex + T.length line)) :. Nil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString

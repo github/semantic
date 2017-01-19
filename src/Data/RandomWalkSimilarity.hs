@@ -74,18 +74,18 @@ rws compare getLabel as bs
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
       foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
         Pure (Right (Delete term)) ->
-          (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure Nil)
+          (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure None)
         Pure (Right (Insert term)) ->
           (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
         syntax -> let diff' = free syntax >>= either identity pure in
           (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
       ) ([], [], 0, 0, [], []) sesDiffs
 
-    findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields)
+    findNearestNeighbourToDiff :: TermOrIndexOrNone (UnmappedTerm f fields)
                                -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
                                         (Maybe (These Int Int, Diff f (Record fields)))
     findNearestNeighbourToDiff termThing = case termThing of
-      Nil -> pure Nothing
+      None -> pure Nothing
       Term term -> Just <$> findNearestNeighbourTo term
       Index i -> do
         (_, unA, unB) <- get
@@ -224,7 +224,7 @@ data UnmappedTerm f fields = UnmappedTerm {
 }
 
 -- | Either a `term`, an index of a matched term, or nil.
-data TermOrIndexOrNil term = Term term | Index Int | Nil
+data TermOrIndexOrNone term = Term term | Index Int | None
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
@@ -244,8 +244,8 @@ defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel default
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
 featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
-  = cata (\ (RCons gram rest :< functor) ->
-      cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
+  = cata (\ ((gram :. rest) :< functor) ->
+      cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor :. rest) :< functor))
   . pqGramDecorator getLabel p q
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
@@ -259,7 +259,7 @@ pqGramDecorator
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
-      cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
+      cofree ((gram label :. headF term) :< assignParentAndSiblingLabels (tailF term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
@@ -267,10 +267,10 @@ pqGramDecorator getLabel p q = cata algebra
                  -> Term f (Record (Gram label ': fields))
                  -> State [Maybe label] (Term f (Record (Gram label ': fields)))
     assignLabels label a = case runCofree a of
-      RCons gram rest :< functor -> do
+      (gram :. rest) :< functor -> do
         labels <- get
         put (drop 1 labels)
-        pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } .: rest) :< functor)
+        pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) :< functor)
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
     padToSize n list = take n (list <> repeat empty)
