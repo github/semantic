@@ -88,8 +88,12 @@ defaultTermAssignment source category children allChildren
     (Error, children) -> S.Error children
 
     (Comment, _) -> S.Comment (toText source)
+
+    -- Control flow statements
     (If, condition : body) -> S.If condition body
     (While, expr : rest ) -> S.While expr rest
+
+    -- Statements
     (Return, _) -> S.Return children
 
     (_, []) -> S.Leaf (toText source)
