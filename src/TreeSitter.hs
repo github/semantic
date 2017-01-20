@@ -71,8 +71,8 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
 assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren = do
   assignment <- assignTermByLanguage language source annotation children allChildren
-  pure $! cofree . (annotation :<) $ case assignment of
-    Just a -> a
+  cofree . (annotation :<) <$> case assignment of
+    Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children
   where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ])))
         assignTermByLanguage = \case
@@ -82,8 +82,8 @@ assignTerm language source annotation children allChildren = do
           Ruby -> Ruby.termAssignment
           _ -> \ _ _ _ _ -> pure Nothing
 
-defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
-defaultTermAssignment source = curry $ \case
+defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
+defaultTermAssignment source = curry $ pure . \case
   (Error, children) -> S.Error children
   (Comment, _) -> S.Comment (toText source)
   (_, []) -> S.Leaf (toText source)
