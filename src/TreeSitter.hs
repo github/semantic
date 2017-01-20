@@ -76,8 +76,8 @@ assignTerm = \case
   Ruby -> Ruby.termAssignment
   _ -> Language.termAssignment
 
-defaultTermAssignment :: Source Char -> (Category, [ SyntaxTerm Text '[Range, Category, SourceSpan] ]) -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
-defaultTermAssignment source = \case
+defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
+defaultTermAssignment source = curry $ \case
   (Comment, _) -> S.Comment (toText source)
   (_, []) -> S.Leaf (toText source)
   (_, children) -> S.Indexed children
