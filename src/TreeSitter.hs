@@ -15,6 +15,7 @@ import Source
 import qualified Syntax
 import Foreign
 import Foreign.C.String
+import qualified Syntax as S
 import Term
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
@@ -71,6 +72,12 @@ assignTerm = \case
   Language.Go -> Go.termConstructor
   Ruby -> Ruby.termConstructor
   _ -> Language.termConstructor
+
+defaultTermAssignment :: Source Char -> (Category, [ SyntaxTerm Text '[Range, Category, SourceSpan] ]) -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
+defaultTermAssignment source = \case
+  (Comment, _) -> S.Comment (toText source)
+  (_, []) -> S.Leaf (toText source)
+  (_, children) -> S.Indexed children
 
 categoryForLanguageProductionName :: Language -> Text -> Category
 categoryForLanguageProductionName = withDefaults . \case
