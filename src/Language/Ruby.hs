@@ -65,10 +65,9 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (For, lhs : expr : rest ) -> S.For [lhs, expr] rest
     (OperatorAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> S.MemberAccess base property
-    (Method, _ ) -> case children of
-      identifier : params : body | Params <- Info.category (extract params) -> S.Method identifier Nothing (toList (unwrap params)) body
-      identifier : body -> S.Method identifier Nothing [] body
-      _ -> S.Error children
+    (Method, identifier : first : rest) | Params <- Info.category (extract first)
+                                        -> S.Method identifier Nothing (toList (unwrap first)) rest
+                                        | null rest -> S.Method identifier Nothing [] [first]
     (Module, constant : body ) -> S.Module constant body
     (Modifier Rescue, [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
     (Rescue, _ ) -> case children of
