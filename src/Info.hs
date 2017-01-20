@@ -12,6 +12,8 @@ module Info
 , SourceSpan(..)
 , SourcePos(..)
 , SourceSpans(..)
+, sourceSpan
+, setSourceSpan
 , SourceText(..)
 , sourceText
 ) where
@@ -51,6 +53,11 @@ setCost = setField
 sourceText :: HasField fields SourceText => Record fields -> SourceText
 sourceText = getField
 
+sourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan
+sourceSpan = getField
+
+setSourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan -> Record fields
+setSourceSpan = setField
 
 -- Instances
 
