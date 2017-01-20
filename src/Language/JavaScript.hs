@@ -42,14 +42,18 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (DoWhile, [ expr, body ]) -> S.DoWhile expr body
     (Throw, [ expr ]) -> S.Throw expr
     (Constructor, [ expr ]) -> S.Constructor expr
-    (Try, _) -> case children of
-      [ body ] -> S.Try [body] [] Nothing Nothing
-      [ body, catch ] | Catch <- Info.category (extract catch) -> S.Try [body] [catch] Nothing Nothing
-      [ body, finally ] | Finally <- Info.category (extract finally) -> S.Try [body] [] Nothing (Just finally)
-      [ body, catch, finally ]
-        | Catch <- Info.category (extract catch)
-        , Finally <- Info.category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
-      _ -> S.Error children
+    (Try, body : rest) | null rest
+                       -> S.Try [body] [] Nothing Nothing
+                       | [catch] <- rest
+                       , Catch <- Info.category (extract catch)
+                       -> S.Try [body] [catch] Nothing Nothing
+                       | [finally] <- rest
+                       , Finally <- Info.category (extract finally)
+                       -> S.Try [body] [] Nothing (Just finally)
+                       | [ catch, finally ] <- rest
+                      , Catch <- Info.category (extract catch)
+                      , Finally <- Info.category (extract finally)
+                      -> S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> S.Array Nothing children
     (Method, [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
     (Method, [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
