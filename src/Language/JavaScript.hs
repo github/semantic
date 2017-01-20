@@ -21,7 +21,7 @@ termAssignment
 termAssignment source (_ :. category :. _ :. Nil) children allChildren
   | category `elem` operators = do
     allChildren' <- allChildren
-    pure $! Just (S.Operator allChildren')
+    pure (Just (S.Operator allChildren'))
   | otherwise = pure $! Just $ case (category, children) of
     (Return, _) -> S.Return children
     (Assignment, [ identifier, value ]) -> S.Assignment identifier value
