@@ -1,5 +1,8 @@
 {-# LANGUAGE DataKinds #-}
-module TreeSitter (treeSitterParser) where
+module TreeSitter
+( treeSitterParser
+, defaultTermAssignment
+) where
 
 import Prologue hiding (Constructor)
 import Category
