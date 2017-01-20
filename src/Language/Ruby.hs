@@ -18,16 +18,13 @@ termAssignment
 termAssignment source (_ :. category :. _ :. Nil) children
   = Just $! case (category, children) of
     (ArgumentPair, [ k, v ] ) -> S.Pair k v
-    (ArgumentPair, _ ) -> S.Error children
     (KeywordParameter, [ k, v ] ) -> S.Pair k v
     -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g.:
     --    def foo(name:); end
     -- Let it fall through to generate an Indexed syntax.
     (OptionalParameter, [ k, v ] ) -> S.Pair k v
-    (OptionalParameter, _ ) -> S.Error children
     (ArrayLiteral, _ ) -> S.Array Nothing children
     (Assignment, [ identifier, value ]) -> S.Assignment identifier value
-    (Assignment, _ ) -> S.Error children
     (Begin, _ ) -> case partition (\x -> Info.category (extract x) == Rescue) children of
       (rescues, rest) -> case partition (\x -> Info.category (extract x) == Ensure || Info.category (extract x) == Else) rest of
         (ensureElse, body) -> case ensureElse of
@@ -41,18 +38,13 @@ termAssignment source (_ :. category :. _ :. Nil) children
           [ ensure ] | Ensure <- Info.category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
     (Case, expr : body ) -> S.Switch (Just expr) body
-    (Case, _ ) -> S.Error children
     (When, condition : body ) -> S.Case condition body
-    (When, _ ) -> S.Error children
     (Class, constant : rest ) -> case rest of
       ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
-    (Class, _ ) -> S.Error children
     (SingletonClass, identifier : rest ) -> S.Class identifier Nothing rest
-    (SingletonClass, _ ) -> S.Error children
     (Comment, _ ) -> S.Comment $ toText source
     (Ternary, condition : cases) -> S.Ternary condition cases
-    (Ternary, _ ) -> S.Error children
     (Constant, _ ) -> S.Fixed children
     (MethodCall, _ ) -> case children of
       member : args | MemberAccess <- Info.category (extract member) -> case toList (unwrap member) of
@@ -66,35 +58,22 @@ termAssignment source (_ :. category :. _ :. Nil) children
       _ -> S.Error children
     (Object, _ ) -> S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> S.If condition [lhs]
-    (Modifier If, _) -> S.Error children
     (If, condition : body ) -> S.If condition body
-    (If, _ ) -> S.Error children
     (Modifier Unless, [lhs, rhs]) -> S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
-    (Modifier Unless, _) -> S.Error children
     (Unless, expr : rest) -> S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
-    (Unless, _) -> S.Error children
     (Modifier Until, [ lhs, rhs ]) -> S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
-    (Modifier Until, _) -> S.Error children
     (Until, expr : rest) -> S.While (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
-    (Until, _) -> S.Error children
     (Elsif, condition : body ) -> S.If condition body
-    (Elsif, _ ) -> S.Error children
     (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
-    (SubscriptAccess, _ ) -> S.Error children
     (For, lhs : expr : rest ) -> S.For [lhs, expr] rest
-    (For, _ ) -> S.Error children
     (OperatorAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
-    (OperatorAssignment, _ ) -> S.Error children
     (MemberAccess, [ base, property ]) -> S.MemberAccess base property
-    (MemberAccess, _ ) -> S.Error children
     (Method, _ ) -> case children of
       identifier : params : body | Params <- Info.category (extract params) -> S.Method identifier Nothing (toList (unwrap params)) body
       identifier : body -> S.Method identifier Nothing [] body
       _ -> S.Error children
     (Module, constant : body ) -> S.Module constant body
-    (Module, _ ) -> S.Error children
     (Modifier Rescue, [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
-    (Modifier Rescue, _) -> S.Error children
     (Rescue, _ ) -> case children of
       exceptions : exceptionVar : rest
         | RescueArgs <- Info.category (extract exceptions)
@@ -104,9 +83,7 @@ termAssignment source (_ :. category :. _ :. Nil) children
       body -> S.Rescue [] body
     (Return, _ ) -> S.Return children
     (Modifier While, [ lhs, condition ]) -> S.While condition [lhs]
-    (Modifier While, _) -> S.Error children
     (While, expr : rest ) -> S.While expr rest
-    (While, _ ) -> S.Error children
     (Yield, _ ) -> S.Yield children
     _ | category `elem` [ BeginBlock, EndBlock ] -> S.BlockStatement children
     (_, []) -> S.Leaf $ toText source
