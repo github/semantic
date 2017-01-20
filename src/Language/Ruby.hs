@@ -51,10 +51,8 @@ termAssignment source (_ :. category :. _ :. Nil) children
                             -> S.MethodCall target method (toList . unwrap =<< args)
                             | otherwise
                             -> S.FunctionCall fn (toList . unwrap =<< args)
-    (Other "lambda", _) -> case children of
-      [ body ] -> S.AnonymousFunction [] [body]
-      ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
-      _ -> S.Error children
+    (Other "lambda", first : rest) | null rest -> S.AnonymousFunction [] [first]
+                                   | otherwise -> S.AnonymousFunction (toList (unwrap first)) rest
     (Object, _ ) -> S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> S.If condition [lhs]
     (If, condition : body ) -> S.If condition body
