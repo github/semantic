@@ -60,10 +60,6 @@ intersectionRange range1 range2 = Range (max (start range1) (start range2)) (min
 unionRange :: Range -> Range -> Range
 unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
 
--- | Return a range that contains all the ranges in a Foldable, or Range 0 0 if it’s empty.
-unionRanges :: Foldable f => f Range -> Range
-unionRanges = unionRangesFrom (Range 0 0)
-
 -- | Return Just the concatenation of any elements in a Foldable, or Nothing if it is empty.
 maybeConcat :: (Foldable f, Semigroup a) => f a -> Maybe a
 maybeConcat = getOption . foldMap (Option . Just)
