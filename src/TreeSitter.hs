@@ -69,12 +69,18 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         isNonEmpty child = category (extract child) /= Empty
 
 assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
-assignTerm = \case
-  JavaScript -> JS.termAssignment
-  C -> C.termAssignment
-  Language.Go -> Go.termAssignment
-  Ruby -> Ruby.termAssignment
-  _ -> Language.termAssignment
+assignTerm language source annotation children allChildren = do
+  assignment <- assignTermByLanguage language source annotation children allChildren
+  pure $! case assignment of
+    Just a -> a
+    _ -> cofree (annotation :< defaultTermAssignment source (category annotation) children)
+  where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
+        assignTermByLanguage = (fmap . fmap . fmap . fmap $ fmap Just) . \case
+          JavaScript -> JS.termAssignment
+          C -> C.termAssignment
+          Language.Go -> Go.termAssignment
+          Ruby -> Ruby.termAssignment
+          _ -> Language.termAssignment
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
 defaultTermAssignment source = curry $ \case
