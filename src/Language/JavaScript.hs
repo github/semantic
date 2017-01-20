@@ -69,11 +69,12 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (Yield, _ ) -> S.Yield children
     (For, _) | Just (exprs, body) <- unsnoc children
              -> S.For exprs [body]
-    (Function, _) -> case children of
-      [ body ] -> S.AnonymousFunction [] [body]
-      [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
-      [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
-      _ -> S.Error children
+    (Function, first : rest) | null rest
+                             -> S.AnonymousFunction [] [first]
+                             | [ body ] <- rest
+                             -> S.AnonymousFunction (toList (unwrap first)) [body]
+                             | [ params, body ] <- rest
+                             -> S.Function first (toList (unwrap params)) [body]
     (_, []) -> S.Leaf $ toText source
     _ -> S.Indexed children
 
