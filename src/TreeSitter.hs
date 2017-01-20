@@ -77,7 +77,7 @@ assignTerm language source annotation children allChildren = do
   where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
         assignTermByLanguage = \case
           JavaScript -> (fmap . fmap . fmap $ fmap Just) . JS.termAssignment
-          C -> (fmap . fmap . fmap $ fmap Just) . C.termAssignment
+          C -> C.termAssignment
           Language.Go -> (fmap . fmap . fmap $ fmap Just) . Go.termAssignment
           Ruby -> Ruby.termAssignment
           _ -> (fmap . fmap . fmap $ fmap Just) . Language.termAssignment
