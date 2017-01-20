@@ -15,68 +15,67 @@ termAssignment
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termAssignment source (_ :. category :. _ :. Nil) children
-  = Just $ case (category, children) of
-    (Return, _) -> S.Return children
-    (Assignment, [ identifier, value ]) -> S.Assignment identifier value
-    (MathAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
-    (MemberAccess, [ base, property ]) -> S.MemberAccess base property
-    (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
-    (CommaOperator, [ a, b ]) -> case unwrap b of
+  = case (category, children) of
+    (Return, _) -> Just $ S.Return children
+    (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
+    (MathAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
+    (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
+    (SubscriptAccess, [ base, element ]) -> Just $ S.SubscriptAccess base element
+    (CommaOperator, [ a, b ]) -> Just $ case unwrap b of
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
     (FunctionCall, fn : args) | MemberAccess <- Info.category (extract fn)
                               , [target, method] <- toList (unwrap fn)
-                              -> S.MethodCall target method (toList . unwrap =<< args)
+                              -> Just $ S.MethodCall target method (toList . unwrap =<< args)
                               | otherwise
-                              -> S.FunctionCall fn (toList . unwrap =<< args)
-    (Ternary, condition : cases) -> S.Ternary condition cases
-    (VarAssignment, [ x, y ]) -> S.VarAssignment x y
-    (VarDecl, _) -> S.Indexed $ toVarDecl <$> children
-    (Switch, expr : rest) -> S.Switch (Just expr) rest
-    (Case, [ expr, body ]) -> S.Case expr [body]
-    (Object, _) -> S.Object Nothing $ foldMap toTuple children
-    (Pair, _) -> S.Fixed children
-    (Comment, _) -> S.Comment $ toText source
-    (If, expr : rest ) -> S.If expr rest
-    (While, expr : rest ) -> S.While expr rest
-    (DoWhile, [ expr, body ]) -> S.DoWhile expr body
-    (Throw, [ expr ]) -> S.Throw expr
-    (Constructor, [ expr ]) -> S.Constructor expr
+                              -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
+    (Ternary, condition : cases) -> Just $ S.Ternary condition cases
+    (VarAssignment, [ x, y ]) -> Just $ S.VarAssignment x y
+    (VarDecl, _) -> Just . S.Indexed $ toVarDecl <$> children
+    (Switch, expr : rest) -> Just $ S.Switch (Just expr) rest
+    (Case, [ expr, body ]) -> Just $ S.Case expr [body]
+    (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
+    (Pair, _) -> Just $ S.Fixed children
+    (Comment, _) -> Just . S.Comment $ toText source
+    (If, expr : rest ) -> Just $ S.If expr rest
+    (While, expr : rest ) -> Just $ S.While expr rest
+    (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
+    (Throw, [ expr ]) -> Just $ S.Throw expr
+    (Constructor, [ expr ]) -> Just $ S.Constructor expr
     (Try, body : rest) | null rest
-                       -> S.Try [body] [] Nothing Nothing
+                       -> Just $ S.Try [body] [] Nothing Nothing
                        | [catch] <- rest
                        , Catch <- Info.category (extract catch)
-                       -> S.Try [body] [catch] Nothing Nothing
+                       -> Just $ S.Try [body] [catch] Nothing Nothing
                        | [finally] <- rest
                        , Finally <- Info.category (extract finally)
-                       -> S.Try [body] [] Nothing (Just finally)
+                       -> Just $ S.Try [body] [] Nothing (Just finally)
                        | [ catch, finally ] <- rest
                       , Catch <- Info.category (extract catch)
                       , Finally <- Info.category (extract finally)
-                      -> S.Try [body] [catch] Nothing (Just finally)
-    (ArrayLiteral, _) -> S.Array Nothing children
-    (Method, [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
-    (Method, [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
-    (Class, [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
-    (Class, [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-    (Import, [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
-    (Import, [ identifier ] ) -> S.Import identifier []
-    (Export, [ statements, identifier] ) -> S.Export (Just identifier) (toList (unwrap statements))
-    (Export, [ statements ] ) -> case unwrap statements of
+                      -> Just $ S.Try [body] [catch] Nothing (Just finally)
+    (ArrayLiteral, _) -> Just $ S.Array Nothing children
+    (Method, [ identifier, params, exprs ]) -> Just $ S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
+    (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing [] (toList (unwrap exprs))
+    (Class, [ identifier, superclass, definitions ]) -> Just $ S.Class identifier (Just superclass) (toList (unwrap definitions))
+    (Class, [ identifier, definitions ]) -> Just $ S.Class identifier Nothing (toList (unwrap definitions))
+    (Import, [ statements, identifier ] ) -> Just $ S.Import identifier (toList (unwrap statements))
+    (Import, [ identifier ] ) -> Just $ S.Import identifier []
+    (Export, [ statements, identifier] ) -> Just $ S.Export (Just identifier) (toList (unwrap statements))
+    (Export, [ statements ] ) -> Just $ case unwrap statements of
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
-    (Break, [ expr ] ) -> S.Break (Just expr)
-    (Yield, _ ) -> S.Yield children
+    (Break, [ expr ] ) -> Just $ S.Break (Just expr)
+    (Yield, _ ) -> Just $ S.Yield children
     (For, _) | Just (exprs, body) <- unsnoc children
-             -> S.For exprs [body]
+             -> Just $ S.For exprs [body]
     (Function, first : rest) | null rest
-                             -> S.AnonymousFunction [] [first]
+                             -> Just $ S.AnonymousFunction [] [first]
                              | [ body ] <- rest
-                             -> S.AnonymousFunction (toList (unwrap first)) [body]
+                             -> Just $ S.AnonymousFunction (toList (unwrap first)) [body]
                              | [ params, body ] <- rest
-                             -> S.Function first (toList (unwrap params)) [body]
-    (_, []) -> S.Leaf $ toText source
-    _ -> S.Indexed children
+                             -> Just $ S.Function first (toList (unwrap params)) [body]
+    _ -> Nothing
 
 categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of
