@@ -1,5 +1,20 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
-module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost, SourceSpan(..), SourcePos(..), SourceSpans(..), SourceText(..), sourceText) where
+module Info
+( Range(..)
+, characterRange
+, setCharacterRange
+, Category(..)
+, category
+, setCategory
+, Cost(..)
+, cost
+, setCost
+, SourceSpan(..)
+, SourcePos(..)
+, SourceSpans(..)
+, SourceText(..)
+, sourceText
+) where
 
 import Data.Functor.Listable
 import Data.Record
