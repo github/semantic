@@ -2,6 +2,7 @@ module Range where
 
 import qualified Data.Char as Char
 import Data.List (span)
+import Data.List.NonEmpty (nonEmpty)
 import Data.Semigroup
 import Data.String
 import Prologue
@@ -66,7 +67,7 @@ maybeConcat = getOption . foldMap (Option . Just)
 
 -- | Return a range that contains all the ranges in a Foldable, or the passed Range if the Foldable is empty.
 unionRangesFrom :: Foldable f => Range -> f Range -> Range
-unionRangesFrom range = fromMaybe range . maybeConcat
+unionRangesFrom range = maybe range sconcat . nonEmpty . toList
 
 
 -- Instances
