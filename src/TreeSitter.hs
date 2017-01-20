@@ -80,7 +80,7 @@ assignTerm language source annotation children allChildren = do
           C -> C.termAssignment
           Language.Go -> (fmap . fmap . fmap $ fmap Just) . Go.termAssignment
           Ruby -> Ruby.termAssignment
-          _ -> (fmap . fmap . fmap $ fmap Just) . Language.termAssignment
+          _ -> \ _ _ _ _ -> pure Nothing
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
 defaultTermAssignment source = curry $ \case
