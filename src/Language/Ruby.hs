@@ -10,21 +10,13 @@ import Language
 import qualified Syntax as S
 import Term
 
-operators :: [Category]
-operators = [ Binary, Unary, RangeExpression, ScopeOperator ]
-
 termAssignment
   :: Source Char -- ^ The source of the term.
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
-  -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
-  -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))) -- ^ The resulting term, in IO.
-termAssignment source (_ :. category :. _ :. Nil) children allChildren
-  | category == Error = pure (Just (S.Error children))
-  | category `elem` operators = do
-    allChildren' <- allChildren
-    pure (Just (S.Operator allChildren'))
-  | otherwise = pure . Just $! case (category, children) of
+  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+termAssignment source (_ :. category :. _ :. Nil) children
+  = Just $! case (category, children) of
     (ArgumentPair, [ k, v ] ) -> S.Pair k v
     (ArgumentPair, _ ) -> S.Error children
     (KeywordParameter, [ k, v ] ) -> S.Pair k v

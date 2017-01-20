@@ -69,18 +69,17 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         isNonEmpty child = category (extract child) /= Empty
 
 assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
-assignTerm language source annotation children allChildren = do
-  assignment <- assignTermByLanguage language source annotation children allChildren
-  cofree . (annotation :<) <$> case assignment of
+assignTerm language source annotation children allChildren =
+  cofree . (annotation :<) <$> case assignTermByLanguage language source annotation children of
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
-  where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ])))
+  where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
         assignTermByLanguage = \case
           JavaScript -> JS.termAssignment
           C -> C.termAssignment
-          Language.Go -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . Go.termAssignment
+          Language.Go -> (fmap . fmap $ fmap unwrap) . Go.termAssignment
           Ruby -> Ruby.termAssignment
-          _ -> \ _ _ _ _ -> pure Nothing
+          _ -> \ _ _ _ -> Nothing
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
 defaultTermAssignment source category children allChildren
