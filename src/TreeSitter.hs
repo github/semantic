@@ -70,11 +70,11 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
 
 assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm = \case
-  JavaScript -> JS.termConstructor
-  C -> C.termConstructor
-  Language.Go -> Go.termConstructor
-  Ruby -> Ruby.termConstructor
-  _ -> Language.termConstructor
+  JavaScript -> JS.termAssignment
+  C -> C.termAssignment
+  Language.Go -> Go.termAssignment
+  Ruby -> Ruby.termAssignment
+  _ -> Language.termAssignment
 
 defaultTermAssignment :: Source Char -> (Category, [ SyntaxTerm Text '[Range, Category, SourceSpan] ]) -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
 defaultTermAssignment source = \case
