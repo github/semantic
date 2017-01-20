@@ -78,6 +78,7 @@ assignTerm = \case
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
 defaultTermAssignment source = curry $ \case
+  (Error, children) -> S.Error children
   (Comment, _) -> S.Comment (toText source)
   (_, []) -> S.Leaf (toText source)
   (_, children) -> S.Indexed children
