@@ -13,7 +13,7 @@ operators :: [Category]
 operators = [ Operator, BooleanOperator, MathOperator, RelationalOperator, BitwiseOperator ]
 
 termConstructor
-  :: Source Char -- ^ The source that the term occurs within.
+  :: Source Char -- ^ The source of the term.
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
@@ -54,7 +54,7 @@ termConstructor source (range :. category :. sourceSpan :. Nil) children allChil
     (Case, _ ) -> S.Error children
     (Object, _) -> S.Object Nothing $ foldMap toTuple children
     (Pair, _) -> S.Fixed children
-    (Comment, _) -> S.Comment . toText $ slice range source
+    (Comment, _) -> S.Comment $ toText source
     (If, expr : rest ) -> S.If expr rest
     (If, _ ) -> S.Error children
     (While, expr : rest ) -> S.While expr rest
@@ -98,7 +98,7 @@ termConstructor source (range :. category :. sourceSpan :. Nil) children allChil
       [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
       [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
       _ -> S.Error children
-    (_, []) -> S.Leaf . toText $ slice range source
+    (_, []) -> S.Leaf $ toText source
     _ -> S.Indexed children
   where
     withDefaultInfo syntax =

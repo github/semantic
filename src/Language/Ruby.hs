@@ -14,7 +14,7 @@ operators :: [Category]
 operators = [ Binary, Unary, RangeExpression, ScopeOperator ]
 
 termConstructor
-  :: Source Char -- ^ The source that the term occurs within.
+  :: Source Char -- ^ The source of the term.
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
@@ -58,7 +58,7 @@ termConstructor source (range :. category :. sourceSpan :. Nil) children allChil
     (Class, _ ) -> S.Error children
     (SingletonClass, identifier : rest ) -> S.Class identifier Nothing rest
     (SingletonClass, _ ) -> S.Error children
-    (Comment, _ ) -> S.Comment . toText $ slice range source
+    (Comment, _ ) -> S.Comment $ toText source
     (Ternary, condition : cases) -> S.Ternary condition cases
     (Ternary, _ ) -> S.Error children
     (Constant, _ ) -> S.Fixed children
@@ -117,7 +117,7 @@ termConstructor source (range :. category :. sourceSpan :. Nil) children allChil
     (While, _ ) -> S.Error children
     (Yield, _ ) -> S.Yield children
     _ | category `elem` [ BeginBlock, EndBlock ] -> S.BlockStatement children
-    (_, []) -> S.Leaf . toText $ slice range source
+    (_, []) -> S.Leaf $ toText source
     _  -> S.Indexed children
   where
     withRecord record syntax = cofree (record :< syntax)

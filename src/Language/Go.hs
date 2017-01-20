@@ -11,7 +11,7 @@ import Range (unionRangesFrom)
 import SourceSpan (unionSourceSpansFrom)
 
 termConstructor
-  :: Source Char -- ^ The source that the term occurs within.
+  :: Source Char -- ^ The source of the term.
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
@@ -103,17 +103,17 @@ termConstructor source (range :. category :. sourceSpan :. Nil) children _ = pur
     let params = withRanges range Params children $ S.Indexed children
     in withDefaultInfo $ S.Ty params
   IncrementStatement ->
-    withDefaultInfo $ S.Leaf . toText $ slice range source
+    withDefaultInfo $ S.Leaf $ toText source
   DecrementStatement ->
-    withDefaultInfo $ S.Leaf . toText $ slice range source
+    withDefaultInfo $ S.Leaf $ toText source
   QualifiedIdentifier ->
-    withDefaultInfo $ S.Leaf . toText $ slice range source
+    withDefaultInfo $ S.Leaf $ toText source
   Break -> toBreak children
   Continue -> toContinue children
   Pair -> toPair children
   Method -> toMethod children
   _ -> withDefaultInfo $ case children of
-    [] -> S.Leaf . toText $ slice range source
+    [] -> S.Leaf $ toText source
     _ -> S.Indexed children
   where
     toMethod = \case

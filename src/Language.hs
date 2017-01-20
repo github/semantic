@@ -50,7 +50,7 @@ termConstructor
 termConstructor source (range :. category :. sourceSpan :. Nil) children _ =
   withDefaultInfo $ case (category, children) of
     (Error, _) -> S.Error children
-    (_, []) -> S.Leaf (toText $ slice range source)
+    (_, []) -> S.Leaf (toText source)
     _ -> S.Indexed children
   where
     withDefaultInfo syntax =
