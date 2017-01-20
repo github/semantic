@@ -8,6 +8,7 @@ module SourceSpan where
 
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
+import Data.List.NonEmpty (nonEmpty)
 import Data.Semigroup
 import Data.These
 import Prologue
@@ -55,7 +56,7 @@ displayStartEndPos sp =
   displaySourcePos (spanStart sp) <> " - " <> displaySourcePos (spanEnd sp)
 
 unionSourceSpansFrom :: Foldable f => SourceSpan -> f SourceSpan -> SourceSpan
-unionSourceSpansFrom sourceSpan = fromMaybe sourceSpan . maybeConcat
+unionSourceSpansFrom sourceSpan = maybe sourceSpan sconcat . nonEmpty . toList
 
 maybeConcat :: (Foldable f, Semigroup a) => f a -> Maybe a
 maybeConcat = getOption . foldMap (Option . Just)
