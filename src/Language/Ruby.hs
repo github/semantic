@@ -46,12 +46,11 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (Comment, _ ) -> S.Comment $ toText source
     (Ternary, condition : cases) -> S.Ternary condition cases
     (Constant, _ ) -> S.Fixed children
-    (MethodCall, _ ) -> case children of
-      member : args | MemberAccess <- Info.category (extract member) -> case toList (unwrap member) of
-        [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
-        _ -> S.Error children
-      function : args -> S.FunctionCall function (toList . unwrap =<< args)
-      _ -> S.Error children
+    (MethodCall, fn : args) | MemberAccess <- Info.category (extract fn)
+                            , [target, method] <- toList (unwrap fn)
+                            -> S.MethodCall target method (toList . unwrap =<< args)
+                            | otherwise
+                            -> S.FunctionCall fn (toList . unwrap =<< args)
     (Other "lambda", _) -> case children of
       [ body ] -> S.AnonymousFunction [] [body]
       ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
