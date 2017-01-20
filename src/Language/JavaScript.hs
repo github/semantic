@@ -25,8 +25,7 @@ termAssignment _ (_ :. category :. _ :. Nil) children
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
     (FunctionCall, member : args)
-      | MemberAccess <- Info.category (extract member)
-      , [target, method] <- toList (unwrap member)
+      | S.MemberAccess target method <- unwrap member
       -> Just $ S.MethodCall target method (toList . unwrap =<< args)
     (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
