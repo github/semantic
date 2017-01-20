@@ -17,13 +17,13 @@ termAssignment
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
-  -> IO (Maybe (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+  -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))) -- ^ The resulting term, in IO.
 termAssignment source (range :. category :. sourceSpan :. Nil) children allChildren
-  | category == Error = withDefaultInfo (S.Error children)
+  | category == Error = pure $! Just (S.Error children)
   | category `elem` operators = do
     allChildren' <- allChildren
-    withDefaultInfo $ S.Operator allChildren'
-  | otherwise = withDefaultInfo $ case (category, children) of
+    pure $! Just (S.Operator allChildren')
+  | otherwise = pure $! Just $ case (category, children) of
     (Return, _) -> S.Return children
     (Assignment, [ identifier, value ]) -> S.Assignment identifier value
     (Assignment, _ ) -> S.Error children
@@ -100,11 +100,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children allChild
       _ -> S.Error children
     (_, []) -> S.Leaf $ toText source
     _ -> S.Indexed children
-  where
-    withDefaultInfo syntax =
-      pure $! Just $ case syntax of
-        S.MethodCall{} -> cofree ((range :.  MethodCall :. sourceSpan :. Nil) :< syntax)
-        _ -> cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
 categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of
