@@ -5,7 +5,6 @@ import Data.Record
 import Info
 import Prologue
 import Source
-import qualified Syntax as S
 import Term
 
 termAssignment
@@ -14,13 +13,8 @@ termAssignment
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (Maybe (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termAssignment source (range :. category :. sourceSpan :. Nil) children _
-  | category == Error = withDefaultInfo (S.Error children)
-  | otherwise = withDefaultInfo $ case children of
-  [] -> S.Leaf $ toText source
-  _ -> S.Indexed children
-  where
-    withDefaultInfo syntax = pure $! Just (cofree ((range :. category :. sourceSpan :. Nil) :< syntax))
+termAssignment _ _ _ _ = pure Nothing
+
 
 categoryForCProductionName :: Text -> Category
 categoryForCProductionName = Other
