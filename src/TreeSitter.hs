@@ -78,7 +78,7 @@ assignTerm language source annotation children allChildren = do
         assignTermByLanguage = \case
           JavaScript -> JS.termAssignment
           C -> C.termAssignment
-          Language.Go -> (fmap . fmap . fmap $ fmap Just) . Go.termAssignment
+          Language.Go -> Go.termAssignment
           Ruby -> Ruby.termAssignment
           _ -> \ _ _ _ _ -> pure Nothing
 
