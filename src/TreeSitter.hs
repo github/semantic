@@ -71,15 +71,15 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
 assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren = do
   assignment <- assignTermByLanguage language source annotation children allChildren
-  pure $! case assignment of
+  pure $! cofree . (annotation :<) $ case assignment of
     Just a -> a
-    _ -> cofree (annotation :< defaultTermAssignment source (category annotation) children)
-  where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
+    _ -> defaultTermAssignment source (category annotation) children
+  where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ])))
         assignTermByLanguage = \case
-          JavaScript -> JS.termAssignment
-          C -> C.termAssignment
-          Language.Go -> Go.termAssignment
-          Ruby -> Ruby.termAssignment
+          JavaScript -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . JS.termAssignment
+          C -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . C.termAssignment
+          Language.Go -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . Go.termAssignment
+          Ruby -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . Ruby.termAssignment
           _ -> \ _ _ _ _ -> pure Nothing
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])
