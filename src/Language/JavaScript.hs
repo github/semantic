@@ -67,9 +67,8 @@ termAssignment source (_ :. category :. _ :. Nil) children
       _ -> S.Export (Just statements) []
     (Break, [ expr ] ) -> S.Break (Just expr)
     (Yield, _ ) -> S.Yield children
-    (For, _) -> case unsnoc children of
-      Just (exprs, body) -> S.For exprs [body]
-      _ -> S.Error children
+    (For, _) | Just (exprs, body) <- unsnoc children
+             -> S.For exprs [body]
     (Function, _) -> case children of
       [ body ] -> S.AnonymousFunction [] [body]
       [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
