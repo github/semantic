@@ -69,12 +69,9 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (Yield, _ ) -> Just $ S.Yield children
     (For, _) | Just (exprs, body) <- unsnoc children
              -> Just $ S.For exprs [body]
-    (Function, first : rest) | null rest
-                             -> Just $ S.AnonymousFunction [] [first]
-                             | [ body ] <- rest
-                             -> Just $ S.AnonymousFunction (toList (unwrap first)) [body]
-                             | [ params, body ] <- rest
-                             -> Just $ S.Function first (toList (unwrap params)) [body]
+    (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
+    (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
+    (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) [body]
     _ -> Nothing
 
 categoryForJavaScriptProductionName :: Text -> Category
