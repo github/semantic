@@ -24,11 +24,11 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (CommaOperator, [ a, b ]) -> Just $ case unwrap b of
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
-    (FunctionCall, fn : args) | MemberAccess <- Info.category (extract fn)
-                              , [target, method] <- toList (unwrap fn)
-                              -> Just $ S.MethodCall target method (toList . unwrap =<< args)
-                              | otherwise
-                              -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
+    (FunctionCall, member : args)
+      | MemberAccess <- Info.category (extract member)
+      , [target, method] <- toList (unwrap member)
+      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
+    (FunctionCall, function : args) -> Just $ S.FunctionCall function (toList . unwrap =<< args)
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (VarAssignment, [ x, y ]) -> Just $ S.VarAssignment x y
     (VarDecl, _) -> Just . S.Indexed $ toVarDecl <$> children
