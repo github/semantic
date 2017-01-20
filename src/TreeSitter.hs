@@ -86,7 +86,10 @@ defaultTermAssignment source category children allChildren
   | category `elem` operatorCategories = S.Operator <$> allChildren
   | otherwise = pure $! case (category, children) of
     (Error, children) -> S.Error children
+
     (Comment, _) -> S.Comment (toText source)
+    (If, condition : body) -> S.If condition body
+
     (_, []) -> S.Leaf (toText source)
     (_, children) -> S.Indexed children
   where operatorCategories =
