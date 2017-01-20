@@ -19,7 +19,6 @@ termAssignment
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))) -- ^ The resulting term, in IO.
 termAssignment source (_ :. category :. _ :. Nil) children allChildren
-  | category == Error = pure (Just (S.Error children))
   | category `elem` operators = do
     allChildren' <- allChildren
     pure $! Just (S.Operator allChildren')
