@@ -18,17 +18,12 @@ termAssignment source (_ :. category :. _ :. Nil) children
   = Just $ case (category, children) of
     (Return, _) -> S.Return children
     (Assignment, [ identifier, value ]) -> S.Assignment identifier value
-    (Assignment, _ ) -> S.Error children
     (MathAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
-    (MathAssignment, _ ) -> S.Error children
     (MemberAccess, [ base, property ]) -> S.MemberAccess base property
-    (MemberAccess, _ ) -> S.Error children
     (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
-    (SubscriptAccess, _ ) -> S.Error children
     (CommaOperator, [ a, b ]) -> case unwrap b of
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
-    (CommaOperator, _ ) -> S.Error children
     (FunctionCall, _) -> case children of
       member : args | Info.category (extract member) == MemberAccess -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
@@ -36,27 +31,18 @@ termAssignment source (_ :. category :. _ :. Nil) children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
     (Ternary, condition : cases) -> S.Ternary condition cases
-    (Ternary, _ ) -> S.Error children
     (VarAssignment, [ x, y ]) -> S.VarAssignment x y
-    (VarAssignment, _ ) -> S.Error children
     (VarDecl, _) -> S.Indexed $ toVarDecl <$> children
     (Switch, expr : rest) -> S.Switch (Just expr) rest
-    (Switch, _ ) -> S.Error children
     (Case, [ expr, body ]) -> S.Case expr [body]
-    (Case, _ ) -> S.Error children
     (Object, _) -> S.Object Nothing $ foldMap toTuple children
     (Pair, _) -> S.Fixed children
     (Comment, _) -> S.Comment $ toText source
     (If, expr : rest ) -> S.If expr rest
-    (If, _ ) -> S.Error children
     (While, expr : rest ) -> S.While expr rest
-    (While, _ ) -> S.Error children
     (DoWhile, [ expr, body ]) -> S.DoWhile expr body
-    (DoWhile, _ ) -> S.Error children
     (Throw, [ expr ]) -> S.Throw expr
-    (Throw, _ ) -> S.Error children
     (Constructor, [ expr ]) -> S.Constructor expr
-    (Constructor, _ ) -> S.Error children
     (Try, _) -> case children of
       [ body ] -> S.Try [body] [] Nothing Nothing
       [ body, catch ] | Catch <- Info.category (extract catch) -> S.Try [body] [catch] Nothing Nothing
@@ -68,18 +54,14 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (ArrayLiteral, _) -> S.Array Nothing children
     (Method, [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
     (Method, [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
-    (Method, _ ) -> S.Error children
     (Class, [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     (Class, [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-    (Class, _ ) -> S.Error children
     (Import, [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
     (Import, [ identifier ] ) -> S.Import identifier []
-    (Import, _ ) -> S.Error children
     (Export, [ statements, identifier] ) -> S.Export (Just identifier) (toList (unwrap statements))
     (Export, [ statements ] ) -> case unwrap statements of
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
-    (Export, _ ) -> S.Error children
     (Break, [ expr ] ) -> S.Break (Just expr)
     (Yield, _ ) -> S.Yield children
     (For, _) -> case unsnoc children of
