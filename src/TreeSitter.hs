@@ -83,11 +83,25 @@ assignTerm language source annotation children allChildren = do
           _ -> \ _ _ _ _ -> pure Nothing
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
-defaultTermAssignment source category children _ = pure $! case (category, children) of
-  (Error, children) -> S.Error children
-  (Comment, _) -> S.Comment (toText source)
-  (_, []) -> S.Leaf (toText source)
-  (_, children) -> S.Indexed children
+defaultTermAssignment source category children allChildren
+  | category `elem` operatorCategories = S.Operator <$> allChildren
+  | otherwise = pure $! case (category, children) of
+    (Error, children) -> S.Error children
+    (Comment, _) -> S.Comment (toText source)
+    (_, []) -> S.Leaf (toText source)
+    (_, children) -> S.Indexed children
+  where operatorCategories =
+          [ Operator
+          , Binary
+          , Unary
+          , RangeExpression
+          , ScopeOperator
+          , BooleanOperator
+          , MathOperator
+          , RelationalOperator
+          , BitwiseOperator
+          ]
+
 
 categoryForLanguageProductionName :: Language -> Text -> Category
 categoryForLanguageProductionName = withDefaults . \case
