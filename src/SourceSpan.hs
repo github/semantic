@@ -58,9 +58,6 @@ displayStartEndPos sp =
 unionSourceSpansFrom :: Foldable f => SourceSpan -> f SourceSpan -> SourceSpan
 unionSourceSpansFrom sourceSpan = maybe sourceSpan sconcat . nonEmpty . toList
 
-unionSourceSpans :: Foldable f => f SourceSpan -> SourceSpan
-unionSourceSpans = unionSourceSpansFrom emptySourceSpan
-
 unionSourceSpan :: SourceSpan -> SourceSpan -> SourceSpan
 unionSourceSpan (SourceSpan start1 end1) (SourceSpan start2 end2) = SourceSpan (min start1 start2) (max end1 end2)
 
