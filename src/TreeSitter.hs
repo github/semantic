@@ -89,6 +89,7 @@ defaultTermAssignment source category children allChildren
 
     (Comment, _) -> S.Comment (toText source)
     (If, condition : body) -> S.If condition body
+    (While, expr : rest ) -> S.While expr rest
     (Return, _) -> S.Return children
 
     (_, []) -> S.Leaf (toText source)
