@@ -73,7 +73,7 @@ assignTerm language source annotation children allChildren = do
   assignment <- assignTermByLanguage language source annotation children allChildren
   cofree . (annotation :<) <$> case assignment of
     Just a -> pure a
-    _ -> defaultTermAssignment source (category annotation) children
+    _ -> defaultTermAssignment source (category annotation) children allChildren
   where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ])))
         assignTermByLanguage = \case
           JavaScript -> JS.termAssignment
@@ -82,8 +82,8 @@ assignTerm language source annotation children allChildren = do
           Ruby -> Ruby.termAssignment
           _ -> \ _ _ _ _ -> pure Nothing
 
-defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
-defaultTermAssignment source = curry $ pure . \case
+defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> IO (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))
+defaultTermAssignment source category children _ = pure $! case (category, children) of
   (Error, children) -> S.Error children
   (Comment, _) -> S.Comment (toText source)
   (_, []) -> S.Leaf (toText source)
