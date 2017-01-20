@@ -79,7 +79,7 @@ assignTerm language source annotation children allChildren = do
           JavaScript -> JS.termAssignment
           C -> C.termAssignment
           Language.Go -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . Go.termAssignment
-          Ruby -> (fmap . fmap . fmap $ fmap (fmap unwrap)) . Ruby.termAssignment
+          Ruby -> Ruby.termAssignment
           _ -> \ _ _ _ _ -> pure Nothing
 
 defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -> S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])

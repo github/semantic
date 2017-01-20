@@ -18,13 +18,13 @@ termAssignment
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
-  -> IO (Maybe (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termAssignment source (range :. category :. sourceSpan :. Nil) children allChildren
-  | category == Error = pure $! withDefaultInfo (S.Error children)
+  -> IO (Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan]))) -- ^ The resulting term, in IO.
+termAssignment source (_ :. category :. _ :. Nil) children allChildren
+  | category == Error = pure (Just (S.Error children))
   | category `elem` operators = do
     allChildren' <- allChildren
-    pure $! withDefaultInfo $ S.Operator allChildren'
-  | otherwise = pure . withDefaultInfo $ case (category, children) of
+    pure (Just (S.Operator allChildren'))
+  | otherwise = pure . Just $! case (category, children) of
     (ArgumentPair, [ k, v ] ) -> S.Pair k v
     (ArgumentPair, _ ) -> S.Error children
     (KeywordParameter, [ k, v ] ) -> S.Pair k v
@@ -121,11 +121,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children allChild
     _  -> S.Indexed children
   where
     withRecord record syntax = cofree (record :< syntax)
-    withCategory category syntax =
-      cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
-    withDefaultInfo syntax = Just $ case syntax of
-      S.MethodCall{} -> withCategory MethodCall syntax
-      _ -> withCategory category syntax
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
