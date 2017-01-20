@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
+{-# OPTIONS_GHC -Wno-deprecations #-}
+-- Disabling deprecation warnings due to pattern match against RescueModifier.
 
 module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
@@ -294,7 +296,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
       C.Rescue -> case t of
         "" -> "in a" <+> catName c
         _ -> "in the" <+> squotes (termName t) <+> catName c
-      C.RescueModifier -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
+      C.Modifier C.Rescue -> "in the" <+> squotes ("rescue" <+> termName t) <+> "modifier"
       C.If -> "in the" <+> squotes (termName t) <+> catName c
       C.Case -> "in the" <+> squotes (termName t) <+> catName c
       C.Break -> case t of
@@ -477,6 +479,8 @@ instance HasCategory Category where
     C.QualifiedIdentifier -> "qualified identifier"
     C.FieldDeclarations -> "field declarations"
     C.RuneLiteral -> "rune literal"
+    C.Modifier C.Rescue -> "rescue modifier"
+    C.Modifier c -> toCategoryName c
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

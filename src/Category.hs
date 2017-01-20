@@ -135,6 +135,7 @@ data Category
   | Elsif
   | Ensure
   | Rescue
+  -- | Formerly used for Ruby’s @x rescue y@ modifier syntax. Deprecated. Use @Modifier Rescue@ instead. Left in place to preserve hashing & RWS results.
   | RescueModifier
   | RescuedException
   | RescueArgs
@@ -222,7 +223,12 @@ data Category
   | FieldDeclarations
   -- | A Go rune literal.
   | RuneLiteral
+  -- | A modifier version of another Category, e.g. Ruby’s trailing @if@, @while@, etc. terms, whose subterms are swapped relative to regular @if@, @while@, etc. terms.
+  | Modifier Category
   deriving (Eq, Generic, Ord, Show)
+
+{-# DEPRECATED RescueModifier "Deprecated; use Modifier Rescue instead." #-}
+
 
 -- Instances
 
@@ -347,3 +353,4 @@ instance Listable Category where
     \/ cons0 FieldDeclarations
     \/ cons0 RuneLiteral
     \/ cons1 (Other . unListableText)
+    \/ cons1 Modifier

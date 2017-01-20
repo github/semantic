@@ -9,120 +9,104 @@ import Language
 import qualified Syntax as S
 import Term
 
-operators :: [Text]
-operators = [ "op", "bool_op", "math_op", "delete_op", "type_op", "void_op", "rel_op", "bitwise_op" ]
-
-functions :: [Text]
-functions = [ "arrow_function", "generator_function", "function" ]
-
-forStatements :: [Text]
-forStatements = [ "for_statement", "for_of_statement", "for_in_statement", "trailing_for_statement", "trailing_for_of_statement", "trailing_for_in_statement" ]
+operators :: [Category]
+operators = [ Operator, BooleanOperator, MathOperator, RelationalOperator, BitwiseOperator ]
 
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> SourceSpan -- ^ The span that the term occupies.
-  -> Text -- ^ The name of the production for this node.
+  -> Category -- ^ The node’s Category.
   -> Range -- ^ The character range that the term occupies.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> IO [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ All child nodes (included unnamed productions) of the term as 'IO'. Only use this if you need it.
   -> IO (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children allChildren
-  | name == "ERROR" = withDefaultInfo (S.Error children)
-  | name `elem` operators = do
+termConstructor source sourceSpan category range children allChildren
+  | category == Error = withDefaultInfo (S.Error children)
+  | category `elem` operators = do
     allChildren' <- allChildren
     withDefaultInfo $ S.Operator allChildren'
-  | otherwise = withDefaultInfo $ case (name, children) of
-    ("return_statement", _) -> S.Return children
-    ("trailing_return_statement", _) -> S.Return children
-    ("assignment", [ identifier, value ]) -> S.Assignment identifier value
-    ("assignment", _ ) -> S.Error children
-    ("math_assignment", [ identifier, value ]) -> S.OperatorAssignment identifier value
-    ("math_assignment", _ ) -> S.Error children
-    ("member_access", [ base, property ]) -> S.MemberAccess base property
-    ("member_access", _ ) -> S.Error children
-    ("subscript_access", [ base, element ]) -> S.SubscriptAccess base element
-    ("subscript_access", _ ) -> S.Error children
-    ("comma_op", [ a, b ]) -> case unwrap b of
+  | otherwise = withDefaultInfo $ case (category, children) of
+    (Return, _) -> S.Return children
+    (Assignment, [ identifier, value ]) -> S.Assignment identifier value
+    (Assignment, _ ) -> S.Error children
+    (MathAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
+    (MathAssignment, _ ) -> S.Error children
+    (MemberAccess, [ base, property ]) -> S.MemberAccess base property
+    (MemberAccess, _ ) -> S.Error children
+    (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
+    (SubscriptAccess, _ ) -> S.Error children
+    (CommaOperator, [ a, b ]) -> case unwrap b of
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
-    ("comma_op", _ ) -> S.Error children
-    ("function_call", _) -> case children of
-      member : args | category (extract member) == MemberAccess -> case toList (unwrap member) of
+    (CommaOperator, _ ) -> S.Error children
+    (FunctionCall, _) -> case children of
+      member : args | Info.category (extract member) == MemberAccess -> case toList (unwrap member) of
         [target, method] -> S.MethodCall target method (toList . unwrap =<< args)
         _ -> S.Error children
       function : args -> S.FunctionCall function (toList . unwrap =<< args)
       _ -> S.Error children
-    ("ternary", condition : cases) -> S.Ternary condition cases
-    ("ternary", _ ) -> S.Error children
-    ("var_assignment", [ x, y ]) -> S.VarAssignment x y
-    ("var_assignment", _ ) -> S.Error children
-    ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
-    ("trailing_var_declaration", _) -> S.Indexed $ toVarDecl <$> children
-    ("switch_statement", expr : rest) -> S.Switch (Just expr) rest
-    ("switch_statement", _ ) -> S.Error children
-    ("case", [ expr, body ]) -> S.Case expr [body]
-    ("case", _ ) -> S.Error children
-    ("object", _) -> S.Object Nothing $ foldMap toTuple children
-    ("pair", _) -> S.Fixed children
-    ("comment", _) -> S.Comment . toText $ slice range source
-    ("if_statement", expr : rest ) -> S.If expr rest
-    ("trailing_if_statement", expr : rest ) -> S.If expr rest
-    ("if_statement", _ ) -> S.Error children
-    ("trailing_if_statement", _ ) -> S.Error children
-    ("while_statement", expr : rest ) -> S.While expr rest
-    ("trailing_while_statement", expr : rest ) -> S.While expr rest
-    ("while_statement", _ ) -> S.Error children
-    ("trailing_while_statement", _ ) -> S.Error children
-    ("do_statement", [ expr, body ]) -> S.DoWhile expr body
-    ("trailing_do_statement", [ expr, body ]) -> S.DoWhile expr body
-    ("do_statement", _ ) -> S.Error children
-    ("trailing_do_statement", _ ) -> S.Error children
-    ("throw_statement", [ expr ]) -> S.Throw expr
-    ("trailing_throw_statement", [ expr ]) -> S.Throw expr
-    ("throw_statment", _ ) -> S.Error children
-    ("trailing_throw_statment", _ ) -> S.Error children
-    ("new_expression", [ expr ]) -> S.Constructor expr
-    ("new_expression", _ ) -> S.Error children
-    ("try_statement", _) -> case children of
+    (Ternary, condition : cases) -> S.Ternary condition cases
+    (Ternary, _ ) -> S.Error children
+    (VarAssignment, [ x, y ]) -> S.VarAssignment x y
+    (VarAssignment, _ ) -> S.Error children
+    (VarDecl, _) -> S.Indexed $ toVarDecl <$> children
+    (Switch, expr : rest) -> S.Switch (Just expr) rest
+    (Switch, _ ) -> S.Error children
+    (Case, [ expr, body ]) -> S.Case expr [body]
+    (Case, _ ) -> S.Error children
+    (Object, _) -> S.Object Nothing $ foldMap toTuple children
+    (Pair, _) -> S.Fixed children
+    (Comment, _) -> S.Comment . toText $ slice range source
+    (If, expr : rest ) -> S.If expr rest
+    (If, _ ) -> S.Error children
+    (While, expr : rest ) -> S.While expr rest
+    (While, _ ) -> S.Error children
+    (DoWhile, [ expr, body ]) -> S.DoWhile expr body
+    (DoWhile, _ ) -> S.Error children
+    (Throw, [ expr ]) -> S.Throw expr
+    (Throw, _ ) -> S.Error children
+    (Constructor, [ expr ]) -> S.Constructor expr
+    (Constructor, _ ) -> S.Error children
+    (Try, _) -> case children of
       [ body ] -> S.Try [body] [] Nothing Nothing
-      [ body, catch ] | Catch <- category (extract catch) -> S.Try [body] [catch] Nothing Nothing
-      [ body, finally ] | Finally <- category (extract finally) -> S.Try [body] [] Nothing (Just finally)
+      [ body, catch ] | Catch <- Info.category (extract catch) -> S.Try [body] [catch] Nothing Nothing
+      [ body, finally ] | Finally <- Info.category (extract finally) -> S.Try [body] [] Nothing (Just finally)
       [ body, catch, finally ]
-        | Catch <- category (extract catch)
-        , Finally <- category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
+        | Catch <- Info.category (extract catch)
+        , Finally <- Info.category (extract finally) -> S.Try [body] [catch] Nothing (Just finally)
       _ -> S.Error children
-    ("array", _) -> S.Array Nothing children
-    ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
-    ("method_definition", [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
-    ("method_definition", _ ) -> S.Error children
-    ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
-    ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-    ("class", _ ) -> S.Error children
-    ("import_statement", [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
-    ("import_statement", [ identifier ] ) -> S.Import identifier []
-    ("import_statement", _ ) -> S.Error children
-    ("export_statement", [ statements, identifier] ) -> S.Export (Just identifier) (toList (unwrap statements))
-    ("export_statement", [ statements ] ) -> case unwrap statements of
+    (ArrayLiteral, _) -> S.Array Nothing children
+    (Method, [ identifier, params, exprs ]) -> S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
+    (Method, [ identifier, exprs ]) -> S.Method identifier Nothing [] (toList (unwrap exprs))
+    (Method, _ ) -> S.Error children
+    (Class, [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
+    (Class, [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+    (Class, _ ) -> S.Error children
+    (Import, [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
+    (Import, [ identifier ] ) -> S.Import identifier []
+    (Import, _ ) -> S.Error children
+    (Export, [ statements, identifier] ) -> S.Export (Just identifier) (toList (unwrap statements))
+    (Export, [ statements ] ) -> case unwrap statements of
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
-    ("export_statement", _ ) -> S.Error children
-    ("break_statement", [ expr ] ) -> S.Break (Just expr)
-    ("yield_statement", _ ) -> S.Yield children
-    _ | name `elem` forStatements -> case unsnoc children of
-          Just (exprs, body) -> S.For exprs [body]
-          _ -> S.Error children
-    _ | name `elem` functions -> case children of
-          [ body ] -> S.AnonymousFunction [] [body]
-          [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
-          [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
-          _ -> S.Error children
+    (Export, _ ) -> S.Error children
+    (Break, [ expr ] ) -> S.Break (Just expr)
+    (Yield, _ ) -> S.Yield children
+    (For, _) -> case unsnoc children of
+      Just (exprs, body) -> S.For exprs [body]
+      _ -> S.Error children
+    (Function, _) -> case children of
+      [ body ] -> S.AnonymousFunction [] [body]
+      [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
+      [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
+      _ -> S.Error children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where
     withDefaultInfo syntax =
       pure $! case syntax of
         S.MethodCall{} -> cofree ((range :.  MethodCall :. sourceSpan :. Nil) :< syntax)
-        _ -> cofree ((range :. categoryForJavaScriptProductionName name :. sourceSpan :. Nil) :< syntax)
+        _ -> cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
 categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of

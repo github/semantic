@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-deprecations #-}
+-- Disabling deprecation warnings due to pattern match against RescueModifier.
 module Renderer.Split (split) where
 
 import Alignment
@@ -145,6 +147,7 @@ styleName category = "category-" <> case category of
   C.IndexExpression -> "index_expression"
   C.FieldDeclarations -> "field_declarations"
   C.RuneLiteral -> "rune_literal"
+  C.Modifier c -> styleName c <> "_modifier"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
