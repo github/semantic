@@ -15,7 +15,7 @@ termAssignment
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termAssignment source (_ :. category :. _ :. Nil) children
+termAssignment _ (_ :. category :. _ :. Nil) children
   = case (category, children) of
     (ArgumentPair, [ k, v ] ) -> Just $ S.Pair k v
     (KeywordParameter, [ k, v ] ) -> Just $ S.Pair k v
@@ -43,7 +43,6 @@ termAssignment source (_ :. category :. _ :. Nil) children
       ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
     (SingletonClass, identifier : rest ) -> Just $ S.Class identifier Nothing rest
-    (Comment, _ ) -> Just . S.Comment $ toText source
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (Constant, _ ) -> Just $ S.Fixed children
     (MethodCall, fn : args) | MemberAccess <- Info.category (extract fn)

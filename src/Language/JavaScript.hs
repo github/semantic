@@ -14,7 +14,7 @@ termAssignment
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termAssignment source (_ :. category :. _ :. Nil) children
+termAssignment _ (_ :. category :. _ :. Nil) children
   = case (category, children) of
     (Return, _) -> Just $ S.Return children
     (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
@@ -36,7 +36,6 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (Case, [ expr, body ]) -> Just $ S.Case expr [body]
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
     (Pair, _) -> Just $ S.Fixed children
-    (Comment, _) -> Just . S.Comment $ toText source
     (If, expr : rest ) -> Just $ S.If expr rest
     (While, expr : rest ) -> Just $ S.While expr rest
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
