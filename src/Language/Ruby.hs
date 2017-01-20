@@ -55,7 +55,6 @@ termAssignment source (_ :. category :. _ :. Nil) children
                                    | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
-    (If, condition : body ) -> Just $ S.If condition body
     (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
     (Unless, expr : rest) -> Just $ S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
     (Modifier Until, [ lhs, rhs ]) -> Just $ S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
