@@ -42,18 +42,17 @@ termAssignment source (_ :. category :. _ :. Nil) children
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
     (Throw, [ expr ]) -> Just $ S.Throw expr
     (Constructor, [ expr ]) -> Just $ S.Constructor expr
-    (Try, body : rest) | null rest
-                       -> Just $ S.Try [body] [] Nothing Nothing
-                       | [catch] <- rest
-                       , Catch <- Info.category (extract catch)
-                       -> Just $ S.Try [body] [catch] Nothing Nothing
-                       | [finally] <- rest
-                       , Finally <- Info.category (extract finally)
-                       -> Just $ S.Try [body] [] Nothing (Just finally)
-                       | [ catch, finally ] <- rest
-                      , Catch <- Info.category (extract catch)
-                      , Finally <- Info.category (extract finally)
-                      -> Just $ S.Try [body] [catch] Nothing (Just finally)
+    (Try, [ body ]) -> Just $ S.Try [body] [] Nothing Nothing
+    (Try, [ body, catch ])
+      | Catch <- Info.category (extract catch)
+      -> Just $ S.Try [body] [catch] Nothing Nothing
+    (Try, [ body, finally ])
+      | Finally <- Info.category (extract finally)
+      -> Just $ S.Try [body] [] Nothing (Just finally)
+    (Try, [ body, catch, finally ])
+      | Catch <- Info.category (extract catch)
+      , Finally <- Info.category (extract finally)
+      -> Just $ S.Try [body] [catch] Nothing (Just finally)
     (ArrayLiteral, _) -> Just $ S.Array Nothing children
     (Method, [ identifier, params, exprs ]) -> Just $ S.Method identifier Nothing (toList (unwrap params)) (toList (unwrap exprs))
     (Method, [ identifier, exprs ]) -> Just $ S.Method identifier Nothing [] (toList (unwrap exprs))
