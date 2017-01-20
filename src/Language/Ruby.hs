@@ -16,16 +16,16 @@ termAssignment
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termAssignment source (_ :. category :. _ :. Nil) children
-  = Just $! case (category, children) of
-    (ArgumentPair, [ k, v ] ) -> S.Pair k v
-    (KeywordParameter, [ k, v ] ) -> S.Pair k v
+  = case (category, children) of
+    (ArgumentPair, [ k, v ] ) -> Just $ S.Pair k v
+    (KeywordParameter, [ k, v ] ) -> Just $ S.Pair k v
     -- NB: ("keyword_parameter", k) is a required keyword parameter, e.g.:
     --    def foo(name:); end
     -- Let it fall through to generate an Indexed syntax.
-    (OptionalParameter, [ k, v ] ) -> S.Pair k v
-    (ArrayLiteral, _ ) -> S.Array Nothing children
-    (Assignment, [ identifier, value ]) -> S.Assignment identifier value
-    (Begin, _ ) -> case partition (\x -> Info.category (extract x) == Rescue) children of
+    (OptionalParameter, [ k, v ] ) -> Just $ S.Pair k v
+    (ArrayLiteral, _ ) -> Just $ S.Array Nothing children
+    (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
+    (Begin, _ ) -> Just $ case partition (\x -> Info.category (extract x) == Rescue) children of
       (rescues, rest) -> case partition (\x -> Info.category (extract x) == Ensure || Info.category (extract x) == Else) rest of
         (ensureElse, body) -> case ensureElse of
           [ elseBlock, ensure ]
@@ -37,53 +37,53 @@ termAssignment source (_ :. category :. _ :. Nil) children
           [ elseBlock ] | Else <- Info.category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
           [ ensure ] | Ensure <- Info.category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    (Case, expr : body ) -> S.Switch (Just expr) body
-    (When, condition : body ) -> S.Case condition body
-    (Class, constant : rest ) -> case rest of
+    (Case, expr : body ) -> Just $ S.Switch (Just expr) body
+    (When, condition : body ) -> Just $ S.Case condition body
+    (Class, constant : rest ) -> Just $ case rest of
       ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
-    (SingletonClass, identifier : rest ) -> S.Class identifier Nothing rest
-    (Comment, _ ) -> S.Comment $ toText source
-    (Ternary, condition : cases) -> S.Ternary condition cases
-    (Constant, _ ) -> S.Fixed children
+    (SingletonClass, identifier : rest ) -> Just $ S.Class identifier Nothing rest
+    (Comment, _ ) -> Just . S.Comment $ toText source
+    (Ternary, condition : cases) -> Just $ S.Ternary condition cases
+    (Constant, _ ) -> Just $ S.Fixed children
     (MethodCall, fn : args) | MemberAccess <- Info.category (extract fn)
                             , [target, method] <- toList (unwrap fn)
-                            -> S.MethodCall target method (toList . unwrap =<< args)
+                            -> Just $ S.MethodCall target method (toList . unwrap =<< args)
                             | otherwise
-                            -> S.FunctionCall fn (toList . unwrap =<< args)
-    (Other "lambda", first : rest) | null rest -> S.AnonymousFunction [] [first]
-                                   | otherwise -> S.AnonymousFunction (toList (unwrap first)) rest
-    (Object, _ ) -> S.Object Nothing $ foldMap toTuple children
-    (Modifier If, [ lhs, condition ]) -> S.If condition [lhs]
-    (If, condition : body ) -> S.If condition body
-    (Modifier Unless, [lhs, rhs]) -> S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
-    (Unless, expr : rest) -> S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
-    (Modifier Until, [ lhs, rhs ]) -> S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
-    (Until, expr : rest) -> S.While (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
-    (Elsif, condition : body ) -> S.If condition body
-    (SubscriptAccess, [ base, element ]) -> S.SubscriptAccess base element
-    (For, lhs : expr : rest ) -> S.For [lhs, expr] rest
-    (OperatorAssignment, [ identifier, value ]) -> S.OperatorAssignment identifier value
-    (MemberAccess, [ base, property ]) -> S.MemberAccess base property
+                            -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
+    (Other "lambda", first : rest) | null rest -> Just $ S.AnonymousFunction [] [first]
+                                   | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
+    (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
+    (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
+    (If, condition : body ) -> Just $ S.If condition body
+    (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Unless, expr : rest) -> Just $ S.If (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
+    (Modifier Until, [ lhs, rhs ]) -> Just $ S.While (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
+    (Until, expr : rest) -> Just $ S.While (withRecord (setCategory (extract expr) Negate) (S.Negate expr)) rest
+    (Elsif, condition : body ) -> Just $ S.If condition body
+    (SubscriptAccess, [ base, element ]) -> Just $ S.SubscriptAccess base element
+    (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
+    (OperatorAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
+    (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
     (Method, identifier : first : rest) | Params <- Info.category (extract first)
-                                        -> S.Method identifier Nothing (toList (unwrap first)) rest
-                                        | null rest -> S.Method identifier Nothing [] [first]
-    (Module, constant : body ) -> S.Module constant body
-    (Modifier Rescue, [lhs, rhs] ) -> S.Rescue [lhs] [rhs]
-    (Rescue, _ ) -> case children of
+                                        -> Just $ S.Method identifier Nothing (toList (unwrap first)) rest
+                                        | null rest
+                                        -> Just $ S.Method identifier Nothing [] [first]
+    (Module, constant : body ) -> Just $ S.Module constant body
+    (Modifier Rescue, [lhs, rhs] ) -> Just $ S.Rescue [lhs] [rhs]
+    (Rescue, _ ) -> Just $ case children of
       exceptions : exceptionVar : rest
         | RescueArgs <- Info.category (extract exceptions)
         , RescuedException <- Info.category (extract exceptionVar) -> S.Rescue (toList (unwrap exceptions) <> [exceptionVar]) rest
       exceptionVar : rest | RescuedException <- Info.category (extract exceptionVar) -> S.Rescue [exceptionVar] rest
       exceptions : body | RescueArgs <- Info.category (extract exceptions) -> S.Rescue (toList (unwrap exceptions)) body
       body -> S.Rescue [] body
-    (Return, _ ) -> S.Return children
-    (Modifier While, [ lhs, condition ]) -> S.While condition [lhs]
-    (While, expr : rest ) -> S.While expr rest
-    (Yield, _ ) -> S.Yield children
-    _ | category `elem` [ BeginBlock, EndBlock ] -> S.BlockStatement children
-    (_, []) -> S.Leaf $ toText source
-    _  -> S.Indexed children
+    (Return, _ ) -> Just $ S.Return children
+    (Modifier While, [ lhs, condition ]) -> Just $ S.While condition [lhs]
+    (While, expr : rest ) -> Just $ S.While expr rest
+    (Yield, _ ) -> Just $ S.Yield children
+    _ | category `elem` [ BeginBlock, EndBlock ] -> Just $ S.BlockStatement children
+    _  -> Nothing
   where
     withRecord record syntax = cofree (record :< syntax)
 
