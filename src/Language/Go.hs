@@ -52,7 +52,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
   (VarAssignment, _) | Just assignment <- toVarAssignment children -> Just assignment
-  (VarDecl, _) | Just assignment <- toVarAssignment children -> Just assignment
+  (VarDecl, [idList, ty]) | Identifier <- Info.category (extract ty) -> withDefaultInfo $ S.VarDecl idList (Just ty)
   (If, _) -> toIfStatement children
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
   (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
@@ -80,10 +80,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
         in withDefaultInfo (S.If clauses' blocks')
 
     toVarAssignment = \case
-        [idList, ty] | Info.category (extract ty) == Identifier ->
-          let ids = toList (unwrap idList)
-              idList' = (\id -> withRanges range VarDecl (S.VarDecl id (Just ty))) <$> ids
-          in Just $ withRanges range ExpressionStatements (S.Indexed idList')
         [idList, expressionList] | Info.category (extract expressionList) == Other "expression_list" ->
           let assignments' = zipWith ((withCategory VarAssignment .) . S.VarAssignment)
                 (toList $ unwrap idList) (toList $ unwrap expressionList)
