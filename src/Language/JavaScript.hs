@@ -33,8 +33,6 @@ termAssignment _ (_ :. category :. _ :. Nil) children
     (Case, [ expr, body ]) -> Just $ S.Case expr [body]
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
     (Pair, _) -> Just $ S.Fixed children
-    (If, expr : rest ) -> Just $ S.If expr rest
-    (While, expr : rest ) -> Just $ S.While expr rest
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
     (Throw, [ expr ]) -> Just $ S.Throw expr
     (Constructor, [ expr ]) -> Just $ S.Constructor expr
