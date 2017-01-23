@@ -30,7 +30,6 @@ termAssignment _ (_ :. category :. _ :. Nil) children
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (VarAssignment, [ x, y ]) -> Just $ S.VarAssignment x y
     (VarDecl, _) -> Just . S.Indexed $ toVarDecl <$> children
-    (Case, expr : body) -> Just $ S.Case expr body
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
     (Pair, _) -> Just $ S.Fixed children
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body

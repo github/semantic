@@ -94,7 +94,8 @@ defaultTermAssignment source category children allChildren
     -- Control flow statements
     (If, condition : body) -> S.If condition body
     (Switch, _) -> uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
-    (While, expr : rest ) -> S.While expr rest
+    (Case, expr : body) -> S.Case expr body
+    (While, expr : rest) -> S.While expr rest
 
     -- Statements
     (Return, _) -> S.Return children
