@@ -42,8 +42,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (SubscriptAccess, _) -> withDefaultInfo $ toSubscriptAccess children
   (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
   (Slice, _) -> sliceToSubscriptAccess children
-  (Other "composite_literal", [ty, _]) -> case Info.category (extract ty) of
-    ArrayTy -> toImplicitArray children
+  (Other "composite_literal", [ty, values]) -> case Info.category (extract ty) of
+    ArrayTy -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
     DictionaryTy -> toMap children
     SliceTy -> sliceToSubscriptAccess children
     _ -> toStruct children
@@ -87,9 +87,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     toStructTy children =
       withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
 
-    toImplicitArray = \case
-      [ty, values] -> withCategory ArrayLiteral (S.Array (Just ty) (toList $ unwrap values))
-      rest -> withRanges range Error rest $ S.Error rest
     toMap = \case
       [ty, values] -> withCategory DictionaryLiteral (S.Object (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
