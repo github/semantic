@@ -59,7 +59,10 @@ data JSONSummary = JSONSummary { info :: ParentInfo, changeType :: Text }
 
 instance ToJSON JSONSummary where
   -- TODO fix JSON instance
-  toJSON JSONSummary{..} = object [ "changeType" .= changeType ]
+  toJSON JSONSummary{..} = object . ([ "changeType" .= changeType ] <>) $ case info of
+    ParentInfo{..} -> [ "category" .= (show parentCategory :: Text), "term" .= parentTermName, "sourceSpan" .= parentSourceSpan ]
+    ExpressionInfo{..} -> [ "category" .= (show exprCategory :: Text), "term" .= exprTermName, "sourceSpan" .= exprSourceSpan ]
+    None -> []
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isErrorSummary :: JSONSummary -> Bool
