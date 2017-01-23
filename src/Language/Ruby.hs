@@ -37,8 +37,8 @@ termAssignment _ (_ :. category :. _ :. Nil) children
           [ elseBlock ] | Else <- Info.category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
           [ ensure ] | Ensure <- Info.category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
-    (When, condition : body ) -> Just $ S.Case condition body
+    (Switch, _) -> Just $ uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
+    (Case, condition : body ) -> Just $ S.Case condition body
     (Class, constant : rest ) -> Just $ case rest of
       ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
@@ -98,7 +98,7 @@ categoryForRubyName = \case
   "block_parameter" -> BlockParameter
   "boolean" -> Boolean
   "call" -> MemberAccess
-  "case" -> Case
+  "case" -> Switch
   "class"  -> Class
   "comment" -> Comment
   "conditional" -> Ternary
@@ -150,7 +150,7 @@ categoryForRubyName = \case
   "unless" -> Unless
   "until_modifier" -> Modifier Until
   "until" -> Until
-  "when" -> When
+  "when" -> Case
   "while_modifier" -> Modifier While
   "while" -> While
   "yield" -> Yield
