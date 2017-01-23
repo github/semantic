@@ -16,7 +16,6 @@ termAssignment
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termAssignment source (range :. category :. sourceSpan :. Nil) children = case (category, children) of
-  (Return, _) -> withDefaultInfo $ S.Return children
   (Import, [importName]) -> withDefaultInfo $ S.Import importName []
   (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
