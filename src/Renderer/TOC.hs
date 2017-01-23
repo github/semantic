@@ -53,21 +53,21 @@ Example: https://github.com/github/github/pull/50259/files
 
 -}
 
-data JSONSummary = JSONSummary { span :: SourceSpan, termContext :: Text, contextType :: Text, changeType :: Text }
-                 | ErrorSummary { error :: Text, span :: SourceSpan }
+data JSONSummary span termContext contextType = JSONSummary { span :: span, termContext :: termContext, contextType :: contextType, changeType :: Text }
+                 | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
                  deriving (Generic, Eq, Show)
 
-instance ToJSON JSONSummary where
+instance (ToJSON span, ToJSON termContext, ToJSON contextType) => ToJSON (JSONSummary span termContext contextType) where
   toJSON JSONSummary{..} = object [ "span" .= span, "termContext" .= termContext, "contextType" .= contextType, "changeType" .= changeType ]
-  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= span ]
+  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
-isErrorSummary :: JSONSummary -> Bool
+isErrorSummary :: JSONSummary termContext contextType changeType -> Bool
 isErrorSummary ErrorSummary{} = True
 isErrorSummary _ = False
 
 data DiffInfo = LeafInfo { leafCategory :: Category, termName :: Text, sourceSpan :: SourceSpan }
  | BranchInfo { branches :: [ DiffInfo ], branchCategory :: Category }
- | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
+ | ErrorInfo { infoSpan :: SourceSpan, termName :: Text }
  | HideInfo -- Hide/Strip from summary output entirely.
  deriving (Eq, Show)
 
@@ -88,15 +88,16 @@ toc blobs diff = TOCOutput $ Map.fromList [
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffTOC blobs diff
 
-diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
+diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary SourceSpan Text Text]
 diffTOC blobs diff = tocToJSONSummaries =<< diffToTOCSummaries (source <$> blobs) diff
   where
-    tocToJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
-    tocToJSONSummaries TOCSummary{..} = summaries patch
+    tocToJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary SourceSpan Text Text]
+    tocToJSONSummaries TOCSummary{..} = summaries parentAnnotation patch
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
       let
+        -- TODO Turn this on to add annotateWithCategory back
         -- diff' = free (Prologue.fst <$> diff)
         -- annotateWithCategory :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
         -- annotateWithCategory children = case (beforeTerm diff', afterTerm diff') of
@@ -111,26 +112,30 @@ diffTOC blobs diff = tocToJSONSummaries =<< diffToTOCSummaries (source <$> blobs
       where
         (beforeSource, afterSource) = runJoin sources
 
--- If the term is a method/function grab the term type, name, and span here, otherwise grab them up top.
-summaries :: Patch DiffInfo -> [JSONSummary]
-summaries = \case
-  (Replace i1 i2) -> zipWith (\a b ->
-    JSONSummary
-     {
-      -- span = SourceSpans $ These (span a) (span b)
-      span = span b
-    , termContext = termContext a <> " -> " <> termContext b
-    , contextType = contextType b
-    , changeType = "replace"
-    }) (toLeafInfos "replace" i1) (toLeafInfos "replace" i2)
-  (Insert info) -> toLeafInfos "insert" info
-  (Delete info) -> toLeafInfos "delete" info
 
-toLeafInfos :: Text -> DiffInfo -> [JSONSummary]
-toLeafInfos _ ErrorInfo{..} = pure $ ErrorSummary termName errorSpan
-toLeafInfos patchType BranchInfo{..} = branches >>= toLeafInfos patchType
-toLeafInfos _ HideInfo = []
-toLeafInfos patchType LeafInfo{..} = pure $ JSONSummary sourceSpan termName (show leafCategory) patchType
+
+-- If the term is a method/function grab the term type, name, and span here, otherwise grab them up top.
+summaries :: [Either (Category, Text) (Category, Text)] -> Patch DiffInfo -> [JSONSummary (Maybe SourceSpan) (Maybe Text) (Maybe Text)]
+summaries parentAnnotations = \case
+  (Replace i1 i2) -> zipWith (\a b ->
+    case (contextType a, termContext a, termContext b, contextType b) of
+      (Just C.Function, Just contextA, Just contextB, Just context) ->
+        JSONSummary (span b) (contextA <> " -> " <> contextB) context (changeType b)
+      (Just C.Method, Just contextA, Just contextB, Just context) ->
+        JSONSummary (span b) (contextA <> " -> " <> contextB) context (changeType b)
+      _ -> JSONSummary Nothing Nothing Nothing (changeType b)
+    ) (toLeafInfos parentAnnotations "replace" i1) (toLeafInfos parentAnnotations "replace" i2)
+  (Insert info) -> toLeafInfos parentAnnotations "insert" info
+  (Delete info) -> toLeafInfos parentAnnotations "delete" info
+
+toLeafInfos :: [Either (Category, Text) (Category, Text)] -> Text -> DiffInfo -> [JSONSummary (Maybe SourceSpan) (Maybe Text) (Maybe Category)]
+toLeafInfos _ _ ErrorInfo{..} = pure $ ErrorSummary termName infoSpan
+toLeafInfos parentAnnotations patchType BranchInfo{..} = branches >>= toLeafInfos parentAnnotations patchType
+toLeafInfos _ _ HideInfo = []
+toLeafInfos parentAnnotations patchType LeafInfo{..} = pure $ case leafCategory of
+  C.Function -> JSONSummary (Just sourceSpan) (Just termName) (Just leafCategory) patchType
+  C.Method -> JSONSummary (Just sourceSpan) (Just termName) (Just leafCategory) patchType
+  _ -> JSONSummary Nothing Nothing Nothing patchType
 
 termToDiffInfo :: (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
