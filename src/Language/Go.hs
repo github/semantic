@@ -63,10 +63,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (VarAssignment, _) -> toVarAssignment children
   (VarDecl, _) -> toVarAssignment children
   (If, _) -> toIfStatement children
-  (FunctionCall, _) -> withDefaultInfo $ case children of
-    [id] -> S.FunctionCall id []
-    id : rest -> S.FunctionCall id rest
-    rest -> S.Error rest
+  (FunctionCall, [id]) -> withDefaultInfo $ S.FunctionCall id []
+  (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
   (Other "const_declaration", _) -> toConsts children
   (AnonymousFunction, _) -> withDefaultInfo $ case children of
     [params, _, body] -> case toList (unwrap params) of
