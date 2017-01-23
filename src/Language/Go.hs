@@ -55,7 +55,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (VarAssignment, _) | Just assignment <- toVarAssignment children -> Just assignment
   (VarDecl, _) | Just assignment <- toVarAssignment children -> Just assignment
   (If, _) -> toIfStatement children
-  (FunctionCall, [id]) -> withDefaultInfo $ S.FunctionCall id []
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
   (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
                                          -> withDefaultInfo $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
