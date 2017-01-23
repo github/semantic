@@ -28,13 +28,13 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
   (StructTy, _) -> withDefaultInfo (S.Ty (withRanges range FieldDeclarations (S.Indexed children)))
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
-                        -> Just $ withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
+                        -> withDefaultInfo (S.FieldDecl ident Nothing Nothing)
   (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
-                            -> case Info.category (extract ty) of
-                                StringLiteral -> Just $ withCategory FieldDecl (S.FieldDecl ident Nothing (Just ty))
-                                _ -> Just $ withCategory FieldDecl (S.FieldDecl ident (Just ty) Nothing)
+                            -> withDefaultInfo $ case Info.category (extract ty) of
+                                StringLiteral -> S.FieldDecl ident Nothing (Just ty)
+                                _ -> S.FieldDecl ident (Just ty) Nothing
   (FieldDecl, [idList, ty, tag]) | [ident] <- toList (unwrap idList)
-                                 -> Just $ withCategory FieldDecl (S.FieldDecl ident (Just ty) (Just tag))
+                                 -> withDefaultInfo (S.FieldDecl ident (Just ty) (Just tag))
   (Switch, _) ->
     withDefaultInfo $ case Prologue.break ((== Case) . Info.category . extract) children of
       ([id], cases) -> S.Switch (Just id) cases -- type_switch_statement
