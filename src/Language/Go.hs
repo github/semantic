@@ -15,20 +15,20 @@ termAssignment
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $ case category of
-  Return -> withDefaultInfo $ S.Return children
-  Module -> case Prologue.break (\node -> Info.category (extract node) == Other "package_clause") children of
+termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $ case (category, children) of
+  (Return, _) -> withDefaultInfo $ S.Return children
+  (Module, _) -> case Prologue.break (\node -> Info.category (extract node) == Other "package_clause") children of
     (comments, packageName : rest) -> case unwrap packageName of
         S.Indexed [id] ->
           let module' = withCategory Module (S.Module id rest)
           in withCategory Program (S.Indexed (comments <> [module']))
         _ -> withRanges range Error children (S.Error children)
     _ -> withRanges range Error children (S.Error children)
-  Other "import_declaration" -> toImports children
-  Function -> withDefaultInfo $ case children of
+  (Other "import_declaration", _) -> toImports children
+  (Function, _) -> withDefaultInfo $ case children of
     [id, params, block] -> S.Function id (toList $ unwrap params) (toList $ unwrap block)
     rest -> S.Error rest
-  For ->
+  (For, _) ->
     withDefaultInfo $ case children of
       [body] | Info.category (extract body) == Other "block" ->
         S.For [] (toList $ unwrap body)
@@ -37,10 +37,10 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
       [rangeClause, body] | Info.category (extract rangeClause) == Other "range_clause" ->
         S.For (toList $ unwrap rangeClause) (toList $ unwrap body)
       other -> S.Error other
-  TypeDecl -> toTypeDecl children
-  StructTy -> toStructTy children
-  FieldDecl -> toFieldDecl children
-  Switch ->
+  (TypeDecl, _) -> toTypeDecl children
+  (StructTy, _) -> toStructTy children
+  (FieldDecl, _) -> toFieldDecl children
+  (Switch, _) ->
     case Prologue.break isCaseClause children of
       (clauses, cases) -> withDefaultInfo $ case clauses of
         [id] -> S.Switch (Just id) cases -- type_switch_statement
@@ -54,63 +54,63 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
             [] -> withCategory DefaultCase $ S.DefaultCase rest
             rest -> withCategory Error $ S.Error rest
           [] -> withCategory Error $ S.Error [clause]
-  ParameterDecl -> withDefaultInfo $ case children of
+  (ParameterDecl, _) -> withDefaultInfo $ case children of
     [param, ty] -> S.ParameterDecl (Just ty) param
     [param] -> S.ParameterDecl Nothing param
     _ -> S.Error children
-  Assignment -> toVarAssignment children
-  Select -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
+  (Assignment, _) -> toVarAssignment children
+  (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
-  Go -> withDefaultInfo $ toExpression S.Go children
-  Defer -> withDefaultInfo $ toExpression S.Defer children
-  SubscriptAccess -> withDefaultInfo $ toSubscriptAccess children
-  IndexExpression -> withDefaultInfo $ toSubscriptAccess children
-  Slice -> sliceToSubscriptAccess children
-  Other "composite_literal" -> toLiteral children
-  TypeAssertion -> withDefaultInfo $ case children of
+  (Go, _) -> withDefaultInfo $ toExpression S.Go children
+  (Defer, _) -> withDefaultInfo $ toExpression S.Defer children
+  (SubscriptAccess, _) -> withDefaultInfo $ toSubscriptAccess children
+  (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
+  (Slice, _) -> sliceToSubscriptAccess children
+  (Other "composite_literal", _) -> toLiteral children
+  (TypeAssertion, _) -> withDefaultInfo $ case children of
     [a, b] -> S.TypeAssertion a b
     rest -> S.Error rest
-  TypeConversion -> withDefaultInfo $ case children of
+  (TypeConversion, _) -> withDefaultInfo $ case children of
     [a, b] -> S.TypeConversion a b
     rest -> S.Error rest
   -- TODO: Handle multiple var specs
-  Other "var_declaration" -> toVarDecls children
-  VarAssignment -> toVarAssignment children
-  VarDecl -> toVarAssignment children
-  If -> toIfStatement children
-  FunctionCall -> withDefaultInfo $ case children of
+  (Other "var_declaration", _) -> toVarDecls children
+  (VarAssignment, _) -> toVarAssignment children
+  (VarDecl, _) -> toVarAssignment children
+  (If, _) -> toIfStatement children
+  (FunctionCall, _) -> withDefaultInfo $ case children of
     [id] -> S.FunctionCall id []
     id : rest -> S.FunctionCall id rest
     rest -> S.Error rest
-  Other "const_declaration" -> toConsts children
-  AnonymousFunction -> withDefaultInfo $ case children of
+  (Other "const_declaration", _) -> toConsts children
+  (AnonymousFunction, _) -> withDefaultInfo $ case children of
     [params, _, body] -> case toList (unwrap params) of
       [params'] -> S.AnonymousFunction (toList $ unwrap params') (toList $ unwrap body)
       rest -> S.Error rest
     rest -> S.Error rest
-  PointerTy -> withDefaultInfo $ case children of
+  (PointerTy, _) -> withDefaultInfo $ case children of
     [ty] -> S.Ty ty
     rest -> S.Error rest
-  ChannelTy -> withDefaultInfo $ case children of
+  (ChannelTy, _) -> withDefaultInfo $ case children of
     [ty] -> S.Ty ty
     rest -> S.Error rest
-  Send -> withDefaultInfo $ case children of
+  (Send, _) -> withDefaultInfo $ case children of
     [channel, expr] -> S.Send channel expr
     rest -> S.Error rest
-  Operator -> withDefaultInfo $ S.Operator children
-  FunctionTy ->
+  (Operator, _) -> withDefaultInfo $ S.Operator children
+  (FunctionTy, _) ->
     let params = withRanges range Params children $ S.Indexed children
     in withDefaultInfo $ S.Ty params
-  IncrementStatement ->
+  (IncrementStatement, _) ->
     withDefaultInfo $ S.Leaf $ toText source
-  DecrementStatement ->
+  (DecrementStatement, _) ->
     withDefaultInfo $ S.Leaf $ toText source
-  QualifiedIdentifier ->
+  (QualifiedIdentifier, _) ->
     withDefaultInfo $ S.Leaf $ toText source
-  Break -> toBreak children
-  Continue -> toContinue children
-  Pair -> toPair children
-  Method -> toMethod children
+  (Break, _) -> toBreak children
+  (Continue, _) -> toContinue children
+  (Pair, _) -> toPair children
+  (Method, _) -> toMethod children
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf $ toText source
     _ -> S.Indexed children
