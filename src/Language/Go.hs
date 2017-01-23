@@ -110,10 +110,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
         _ -> Nothing
 
     withRanges originalRange category' terms syntax =
-      let ranges' = getField . extract <$> terms
-          sourceSpans' = getField . extract <$> terms
-      in
-      cofree ((unionRangesFrom originalRange ranges' :. category' :. unionSourceSpansFrom sourceSpan sourceSpans' :. Nil) :< syntax)
+      cofree ((unionRangesFrom originalRange (characterRange . extract <$> terms) :. category' :. unionSourceSpansFrom sourceSpan (Info.sourceSpan . extract <$> terms) :. Nil) :< syntax)
 
     withCategory category syntax =
       cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
