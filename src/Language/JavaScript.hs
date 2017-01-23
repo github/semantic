@@ -61,7 +61,6 @@ termAssignment _ (_ :. category :. _ :. Nil) children
     (Export, [ statements ] ) -> Just $ case unwrap statements of
       S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
       _ -> S.Export (Just statements) []
-    (Break, [ expr ] ) -> Just $ S.Break (Just expr)
     (Yield, _ ) -> Just $ S.Yield children
     (For, _) | Just (exprs, body) <- unsnoc children
              -> Just $ S.For exprs [body]

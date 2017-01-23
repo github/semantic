@@ -97,6 +97,10 @@ defaultTermAssignment source category children allChildren
 
     -- Statements
     (Return, _) -> S.Return children
+    (Break, [label]) -> S.Break (Just label)
+    (Break, []) -> S.Break Nothing
+    (Continue, [label]) -> S.Continue (Just label)
+    (Continue, []) -> S.Continue Nothing
 
     (_, []) -> S.Leaf (toText source)
     (_, children) -> S.Indexed children

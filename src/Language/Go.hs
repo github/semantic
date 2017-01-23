@@ -83,10 +83,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
     withDefaultInfo $ S.Leaf $ toText source
   (QualifiedIdentifier, _) ->
     withDefaultInfo $ S.Leaf $ toText source
-  (Break, [label]) -> withDefaultInfo $ S.Break (Just label)
-  (Break, []) -> withDefaultInfo $ S.Break Nothing
-  (Continue, [label]) -> withDefaultInfo $ S.Continue (Just label)
-  (Continue, []) -> withDefaultInfo $ S.Continue Nothing
   (Method, [params, name, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
   (Method, [params, name, outParams, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
