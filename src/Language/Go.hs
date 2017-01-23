@@ -77,12 +77,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
       [params'] -> S.AnonymousFunction (toList $ unwrap params') (toList $ unwrap body)
       rest -> S.Error rest
     rest -> S.Error rest
-  (PointerTy, _) -> withDefaultInfo $ case children of
-    [ty] -> S.Ty ty
-    rest -> S.Error rest
-  (ChannelTy, _) -> withDefaultInfo $ case children of
-    [ty] -> S.Ty ty
-    rest -> S.Error rest
+  (PointerTy, [ty]) -> withDefaultInfo $ S.Ty ty
+  (ChannelTy, [ty]) -> withDefaultInfo $ S.Ty ty
   (Send, _) -> withDefaultInfo $ case children of
     [channel, expr] -> S.Send channel expr
     rest -> S.Error rest
