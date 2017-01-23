@@ -56,12 +56,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
   (Slice, _) -> sliceToSubscriptAccess children
   (Other "composite_literal", _) -> toLiteral children
-  (TypeAssertion, _) -> withDefaultInfo $ case children of
-    [a, b] -> S.TypeAssertion a b
-    rest -> S.Error rest
-  (TypeConversion, _) -> withDefaultInfo $ case children of
-    [a, b] -> S.TypeConversion a b
-    rest -> S.Error rest
+  (TypeAssertion, [a, b]) -> withDefaultInfo $ S.TypeAssertion a b
+  (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
   (Other "var_declaration", _) -> toVarDecls children
   (VarAssignment, _) -> toVarAssignment children
