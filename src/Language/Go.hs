@@ -87,24 +87,13 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (Break, _) -> toBreak children
   (Continue, _) -> toContinue children
   (Pair, _) -> toPair children
-  (Method, _) -> toMethod children
+  (Method, [params, name, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
+  (Method, [params, name, outParams, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
+  (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   _ -> withDefaultInfo $ case children of
     [] -> S.Leaf $ toText source
     _ -> S.Indexed children
   where
-    toMethod = \case
-      [params, name, fun] -> withDefaultInfo (S.Method name Nothing (toList $ unwrap params) (toList $ unwrap fun))
-      [params, name, outParams, fun] ->
-        let params' = toList (unwrap params)
-            outParams' = toList (unwrap outParams)
-            allParams = params' <> outParams'
-        in withDefaultInfo (S.Method name Nothing allParams (toList $ unwrap fun))
-      [params, name, outParams, ty, fun] ->
-        let params' = toList (unwrap params)
-            outParams' = toList (unwrap outParams)
-            allParams = params' <> outParams'
-        in withDefaultInfo (S.Method name (Just ty) allParams (toList $ unwrap fun))
-      rest -> withCategory Error (S.Error rest)
     toPair = \case
       [key, value] -> withDefaultInfo (S.Pair key value)
       rest -> withCategory Error (S.Error rest)
