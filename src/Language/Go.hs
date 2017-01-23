@@ -15,11 +15,11 @@ termAssignment
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $ case (category, children) of
+termAssignment source (range :. category :. sourceSpan :. Nil) children = case (category, children) of
   (Return, _) -> withDefaultInfo $ S.Return children
   (Module, _) | (comments, packageName : rest) <- Prologue.break ((== Other "package_clause") . Info.category . extract) children
               , S.Indexed [id] <- unwrap packageName
-              -> withCategory Program (S.Indexed (comments <> [withCategory Module (S.Module id rest)]))
+              -> Just $ withCategory Program (S.Indexed (comments <> [withCategory Module (S.Module id rest)]))
   (Import, [importName]) -> withDefaultInfo $ S.Import importName []
   (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
@@ -28,27 +28,27 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
   (StructTy, _) -> toStructTy children
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
-                        -> withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
+                        -> Just $ withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
   (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
                             -> case Info.category (extract ty) of
-                                StringLiteral -> withCategory FieldDecl (S.FieldDecl ident Nothing (Just ty))
-                                _ -> withCategory FieldDecl (S.FieldDecl ident (Just ty) Nothing)
+                                StringLiteral -> Just $ withCategory FieldDecl (S.FieldDecl ident Nothing (Just ty))
+                                _ -> Just $ withCategory FieldDecl (S.FieldDecl ident (Just ty) Nothing)
   (FieldDecl, [idList, ty, tag]) | [ident] <- toList (unwrap idList)
-                                 -> withCategory FieldDecl (S.FieldDecl ident (Just ty) (Just tag))
+                                 -> Just $ withCategory FieldDecl (S.FieldDecl ident (Just ty) (Just tag))
   (Switch, _) ->
     withDefaultInfo $ case Prologue.break ((== Case) . Info.category . extract) children of
       ([id], cases) -> S.Switch (Just id) cases -- type_switch_statement
       ([], cases) -> S.Switch Nothing cases
       (clauses, cases) -> S.Switch (Just (withCategory ExpressionStatements (S.Indexed clauses))) cases
   (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
-  (Assignment, _) | Just assignment <- toVarAssignment children -> assignment
+  (Assignment, _) | Just assignment <- toVarAssignment children -> Just assignment
   (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
   (Go, [expr]) -> withDefaultInfo $ S.Go expr
   (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
   (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
-  (Slice, a : rest) -> withCategory Slice (S.SubscriptAccess a (withRanges range Element rest (S.Fixed rest)))
+  (Slice, a : rest) -> Just $ withCategory Slice (S.SubscriptAccess a (withRanges range Element rest (S.Fixed rest)))
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
                                             | DictionaryTy <- Info.category (extract ty)
@@ -62,8 +62,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
   (Other "var_declaration", _) -> toVarDecls children
-  (VarAssignment, _) | Just assignment <- toVarAssignment children -> assignment
-  (VarDecl, _) | Just assignment <- toVarAssignment children -> assignment
+  (VarAssignment, _) | Just assignment <- toVarAssignment children -> Just assignment
+  (VarDecl, _) | Just assignment <- toVarAssignment children -> Just assignment
   (If, _) -> toIfStatement children
   (FunctionCall, [id]) -> withDefaultInfo $ S.FunctionCall id []
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
@@ -91,9 +91,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (Method, [params, name, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
   (Method, [params, name, outParams, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
-  _ -> withDefaultInfo $ case children of
-    [] -> S.Leaf $ toText source
-    _ -> S.Indexed children
+  _ -> Nothing
   where
     toStructTy children =
       withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
@@ -122,7 +120,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
           let assignments' = zipWith (\id expr ->
                 withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
           in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
-        [idList] -> Just $ withDefaultInfo (S.Indexed [idList])
+        [idList] -> withDefaultInfo (S.Indexed [idList])
         _ -> Nothing
 
     withRanges originalRange category' terms syntax =
@@ -134,7 +132,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     withCategory category syntax =
       cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
-    withDefaultInfo = withCategory category
+    withDefaultInfo = Just . withCategory category
 
 categoryForGoName :: Text -> Category
 categoryForGoName = \case
