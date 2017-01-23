@@ -27,7 +27,14 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
   (StructTy, _) -> toStructTy children
-  (FieldDecl, _) -> toFieldDecl children
+  (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
+                        -> withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
+  (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
+                            -> case Info.category (extract ty) of
+                                StringLiteral -> withCategory FieldDecl (S.FieldDecl ident Nothing (Just ty))
+                                _ -> withCategory FieldDecl (S.FieldDecl ident (Just ty) Nothing)
+  (FieldDecl, [idList, ty, tag]) | [ident] <- toList (unwrap idList)
+                                 -> withCategory FieldDecl (S.FieldDecl ident (Just ty) (Just tag))
   (Switch, _) ->
     withDefaultInfo $ case Prologue.break ((== Case) . Info.category . extract) children of
       ([id], cases) -> S.Switch (Just id) cases -- type_switch_statement
@@ -90,16 +97,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   where
     toStructTy children =
       withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
-
-    toFieldDecl = \case
-      [idList, ty] | [ident] <- toList (unwrap idList) ->
-        case Info.category (extract ty) of
-          StringLiteral -> withCategory FieldDecl (S.FieldDecl ident Nothing (Just ty))
-          _ -> withCategory FieldDecl (S.FieldDecl ident (Just ty) Nothing)
-      [idList] | [ident] <- toList (unwrap idList) ->
-        withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
-      [idList, ty, tag] | [ident] <- toList (unwrap idList) -> withCategory FieldDecl (S.FieldDecl ident (Just ty) (Just tag))
-      rest -> withRanges range Error rest (S.Error rest)
 
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
       (clauses, blocks) ->
