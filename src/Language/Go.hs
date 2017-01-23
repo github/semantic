@@ -57,11 +57,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (FunctionCall, [id]) -> withDefaultInfo $ S.FunctionCall id []
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
   (Other "const_declaration", _) -> toConsts children
-  (AnonymousFunction, _) -> withDefaultInfo $ case children of
-    [params, _, body] -> case toList (unwrap params) of
-      [params'] -> S.AnonymousFunction (toList $ unwrap params') (toList $ unwrap body)
-      rest -> S.Error rest
-    rest -> S.Error rest
+  (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
+                                         -> withDefaultInfo $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
   (PointerTy, [ty]) -> withDefaultInfo $ S.Ty ty
   (ChannelTy, [ty]) -> withDefaultInfo $ S.Ty ty
   (Send, [channel, expr]) -> withDefaultInfo $ S.Send channel expr
