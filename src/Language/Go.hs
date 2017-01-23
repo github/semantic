@@ -33,19 +33,10 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (StructTy, _) -> toStructTy children
   (FieldDecl, _) -> toFieldDecl children
   (Switch, _) ->
-    case Prologue.break isCaseClause children of
-      (clauses, cases) -> withDefaultInfo $ case clauses of
-        [id] -> S.Switch (Just id) cases -- type_switch_statement
-        [] -> S.Switch Nothing (toCase <$> cases)
-        _ -> S.Switch (Just (withCategory ExpressionStatements (S.Indexed clauses))) (toCase <$> cases)
-      where
-        isCaseClause = (== Case) . Info.category . extract
-        toCase clause = case toList (unwrap clause) of
-          clause' : rest -> case toList (unwrap clause') of
-            [clause''] -> withCategory Case $ S.Case clause'' rest
-            [] -> withCategory DefaultCase $ S.DefaultCase rest
-            rest -> withCategory Error $ S.Error rest
-          [] -> withCategory Error $ S.Error [clause]
+    withDefaultInfo $ case Prologue.break ((== Case) . Info.category . extract) children of
+      ([id], cases) -> S.Switch (Just id) cases -- type_switch_statement
+      ([], cases) -> S.Switch Nothing cases
+      (clauses, cases) -> S.Switch (Just (withCategory ExpressionStatements (S.Indexed clauses))) cases
   (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
   (Assignment, _) -> toVarAssignment children
   (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
