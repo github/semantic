@@ -26,7 +26,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
-  (StructTy, _) -> withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
+  (StructTy, _) -> withDefaultInfo (S.Ty (withRanges range FieldDeclarations (S.Indexed children)))
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
                         -> Just $ withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
   (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
@@ -48,7 +48,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
   (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
-  (Slice, a : rest) -> Just $ withCategory Slice (S.SubscriptAccess a (withRanges range Element rest (S.Fixed rest)))
+  (Slice, a : rest) -> Just $ withCategory Slice (S.SubscriptAccess a (withRanges range Element (S.Fixed rest)))
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
                                             | DictionaryTy <- Info.category (extract ty)
@@ -73,7 +73,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Send, [channel, expr]) -> withDefaultInfo $ S.Send channel expr
   (Operator, _) -> withDefaultInfo $ S.Operator children
   (FunctionTy, _) ->
-    let params = withRanges range Params children $ S.Indexed children
+    let params = withRanges range Params $ S.Indexed children
     in withDefaultInfo $ S.Ty params
   (IncrementStatement, _) ->
     withDefaultInfo $ S.Leaf $ toText source
@@ -88,27 +88,27 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   where
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
       (clauses, blocks) ->
-        let clauses' = withRanges range ExpressionStatements clauses (S.Indexed clauses)
+        let clauses' = withRanges range ExpressionStatements (S.Indexed clauses)
             blocks' = foldMap (toList . unwrap) blocks
         in withDefaultInfo (S.If clauses' blocks')
 
     toVarAssignment = \case
         [idList, ty] | Info.category (extract ty) == Identifier ->
           let ids = toList (unwrap idList)
-              idList' = (\id -> withRanges range VarDecl [id] (S.VarDecl id (Just ty))) <$> ids
-          in Just $ withRanges range ExpressionStatements idList' (S.Indexed idList')
+              idList' = (\id -> withRanges range VarDecl (S.VarDecl id (Just ty))) <$> ids
+          in Just $ withRanges range ExpressionStatements (S.Indexed idList')
         [idList, expressionList] | Info.category (extract expressionList) == Other "expression_list" ->
           let assignments' = zipWith ((withCategory VarAssignment .) . S.VarAssignment)
                 (toList $ unwrap idList) (toList $ unwrap expressionList)
-          in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
+          in Just $ withRanges range ExpressionStatements (S.Indexed assignments')
         [idList, _, expressionList] ->
           let assignments' = zipWith ((withCategory VarAssignment .) . S.VarAssignment) (toList $ unwrap idList) (toList $ unwrap expressionList)
-          in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
+          in Just $ withRanges range ExpressionStatements (S.Indexed assignments')
         [idList] -> withDefaultInfo (S.Indexed [idList])
         _ -> Nothing
 
-    withRanges originalRange category' terms syntax =
-      cofree ((unionRangesFrom originalRange (characterRange . extract <$> terms) :. category' :. unionSourceSpansFrom sourceSpan (Info.sourceSpan . extract <$> terms) :. Nil) :< syntax)
+    withRanges originalRange category' syntax =
+      cofree ((unionRangesFrom originalRange (characterRange . extract <$> toList syntax) :. category' :. unionSourceSpansFrom sourceSpan (Info.sourceSpan . extract <$> toList syntax) :. Nil) :< syntax)
 
     withCategory category syntax =
       cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
