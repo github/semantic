@@ -89,6 +89,8 @@ defaultTermAssignment source category children allChildren
 
     (Comment, _) -> S.Comment (toText source)
 
+    (Pair, [key, value]) -> S.Pair key value
+
     -- Control flow statements
     (If, condition : body) -> S.If condition body
     (While, expr : rest ) -> S.While expr rest
