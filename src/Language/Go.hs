@@ -46,10 +46,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
             [] -> withCategory DefaultCase $ S.DefaultCase rest
             rest -> withCategory Error $ S.Error rest
           [] -> withCategory Error $ S.Error [clause]
-  (ParameterDecl, _) -> withDefaultInfo $ case children of
-    [param, ty] -> S.ParameterDecl (Just ty) param
-    [param] -> S.ParameterDecl Nothing param
-    _ -> S.Error children
+  (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
   (Assignment, _) -> toVarAssignment children
   (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
