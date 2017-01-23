@@ -92,20 +92,14 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
       withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
 
     toFieldDecl = \case
-      [idList, ty] ->
+      [idList, ty] | [ident] <- toList (unwrap idList) ->
         case Info.category (extract ty) of
-          StringLiteral -> withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) Nothing (Just ty))
-          _ -> withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) (Just ty) Nothing)
-      [idList] ->
-        withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) Nothing Nothing)
-      [idList, ty, tag] ->
-        withCategory FieldDecl (S.FieldDecl (toIdent (toList (unwrap idList))) (Just ty) (Just tag))
+          StringLiteral -> withCategory FieldDecl (S.FieldDecl ident Nothing (Just ty))
+          _ -> withCategory FieldDecl (S.FieldDecl ident (Just ty) Nothing)
+      [idList] | [ident] <- toList (unwrap idList) ->
+        withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
+      [idList, ty, tag] | [ident] <- toList (unwrap idList) -> withCategory FieldDecl (S.FieldDecl ident (Just ty) (Just tag))
       rest -> withRanges range Error rest (S.Error rest)
-
-      where
-        toIdent = \case
-          [ident] -> ident
-          rest -> withRanges range Error rest (S.Error rest)
 
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
       (clauses, blocks) ->
