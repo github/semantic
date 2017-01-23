@@ -32,7 +32,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
                                 _ -> S.FieldDecl ident (Just ty) Nothing
   (FieldDecl, [idList, ty, tag]) | [ident] <- toList (unwrap idList)
                                  -> withDefaultInfo (S.FieldDecl ident (Just ty) (Just tag))
-  (Switch, _) -> withDefaultInfo $ uncurry S.Switch (Prologue.break ((== Case) . Info.category . extract) children)
   (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
   (Assignment, _) | Just assignment <- toVarAssignment children -> Just assignment
   (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
