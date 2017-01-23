@@ -16,7 +16,6 @@ termAssignment
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termAssignment _ (_ :. category :. _ :. Nil) children
   = case (category, children) of
-    (Return, _) -> Just $ S.Return children
     (Assignment, [ identifier, value ]) -> Just $ S.Assignment identifier value
     (MathAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
