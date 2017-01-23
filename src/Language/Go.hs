@@ -41,13 +41,13 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (Defer, _) -> withDefaultInfo $ toExpression S.Defer children
   (SubscriptAccess, _) -> withDefaultInfo $ toSubscriptAccess children
   (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
-  (Slice, _) -> sliceToSubscriptAccess children
+  (Slice, a : rest) -> withCategory Slice (S.SubscriptAccess a (withRanges range Element rest (S.Fixed rest)))
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
                                             | DictionaryTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Object (Just ty) (toList (unwrap values))
                                             | SliceTy <- Info.category (extract ty)
-                                            -> sliceToSubscriptAccess children
+                                            -> withDefaultInfo $ S.SubscriptAccess ty values
   (Other "composite_literal", []) -> withDefaultInfo $ S.Struct Nothing []
   (Other "composite_literal", [ty]) -> withDefaultInfo $ S.Struct (Just ty) []
   (Other "composite_literal", [ty, values]) -> withDefaultInfo $ S.Struct (Just ty) (toList (unwrap values))
@@ -114,11 +114,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     toSubscriptAccess = \case
       [a, b] -> S.SubscriptAccess a b
       rest -> S.Error rest
-    sliceToSubscriptAccess = \case
-      a : rest ->
-        let sliceElement = withRanges range Element rest $ S.Fixed rest
-        in withCategory Slice (S.SubscriptAccess a sliceElement)
-      rest -> withRanges range Error rest $ S.Error rest
 
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
       (clauses, blocks) ->
