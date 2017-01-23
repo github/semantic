@@ -17,13 +17,9 @@ termAssignment
   -> Maybe (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $ case (category, children) of
   (Return, _) -> withDefaultInfo $ S.Return children
-  (Module, _) -> case Prologue.break (\node -> Info.category (extract node) == Other "package_clause") children of
-    (comments, packageName : rest) -> case unwrap packageName of
-        S.Indexed [id] ->
-          let module' = withCategory Module (S.Module id rest)
-          in withCategory Program (S.Indexed (comments <> [module']))
-        _ -> withRanges range Error children (S.Error children)
-    _ -> withRanges range Error children (S.Error children)
+  (Module, _) | (comments, packageName : rest) <- Prologue.break ((== Other "package_clause") . Info.category . extract) children
+              , S.Indexed [id] <- unwrap packageName
+              -> withCategory Program (S.Indexed (comments <> [withCategory Module (S.Module id rest)]))
   (Other "import_declaration", _) -> toImports children
   (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
