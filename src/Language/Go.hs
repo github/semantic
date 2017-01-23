@@ -7,8 +7,6 @@ import Source
 import Term
 import qualified Syntax as S
 import Data.Record
-import Range (unionRangesFrom)
-import SourceSpan (unionSourceSpansFrom)
 
 termAssignment
   :: Source Char -- ^ The source of the term.
@@ -39,7 +37,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
   (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
-  (Slice, a : rest) -> withDefaultInfo (S.SubscriptAccess a (withRanges range Element (S.Fixed rest)))
+  (Slice, [a, rest]) -> withDefaultInfo $ S.SubscriptAccess a rest
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
                                             | DictionaryTy <- Info.category (extract ty)
@@ -73,9 +71,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   _ -> Nothing
   where
-    withRanges originalRange category' syntax =
-      cofree ((unionRangesFrom originalRange (characterRange . extract <$> toList syntax) :. category' :. unionSourceSpansFrom sourceSpan (Info.sourceSpan . extract <$> toList syntax) :. Nil) :< syntax)
-
     withCategory category syntax =
       cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
 
