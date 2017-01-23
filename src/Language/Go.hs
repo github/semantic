@@ -28,15 +28,9 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (Function, _) -> withDefaultInfo $ case children of
     [id, params, block] -> S.Function id (toList $ unwrap params) (toList $ unwrap block)
     rest -> S.Error rest
-  (For, _) ->
-    withDefaultInfo $ case children of
-      [body] | Info.category (extract body) == Other "block" ->
-        S.For [] (toList $ unwrap body)
-      [forClause, body] | Info.category (extract forClause) == Other "for_clause" ->
-        S.For (toList $ unwrap forClause) (toList $ unwrap body)
-      [rangeClause, body] | Info.category (extract rangeClause) == Other "range_clause" ->
-        S.For (toList $ unwrap rangeClause) (toList $ unwrap body)
-      other -> S.Error other
+  (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
+  (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
+  (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, _) -> toTypeDecl children
   (StructTy, _) -> toStructTy children
   (FieldDecl, _) -> toFieldDecl children
