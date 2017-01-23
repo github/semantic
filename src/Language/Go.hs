@@ -79,9 +79,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     rest -> S.Error rest
   (PointerTy, [ty]) -> withDefaultInfo $ S.Ty ty
   (ChannelTy, [ty]) -> withDefaultInfo $ S.Ty ty
-  (Send, _) -> withDefaultInfo $ case children of
-    [channel, expr] -> S.Send channel expr
-    rest -> S.Error rest
+  (Send, [channel, expr]) -> withDefaultInfo $ S.Send channel expr
   (Operator, _) -> withDefaultInfo $ S.Operator children
   (FunctionTy, _) ->
     let params = withRanges range Params children $ S.Indexed children
