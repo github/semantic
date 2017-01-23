@@ -54,7 +54,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   -- TODO: Handle multiple var specs
   (VarAssignment, [identifier, expression]) -> withDefaultInfo $ S.VarAssignment identifier expression
   (VarDecl, [idList, ty]) | Identifier <- Info.category (extract ty) -> withDefaultInfo $ S.VarDecl idList (Just ty)
-  (If, _) -> toIfStatement children
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
   (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
                                          -> withDefaultInfo $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
@@ -74,12 +73,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   _ -> Nothing
   where
-    toIfStatement children = case Prologue.break ((ExpressionStatements ==) . Info.category . extract) children of
-      (clauses, blocks) ->
-        let clauses' = withRanges range ExpressionStatements (S.Indexed clauses)
-            blocks' = foldMap (toList . unwrap) blocks
-        in withDefaultInfo (S.If clauses' blocks')
-
     withRanges originalRange category' syntax =
       cofree ((unionRangesFrom originalRange (characterRange . extract <$> toList syntax) :. category' :. unionSourceSpansFrom sourceSpan (Info.sourceSpan . extract <$> toList syntax) :. Nil) :< syntax)
 
