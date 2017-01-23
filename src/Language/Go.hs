@@ -25,6 +25,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
       toImport i = case toList (unwrap i) of
         [importName] -> [ withCategory Import (S.Import importName []) ]
         rest -> rest
+  (Import, [importName]) -> withDefaultInfo $ S.Import importName []
   (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
