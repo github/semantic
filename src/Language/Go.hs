@@ -74,7 +74,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   _ -> Nothing
   where
-    toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
+    toIfStatement children = case Prologue.break ((ExpressionStatements ==) . Info.category . extract) children of
       (clauses, blocks) ->
         let clauses' = withRanges range ExpressionStatements (S.Indexed clauses)
             blocks' = foldMap (toList . unwrap) blocks
@@ -148,4 +148,5 @@ categoryForGoName = \case
   "rune_literal" -> RuneLiteral
   "method_declaration" -> Method
   "import_spec" -> Import
+  "block" -> ExpressionStatements
   s -> Other (toS s)
