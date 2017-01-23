@@ -33,8 +33,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
                                  -> withDefaultInfo (S.FieldDecl ident (Just ty) (Just tag))
   (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
   (Assignment, _) | Just assignment <- toVarAssignment children -> Just assignment
-  (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
-    where toCommunicationCase = toList . unwrap
+  (Select, _) -> withDefaultInfo $ S.Select (children >>= toList . unwrap)
   (Go, [expr]) -> withDefaultInfo $ S.Go expr
   (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
   (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
