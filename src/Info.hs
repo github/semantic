@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
-module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost, SourceSpan(..), SourcePos(..), SourceSpans(..), SourceText(..), sourceText) where
+module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost, sourceSpan, SourceSpan(..), SourcePos(..), SourceSpans(..), SourceText(..), sourceText) where
 
 import Data.Functor.Listable
 import Data.Record
@@ -29,6 +29,9 @@ setCategory = setField
 
 cost :: HasField fields Cost => Record fields -> Cost
 cost = getField
+
+sourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan
+sourceSpan = getField
 
 sourceText :: HasField fields SourceText => Record fields -> SourceText
 sourceText = getField
