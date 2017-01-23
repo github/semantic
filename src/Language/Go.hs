@@ -98,13 +98,11 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
               idList' = (\id -> withRanges range VarDecl [id] (S.VarDecl id (Just ty))) <$> ids
           in Just $ withRanges range ExpressionStatements idList' (S.Indexed idList')
         [idList, expressionList] | Info.category (extract expressionList) == Other "expression_list" ->
-          let assignments' = zipWith (\id expr ->
-                withCategory VarAssignment $ S.VarAssignment id expr)
+          let assignments' = zipWith ((withCategory VarAssignment .) . S.VarAssignment)
                 (toList $ unwrap idList) (toList $ unwrap expressionList)
           in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
         [idList, _, expressionList] ->
-          let assignments' = zipWith (\id expr ->
-                withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
+          let assignments' = zipWith ((withCategory VarAssignment .) . S.VarAssignment) (toList $ unwrap idList) (toList $ unwrap expressionList)
           in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
         [idList] -> withDefaultInfo (S.Indexed [idList])
         _ -> Nothing
