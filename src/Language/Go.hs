@@ -42,7 +42,11 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (SubscriptAccess, _) -> withDefaultInfo $ toSubscriptAccess children
   (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
   (Slice, _) -> sliceToSubscriptAccess children
-  (Other "composite_literal", _) -> toLiteral children
+  (Other "composite_literal", [ty, _]) -> case Info.category (extract ty) of
+    ArrayTy -> toImplicitArray children
+    DictionaryTy -> toMap children
+    SliceTy -> sliceToSubscriptAccess children
+    _ -> toStruct children
   (TypeAssertion, [a, b]) -> withDefaultInfo $ S.TypeAssertion a b
   (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
@@ -83,13 +87,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     toStructTy children =
       withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
 
-    toLiteral = \case
-      children@[ty, _] -> case Info.category (extract ty) of
-        ArrayTy -> toImplicitArray children
-        DictionaryTy -> toMap children
-        SliceTy -> sliceToSubscriptAccess children
-        _ -> toStruct children
-      rest -> withRanges range Error rest $ S.Error rest
     toImplicitArray = \case
       [ty, values] -> withCategory ArrayLiteral (S.Array (Just ty) (toList $ unwrap values))
       rest -> withRanges range Error rest $ S.Error rest
