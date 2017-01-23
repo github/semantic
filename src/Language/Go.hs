@@ -37,8 +37,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (Assignment, _) -> toVarAssignment children
   (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
-  (Go, _) -> withDefaultInfo $ toExpression S.Go children
-  (Defer, _) -> withDefaultInfo $ toExpression S.Defer children
+  (Go, [expr]) -> withDefaultInfo $ S.Go expr
+  (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
   (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (Slice, a : rest) -> withCategory Slice (S.SubscriptAccess a (withRanges range Element rest (S.Fixed rest)))
@@ -106,11 +106,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
         toIdent = \case
           [ident] -> ident
           rest -> withRanges range Error rest (S.Error rest)
-
-
-    toExpression f = \case
-      [expr] -> f expr
-      rest -> S.Error rest
 
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
       (clauses, blocks) ->
