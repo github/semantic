@@ -4,6 +4,7 @@ module Renderer.TOC where
 import Category as C
 import Data.Aeson
 import Data.Functor.Both hiding (fst, snd)
+import qualified Data.Functor.Both as Both
 import Data.Record
 import Diff
 import Info
@@ -74,7 +75,7 @@ data DiffInfo = LeafInfo { leafCategory :: Category, termName :: Text, sourceSpa
 
 data TOCSummary a = TOCSummary {
   patch :: Patch a,
-  parentAnnotation :: ParentInfo
+  parentInfo :: ParentInfo
 } deriving (Eq, Functor, Show, Generic)
 
 data ParentInfo = ParentInfo { parentCategory :: Category, parentTermName :: Text, parentSourceSpan :: SourceSpan }
@@ -98,23 +99,23 @@ diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> Sy
 diffTOC blobs diff = tocToJSONSummaries =<< diffToTOCSummaries (source <$> blobs) diff
   where
     tocToJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
-    tocToJSONSummaries TOCSummary{..} = summaries parentAnnotation patch
+    tocToJSONSummaries TOCSummary{..} = summaries parentInfo patch
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
       let
         -- TODO Turn this on to add annotateWithCategory back
-        -- diff' = free (Prologue.fst <$> diff)
-        -- annotateWithCategory :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
-        -- annotateWithCategory children = case (beforeTerm diff', afterTerm diff') of
-        --   (_, Just diff'') -> appendSummary (Both.snd sources) diff'' <$> children
-        --   (Just diff'', _) -> appendSummary (Both.fst sources) diff'' <$> children
-        --   (Nothing, Nothing) -> []
+        diff' = free (Prologue.fst <$> diff)
+        annotateWithCategory :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
+        annotateWithCategory children = case (beforeTerm diff', afterTerm diff') of
+          (_, Just diff'') -> appendSummary (Both.snd sources) diff'' <$> children
+          (Just diff'', _) -> appendSummary (Both.fst sources) diff'' <$> children
+          (Nothing, Nothing) -> []
       in case diff of
         -- Skip comments and leaves since they don't have any changes
         -- (Free (_ :< syntax)) -> annotateWithCategory (toList syntax >>= snd)
-        (Free (_ :< syntax)) -> toList syntax >>= snd
-        (Pure patch) -> [ TOCSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) [] ]
+        (Free (_ :< syntax)) -> annotateWithCategory (toList syntax >>= snd)
+        (Pure patch) -> [ TOCSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) None ]
       where
         (beforeSource, afterSource) = runJoin sources
 
@@ -159,9 +160,27 @@ termToDiffInfo blob term = case unwrap term of
         termToDiffInfo' = termToDiffInfo blob
         toLeafInfo term = LeafInfo (category $ extract term) (toTermName' term) (getField $ extract term)
 
-toTermName :: forall leaf fields. (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source = termNameFromSource
   where
     termNameFromSource term = termNameFromRange (range term)
     termNameFromRange range = toText $ Source.slice range source
     range = characterRange . extract
+
+appendSummary :: DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> TOCSummary DiffInfo -> TOCSummary DiffInfo
+appendSummary source term summary =
+  case (parentInfo summary, parent term) of
+    (None, Parent _) ->
+      summary { parentInfo = ParentInfo (category (extract term)) (toTermName source term) (Info.sourceSpan (extract term)) }
+    (_, Parent _) -> summary
+    (_, NotParent _) -> summary
+    -- TODO: Add IsExpression?
+
+data IsParent a = Parent a | NotParent a
+
+parent :: ComonadCofree (Syntax t) w => w a -> IsParent (w a)
+parent term = isParent (unwrap term) term
+  where isParent = \case
+          S.Method{} -> Parent
+          S.Function{} -> Parent
+          _ -> NotParent
