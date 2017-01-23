@@ -68,7 +68,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     withDefaultInfo $ S.Leaf $ toText source
   (QualifiedIdentifier, _) ->
     withDefaultInfo $ S.Leaf $ toText source
-  (Break, _) -> toBreak children
+  (Break, [label]) -> withDefaultInfo $ S.Break (Just label)
+  (Break, []) -> withDefaultInfo $ S.Break Nothing
   (Continue, _) -> toContinue children
   (Pair, [key, value]) -> withDefaultInfo $ S.Pair key value
   (Method, [params, name, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
@@ -78,10 +79,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     [] -> S.Leaf $ toText source
     _ -> S.Indexed children
   where
-    toBreak = \case
-      [label] -> withDefaultInfo (S.Break (Just label))
-      [] -> withDefaultInfo (S.Break Nothing)
-      rest -> withCategory Error (S.Error rest)
     toContinue = \case
       [label] -> withDefaultInfo (S.Continue (Just label))
       [] -> withDefaultInfo (S.Continue Nothing)
