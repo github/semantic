@@ -198,4 +198,5 @@ categoryForGoName = \case
   "continue_statement" -> Continue
   "rune_literal" -> RuneLiteral
   "method_declaration" -> Method
+  "import_spec" -> Import
   s -> Other (toS s)
