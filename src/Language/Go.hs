@@ -17,9 +17,6 @@ termAssignment
   -> Maybe (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
 termAssignment source (range :. category :. sourceSpan :. Nil) children = case (category, children) of
   (Return, _) -> withDefaultInfo $ S.Return children
-  (Module, _) | (comments, packageName : rest) <- Prologue.break ((== Other "package_clause") . Info.category . extract) children
-              , S.Indexed [id] <- unwrap packageName
-              -> Just $ withCategory Program (S.Indexed (comments <> [withCategory Module (S.Module id rest)]))
   (Import, [importName]) -> withDefaultInfo $ S.Import importName []
   (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
@@ -134,7 +131,8 @@ categoryForGoName = \case
   "var_spec" -> VarAssignment
   "const_spec" -> VarAssignment
   "assignment_statement" -> Assignment
-  "source_file" -> Module
+  "source_file" -> Program
+  "package_clause" -> Module
   "if_statement" -> If
   "for_statement" -> For
   "expression_switch_statement" -> Switch
