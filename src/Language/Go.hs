@@ -21,6 +21,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
+  (Other "expression_list", [child]) -> Just child
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
   (StructTy, _) -> withDefaultInfo (S.Ty children)
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
