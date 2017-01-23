@@ -25,9 +25,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
         _ -> withRanges range Error children (S.Error children)
     _ -> withRanges range Error children (S.Error children)
   (Other "import_declaration", _) -> toImports children
-  (Function, _) -> withDefaultInfo $ case children of
-    [id, params, block] -> S.Function id (toList $ unwrap params) (toList $ unwrap block)
-    rest -> S.Error rest
+  (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
