@@ -26,7 +26,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
-  (StructTy, _) -> toStructTy children
+  (StructTy, _) -> withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
                         -> Just $ withCategory FieldDecl (S.FieldDecl ident Nothing Nothing)
   (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
@@ -88,9 +88,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   _ -> Nothing
   where
-    toStructTy children =
-      withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
-
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
       (clauses, blocks) ->
         let clauses' = withRanges range ExpressionStatements clauses (S.Indexed clauses)
