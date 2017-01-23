@@ -20,11 +20,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (Module, _) | (comments, packageName : rest) <- Prologue.break ((== Other "package_clause") . Info.category . extract) children
               , S.Indexed [id] <- unwrap packageName
               -> withCategory Program (S.Indexed (comments <> [withCategory Module (S.Module id rest)]))
-  (Other "import_declaration", _) -> withDefaultInfo $ S.Indexed (children >>= toImport)
-    where
-      toImport i = case toList (unwrap i) of
-        [importName] -> [ withCategory Import (S.Import importName []) ]
-        rest -> rest
   (Import, [importName]) -> withDefaultInfo $ S.Import importName []
   (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
