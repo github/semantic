@@ -61,13 +61,11 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (TypeAssertion, [a, b]) -> withDefaultInfo $ S.TypeAssertion a b
   (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
-  (Other "var_declaration", _) -> toVarDecls children
   (VarAssignment, _) | Just assignment <- toVarAssignment children -> Just assignment
   (VarDecl, _) | Just assignment <- toVarAssignment children -> Just assignment
   (If, _) -> toIfStatement children
   (FunctionCall, [id]) -> withDefaultInfo $ S.FunctionCall id []
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
-  (Other "const_declaration", _) -> toConsts children
   (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
                                          -> withDefaultInfo $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
   (PointerTy, [ty]) -> withDefaultInfo $ S.Ty ty
@@ -93,10 +91,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
         let clauses' = withRanges range ExpressionStatements clauses (S.Indexed clauses)
             blocks' = foldMap (toList . unwrap) blocks
         in withDefaultInfo (S.If clauses' blocks')
-
-    toVarDecls children = withDefaultInfo (S.Indexed children)
-
-    toConsts constSpecs = withDefaultInfo (S.Indexed constSpecs)
 
     toVarAssignment = \case
         [idList, ty] | Info.category (extract ty) == Identifier ->
