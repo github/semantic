@@ -41,7 +41,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
       ([], cases) -> S.Switch Nothing cases
       (clauses, cases) -> S.Switch (Just (withCategory ExpressionStatements (S.Indexed clauses))) cases
   (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
-  (Assignment, _) -> toVarAssignment children
+  (Assignment, _) | Just assignment <- toVarAssignment children -> assignment
   (Select, _) -> withDefaultInfo $ S.Select (toCommunicationCase =<< children)
     where toCommunicationCase = toList . unwrap
   (Go, [expr]) -> withDefaultInfo $ S.Go expr
@@ -62,8 +62,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
   (Other "var_declaration", _) -> toVarDecls children
-  (VarAssignment, _) -> toVarAssignment children
-  (VarDecl, _) -> toVarAssignment children
+  (VarAssignment, _) | Just assignment <- toVarAssignment children -> assignment
+  (VarDecl, _) | Just assignment <- toVarAssignment children -> assignment
   (If, _) -> toIfStatement children
   (FunctionCall, [id]) -> withDefaultInfo $ S.FunctionCall id []
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
@@ -112,18 +112,18 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
         [idList, ty] | Info.category (extract ty) == Identifier ->
           let ids = toList (unwrap idList)
               idList' = (\id -> withRanges range VarDecl [id] (S.VarDecl id (Just ty))) <$> ids
-          in withRanges range ExpressionStatements idList' (S.Indexed idList')
+          in Just $ withRanges range ExpressionStatements idList' (S.Indexed idList')
         [idList, expressionList] | Info.category (extract expressionList) == Other "expression_list" ->
           let assignments' = zipWith (\id expr ->
                 withCategory VarAssignment $ S.VarAssignment id expr)
                 (toList $ unwrap idList) (toList $ unwrap expressionList)
-          in withRanges range ExpressionStatements assignments' (S.Indexed assignments')
+          in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
         [idList, _, expressionList] ->
           let assignments' = zipWith (\id expr ->
                 withCategory VarAssignment $ S.VarAssignment id expr) (toList $ unwrap idList) (toList $ unwrap expressionList)
-          in withRanges range ExpressionStatements assignments' (S.Indexed assignments')
-        [idList] -> withDefaultInfo (S.Indexed [idList])
-        rest -> withRanges range Error rest (S.Error rest)
+          in Just $ withRanges range ExpressionStatements assignments' (S.Indexed assignments')
+        [idList] -> Just $ withDefaultInfo (S.Indexed [idList])
+        _ -> Nothing
 
     withRanges originalRange category' terms syntax =
       let ranges' = getField . extract <$> terms
