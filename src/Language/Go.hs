@@ -42,11 +42,15 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (SubscriptAccess, _) -> withDefaultInfo $ toSubscriptAccess children
   (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
   (Slice, _) -> sliceToSubscriptAccess children
-  (Other "composite_literal", [ty, values]) -> case Info.category (extract ty) of
-    ArrayTy -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
-    DictionaryTy -> withDefaultInfo $ S.Object (Just ty) (toList (unwrap values))
-    SliceTy -> sliceToSubscriptAccess children
-    _ -> toStruct children
+  (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
+                                            -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
+                                            | DictionaryTy <- Info.category (extract ty)
+                                            -> withDefaultInfo $ S.Object (Just ty) (toList (unwrap values))
+                                            | SliceTy <- Info.category (extract ty)
+                                            -> sliceToSubscriptAccess children
+  (Other "composite_literal", []) -> withDefaultInfo $ S.Struct Nothing []
+  (Other "composite_literal", [ty]) -> withDefaultInfo $ S.Struct (Just ty) []
+  (Other "composite_literal", [ty, values]) -> withDefaultInfo $ S.Struct (Just ty) (toList (unwrap values))
   (TypeAssertion, [a, b]) -> withDefaultInfo $ S.TypeAssertion a b
   (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
@@ -87,11 +91,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     toStructTy children =
       withDefaultInfo (S.Ty (withRanges range FieldDeclarations children (S.Indexed children)))
 
-    toStruct = \case
-      [] -> withCategory Struct (S.Struct Nothing [])
-      [ty] -> withCategory Struct (S.Struct (Just ty) [])
-      [ty, values] -> withCategory Struct (S.Struct (Just ty) (toList $ unwrap values))
-      rest -> withRanges range Error rest $ S.Error rest
     toFieldDecl = \case
       [idList, ty] ->
         case Info.category (extract ty) of
