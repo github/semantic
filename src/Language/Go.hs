@@ -12,69 +12,63 @@ termAssignment
   :: Source Char -- ^ The source of the term.
   -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
-  -> Maybe (SyntaxTerm Text '[Range, Category, SourceSpan]) -- ^ The resulting term, in IO.
-termAssignment source (range :. category :. sourceSpan :. Nil) children = case (category, children) of
-  (Import, [importName]) -> withDefaultInfo $ S.Import importName []
-  (Function, [id, params, block]) -> withDefaultInfo $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
-  (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
-  (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
-  (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
-  (Other "expression_list", [child]) -> Just child
-  (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
-  (StructTy, _) -> withDefaultInfo (S.Ty children)
+  -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+termAssignment source (_ :. category :. _ :. Nil) children = case (category, children) of
+  (Import, [importName]) -> Just $ S.Import importName []
+  (Function, [id, params, block]) -> Just $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
+  (For, [body]) | Other "block" <- Info.category (extract body) -> Just $ S.For [] (toList (unwrap body))
+  (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> Just $ S.For (toList (unwrap forClause)) (toList (unwrap body))
+  (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> Just $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
+  (TypeDecl, [identifier, ty]) -> Just $ S.TypeDecl identifier ty
+  (StructTy, _) -> Just (S.Ty children)
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
-                        -> withDefaultInfo (S.FieldDecl ident Nothing Nothing)
+                        -> Just (S.FieldDecl ident Nothing Nothing)
   (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
-                            -> withDefaultInfo $ case Info.category (extract ty) of
+                            -> Just $ case Info.category (extract ty) of
                                 StringLiteral -> S.FieldDecl ident Nothing (Just ty)
                                 _ -> S.FieldDecl ident (Just ty) Nothing
   (FieldDecl, [idList, ty, tag]) | [ident] <- toList (unwrap idList)
-                                 -> withDefaultInfo (S.FieldDecl ident (Just ty) (Just tag))
-  (ParameterDecl, param : ty) -> withDefaultInfo $ S.ParameterDecl (listToMaybe ty) param
-  (Assignment, [identifier, expression]) -> withDefaultInfo $ S.VarAssignment identifier expression
-  (Select, _) -> withDefaultInfo $ S.Select (children >>= toList . unwrap)
-  (Go, [expr]) -> withDefaultInfo $ S.Go expr
-  (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
-  (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
-  (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
-  (Slice, [a, rest]) -> withDefaultInfo $ S.SubscriptAccess a rest
+                                 -> Just (S.FieldDecl ident (Just ty) (Just tag))
+  (ParameterDecl, param : ty) -> Just $ S.ParameterDecl (listToMaybe ty) param
+  (Assignment, [identifier, expression]) -> Just $ S.VarAssignment identifier expression
+  (Select, _) -> Just $ S.Select (children >>= toList . unwrap)
+  (Go, [expr]) -> Just $ S.Go expr
+  (Defer, [expr]) -> Just $ S.Defer expr
+  (SubscriptAccess, [a, b]) -> Just $ S.SubscriptAccess a b
+  (IndexExpression, [a, b]) -> Just $ S.SubscriptAccess a b
+  (Slice, [a, rest]) -> Just $ S.SubscriptAccess a rest
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
-                                            -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
+                                            -> Just $ S.Array (Just ty) (toList (unwrap values))
                                             | DictionaryTy <- Info.category (extract ty)
-                                            -> withDefaultInfo $ S.Object (Just ty) (toList (unwrap values))
+                                            -> Just $ S.Object (Just ty) (toList (unwrap values))
                                             | SliceTy <- Info.category (extract ty)
-                                            -> withDefaultInfo $ S.SubscriptAccess ty values
-  (Other "composite_literal", []) -> withDefaultInfo $ S.Struct Nothing []
-  (Other "composite_literal", [ty]) -> withDefaultInfo $ S.Struct (Just ty) []
-  (Other "composite_literal", [ty, values]) -> withDefaultInfo $ S.Struct (Just ty) (toList (unwrap values))
-  (TypeAssertion, [a, b]) -> withDefaultInfo $ S.TypeAssertion a b
-  (TypeConversion, [a, b]) -> withDefaultInfo $ S.TypeConversion a b
+                                            -> Just $ S.SubscriptAccess ty values
+  (Other "composite_literal", []) -> Just $ S.Struct Nothing []
+  (Other "composite_literal", [ty]) -> Just $ S.Struct (Just ty) []
+  (Other "composite_literal", [ty, values]) -> Just $ S.Struct (Just ty) (toList (unwrap values))
+  (TypeAssertion, [a, b]) -> Just $ S.TypeAssertion a b
+  (TypeConversion, [a, b]) -> Just $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
-  (VarAssignment, [identifier, expression]) -> withDefaultInfo $ S.VarAssignment identifier expression
-  (VarDecl, [idList, ty]) | Identifier <- Info.category (extract ty) -> withDefaultInfo $ S.VarDecl idList (Just ty)
-  (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
+  (VarAssignment, [identifier, expression]) -> Just $ S.VarAssignment identifier expression
+  (VarDecl, [idList, ty]) | Identifier <- Info.category (extract ty) -> Just $ S.VarDecl idList (Just ty)
+  (FunctionCall, id : rest) -> Just $ S.FunctionCall id rest
   (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
-                                         -> withDefaultInfo $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
-  (PointerTy, _) -> withDefaultInfo $ S.Ty children
-  (ChannelTy, _) -> withDefaultInfo $ S.Ty children
-  (Send, [channel, expr]) -> withDefaultInfo $ S.Send channel expr
-  (Operator, _) -> withDefaultInfo $ S.Operator children
-  (FunctionTy, _) -> withDefaultInfo $ S.Ty children
+                                         -> Just $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
+  (PointerTy, _) -> Just $ S.Ty children
+  (ChannelTy, _) -> Just $ S.Ty children
+  (Send, [channel, expr]) -> Just $ S.Send channel expr
+  (Operator, _) -> Just $ S.Operator children
+  (FunctionTy, _) -> Just $ S.Ty children
   (IncrementStatement, _) ->
-    withDefaultInfo $ S.Leaf $ toText source
+    Just $ S.Leaf $ toText source
   (DecrementStatement, _) ->
-    withDefaultInfo $ S.Leaf $ toText source
+    Just $ S.Leaf $ toText source
   (QualifiedIdentifier, _) ->
-    withDefaultInfo $ S.Leaf $ toText source
-  (Method, [params, name, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
-  (Method, [params, name, outParams, fun]) -> withDefaultInfo (S.Method name Nothing (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
-  (Method, [params, name, outParams, ty, fun]) -> withDefaultInfo (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
+    Just $ S.Leaf $ toText source
+  (Method, [params, name, fun]) -> Just (S.Method name Nothing (toList (unwrap params)) (toList (unwrap fun)))
+  (Method, [params, name, outParams, fun]) -> Just (S.Method name Nothing (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
+  (Method, [params, name, outParams, ty, fun]) -> Just (S.Method name (Just ty) (toList (unwrap params) <> toList (unwrap outParams)) (toList (unwrap fun)))
   _ -> Nothing
-  where
-    withCategory category syntax =
-      cofree ((range :. category :. sourceSpan :. Nil) :< syntax)
-
-    withDefaultInfo = Just . withCategory category
 
 categoryForGoName :: Text -> Category
 categoryForGoName = \case
