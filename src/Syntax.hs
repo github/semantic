@@ -45,7 +45,7 @@ data Syntax a f
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
-  | Switch { switchExpr :: (Maybe f), cases :: [f] }
+  | Switch { switchExpr :: Maybe f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
   -- | A default case in a switch statement.
   | DefaultCase [f]
@@ -101,7 +101,7 @@ data Syntax a f
   -- | A field declaration with an optional type, and an optional tag.
   | FieldDecl f (Maybe f) (Maybe f)
   -- | A type.
-  | Ty f
+  | Ty [f]
   -- | A send statement has a channel and an expression in Go.
   | Send f f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, ToJSON)
@@ -161,7 +161,7 @@ instance Listable2 Syntax where
     \/ liftCons2 (liftTiers recur) recur ParameterDecl
     \/ liftCons2 recur recur TypeDecl
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FieldDecl
-    \/ liftCons1 recur Ty
+    \/ liftCons1 (liftTiers recur) Ty
     \/ liftCons2 recur recur Send
     \/ liftCons1 (liftTiers recur) DefaultCase
 

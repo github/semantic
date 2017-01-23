@@ -26,7 +26,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
   (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
-  (StructTy, _) -> withDefaultInfo (S.Ty (withRanges range FieldDeclarations (S.Indexed children)))
+  (StructTy, _) -> withDefaultInfo (S.Ty children)
   (FieldDecl, [idList]) | [ident] <- toList (unwrap idList)
                         -> withDefaultInfo (S.FieldDecl ident Nothing Nothing)
   (FieldDecl, [idList, ty]) | [ident] <- toList (unwrap idList)
@@ -48,7 +48,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (Defer, [expr]) -> withDefaultInfo $ S.Defer expr
   (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
-  (Slice, a : rest) -> Just $ withCategory Slice (S.SubscriptAccess a (withRanges range Element (S.Fixed rest)))
+  (Slice, a : rest) -> withDefaultInfo (S.SubscriptAccess a (withRanges range Element (S.Fixed rest)))
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
                                             | DictionaryTy <- Info.category (extract ty)
@@ -68,13 +68,11 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = case (
   (FunctionCall, id : rest) -> withDefaultInfo $ S.FunctionCall id rest
   (AnonymousFunction, [params, _, body]) | [params'] <- toList (unwrap params)
                                          -> withDefaultInfo $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
-  (PointerTy, [ty]) -> withDefaultInfo $ S.Ty ty
-  (ChannelTy, [ty]) -> withDefaultInfo $ S.Ty ty
+  (PointerTy, _) -> withDefaultInfo $ S.Ty children
+  (ChannelTy, _) -> withDefaultInfo $ S.Ty children
   (Send, [channel, expr]) -> withDefaultInfo $ S.Send channel expr
   (Operator, _) -> withDefaultInfo $ S.Operator children
-  (FunctionTy, _) ->
-    let params = withRanges range Params $ S.Indexed children
-    in withDefaultInfo $ S.Ty params
+  (FunctionTy, _) -> withDefaultInfo $ S.Ty children
   (IncrementStatement, _) ->
     withDefaultInfo $ S.Leaf $ toText source
   (DecrementStatement, _) ->
