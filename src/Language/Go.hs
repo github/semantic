@@ -25,7 +25,7 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
   (For, [body]) | Other "block" <- Info.category (extract body) -> withDefaultInfo $ S.For [] (toList (unwrap body))
   (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> withDefaultInfo $ S.For (toList (unwrap forClause)) (toList (unwrap body))
   (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> withDefaultInfo $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
-  (TypeDecl, _) -> toTypeDecl children
+  (TypeDecl, [identifier, ty]) -> withDefaultInfo $ S.TypeDecl identifier ty
   (StructTy, _) -> toStructTy children
   (FieldDecl, _) -> toFieldDecl children
   (Switch, _) ->
@@ -112,10 +112,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
         let clauses' = withRanges range ExpressionStatements clauses (S.Indexed clauses)
             blocks' = foldMap (toList . unwrap) blocks
         in withDefaultInfo (S.If clauses' blocks')
-
-    toTypeDecl = \case
-      [identifier, ty] -> withDefaultInfo $ S.TypeDecl identifier ty
-      rest -> withRanges range Error rest $ S.Error rest
 
     toImports imports =
       withDefaultInfo $ S.Indexed (imports >>= toImport)
