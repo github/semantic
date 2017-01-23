@@ -231,7 +231,7 @@ toTermName source term = case unwrap term of
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   S.Case expr _ -> termNameFromSource expr
-  S.Switch expr _ -> maybe "" toTermName' expr
+  S.Switch exprs _ -> maybe "" toTermName' (fmap snd (unsnoc exprs))
   S.Ternary expr _ -> toTermName' expr
   S.OperatorAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term

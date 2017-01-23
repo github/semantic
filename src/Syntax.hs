@@ -45,7 +45,7 @@ data Syntax a f
   -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
   -- | e.g. in Javascript x["y"] represents a subscript access syntax.
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
-  | Switch { switchExpr :: Maybe f, cases :: [f] }
+  | Switch { switchExpr :: [f], cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: [f] }
   -- | A default case in a switch statement.
   | DefaultCase [f]
