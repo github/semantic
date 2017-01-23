@@ -49,6 +49,7 @@ concatOutputs list | isSummary list = toS . encodingToLazyByteString . toEncodin
   where
     concatSummaries :: [Output] -> Map Text (Map Text [Value])
     concatSummaries (SummaryOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
+    concatSummaries (TOCOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
     concatSummaries _ = mempty
 concatOutputs list | isText list = T.intercalate "\n" (toText <$> list)
 concatOutputs _ = mempty
@@ -59,6 +60,7 @@ isJSON _ = False
 
 isSummary :: [Output] -> Bool
 isSummary (SummaryOutput _ : _) = True
+isSummary (TOCOutput _ : _) = True
 isSummary _ = False
 
 isText :: [Output] -> Bool
