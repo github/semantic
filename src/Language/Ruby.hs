@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs #-}
 module Language.Ruby where
 
-import Data.Record
 import Data.List (partition)
 import Info
 import Prologue
@@ -12,10 +11,10 @@ import Term
 
 termAssignment
   :: Source Char -- ^ The source of the term.
-  -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
+  -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termAssignment _ (_ :. category :. _ :. Nil) children
+termAssignment _ category children
   = case (category, children) of
     (ArgumentPair, [ k, v ] ) -> Just $ S.Pair k v
     (KeywordParameter, [ k, v ] ) -> Just $ S.Pair k v

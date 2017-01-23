@@ -6,14 +6,13 @@ import Info
 import Source
 import Term
 import qualified Syntax as S
-import Data.Record
 
 termAssignment
   :: Source Char -- ^ The source of the term.
-  -> Record '[Range, Category, SourceSpan] -- ^ The proposed annotation for the term.
+  -> Category -- ^ The category for the term.
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termAssignment source (_ :. category :. _ :. Nil) children = case (category, children) of
+termAssignment source category children = case (category, children) of
   (Import, [importName]) -> Just $ S.Import importName []
   (Function, [id, params, block]) -> Just $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> Just $ S.For [] (toList (unwrap body))

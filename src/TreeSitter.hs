@@ -70,10 +70,10 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
 
 assignTerm :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> IO (SyntaxTerm Text '[ Range, Category, SourceSpan ])
 assignTerm language source annotation children allChildren =
-  cofree . (annotation :<) <$> case assignTermByLanguage language source annotation children of
+  cofree . (annotation :<) <$> case assignTermByLanguage language source (category annotation) children of
     Just a -> pure a
     _ -> defaultTermAssignment source (category annotation) children allChildren
-  where assignTermByLanguage :: Language -> Source Char -> Record '[Range, Category, SourceSpan] -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
+  where assignTermByLanguage :: Language -> Source Char -> Category -> [ SyntaxTerm Text '[ Range, Category, SourceSpan ] ] -> Maybe (S.Syntax Text (SyntaxTerm Text '[ Range, Category, SourceSpan ]))
         assignTermByLanguage = \case
           JavaScript -> JS.termAssignment
           C -> C.termAssignment
