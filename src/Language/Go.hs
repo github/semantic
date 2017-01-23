@@ -39,8 +39,8 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
     where toCommunicationCase = toList . unwrap
   (Go, _) -> withDefaultInfo $ toExpression S.Go children
   (Defer, _) -> withDefaultInfo $ toExpression S.Defer children
-  (SubscriptAccess, _) -> withDefaultInfo $ toSubscriptAccess children
-  (IndexExpression, _) -> withDefaultInfo $ toSubscriptAccess children
+  (SubscriptAccess, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
+  (IndexExpression, [a, b]) -> withDefaultInfo $ S.SubscriptAccess a b
   (Slice, a : rest) -> withCategory Slice (S.SubscriptAccess a (withRanges range Element rest (S.Fixed rest)))
   (Other "composite_literal", [ty, values]) | ArrayTy <- Info.category (extract ty)
                                             -> withDefaultInfo $ S.Array (Just ty) (toList (unwrap values))
@@ -110,9 +110,6 @@ termAssignment source (range :. category :. sourceSpan :. Nil) children = Just $
 
     toExpression f = \case
       [expr] -> f expr
-      rest -> S.Error rest
-    toSubscriptAccess = \case
-      [a, b] -> S.SubscriptAccess a b
       rest -> S.Error rest
 
     toIfStatement children = case Prologue.break ((Other "block" ==) . Info.category . extract) children of
