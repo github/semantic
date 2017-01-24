@@ -127,14 +127,9 @@ toTOCSummaries patch = case afterOrBefore patch of
       BranchInfo{..} -> branches >>= toTOCSummaries'
       HideInfo{} -> []
       LeafInfo{..} -> pure . TOCSummary patch $ case leafCategory of
-        C.Function -> Summarizable leafCategory termName leafSourceSpan patchType
-        C.Method -> Summarizable leafCategory termName leafSourceSpan patchType
+        C.Function -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
+        C.Method -> Summarizable leafCategory termName leafSourceSpan (patchType patch)
         _ -> NotSummarizable
-        where
-          patchType = case patch of
-            Replace{} -> "replaced"
-            Insert{} -> "added"
-            Delete{} -> "deleted"
 
 mapToInSummarizable :: DefaultFields fields => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
 mapToInSummarizable sources diff children = case (beforeTerm diff, afterTerm diff) of

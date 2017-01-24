@@ -12,6 +12,7 @@ module Patch
 , maybeFst
 , maybeSnd
 , mapPatch
+, patchType
 ) where
 
 import Data.Functor.Listable
@@ -78,6 +79,12 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
+
+patchType :: Patch a -> Text
+patchType = \case
+  Replace{} -> "replaced"
+  Insert{} -> "added"
+  Delete{} -> "deleted"
 
 -- Instances
 
