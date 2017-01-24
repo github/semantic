@@ -60,8 +60,8 @@ data JSONSummary = JSONSummary { info :: Summarizable }
 
 instance ToJSON JSONSummary where
   toJSON JSONSummary{..} = object $ case info of
-    InSummarizable{..} -> [ "changeType" .= ("modified" :: Text), "category" .= (show parentCategory :: Text), "term" .= parentTermName, "sourceSpan" .= parentSourceSpan ]
-    Summarizable{..} -> [ "changeType" .= summarizableChangeType, "category" .= (show summarizableCategory :: Text), "term" .= summarizableTermName, "sourceSpan" .= summarizableSourceSpan ]
+    InSummarizable{..} -> [ "changeType" .= ("modified" :: Text), "category" .= (show parentCategory :: Text), "term" .= parentTermName, "span" .= parentSourceSpan ]
+    Summarizable{..} -> [ "changeType" .= summarizableChangeType, "category" .= (show summarizableCategory :: Text), "term" .= summarizableTermName, "span" .= summarizableSourceSpan ]
     NotSummarizable -> panic "NotSummarizable should have been pruned"
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
