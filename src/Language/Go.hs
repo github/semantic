@@ -13,6 +13,7 @@ termAssignment
   -> [ SyntaxTerm Text '[Range, Category, SourceSpan] ] -- ^ The child nodes of the term.
   -> Maybe (S.Syntax Text (SyntaxTerm Text '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termAssignment source category children = case (category, children) of
+  (Module, [moduleName]) -> Just $ S.Module moduleName []
   (Import, [importName]) -> Just $ S.Import importName []
   (Function, [id, params, block]) -> Just $ S.Function id (toList $ unwrap params) (toList $ unwrap block)
   (For, [body]) | Other "block" <- Info.category (extract body) -> Just $ S.For [] (toList (unwrap body))
