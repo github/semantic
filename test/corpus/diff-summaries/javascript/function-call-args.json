@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index e69de29..699333d 100644",
+        "index e69de29b..699333de 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -0,0 +1 @@",
         "+someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5d5d40b2fa515dfcb7494d9b83f22687c56de0f5..d2a8bcf4eb5c5193cb358f09a81b0239be2a84ad"
+    "shas": "ff5044f4617b79b896e8da9c860b589d4022aa5b..134a719c5ccc94c9a8583a521e8d4b4666ede5b1"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index 699333d..3f4ee6e 100644",
+        "index 699333de..3f4ee6ef 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d2a8bcf4eb5c5193cb358f09a81b0239be2a84ad..539cee544c8600977bd76181a692ef4e27c4b759"
+    "shas": "134a719c5ccc94c9a8583a521e8d4b4666ede5b1..3ec69cfc69155ac3e026b36ac8a41d575b4dc044"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-insert-test",
@@ -202,7 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) method call"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) function call"
                 },
                 {
                     "span": {
@@ -267,7 +267,7 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index 3f4ee6e..dc419cb 100644",
+        "index 3f4ee6ef..dc419cba 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -1,3 +1,3 @@",
@@ -277,7 +277,7 @@
         " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "539cee544c8600977bd76181a692ef4e27c4b759..f808e14f78dbe08885649be38dff25564f90fd98"
+    "shas": "3ec69cfc69155ac3e026b36ac8a41d575b4dc044..892d8ea0f7fe8285bae3236b781249c94c60ec84"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-test",
@@ -390,7 +390,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) method call"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) function call"
                 },
                 {
                     "span": {
@@ -455,7 +455,7 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index dc419cb..3f4ee6e 100644",
+        "index dc419cba..3f4ee6ef 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -1,3 +1,3 @@",
@@ -465,7 +465,7 @@
         " someFunction(1, \"string\", function(a,b) { console.log(a); return b; }, true)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f808e14f78dbe08885649be38dff25564f90fd98..6df8cc03d89ad9408f10b3e84a8168891e16c824"
+    "shas": "892d8ea0f7fe8285bae3236b781249c94c60ec84..09414b2a48c0168304c23b6878394c51ce959392"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
@@ -526,7 +526,7 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index 3f4ee6e..cae967b 100644",
+        "index 3f4ee6ef..cae967b6 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -1,3 +1,2 @@",
@@ -536,7 +536,7 @@
         "+someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6df8cc03d89ad9408f10b3e84a8168891e16c824..8fe5a2260c0258b29e266f904dcdb1dbe02d4c10"
+    "shas": "09414b2a48c0168304c23b6878394c51ce959392..0020b036b7829f6ca7ba7f32e211439f74b73d63"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-test",
@@ -567,7 +567,7 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index cae967b..0d19573 100644",
+        "index cae967b6..0d19573d 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -1,2 +1 @@",
@@ -575,7 +575,7 @@
         " someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8fe5a2260c0258b29e266f904dcdb1dbe02d4c10..657ddea03b3413ea6f2d4e8546403ec115769828"
+    "shas": "0020b036b7829f6ca7ba7f32e211439f74b73d63..550eba6d0f7ad10f05f0fbcf145ad4c69fb98579"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-rest-test",
@@ -606,12 +606,12 @@
     ],
     "patch": [
         "diff --git a/function-call-args.js b/function-call-args.js",
-        "index 0d19573..e69de29 100644",
+        "index 0d19573d..e69de29b 100644",
         "--- a/function-call-args.js",
         "+++ b/function-call-args.js",
         "@@ -1 +0,0 @@",
         "-someFunction(1, \"otherString\", function(b,c) { console.log(b); return c; }, false)"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "657ddea03b3413ea6f2d4e8546403ec115769828..b1ed87edc6bf561edc524058ab781a95970a3258"
+    "shas": "550eba6d0f7ad10f05f0fbcf145ad4c69fb98579..bc8f6203c7c5033d706c0155313d250aff41b6ce"
 }]

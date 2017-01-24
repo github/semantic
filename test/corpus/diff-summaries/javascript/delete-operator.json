@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index e69de29..c83346d 100644",
+        "index e69de29b..c83346db 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -0,0 +1 @@",
         "+delete thing['prop'];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b5645de0a9c0002d8f44d302c200dd88ff113f52..d1aaae4cff971b6bd6647c77427eab5789728dea"
+    "shas": "40c56c88e1737aa2249e65bf6883ae636953376f..ee79dec332e4b19b503a3ffb045b1a62a316b947"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index c83346d..7c8b990 100644",
+        "index c83346db..7c8b9908 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " delete thing['prop'];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d1aaae4cff971b6bd6647c77427eab5789728dea..6444b777c04540c4e0229617aaadcf274dbe092f"
+    "shas": "ee79dec332e4b19b503a3ffb045b1a62a316b947..a6f1cfe9edeaf12c99653aeaf65488509b500b4b"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index 7c8b990..f506e36 100644",
+        "index 7c8b9908..f506e360 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " delete thing['prop'];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6444b777c04540c4e0229617aaadcf274dbe092f..ce69f237ff3cf767d8814435ffa957dadfeafa37"
+    "shas": "a6f1cfe9edeaf12c99653aeaf65488509b500b4b..bc0464b08e597fe9799ba5c4dcd8790cee637929"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index f506e36..7c8b990 100644",
+        "index f506e360..7c8b9908 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " delete thing['prop'];"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ce69f237ff3cf767d8814435ffa957dadfeafa37..71f7d6db03225cbfcc31f2bbd6ab589e9183c55c"
+    "shas": "bc0464b08e597fe9799ba5c4dcd8790cee637929..c001371459eed13c17e2fde3051831a6186b887e"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index 7c8b990..2dfe079 100644",
+        "index 7c8b9908..2dfe0799 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+delete thing.prop"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "71f7d6db03225cbfcc31f2bbd6ab589e9183c55c..629c83e185f6ed3c97976cc604dfb3c5f455c11b"
+    "shas": "c001371459eed13c17e2fde3051831a6186b887e..aeacfbd49b5813111cb6d41d23e1eb0333940a73"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index 2dfe079..9d68dfb 100644",
+        "index 2dfe0799..9d68dfb8 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " delete thing.prop"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "629c83e185f6ed3c97976cc604dfb3c5f455c11b..cf1e4c5bef7af55d4866d7be93a24a523edbbf4f"
+    "shas": "aeacfbd49b5813111cb6d41d23e1eb0333940a73..8f89b423be7695216881a3cf0d40c047dc6b820a"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/delete-operator.js b/delete-operator.js",
-        "index 9d68dfb..e69de29 100644",
+        "index 9d68dfb8..e69de29b 100644",
         "--- a/delete-operator.js",
         "+++ b/delete-operator.js",
         "@@ -1 +0,0 @@",
         "-delete thing.prop"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "cf1e4c5bef7af55d4866d7be93a24a523edbbf4f..56f88d5286e94da2b11b7f6d0a35aa836d4f5921"
+    "shas": "8f89b423be7695216881a3cf0d40c047dc6b820a..f90555ef6eea69038b7aa16bd074797419738b0a"
 }]

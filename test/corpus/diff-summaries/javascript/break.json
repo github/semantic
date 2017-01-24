@@ -34,7 +34,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0e81c586bea55e0eeb46e3422b25ccba96c7d9ea..d86036d38621253021f5fde6256a16a5d58ffd49"
+    "shas": "7b8267eabe246347b009d08c9100f36a568a81a6..28130e2a01e50fed72c5d18d6ccd586431a83bfc"
 }
 ,{
     "testCaseDescription": "javascript-break-insert-test",
@@ -88,7 +88,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d86036d38621253021f5fde6256a16a5d58ffd49..c2a0cadf8477ba2c7525fba7c37923afd994ad15"
+    "shas": "28130e2a01e50fed72c5d18d6ccd586431a83bfc..317d999d5da052390013abf0f427fd789c566257"
 }
 ,{
     "testCaseDescription": "javascript-break-replacement-test",
@@ -142,7 +142,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) { continue; }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c2a0cadf8477ba2c7525fba7c37923afd994ad15..3bcd48f5d5894250de6349c4ca5272b3ae92fa6d"
+    "shas": "317d999d5da052390013abf0f427fd789c566257..9fe6a556575e0705efd0de4d67f1868e143e16d0"
 }
 ,{
     "testCaseDescription": "javascript-break-delete-replacement-test",
@@ -196,7 +196,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) { break; }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3bcd48f5d5894250de6349c4ca5272b3ae92fa6d..bbabc7d7ad65f9ab05f74f83c6e5777a3eeb4be2"
+    "shas": "9fe6a556575e0705efd0de4d67f1868e143e16d0..7ecb84d91df841eddd510ab0c991ae5ca71b69f6"
 }
 ,{
     "testCaseDescription": "javascript-break-delete-insert-test",
@@ -250,7 +250,7 @@
         "+for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "bbabc7d7ad65f9ab05f74f83c6e5777a3eeb4be2..016996f57081dda9f5b4ebdd801853944017b617"
+    "shas": "7ecb84d91df841eddd510ab0c991ae5ca71b69f6..2d0483e720373f442c34a5f9c1a097c6a318a7d8"
 }
 ,{
     "testCaseDescription": "javascript-break-teardown-test",
@@ -288,5 +288,5 @@
         "-for (i = 0; i < 10; i++) { if (i === 4) {  }; i }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "016996f57081dda9f5b4ebdd801853944017b617..7b31459c5a9378f4fe26f4e3e6d5c1fd3b6aee23"
+    "shas": "2d0483e720373f442c34a5f9c1a097c6a318a7d8..d0acf2e1ee4c3ff99054d1cd40885f62e64b87be"
 }]

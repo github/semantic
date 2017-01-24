@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "64841687a4cbcda7d1eda64e527648f5cef1bf73..b2485087ecf70a7b996361b966bdfb6373510813"
+    "shas": "f14ae58ae13b805bc8ac246575c9e8eef0d6b9ee..be1f42f939aef7d9243c040741c3c2bbd2f98edb"
 }
 ,{
     "testCaseDescription": "go-map-literals-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 's' var assignment in the main function"
                 }
             ]
         },
@@ -84,7 +99,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b2485087ecf70a7b996361b966bdfb6373510813..dd38ad1ed6fda4e26d6065861e629ba29b8dd33e"
+    "shas": "be1f42f939aef7d9243c040741c3c2bbd2f98edb..7f8f2c5e4ba194a8588bff86e59ee99554a8b81a"
 }
 ,{
     "testCaseDescription": "go-map-literals-replacement-test",
@@ -116,7 +131,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the map[string]int dictionary of the 'main' function"
+                    "summary": "Replaced the 'string' identifier with the 'int' identifier in the map[string]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -131,7 +146,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"foo\": \"bar\"' pair in the map[string]int dictionary of the 'main' function"
+                    "summary": "Added the '\"foo\": \"bar\"' pair in the map[string]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -173,7 +188,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"bye\": \"goodbye\"' pair in the map[string]int dictionary of the 'main' function"
+                    "summary": "Deleted the '\"bye\": \"goodbye\"' pair in the map[string]int composite_literal of the 'main' function"
                 }
             ]
         },
@@ -201,7 +216,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dd38ad1ed6fda4e26d6065861e629ba29b8dd33e..c4484b12af87ff7331e23808d5474b9f4534bb71"
+    "shas": "7f8f2c5e4ba194a8588bff86e59ee99554a8b81a..75e7f6d3a0cde47a44d6d3db7dedbdeaaede2437"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-replacement-test",
@@ -233,7 +248,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the map[string]string dictionary of the 'main' function"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the map[string]string composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -369,7 +384,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c4484b12af87ff7331e23808d5474b9f4534bb71..fa3a274956f58eb7630b0a1d75d0ee0566068672"
+    "shas": "75e7f6d3a0cde47a44d6d3db7dedbdeaaede2437..4fc61b092240fa2675064651318ad741e6520929"
 }
 ,{
     "testCaseDescription": "go-map-literals-delete-insert-test",
@@ -389,7 +404,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 's' var assignment in the main function"
                 }
             ]
         },
@@ -415,7 +430,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fa3a274956f58eb7630b0a1d75d0ee0566068672..6f805cd7db38b8dd4bce3f304e7e11953170db5d"
+    "shas": "4fc61b092240fa2675064651318ad741e6520929..744abd7104c4a915edb126b8b497c50622e0514b"
 }
 ,{
     "testCaseDescription": "go-map-literals-teardown-test",
@@ -430,12 +445,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -457,5 +487,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6f805cd7db38b8dd4bce3f304e7e11953170db5d..c7c9b52a2e3477a5c5970b67af95fa2a603c8359"
+    "shas": "744abd7104c4a915edb126b8b497c50622e0514b..af00b5d0e32239cad04180f3c048358c52c24564"
 }]

@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index e69de29..3c837c9 100644",
+        "index e69de29b..3c837c9a 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -0,0 +1 @@",
         "+x.someProperty;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0cbc55e481f01ab536c7832c5ebbc21d7f9e9021..9a5f4f1bbfa04d4b229b51802ca72129a31b1953"
+    "shas": "5465664fb6e49eb214afa9feb0fadd451399dad9..fbdf589ce4b68c6eb2c32f0caf1f5a98977575dd"
 }
 ,{
     "testCaseDescription": "javascript-member-access-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index 3c837c9..858131a 100644",
+        "index 3c837c9a..858131af 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " x.someProperty;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9a5f4f1bbfa04d4b229b51802ca72129a31b1953..93677ca22426294b752c658707b4052a3a3220ed"
+    "shas": "fbdf589ce4b68c6eb2c32f0caf1f5a98977575dd..4af60582c01401af8e4fb5440ebf9a27278743d3"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index 858131a..5ed8a8d 100644",
+        "index 858131af..5ed8a8d2 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " x.someProperty;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "93677ca22426294b752c658707b4052a3a3220ed..df73936014819634cde8e6741fef45116b094d93"
+    "shas": "4af60582c01401af8e4fb5440ebf9a27278743d3..d7c2b4243cc835256891d23b8ac815bf2c8100fd"
 }
 ,{
     "testCaseDescription": "javascript-member-access-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index 5ed8a8d..858131a 100644",
+        "index 5ed8a8d2..858131af 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " x.someProperty;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "df73936014819634cde8e6741fef45116b094d93..94c28d92c27008e7f21ed463e683fdfbda0b8287"
+    "shas": "d7c2b4243cc835256891d23b8ac815bf2c8100fd..fe939d7cf2c040cbe7a3c0e2ba5ce50beb5b00eb"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index 858131a..81f5f46 100644",
+        "index 858131af..81f5f468 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+x.someOtherProperty"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "94c28d92c27008e7f21ed463e683fdfbda0b8287..38ee25545f8644cee42edb45ef2f7b29b26892d5"
+    "shas": "fe939d7cf2c040cbe7a3c0e2ba5ce50beb5b00eb..5e0221213de5c8eb25ac5751117b6e9632b32e2f"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index 81f5f46..8329c77 100644",
+        "index 81f5f468..8329c770 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " x.someOtherProperty"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "38ee25545f8644cee42edb45ef2f7b29b26892d5..6188b94ce3872e80b40738d01c4853a467d502c2"
+    "shas": "5e0221213de5c8eb25ac5751117b6e9632b32e2f..8ab246f4bfdc85fc189921ae13ea91f0a9bae27e"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/member-access.js b/member-access.js",
-        "index 8329c77..e69de29 100644",
+        "index 8329c770..e69de29b 100644",
         "--- a/member-access.js",
         "+++ b/member-access.js",
         "@@ -1 +0,0 @@",
         "-x.someOtherProperty"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6188b94ce3872e80b40738d01c4853a467d502c2..bcba202e709aea072f614c126e2a5bb356cbf3fe"
+    "shas": "8ab246f4bfdc85fc189921ae13ea91f0a9bae27e..9043f23503e9e2afefc8849bfc0831696797e235"
 }]

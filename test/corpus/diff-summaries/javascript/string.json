@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index e69de29..ea5bd42 100644",
+        "index e69de29b..ea5bd425 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -0,0 +1 @@",
         "+'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c1ec2fd690eae01418882f3dbba8b6a5c0c3c2eb..dd9d769102a7c17e08e27bae6e4e070a6677cd7f"
+    "shas": "3c2e1bb6f33f4497e1151ea52af30ddcf6dcfcd7..3ba34eb51aaf7a4ba4049b784c63092efcfe86ec"
 }
 ,{
     "testCaseDescription": "javascript-string-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index ea5bd42..5cef047 100644",
+        "index ea5bd425..5cef047e 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " 'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dd9d769102a7c17e08e27bae6e4e070a6677cd7f..6504adbbbbdb0f45a0fba583ccb72ff50cdf8349"
+    "shas": "3ba34eb51aaf7a4ba4049b784c63092efcfe86ec..cc71e24b9defde56a3163b06e53add09e5ef3e4d"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index 5cef047..7af39a5 100644",
+        "index 5cef047e..7af39a55 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " 'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6504adbbbbdb0f45a0fba583ccb72ff50cdf8349..d39f387280812bce0247667978d542ebe0d27bcb"
+    "shas": "cc71e24b9defde56a3163b06e53add09e5ef3e4d..3322d99a7ccfef32ba3dd025b13d2fb041746404"
 }
 ,{
     "testCaseDescription": "javascript-string-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index 7af39a5..5cef047 100644",
+        "index 7af39a55..5cef047e 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " 'A string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d39f387280812bce0247667978d542ebe0d27bcb..b2f472510952cefbc5514307177170e71e3599ec"
+    "shas": "3322d99a7ccfef32ba3dd025b13d2fb041746404..befbd0d4f556ba947b8b22393ac13ac8d67d9e82"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index 5cef047..8dd4514 100644",
+        "index 5cef047e..8dd4514f 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+'A different string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b2f472510952cefbc5514307177170e71e3599ec..e83edaaa1afe0823f876025cf3b281bf6f6ab951"
+    "shas": "befbd0d4f556ba947b8b22393ac13ac8d67d9e82..08b5dc1f18c4153bae2f92a163bf79352942ffef"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index 8dd4514..95fbde5 100644",
+        "index 8dd4514f..95fbde5d 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " 'A different string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e83edaaa1afe0823f876025cf3b281bf6f6ab951..b00ba4fad86fcb97c8703641c255c5ca427424eb"
+    "shas": "08b5dc1f18c4153bae2f92a163bf79352942ffef..8f2189894058b7aabe2f63349a1dc7a2326f5a1c"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/string.js b/string.js",
-        "index 95fbde5..e69de29 100644",
+        "index 95fbde5d..e69de29b 100644",
         "--- a/string.js",
         "+++ b/string.js",
         "@@ -1 +0,0 @@",
         "-'A different string with \"double\" quotes';"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b00ba4fad86fcb97c8703641c255c5ca427424eb..aa6143f1a8ae9ca9b1ee3577121858208df3cce0"
+    "shas": "8f2189894058b7aabe2f63349a1dc7a2326f5a1c..6973df063cce62bb3a038ea4124571d47a2c9083"
 }]

@@ -34,7 +34,7 @@
         "+return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b4a1b602905b005b1bfe48d8f78faebd8c9cf016..e4dd7ea96606956464809e9a3bcfdb81f318c39b"
+    "shas": "c0d1f59dbc88b8a161e9dfa867107276f10b2898..b8c22790764e8661eb7f8d764e9b0af1b93cdd89"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
@@ -89,7 +89,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e4dd7ea96606956464809e9a3bcfdb81f318c39b..6365577e012aa898ba1d2cc77d10eec1fb9a016d"
+    "shas": "b8c22790764e8661eb7f8d764e9b0af1b93cdd89..63a6ea11f36663237346e70a138fd62524b9aef6"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…) method call"
+                    "summary": "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…) function call"
                 },
                 {
                     "span": {
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…).fail(…) method call"
+                    "summary": "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…).fail(…) function call"
                 }
             ]
         },
@@ -169,7 +169,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6365577e012aa898ba1d2cc77d10eec1fb9a016d..8ab9cd6c506847581b2fc7f04124803cd344b3ff"
+    "shas": "63a6ea11f36663237346e70a138fd62524b9aef6..1bbcdcf73d6865d9695b99b229ac793f118439a4"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-test",
@@ -201,7 +201,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…) method call"
+                    "summary": "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…) function call"
                 },
                 {
                     "span": {
@@ -228,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…).fail(…) method call"
+                    "summary": "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…).fail(…) function call"
                 }
             ]
         },
@@ -249,7 +249,7 @@
         " return returned.promise().done( newDefer.resolve ).fail( newDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8ab9cd6c506847581b2fc7f04124803cd344b3ff..d535074522aa956a8ea7e8d943227d9d78775725"
+    "shas": "1bbcdcf73d6865d9695b99b229ac793f118439a4..6b89d7a2b0d652938ed2c5f638d5091c6d8555d2"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
@@ -320,7 +320,7 @@
         "+return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d535074522aa956a8ea7e8d943227d9d78775725..b3f90f50ba0ea4d42e78ba37c176a4d69282fcd7"
+    "shas": "6b89d7a2b0d652938ed2c5f638d5091c6d8555d2..99c802ed801ddf5a24e177c5a08fc18f2658c6ce"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-test",
@@ -359,7 +359,7 @@
         " return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b3f90f50ba0ea4d42e78ba37c176a4d69282fcd7..6dd90e85a905d3c205cd42bcbedaa3d50110d426"
+    "shas": "99c802ed801ddf5a24e177c5a08fc18f2658c6ce..6b0b1796a40ecd246a53b69ffa84e15966547ff9"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
@@ -397,5 +397,5 @@
         "-return returned.promise().done( otherDefer.resolve ).fail( otherDefer.reject )"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6dd90e85a905d3c205cd42bcbedaa3d50110d426..7b26c97829302e6f2c2fc76d9a1e5dc25caf58d9"
+    "shas": "6b0b1796a40ecd246a53b69ffa84e15966547ff9..e97f568708cabfc40035c206b04bf5b6abf6e5bd"
 }]

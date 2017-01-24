@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index e69de29..d81ebad 100644",
+        "index e69de29b..d81ebadd 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -0,0 +1 @@",
         "+if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ee538d5b471190fe27f80e1defc319f36f5f9c38..d5f532daeb84c4dd664519d388575b8891e7e25a"
+    "shas": "9b27e4158f8b990b3f7ca2f77fcf65bf40e26802..6da4e4af4550225b9f9493faa2575360b93f8e5f"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index d81ebad..6bb0eaa 100644",
+        "index d81ebadd..6bb0eaa7 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d5f532daeb84c4dd664519d388575b8891e7e25a..539d5f1eb9ec34131ed8d31c596c38285f83e6bf"
+    "shas": "6da4e4af4550225b9f9493faa2575360b93f8e5f..8a8df26cb938506ec102e908d4552929a7073d00"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-insert-test",
@@ -354,7 +354,7 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index 6bb0eaa..2034be1 100644",
+        "index 6bb0eaa7..2034be1b 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -1,3 +1,3 @@",
@@ -364,7 +364,7 @@
         " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "539d5f1eb9ec34131ed8d31c596c38285f83e6bf..f525e3671aa6d43caf17c2582f3c746f07570b7a"
+    "shas": "8a8df26cb938506ec102e908d4552929a7073d00..0dc2b9999e933cc5f579be3de82aafbe951cd42c"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-test",
@@ -629,7 +629,7 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index 2034be1..6bb0eaa 100644",
+        "index 2034be1b..6bb0eaa7 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -1,3 +1,3 @@",
@@ -639,7 +639,7 @@
         " if (x) y; else if (a) b; else if (c) d; else if (e) f; else g"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f525e3671aa6d43caf17c2582f3c746f07570b7a..9fce9df9688253990d3fcfa4eb8f2280aa1c0c7c"
+    "shas": "0dc2b9999e933cc5f579be3de82aafbe951cd42c..0b04aed14c61bf7674a5161b0f0de2b45aa73c7d"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-replacement-test",
@@ -700,7 +700,7 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index 6bb0eaa..e26d6c4 100644",
+        "index 6bb0eaa7..e26d6c43 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -1,3 +1,2 @@",
@@ -710,7 +710,7 @@
         "+if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9fce9df9688253990d3fcfa4eb8f2280aa1c0c7c..f5b900cb596f7084a32ca9441f01e9be4b1e27dd"
+    "shas": "0b04aed14c61bf7674a5161b0f0de2b45aa73c7d..805c0a73d13a58a939691a22c60cf60a9bf9ebe9"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-test",
@@ -741,7 +741,7 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index e26d6c4..1a55d0b 100644",
+        "index e26d6c43..1a55d0bd 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -1,2 +1 @@",
@@ -749,7 +749,7 @@
         " if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f5b900cb596f7084a32ca9441f01e9be4b1e27dd..c3bb4c6e35fc4755d18a5e0fb53d5410a476c039"
+    "shas": "805c0a73d13a58a939691a22c60cf60a9bf9ebe9..c61977d5bbe6b4469c6df78bfaeaff5caca6fa6f"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-rest-test",
@@ -780,12 +780,12 @@
     ],
     "patch": [
         "diff --git a/if-else.js b/if-else.js",
-        "index 1a55d0b..e69de29 100644",
+        "index 1a55d0bd..e69de29b 100644",
         "--- a/if-else.js",
         "+++ b/if-else.js",
         "@@ -1 +0,0 @@",
         "-if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c3bb4c6e35fc4755d18a5e0fb53d5410a476c039..dffe792710a5ad52de12ed62e48340a71e5c9227"
+    "shas": "c61977d5bbe6b4469c6df78bfaeaff5caca6fa6f..b0cccfc42d36aba8e42003998233c798245c627f"
 }]

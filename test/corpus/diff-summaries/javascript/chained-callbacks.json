@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this.map(…)' method call"
+                    "summary": "Added the 'this.map(…)' function call"
                 }
             ]
         },
@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index e69de29..ce9ee1e 100644",
+        "index e69de29b..ce9ee1ed 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -0,0 +1 @@",
         "+this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1512ae1cef2a096ce2723ce98334e4ce0e4bc82b..2a014ee8fd6ea4f8ce5b6bae0ca35a4fa6462deb"
+    "shas": "e97f568708cabfc40035c206b04bf5b6abf6e5bd..f14828a645c440584da5db2b188a4155d63843e0"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
@@ -54,7 +54,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this.reduce(…)' method call"
+                    "summary": "Added the 'this.reduce(…)' function call"
                 },
                 {
                     "span": {
@@ -69,7 +69,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this.map(…)' method call"
+                    "summary": "Added the 'this.map(…)' function call"
                 }
             ]
         },
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index ce9ee1e..acba744 100644",
+        "index ce9ee1ed..acba744a 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2a014ee8fd6ea4f8ce5b6bae0ca35a4fa6462deb..6a6e1ae99abc9cae5f8ac31aac43836380944603"
+    "shas": "f14828a645c440584da5db2b188a4155d63843e0..861d17aed5329b7a49e2f97ae261307fe9b4431e"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'reduce' identifier with the 'map' identifier in the this.map(…) method call"
+                    "summary": "Replaced the 'reduce' identifier with the 'map' identifier in the this.map(…) function call"
                 },
                 {
                     "span": {
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the this.map(…) method call"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the this.map(…) function call"
                 },
                 {
                     "span": {
@@ -175,7 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the this.map(…) method call"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the this.map(…) function call"
                 }
             ]
         },
@@ -186,7 +186,7 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index acba744..7390534 100644",
+        "index acba744a..73905343 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -1,3 +1,3 @@",
@@ -196,7 +196,7 @@
         " this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6a6e1ae99abc9cae5f8ac31aac43836380944603..c86429cb689c74e2ce3988c8bc257a365734cbe3"
+    "shas": "861d17aed5329b7a49e2f97ae261307fe9b4431e..e2193800198a04799244dc9f70907be929bdc41f"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-test",
@@ -228,7 +228,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'map' identifier with the 'reduce' identifier in the this.reduce(…) method call"
+                    "summary": "Replaced the 'map' identifier with the 'reduce' identifier in the this.reduce(…) function call"
                 },
                 {
                     "span": {
@@ -255,7 +255,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the this.reduce(…) method call"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the this.reduce(…) function call"
                 },
                 {
                     "span": {
@@ -282,7 +282,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the this.reduce(…) method call"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the this.reduce(…) function call"
                 }
             ]
         },
@@ -293,7 +293,7 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index 7390534..acba744 100644",
+        "index 73905343..acba744a 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -1,3 +1,3 @@",
@@ -303,7 +303,7 @@
         " this.map(function (a) { return a.b; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c86429cb689c74e2ce3988c8bc257a365734cbe3..c4df0b8afdd73cae6d89a9098ae38d9c3085dbb8"
+    "shas": "e2193800198a04799244dc9f70907be929bdc41f..53dec994d0dc3b7c7bcc9249cab85a543ef25200"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
@@ -323,7 +323,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this.reduce(…)' method call"
+                    "summary": "Deleted the 'this.reduce(…)' function call"
                 },
                 {
                     "span": {
@@ -338,7 +338,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this.map(…)' method call"
+                    "summary": "Deleted the 'this.map(…)' function call"
                 },
                 {
                     "span": {
@@ -353,7 +353,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this.reduce(…)' method call"
+                    "summary": "Added the 'this.reduce(…)' function call"
                 }
             ]
         },
@@ -364,7 +364,7 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index acba744..c4db432 100644",
+        "index acba744a..c4db4326 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -1,3 +1,2 @@",
@@ -374,7 +374,7 @@
         "+this.reduce(function (a) { return b.a; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c4df0b8afdd73cae6d89a9098ae38d9c3085dbb8..8b7dbbb0ca20e47dfed24fb3eb3a790721d2e9d0"
+    "shas": "53dec994d0dc3b7c7bcc9249cab85a543ef25200..294233550240c3b5f5b279f688cc1f0dd2416ceb"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-test",
@@ -394,7 +394,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this.map(…)' method call"
+                    "summary": "Deleted the 'this.map(…)' function call"
                 }
             ]
         },
@@ -405,7 +405,7 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index c4db432..e593419 100644",
+        "index c4db4326..e5934198 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -1,2 +1 @@",
@@ -413,7 +413,7 @@
         " this.reduce(function (a) { return b.a; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8b7dbbb0ca20e47dfed24fb3eb3a790721d2e9d0..e2c2e86db834a0ab3c6006c6385e90d780851357"
+    "shas": "294233550240c3b5f5b279f688cc1f0dd2416ceb..bc7658e860c11b717d322c7c38b7b5be70af8169"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
@@ -433,7 +433,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this.reduce(…)' method call"
+                    "summary": "Deleted the 'this.reduce(…)' function call"
                 }
             ]
         },
@@ -444,12 +444,12 @@
     ],
     "patch": [
         "diff --git a/chained-callbacks.js b/chained-callbacks.js",
-        "index e593419..e69de29 100644",
+        "index e5934198..e69de29b 100644",
         "--- a/chained-callbacks.js",
         "+++ b/chained-callbacks.js",
         "@@ -1 +0,0 @@",
         "-this.reduce(function (a) { return b.a; })"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e2c2e86db834a0ab3c6006c6385e90d780851357..5ef42771e35b5af39f3befe137fedf40f174a5c7"
+    "shas": "bc7658e860c11b717d322c7c38b7b5be70af8169..65ec4b91fc50d92244f898493564425dc91dec99"
 }]

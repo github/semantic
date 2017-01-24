@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index e69de29..4a26ae8 100644",
+        "index e69de29b..4a26ae86 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -0,0 +1 @@",
         "+function() { return 'hi'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2a5f85a471c9c83f2e835139afa5eb7bfecd546a..a2527ab39dbaa7651e66e24f3d143d11060841f6"
+    "shas": "c18d7bf565cc21b4eab97bee06b8182d71f79310..8872d92c96b47e465013ae1cd75ddd7bb7ab0f78"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index 4a26ae8..c31dd4b 100644",
+        "index 4a26ae86..c31dd4b7 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " function() { return 'hi'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a2527ab39dbaa7651e66e24f3d143d11060841f6..4b3321e8a707ad91af6735319257f7f68fb593b7"
+    "shas": "8872d92c96b47e465013ae1cd75ddd7bb7ab0f78..c76f6c6269c776c99d92fd30687cfa77e62ea746"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index c31dd4b..6b1efa4 100644",
+        "index c31dd4b7..6b1efa42 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " function() { return 'hi'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4b3321e8a707ad91af6735319257f7f68fb593b7..a01626612654464812b9cedaad745f686edc8138"
+    "shas": "c76f6c6269c776c99d92fd30687cfa77e62ea746..332ec447157ee23778ae3857a5a01f9e10ece1cc"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index 6b1efa4..c31dd4b 100644",
+        "index 6b1efa42..c31dd4b7 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " function() { return 'hi'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a01626612654464812b9cedaad745f686edc8138..d640dfcedbbda8708bb8c679b2b96460e63e8e53"
+    "shas": "332ec447157ee23778ae3857a5a01f9e10ece1cc..795ada7689a6f349ad93621970b5f5ec5332ac86"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index c31dd4b..b8e05c0 100644",
+        "index c31dd4b7..b8e05c0e 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+function() { return 'hello'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d640dfcedbbda8708bb8c679b2b96460e63e8e53..f1436a17d64c050a7d6aa15fe0876ce3fc4176f0"
+    "shas": "795ada7689a6f349ad93621970b5f5ec5332ac86..83f67f1b48452e4d9b163a320152ae9dc8ef403a"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index b8e05c0..ce1ef83 100644",
+        "index b8e05c0e..ce1ef833 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " function() { return 'hello'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f1436a17d64c050a7d6aa15fe0876ce3fc4176f0..1bd2372f874ec3588d5510b5c7fa50c378b5e665"
+    "shas": "83f67f1b48452e4d9b163a320152ae9dc8ef403a..3a2d2bcd317d7b045070c4d90d694fc69c5b1f38"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/anonymous-parameterless-function.js b/anonymous-parameterless-function.js",
-        "index ce1ef83..e69de29 100644",
+        "index ce1ef833..e69de29b 100644",
         "--- a/anonymous-parameterless-function.js",
         "+++ b/anonymous-parameterless-function.js",
         "@@ -1 +0,0 @@",
         "-function() { return 'hello'; }"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1bd2372f874ec3588d5510b5c7fa50c378b5e665..e66b1b20abc596d2b560eaa80f1749c79816f9ff"
+    "shas": "3a2d2bcd317d7b045070c4d90d694fc69c5b1f38..aab57fb5b99b7d08c03849736ffa873c26495bec"
 }]

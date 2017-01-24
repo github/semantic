@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8b9132202584b9cb77727d35fc5933c26eca6b3c..05f174ca0361352203a7d61ff484d16b59f7a35a"
+    "shas": "7b26c68cc9841c04abae494e67e0e39d174acf6b..3da966c73a8f508816008fad2bc6ac826829056c"
 }
 ,{
     "testCaseDescription": "go-interface-types-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i1' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'i1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i2' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'i2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i3' type declaration in the main function of the 'main' module"
+                    "summary": "Added the 'i3' type declaration in the main function"
                 }
             ]
         },
@@ -117,7 +132,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "05f174ca0361352203a7d61ff484d16b59f7a35a..a33a0d6ca8ca62b9272edab5ea3d7c95f0abecd3"
+    "shas": "3da966c73a8f508816008fad2bc6ac826829056c..f4a0f77e1d08f07a09da307c09864e8c9308c8ab"
 }
 ,{
     "testCaseDescription": "go-interface-types-replacement-test",
@@ -232,7 +247,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a33a0d6ca8ca62b9272edab5ea3d7c95f0abecd3..8e1af67f8e4799d33dda9790076d3ebd0f992ae9"
+    "shas": "f4a0f77e1d08f07a09da307c09864e8c9308c8ab..0528cba18c80e31e589da98db81920a6e2701e69"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-replacement-test",
@@ -347,7 +362,7 @@
         "  SomeMethod(s string) error"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8e1af67f8e4799d33dda9790076d3ebd0f992ae9..d38eef21ef5c858651ded42d3546f79843ba436e"
+    "shas": "0528cba18c80e31e589da98db81920a6e2701e69..8e3e7577227bcdaa315e4a17b546003646f2a7a6"
 }
 ,{
     "testCaseDescription": "go-interface-types-delete-insert-test",
@@ -367,7 +382,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i1' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'i1' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -382,7 +397,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i2' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'i2' type declaration in the main function"
                 },
                 {
                     "span": {
@@ -397,7 +412,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i3' type declaration in the main function of the 'main' module"
+                    "summary": "Deleted the 'i3' type declaration in the main function"
                 }
             ]
         },
@@ -426,7 +441,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d38eef21ef5c858651ded42d3546f79843ba436e..c3779f6bce6cf4a13e0e123647ff20ecb94a941d"
+    "shas": "8e3e7577227bcdaa315e4a17b546003646f2a7a6..ca7cd1aa4ef03e5837e4143ef9144235fb5f5528"
 }
 ,{
     "testCaseDescription": "go-interface-types-teardown-test",
@@ -441,12 +456,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -468,5 +498,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c3779f6bce6cf4a13e0e123647ff20ecb94a941d..537b856e670ab8ae8aa4d420943369b4ba180c16"
+    "shas": "ca7cd1aa4ef03e5837e4143ef9144235fb5f5528..76ac51b6d6c38a93b6847800d67d4362943a86ad"
 }]

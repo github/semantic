@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c14d55dd062dc340dde5986bd08c8b6aa1173023..278def98e925c3f8c4c39e7b82e6d4e93d3f6f01"
+    "shas": "372dfd6bcd3a6ff64487adf376d5afeb38b130aa..6865a500a3436787a7df2fb2030ab34b468fc7b3"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[y]()' defer statement in the main function of the 'main' module"
+                    "summary": "Added the 'x[y]()' defer statement in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[y]()' go statement in the main function of the 'main' module"
+                    "summary": "Added the 'x[y]()' go statement in the main function"
                 }
             ]
         },
@@ -97,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "278def98e925c3f8c4c39e7b82e6d4e93d3f6f01..77af86d247af5374e02a3083387901e4f6055d85"
+    "shas": "6865a500a3436787a7df2fb2030ab34b468fc7b3..ff8785a4e7d6cdebc2572ce440f3958f5f6ddd75"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -235,7 +250,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "77af86d247af5374e02a3083387901e4f6055d85..3195df01c958961855d16db8dd512ca3db0b4cec"
+    "shas": "ff8785a4e7d6cdebc2572ce440f3958f5f6ddd75..2d6c96a98b5c075da330035a8ecd653be585aeb7"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -373,7 +388,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3195df01c958961855d16db8dd512ca3db0b4cec..66da4d913b11ceae987aa3dbbcce0da116e3ee12"
+    "shas": "2d6c96a98b5c075da330035a8ecd653be585aeb7..d5e2b62a34599c340ffac4a0a9d246521dbf03a2"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -393,7 +408,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[y]()' defer statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'x[y]()' defer statement in the main function"
                 },
                 {
                     "span": {
@@ -408,7 +423,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[y]()' go statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'x[y]()' go statement in the main function"
                 }
             ]
         },
@@ -432,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "66da4d913b11ceae987aa3dbbcce0da116e3ee12..385153e6284f16b53e7195c7f3e4d8d0299ecc15"
+    "shas": "d5e2b62a34599c340ffac4a0a9d246521dbf03a2..3fc499fb9046ba8f4af95b18bc752ad5d8514b91"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -447,12 +462,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -474,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "385153e6284f16b53e7195c7f3e4d8d0299ecc15..f9136e3be46a93bc0e0b6dc467c7b9ced1b97894"
+    "shas": "3fc499fb9046ba8f4af95b18bc752ad5d8514b91..99baf955f08d1bbc4b8e2286b69f637388270021"
 }]

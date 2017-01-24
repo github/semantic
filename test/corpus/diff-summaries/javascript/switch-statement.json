@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index e69de29..5481c49 100644",
+        "index e69de29b..5481c49f 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -0,0 +1 @@",
         "+switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8f7edd21ecef61769b82fb5a60a881f31ce30a01..9e6646e9f984497bc80a1c1f1afb86eb869c9b26"
+    "shas": "20109cf62d65353fadfe9965edbf1f9e875db9c4..41b828f4af89e6677a4997fe9d4b9cc8ad5a8268"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index 5481c49..ffd4a32 100644",
+        "index 5481c49f..ffd4a32a 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9e6646e9f984497bc80a1c1f1afb86eb869c9b26..887d9088c295dc7a59711a02769e0754c6d1fa33"
+    "shas": "41b828f4af89e6677a4997fe9d4b9cc8ad5a8268..b21a69cfb5bddfed6b44656554b88ba169752dcf"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-insert-test",
@@ -159,7 +159,7 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index ffd4a32..302fb8b 100644",
+        "index ffd4a32a..302fb8bc 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -1,3 +1,3 @@",
@@ -169,7 +169,7 @@
         " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "887d9088c295dc7a59711a02769e0754c6d1fa33..ba0bf7fe9de15a5f734f4e4c6059ce15c34e8311"
+    "shas": "b21a69cfb5bddfed6b44656554b88ba169752dcf..7c2c88ac6ae82fe4371fefaeaf5f839395d35fa4"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-test",
@@ -239,7 +239,7 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index 302fb8b..ffd4a32 100644",
+        "index 302fb8bc..ffd4a32a 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -1,3 +1,3 @@",
@@ -249,7 +249,7 @@
         " switch (1) { case 1: 1; case 2: 1; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ba0bf7fe9de15a5f734f4e4c6059ce15c34e8311..213e3cb9828fdcbfe60dea518fb77b1896af15bb"
+    "shas": "7c2c88ac6ae82fe4371fefaeaf5f839395d35fa4..8c80e040d635672848180ef8fe6acefbf8c93fbc"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
@@ -310,7 +310,7 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index ffd4a32..9b60579 100644",
+        "index ffd4a32a..9b605791 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -1,3 +1,2 @@",
@@ -320,7 +320,7 @@
         "+switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "213e3cb9828fdcbfe60dea518fb77b1896af15bb..a818910ed9354ea4b6070e11af8de9cefd66aedf"
+    "shas": "8c80e040d635672848180ef8fe6acefbf8c93fbc..bd3aa8f2fcea05110e0b7efb3d7662b3de7bf631"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-test",
@@ -351,7 +351,7 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index 9b60579..374091f 100644",
+        "index 9b605791..374091f2 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -1,2 +1 @@",
@@ -359,7 +359,7 @@
         " switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a818910ed9354ea4b6070e11af8de9cefd66aedf..db5abd71dd4f34b20163d37657b839707b279e09"
+    "shas": "bd3aa8f2fcea05110e0b7efb3d7662b3de7bf631..70d56762d3e6f27e10409d458adfa25226b79a99"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-rest-test",
@@ -390,12 +390,12 @@
     ],
     "patch": [
         "diff --git a/switch-statement.js b/switch-statement.js",
-        "index 374091f..e69de29 100644",
+        "index 374091f2..e69de29b 100644",
         "--- a/switch-statement.js",
         "+++ b/switch-statement.js",
         "@@ -1 +0,0 @@",
         "-switch (2) { case 1: 1; case 2: 2; case 3: 3; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "db5abd71dd4f34b20163d37657b839707b279e09..8e3f45940f773e7849a53fefdaeb52a682a6a488"
+    "shas": "70d56762d3e6f27e10409d458adfa25226b79a99..20c612d09dbfc0c2c4ab61b7c9234d17faa3f43e"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "846045886cec5887a42533f48de771ee58d766a0..4ff1c192d8ce792d43135c481bc6ac2038e9a75b"
+    "shas": "18d2ad4c865e7a97e1e9f103fbbb132f6d35be8f..210a48ef178de75f2cf848a32533007deb4e9444"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'e' switch statement in the main function of the 'main' module"
+                    "summary": "Added the 'e' switch statement in the main function"
                 }
             ]
         },
@@ -86,7 +101,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ff1c192d8ce792d43135c481bc6ac2038e9a75b..4c5713dc076428d72a0468a2016d850ec4da21ff"
+    "shas": "210a48ef178de75f2cf848a32533007deb4e9444..4bada3ff6ae6cc3176a19b25f3ead9e2c6d28ecf"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-replacement-test",
@@ -143,7 +158,7 @@
         "   case *Dog:"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4c5713dc076428d72a0468a2016d850ec4da21ff..bb88efe8967423243277e2c5baf1ffa430e98601"
+    "shas": "4bada3ff6ae6cc3176a19b25f3ead9e2c6d28ecf..181f0b7d2cd3d888898f70fdb0c69f448a5c30fe"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-delete-replacement-test",
@@ -200,7 +215,7 @@
         "   case *Dog:"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bb88efe8967423243277e2c5baf1ffa430e98601..3bec68c0b122bbb4ea1dbbf39abac06c3ae0ad07"
+    "shas": "181f0b7d2cd3d888898f70fdb0c69f448a5c30fe..2af764642e557fa58e71e143b896e8925cdad518"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-delete-insert-test",
@@ -220,7 +235,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e' switch statement in the main function of the 'main' module"
+                    "summary": "Deleted the 'e' switch statement in the main function"
                 }
             ]
         },
@@ -248,7 +263,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3bec68c0b122bbb4ea1dbbf39abac06c3ae0ad07..9497bebe3b0e4c555d273a7c99f0f0937a9c158b"
+    "shas": "2af764642e557fa58e71e143b896e8925cdad518..bf8220a4af0d019b98fff9d75a273b0deec6571b"
 }
 ,{
     "testCaseDescription": "go-type-switch-statements-teardown-test",
@@ -263,12 +278,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -290,5 +320,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9497bebe3b0e4c555d273a7c99f0f0937a9c158b..5ef8bc0eb6c5afcf5b71c3773b50aacebffe32d5"
+    "shas": "bf8220a4af0d019b98fff9d75a273b0deec6571b..225702deae294ce851fb593c09eb3e6da643b0bc"
 }]

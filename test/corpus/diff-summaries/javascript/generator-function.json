@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index e69de29..04e8a59 100644",
+        "index e69de29b..04e8a59b 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -0,0 +1 @@",
         "+function *generateStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5cab8720cde055f6d78f5c5deaf8980b89a434e1..8ff6dd40a182ab5500d976f04b8d0e919d045ddc"
+    "shas": "a50f5d25657afa02329debd2a87b7ffbb8f2b76d..9df04cfb26b2766e7e78bcd47ee06b6becb2f572"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index 04e8a59..ed5c037 100644",
+        "index 04e8a59b..ed5c0370 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " function *generateStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8ff6dd40a182ab5500d976f04b8d0e919d045ddc..e3273bce016747d95cbc043e14d23cda41b65129"
+    "shas": "9df04cfb26b2766e7e78bcd47ee06b6becb2f572..ec757a8900be08223339e8e9727898b3255d8f08"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index ed5c037..0895c3f 100644",
+        "index ed5c0370..0895c3fd 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " function *generateStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e3273bce016747d95cbc043e14d23cda41b65129..3dd2a62eface3915c946a63ecef0c9134bf5b9be"
+    "shas": "ec757a8900be08223339e8e9727898b3255d8f08..15ec5e1fa46bd4e16d253840d6f0102c44496fed"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index 0895c3f..ed5c037 100644",
+        "index 0895c3fd..ed5c0370 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " function *generateStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3dd2a62eface3915c946a63ecef0c9134bf5b9be..9a4d77ff9359a6c8fe9ab42d88157282b742e1be"
+    "shas": "15ec5e1fa46bd4e16d253840d6f0102c44496fed..b7e7155e6794ba2a257dcbc55a91f8b12093fa58"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index ed5c037..1dae105 100644",
+        "index ed5c0370..1dae1059 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9a4d77ff9359a6c8fe9ab42d88157282b742e1be..63a8b6f6c41bdd248590069ba8f59d53a3b0992f"
+    "shas": "b7e7155e6794ba2a257dcbc55a91f8b12093fa58..f5c134c2262cb4b15c43b2c35a34ae3812d4cfd8"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index 1dae105..5846d1c 100644",
+        "index 1dae1059..5846d1c0 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "63a8b6f6c41bdd248590069ba8f59d53a3b0992f..2087f684c9ba7fa39876477f2eacf8b9b12949fa"
+    "shas": "f5c134c2262cb4b15c43b2c35a34ae3812d4cfd8..51e5241d63f1a14e77194ba7b954d06d11de1600"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/generator-function.js b/generator-function.js",
-        "index 5846d1c..e69de29 100644",
+        "index 5846d1c0..e69de29b 100644",
         "--- a/generator-function.js",
         "+++ b/generator-function.js",
         "@@ -1 +0,0 @@",
         "-function *generateNewStuff(arg1, arg2) { yield; yield arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2087f684c9ba7fa39876477f2eacf8b9b12949fa..973cce7b94116a9e6e8b399f9f0a50bd107fb9b5"
+    "shas": "51e5241d63f1a14e77194ba7b954d06d11de1600..35363e93d3151d395860548f66a39be33fcc6b34"
 }]

@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index e69de29..8bd95e0 100644",
+        "index e69de29b..8bd95e09 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -0,0 +1 @@",
         "+someFunction(arg1, \"arg2\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "5ef42771e35b5af39f3befe137fedf40f174a5c7..00b36bff0934786a0071eff76e45c17c464e432a"
+    "shas": "65ec4b91fc50d92244f898493564425dc91dec99..b615308df966b578cf01e5d48566843aa41cdb9a"
 }
 ,{
     "testCaseDescription": "javascript-function-call-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index 8bd95e0..6bb4cf3 100644",
+        "index 8bd95e09..6bb4cf3f 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " someFunction(arg1, \"arg2\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "00b36bff0934786a0071eff76e45c17c464e432a..520cba16d2faea8fd35a81086ea0a0b2405bf082"
+    "shas": "b615308df966b578cf01e5d48566843aa41cdb9a..bbeb6c549afd5768be327d11d6f0586b19b54f5f"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index 6bb4cf3..b38c232 100644",
+        "index 6bb4cf3f..b38c232b 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " someFunction(arg1, \"arg2\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "520cba16d2faea8fd35a81086ea0a0b2405bf082..8f84b861874020df6e144f16bbccb5221b1543e4"
+    "shas": "bbeb6c549afd5768be327d11d6f0586b19b54f5f..34be18f8448763874f7ef124b682bfd0cf7f5d6c"
 }
 ,{
     "testCaseDescription": "javascript-function-call-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index b38c232..6bb4cf3 100644",
+        "index b38c232b..6bb4cf3f 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " someFunction(arg1, \"arg2\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8f84b861874020df6e144f16bbccb5221b1543e4..718e8939aaef9685a140e371b050e8933450a215"
+    "shas": "34be18f8448763874f7ef124b682bfd0cf7f5d6c..48a4faebbb542de45e082a48f7ebc7dc146434ee"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index 6bb4cf3..3e15c6a 100644",
+        "index 6bb4cf3f..3e15c6ac 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+someFunction(arg1, \"arg3\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "718e8939aaef9685a140e371b050e8933450a215..35112398ed93567a624e79597194400f3a6ba5ed"
+    "shas": "48a4faebbb542de45e082a48f7ebc7dc146434ee..830303cbd8c1c18ab526b72ee0af22ce1117f291"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index 3e15c6a..1add64b 100644",
+        "index 3e15c6ac..1add64b5 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " someFunction(arg1, \"arg3\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "35112398ed93567a624e79597194400f3a6ba5ed..2928901cff45e08e275b3c7cc5559704326f2974"
+    "shas": "830303cbd8c1c18ab526b72ee0af22ce1117f291..907c562a9a25a3d6b2cba73e693b57825dc8157f"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/function-call.js b/function-call.js",
-        "index 1add64b..e69de29 100644",
+        "index 1add64b5..e69de29b 100644",
         "--- a/function-call.js",
         "+++ b/function-call.js",
         "@@ -1 +0,0 @@",
         "-someFunction(arg1, \"arg3\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2928901cff45e08e275b3c7cc5559704326f2974..f8662860eb083b9e95b5cc1c706a7872a4779532"
+    "shas": "907c562a9a25a3d6b2cba73e693b57825dc8157f..bded2c0215b6dc80127e031b7d9978f1883709b1"
 }]

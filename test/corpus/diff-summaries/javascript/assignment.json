@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index e69de29..6882fe5 100644",
+        "index e69de29b..6882fe5e 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -0,0 +1 @@",
         "+x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "10c888c0caabf36cb211a96640afbe435dfad3fb..6a5eb86577a86881fdd53c3db17dd589617b887e"
+    "shas": "b8e96cb516ef4cd80a86e0b6a00f5d4e542141dd..aa1627d9ad30ddc96644440396be830160280595"
 }
 ,{
     "testCaseDescription": "javascript-assignment-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index 6882fe5..fb4cba4 100644",
+        "index 6882fe5e..fb4cba44 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6a5eb86577a86881fdd53c3db17dd589617b887e..79ca8610276bd0cc32d257702e20ec268187f1b6"
+    "shas": "aa1627d9ad30ddc96644440396be830160280595..ed0eb692d90f44c893700d15456f02b82c5adb89"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index fb4cba4..42e16c6 100644",
+        "index fb4cba44..42e16c61 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "79ca8610276bd0cc32d257702e20ec268187f1b6..c3da25392def8e82aaf0179cdd8cc51849d805c8"
+    "shas": "ed0eb692d90f44c893700d15456f02b82c5adb89..9c07d74d31da21c5ed0bb307a9b11a96e2da6f60"
 }
 ,{
     "testCaseDescription": "javascript-assignment-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index 42e16c6..fb4cba4 100644",
+        "index 42e16c61..fb4cba44 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c3da25392def8e82aaf0179cdd8cc51849d805c8..be4979757f9464e59b4b7fb7dbdce17f4f362029"
+    "shas": "9c07d74d31da21c5ed0bb307a9b11a96e2da6f60..bb29b11c0519aee4b1469d0510963e5d9f846e97"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index fb4cba4..11fe15d 100644",
+        "index fb4cba44..11fe15d7 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "be4979757f9464e59b4b7fb7dbdce17f4f362029..592d4d9a24fe20282bbaa1cf66bbe20959d47ae5"
+    "shas": "bb29b11c0519aee4b1469d0510963e5d9f846e97..daadf6daec7e50a39f21429277fb77556dfc202a"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index 11fe15d..198b8f8 100644",
+        "index 11fe15d7..198b8f89 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "592d4d9a24fe20282bbaa1cf66bbe20959d47ae5..f0b77709f5be6c1d671a943d73b8fbb12344762e"
+    "shas": "daadf6daec7e50a39f21429277fb77556dfc202a..f86e9f7675d8d6ad3fb9f6a2703e475b6eb24a8e"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/assignment.js b/assignment.js",
-        "index 198b8f8..e69de29 100644",
+        "index 198b8f89..e69de29b 100644",
         "--- a/assignment.js",
         "+++ b/assignment.js",
         "@@ -1 +0,0 @@",
         "-x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f0b77709f5be6c1d671a943d73b8fbb12344762e..83f3153b76f49e077237997c965dc6f3c3a159bc"
+    "shas": "f86e9f7675d8d6ad3fb9f6a2703e475b6eb24a8e..8971dc3263a4d4060368d23937d32f6df7c06d16"
 }]

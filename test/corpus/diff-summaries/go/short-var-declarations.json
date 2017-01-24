@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ccea258bd2125cbbe34266069b39fc47fe5d4e3..d86a797bca0743cdc0eb4671f5b3eb25921e46b5"
+    "shas": "bd4ab6fa47d6fc0894c2e2eef8a8f057041f9ac6..664515cc84883284bba84f34ac558df1633a3682"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -54,18 +69,48 @@
                             ],
                             "end": [
                                 4,
-                                13
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'a' identifier in the main function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added '1' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                12
                             ],
                             "end": [
                                 4,
@@ -73,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' var assignment in the main function of the 'main' module"
+                    "summary": "Added '2' in the main function"
                 }
             ]
         },
@@ -96,7 +141,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d86a797bca0743cdc0eb4671f5b3eb25921e46b5..949f040e38e0adb5a87c9b9ea7c42568058a2b32"
+    "shas": "664515cc84883284bba84f34ac558df1633a3682..152b12c1af0962f1dd4c8a56a6f6787f749a20ac"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -128,34 +173,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the x var assignment of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    9
-                                ],
-                                "end": [
-                                    4,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    9
-                                ],
-                                "end": [
-                                    4,
-                                    10
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '3' in the x var assignment of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the main function"
                 },
                 {
                     "span": {
@@ -182,7 +200,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the y var assignment of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '3' in the main function"
                 },
                 {
                     "span": {
@@ -209,7 +254,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '4' in the y var assignment of the 'main' function"
+                    "summary": "Replaced '2' with '4' in the main function"
                 }
             ]
         },
@@ -232,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "949f040e38e0adb5a87c9b9ea7c42568058a2b32..cee7f55944490cc3fd074d9b92e033c52b44a036"
+    "shas": "152b12c1af0962f1dd4c8a56a6f6787f749a20ac..990f8d4f2cdc537257a3b75c6e258b525e50b664"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -264,34 +309,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the a var assignment of the 'main' function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    9
-                                ],
-                                "end": [
-                                    4,
-                                    10
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    9
-                                ],
-                                "end": [
-                                    4,
-                                    10
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '3' with '1' in the a var assignment of the 'main' function"
+                    "summary": "Replaced the 'x' identifier with the 'a' identifier in the main function"
                 },
                 {
                     "span": {
@@ -318,7 +336,34 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the b var assignment of the 'main' function"
+                    "summary": "Replaced the 'y' identifier with the 'b' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    9
+                                ],
+                                "end": [
+                                    4,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '1' in the main function"
                 },
                 {
                     "span": {
@@ -345,7 +390,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '2' in the b var assignment of the 'main' function"
+                    "summary": "Replaced '4' with '2' in the main function"
                 }
             ]
         },
@@ -368,7 +413,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cee7f55944490cc3fd074d9b92e033c52b44a036..d8c62fa2d207d7d564ca6f2673d47a697ecea20e"
+    "shas": "990f8d4f2cdc537257a3b75c6e258b525e50b664..e0556808db84f6eaa9eb9a2c70135b9c0a8ac46e"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -384,18 +429,48 @@
                             ],
                             "end": [
                                 4,
-                                13
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'a' identifier in the main function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                4
+                            ],
+                            "end": [
+                                4,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                9
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                12
                             ],
                             "end": [
                                 4,
@@ -403,7 +478,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted '2' in the main function"
                 }
             ]
         },
@@ -426,7 +501,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8c62fa2d207d7d564ca6f2673d47a697ecea20e..38ed1694da804c308df6058dd3cbc3c4c552418d"
+    "shas": "e0556808db84f6eaa9eb9a2c70135b9c0a8ac46e..2858e81d239d96a3512a4773bea6347b6accd37a"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -441,12 +516,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -468,5 +558,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38ed1694da804c308df6058dd3cbc3c4c552418d..20ca91d3f69487f7d530b334333fdfe2a3743e03"
+    "shas": "2858e81d239d96a3512a4773bea6347b6accd37a..cf70e6f19e450518d80476ba6c15e6aaf90d7477"
 }]

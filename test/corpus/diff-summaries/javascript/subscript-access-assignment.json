@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index e69de29..6b6d48d 100644",
+        "index e69de29b..6b6d48d2 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -0,0 +1 @@",
         "+y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "faf582893e706ae259a0482d65d424fbcf137bb2..b59647bbb7592da11c7d4ac78458e63e854b04f3"
+    "shas": "4771589971576b44762a611a7b4b4cbdb9259735..0cfddba7d07880a41ca2de997a9a905ca8395b86"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index 6b6d48d..17d3ff4 100644",
+        "index 6b6d48d2..17d3ff48 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b59647bbb7592da11c7d4ac78458e63e854b04f3..8b0173919309e1b0e73ab4a4a4fcd8dd02bc0ccb"
+    "shas": "0cfddba7d07880a41ca2de997a9a905ca8395b86..c4524a646dc110253088196709418c9c7973b24e"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index 17d3ff4..d856ac0 100644",
+        "index 17d3ff48..d856ac0d 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8b0173919309e1b0e73ab4a4a4fcd8dd02bc0ccb..461eebed467430133c1996ed21dd6e72dd4f06ac"
+    "shas": "c4524a646dc110253088196709418c9c7973b24e..5441e85813c5d2a2a412609c15592022ecac4471"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index d856ac0..17d3ff4 100644",
+        "index d856ac0d..17d3ff48 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " y[\"x\"] = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "461eebed467430133c1996ed21dd6e72dd4f06ac..689acd0e8c575ae20e8d6acaa4522119800c3a39"
+    "shas": "5441e85813c5d2a2a412609c15592022ecac4471..75a07bef0582ba59d8b878d49058c73cba104455"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index 17d3ff4..cdcb426 100644",
+        "index 17d3ff48..cdcb426e 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+y[\"x\"] = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "689acd0e8c575ae20e8d6acaa4522119800c3a39..a124eee21e5e3f952e498fb2175d1497ca06aa13"
+    "shas": "75a07bef0582ba59d8b878d49058c73cba104455..921de36fbbb7fea44d2d5910e8b6a58e9866f8c3"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index cdcb426..0407c3a 100644",
+        "index cdcb426e..0407c3a1 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " y[\"x\"] = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a124eee21e5e3f952e498fb2175d1497ca06aa13..194ef1fb19bf18a70a7e1a0dd198c832d2383bd9"
+    "shas": "921de36fbbb7fea44d2d5910e8b6a58e9866f8c3..bf26a76e4e4ccc3b3705ef27a866546586322ea3"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/subscript-access-assignment.js b/subscript-access-assignment.js",
-        "index 0407c3a..e69de29 100644",
+        "index 0407c3a1..e69de29b 100644",
         "--- a/subscript-access-assignment.js",
         "+++ b/subscript-access-assignment.js",
         "@@ -1 +0,0 @@",
         "-y[\"x\"] = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "194ef1fb19bf18a70a7e1a0dd198c832d2383bd9..ec86aaba01801d01aca70fd31403642be1e2d438"
+    "shas": "bf26a76e4e4ccc3b3705ef27a866546586322ea3..a51b44e93b10645f205b119e37a93f384ee4d64c"
 }]

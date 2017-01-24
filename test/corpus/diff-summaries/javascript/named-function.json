@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index e69de29..94b19f8 100644",
+        "index e69de29b..94b19f8e 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -0,0 +1 @@",
         "+function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "973cce7b94116a9e6e8b399f9f0a50bd107fb9b5..0af41b91893fcc8e9172616a4e5a71c70ee47985"
+    "shas": "35363e93d3151d395860548f66a39be33fcc6b34..79a23a83c739d0cfa28d7a169a6bf7da60e491a0"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index 94b19f8..cb766a0 100644",
+        "index 94b19f8e..cb766a0e 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0af41b91893fcc8e9172616a4e5a71c70ee47985..2fe69bd38fe1db507331dc14063479b66eb2a880"
+    "shas": "79a23a83c739d0cfa28d7a169a6bf7da60e491a0..a4d27609f597d097c760a7cc1b472df19e639346"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-insert-test",
@@ -192,7 +192,7 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index cb766a0..c9cff07 100644",
+        "index cb766a0e..c9cff077 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -1,3 +1,3 @@",
@@ -202,7 +202,7 @@
         " function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2fe69bd38fe1db507331dc14063479b66eb2a880..4b0a0bcf80003eb74b67b8947f8a0443cb2ad80f"
+    "shas": "a4d27609f597d097c760a7cc1b472df19e639346..8d31ee951cafd297a9e905803bd5b2bc56c2f630"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-test",
@@ -305,7 +305,7 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index c9cff07..cb766a0 100644",
+        "index c9cff077..cb766a0e 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -1,3 +1,3 @@",
@@ -315,7 +315,7 @@
         " function myFunction(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4b0a0bcf80003eb74b67b8947f8a0443cb2ad80f..785a621c11eb5f6e1e93d2ea1e40828c8786ae2d"
+    "shas": "8d31ee951cafd297a9e905803bd5b2bc56c2f630..69e6312b3a109336408f27d7e8be8f73d8755a00"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-replacement-test",
@@ -376,7 +376,7 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index cb766a0..148bcc7 100644",
+        "index cb766a0e..148bcc77 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -1,3 +1,2 @@",
@@ -386,7 +386,7 @@
         "+function anotherFunction() { return false; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "785a621c11eb5f6e1e93d2ea1e40828c8786ae2d..7ecdd3334fd0090f017044bd0780b5a5df128eda"
+    "shas": "69e6312b3a109336408f27d7e8be8f73d8755a00..47634c570fdbb43851ac8f35d7ba6533aa1560d5"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-test",
@@ -417,7 +417,7 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index 148bcc7..80e11b0 100644",
+        "index 148bcc77..80e11b02 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -1,2 +1 @@",
@@ -425,7 +425,7 @@
         " function anotherFunction() { return false; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7ecdd3334fd0090f017044bd0780b5a5df128eda..92cb451c62ab6f9a63bad5a24b21beb2cbe9bdde"
+    "shas": "47634c570fdbb43851ac8f35d7ba6533aa1560d5..0062e2d432f2030721aa50d3a3655d3d3230d2a8"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-rest-test",
@@ -456,12 +456,12 @@
     ],
     "patch": [
         "diff --git a/named-function.js b/named-function.js",
-        "index 80e11b0..e69de29 100644",
+        "index 80e11b02..e69de29b 100644",
         "--- a/named-function.js",
         "+++ b/named-function.js",
         "@@ -1 +0,0 @@",
         "-function anotherFunction() { return false; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "92cb451c62ab6f9a63bad5a24b21beb2cbe9bdde..0cbc55e481f01ab536c7832c5ebbc21d7f9e9021"
+    "shas": "0062e2d432f2030721aa50d3a3655d3d3230d2a8..5465664fb6e49eb214afa9feb0fadd451399dad9"
 }]

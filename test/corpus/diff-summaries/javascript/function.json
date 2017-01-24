@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index e69de29..2d8d739 100644",
+        "index e69de29b..2d8d739d 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -0,0 +1 @@",
         "+function(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0bdf412036a9a6aea51108a20404c37541fffcfb..c76e13ba716fc18e9924e1f4675845f61823c9c7"
+    "shas": "6a98861e426cf72452392e143d875b8ccd968a2c..a9d3342f1523a3bdfb2089737e26c073d72518e1"
 }
 ,{
     "testCaseDescription": "javascript-function-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index 2d8d739..4389406 100644",
+        "index 2d8d739d..43894067 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " function(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c76e13ba716fc18e9924e1f4675845f61823c9c7..7c1485f22ad0c4bc98a22cdb8d341d2eb97fcab8"
+    "shas": "a9d3342f1523a3bdfb2089737e26c073d72518e1..ed5a8373997dc1879db9c1c9168d3b26e7b3dc90"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index 4389406..924c99e 100644",
+        "index 43894067..924c99e8 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " function(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "7c1485f22ad0c4bc98a22cdb8d341d2eb97fcab8..9e13719e7c1614958c3528e609d7ac1cfb068fe6"
+    "shas": "ed5a8373997dc1879db9c1c9168d3b26e7b3dc90..dc33c0452310a395ba61cd50472fcbb7c09eb19a"
 }
 ,{
     "testCaseDescription": "javascript-function-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index 924c99e..4389406 100644",
+        "index 924c99e8..43894067 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " function(arg1, arg2) { arg2; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9e13719e7c1614958c3528e609d7ac1cfb068fe6..e36301a0b4cc27e38d4c77c49f97e1a6ba816fbb"
+    "shas": "dc33c0452310a395ba61cd50472fcbb7c09eb19a..a95c62fef6c7f158ccb26b14adceb5a3a3f52ad1"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index 4389406..254dbcf 100644",
+        "index 43894067..254dbcf8 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+function(arg1, arg2) { arg1; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e36301a0b4cc27e38d4c77c49f97e1a6ba816fbb..fbc7371a528f691d2e0b43ceed413fab19186b82"
+    "shas": "a95c62fef6c7f158ccb26b14adceb5a3a3f52ad1..74d7b44b4bf8045b15dbd99ff56365d56beca8c3"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index 254dbcf..b37e867 100644",
+        "index 254dbcf8..b37e8671 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " function(arg1, arg2) { arg1; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fbc7371a528f691d2e0b43ceed413fab19186b82..dd37f0a24f8a677191eb11c1dad4119d46e35d14"
+    "shas": "74d7b44b4bf8045b15dbd99ff56365d56beca8c3..4a809529033c4b4ce9ac0dff95e378035c98a29f"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/function.js b/function.js",
-        "index b37e867..e69de29 100644",
+        "index b37e8671..e69de29b 100644",
         "--- a/function.js",
         "+++ b/function.js",
         "@@ -1 +0,0 @@",
         "-function(arg1, arg2) { arg1; };"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dd37f0a24f8a677191eb11c1dad4119d46e35d14..d700dc51fee7a3dd557906dcdf46d426285d7955"
+    "shas": "4a809529033c4b4ce9ac0dff95e378035c98a29f..9adc811773ddcc66050c739b5bc900c4c2daff55"
 }]

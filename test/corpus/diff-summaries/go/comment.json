@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,30 +53,12 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2ff7aeec9c5efbeaf3a7b681f718640926ca1f90..74e82f0e6d4689ed73a303f79e35a56f42fd47d2"
+    "shas": "8e3963891495e21f1ae65d7e70a3318144f75eaf..eacec1615ec7d632e65f6399ba4bd1d6eb0c655b"
 }
 ,{
     "testCaseDescription": "go-comment-insert-test",
     "expectedResult": {
-        "changes": {
-            "comment.go": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added the '// this is a comment' comment in the main function of the 'main' module"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -81,42 +78,12 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "74e82f0e6d4689ed73a303f79e35a56f42fd47d2..0d4ddf5fe3e61320b81f8c2392116951ac63bc19"
+    "shas": "eacec1615ec7d632e65f6399ba4bd1d6eb0c655b..22ba35f34265f125747ff97f31d80501bb2ea9be"
 }
 ,{
     "testCaseDescription": "go-comment-replacement-test",
     "expectedResult": {
-        "changes": {
-            "comment.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '// this is a comment' comment with the '/*\nthis is a block comment\n*/' comment in the main function of the 'main' module"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -138,42 +105,12 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0d4ddf5fe3e61320b81f8c2392116951ac63bc19..910896385d213cb7c06e2ead55a4b9abba069a36"
+    "shas": "22ba35f34265f125747ff97f31d80501bb2ea9be..5d0d50089832fc0af1b374ae2b4ef75d437ec836"
 }
 ,{
     "testCaseDescription": "go-comment-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "comment.go": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    6,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    1
-                                ],
-                                "end": [
-                                    4,
-                                    21
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '/*\nthis is a block comment\n*/' comment with the '// this is a comment' comment in the main function of the 'main' module"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -195,30 +132,12 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "910896385d213cb7c06e2ead55a4b9abba069a36..f129ff19da478611e72dc4a472f1fe440e32d7a8"
+    "shas": "5d0d50089832fc0af1b374ae2b4ef75d437ec836..cc003e940a92d95723ec317b15d741ccb647e273"
 }
 ,{
     "testCaseDescription": "go-comment-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "comment.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '// this is a comment' comment in the main function of the 'main' module"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -238,7 +157,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f129ff19da478611e72dc4a472f1fe440e32d7a8..9db6c10b7cd6aeeda4a153ac070d38768258f376"
+    "shas": "cc003e940a92d95723ec317b15d741ccb647e273..6a1fc3457e96802a77733a246f434d6467488c72"
 }
 ,{
     "testCaseDescription": "go-comment-teardown-test",
@@ -253,12 +172,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -280,5 +214,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9db6c10b7cd6aeeda4a153ac070d38768258f376..96429faca853f0301df4b0d4d43ce26e3011129c"
+    "shas": "6a1fc3457e96802a77733a246f434d6467488c72..48185d56157b0dff94b8ad49ec436a0f88a6938d"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d47123e6fd9c69b12607e0236be45289b764ce8b..2295a64ba4b51a33fb10e4f15334c064fc693f38"
+    "shas": "1bc0bf28b3d52d5c76f3ecfd9f851436c94826be..2d862a9828824d4abac9905df843496b873c3826"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[]a.b(c.d)' type conversion expression in the main function of the 'main' module"
+                    "summary": "Added the '[]a.b(c.d)' type conversion expression in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '([]a.b)(c.d)' type conversion expression in the main function of the 'main' module"
+                    "summary": "Added the '([]a.b)(c.d)' type conversion expression in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'e[f](g)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'e[f](g)' function call in the main function"
                 },
                 {
                     "span": {
@@ -103,7 +118,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'e[f](g)' function call in the main function of the 'main' module"
+                    "summary": "Added the 'e[f](g)' function call in the main function"
                 }
             ]
         },
@@ -129,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2295a64ba4b51a33fb10e4f15334c064fc693f38..ea6a60af4f877c1ff46a539776d2893d1268c4a5"
+    "shas": "2d862a9828824d4abac9905df843496b873c3826..0f55e5c4f0c516d95a93de9a271272f49fa2d356"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-replacement-test",
@@ -161,7 +176,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a.b' qualified identifier with the 'x.y' qualified identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a.b' qualified identifier with the 'x.y' qualified identifier in the main function"
                 },
                 {
                     "span": {
@@ -242,7 +257,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a.b' qualified identifier with the 'f.g' qualified identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'a.b' qualified identifier with the 'f.g' qualified identifier in the main function"
                 },
                 {
                     "span": {
@@ -487,7 +502,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ea6a60af4f877c1ff46a539776d2893d1268c4a5..726d84b24c74206d9ba8612e5595e5c1d34c8234"
+    "shas": "0f55e5c4f0c516d95a93de9a271272f49fa2d356..ebac03bdc5b7794179c4ccb5605a51829475c668"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-replacement-test",
@@ -519,7 +534,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x.y' qualified identifier with the 'a.b' qualified identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'x.y' qualified identifier with the 'a.b' qualified identifier in the main function"
                 },
                 {
                     "span": {
@@ -600,7 +615,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f.g' qualified identifier with the 'a.b' qualified identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'f.g' qualified identifier with the 'a.b' qualified identifier in the main function"
                 },
                 {
                     "span": {
@@ -845,7 +860,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "726d84b24c74206d9ba8612e5595e5c1d34c8234..9138ddb9e7c8d3be78dd7cd750ceb0f307a30065"
+    "shas": "ebac03bdc5b7794179c4ccb5605a51829475c668..2d9cc45388ce0133a91d1d8eff260f1b7300ced2"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-delete-insert-test",
@@ -865,7 +880,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[]a.b(c.d)' type conversion expression in the main function of the 'main' module"
+                    "summary": "Deleted the '[]a.b(c.d)' type conversion expression in the main function"
                 },
                 {
                     "span": {
@@ -880,7 +895,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '([]a.b)(c.d)' type conversion expression in the main function of the 'main' module"
+                    "summary": "Deleted the '([]a.b)(c.d)' type conversion expression in the main function"
                 },
                 {
                     "span": {
@@ -895,7 +910,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e[f](g)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'e[f](g)' function call in the main function"
                 },
                 {
                     "span": {
@@ -910,7 +925,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e[f](g)' function call in the main function of the 'main' module"
+                    "summary": "Deleted the 'e[f](g)' function call in the main function"
                 }
             ]
         },
@@ -936,7 +951,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9138ddb9e7c8d3be78dd7cd750ceb0f307a30065..d5e1f18c7c2feeee39275f304cacd1575d22ac1a"
+    "shas": "2d9cc45388ce0133a91d1d8eff260f1b7300ced2..781a877587c75941d16a7edfe4ce86dcfb22abb3"
 }
 ,{
     "testCaseDescription": "go-type-conversion-expressions-teardown-test",
@@ -951,12 +966,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -978,5 +1008,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5e1f18c7c2feeee39275f304cacd1575d22ac1a..17539bd3043b11a2ee479a191c1a1b3c10116161"
+    "shas": "781a877587c75941d16a7edfe4ce86dcfb22abb3..f492750d73c1612924d6664276dd926ea6e42961"
 }]

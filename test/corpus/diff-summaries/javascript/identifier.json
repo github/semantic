@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index e69de29..1cf4ad0 100644",
+        "index e69de29b..1cf4ad05 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -0,0 +1 @@",
         "+theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2642fef686808ac2a6c5edde323e87257f4f2983..369e63ae9927770fe9ca2fd662ca648e43ab72e5"
+    "shas": "23f245e71b4513803366aff2b4ae93549ad9d3fa..cdaacae44dc6aa4a3aba0e68c2459f5065fd1fa4"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index 1cf4ad0..888855a 100644",
+        "index 1cf4ad05..888855ad 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "369e63ae9927770fe9ca2fd662ca648e43ab72e5..ee416c16400890b8f6351b1c8113657cb7671eb7"
+    "shas": "cdaacae44dc6aa4a3aba0e68c2459f5065fd1fa4..1389abc96bdc1a98d47c21fd7d6740d4eeca4269"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index 888855a..60e041c 100644",
+        "index 888855ad..60e041c1 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ee416c16400890b8f6351b1c8113657cb7671eb7..13d808ca205317e4c1b13c036517ed17cdde1da3"
+    "shas": "1389abc96bdc1a98d47c21fd7d6740d4eeca4269..3c9356ded5de6099c8d07a2edba09dfbbeb5807c"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index 60e041c..888855a 100644",
+        "index 60e041c1..888855ad 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "13d808ca205317e4c1b13c036517ed17cdde1da3..1f1988b798d7bd2558d1d050b242ef4afbd52629"
+    "shas": "3c9356ded5de6099c8d07a2edba09dfbbeb5807c..cfaa88230fcf2d750b14d9e07f3fd13a9d254b36"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index 888855a..fbc7b28 100644",
+        "index 888855ad..fbc7b28e 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+theVar2"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1f1988b798d7bd2558d1d050b242ef4afbd52629..6408b95d2773e060ccc2c624b319447b326c8a51"
+    "shas": "cfaa88230fcf2d750b14d9e07f3fd13a9d254b36..282c008a1c6565c04e67798c059f42f44495243f"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index fbc7b28..7276d95 100644",
+        "index fbc7b28e..7276d95d 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " theVar2"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6408b95d2773e060ccc2c624b319447b326c8a51..011d19e2d6ea45758e3df50809069437b44911b5"
+    "shas": "282c008a1c6565c04e67798c059f42f44495243f..44cb18591cf8d85ba07812c409c991217cd383ba"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/identifier.js b/identifier.js",
-        "index 7276d95..e69de29 100644",
+        "index 7276d95d..e69de29b 100644",
         "--- a/identifier.js",
         "+++ b/identifier.js",
         "@@ -1 +0,0 @@",
         "-theVar2"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "011d19e2d6ea45758e3df50809069437b44911b5..5180fa74c7ae39b3c2cb94b9b5498307af385e5c"
+    "shas": "44cb18591cf8d85ba07812c409c991217cd383ba..62c20bfb9474af540a2ab5d5be1a93530bd21eb8"
 }]

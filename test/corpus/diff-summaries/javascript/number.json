@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index e69de29..398050c 100644",
+        "index e69de29b..398050c6 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -0,0 +1 @@",
         "+101"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "aa6143f1a8ae9ca9b1ee3577121858208df3cce0..3838259f90e9c1e4e6ce33e99b8d9a0fbcd9e616"
+    "shas": "6973df063cce62bb3a038ea4124571d47a2c9083..e1ac9add54a38da5738a49903820e2a3f5db3f52"
 }
 ,{
     "testCaseDescription": "javascript-number-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index 398050c..16da476 100644",
+        "index 398050c6..16da476c 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " 101"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3838259f90e9c1e4e6ce33e99b8d9a0fbcd9e616..6e18d86d44c74acdcea5dc6ea75a8169152e0dd2"
+    "shas": "e1ac9add54a38da5738a49903820e2a3f5db3f52..2445bb7656755d88141c3503580a987fada88d34"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index 16da476..252b3e8 100644",
+        "index 16da476c..252b3e84 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " 101"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "6e18d86d44c74acdcea5dc6ea75a8169152e0dd2..b40e32fd74e885cdf5d9617ef37150ec3d414177"
+    "shas": "2445bb7656755d88141c3503580a987fada88d34..a489f5fb28c2cc4be7b3d8015c0f5bebe43f060e"
 }
 ,{
     "testCaseDescription": "javascript-number-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index 252b3e8..16da476 100644",
+        "index 252b3e84..16da476c 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " 101"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b40e32fd74e885cdf5d9617ef37150ec3d414177..85a591e8bebf6a7b8b9adfdebebfb4b8776ab809"
+    "shas": "a489f5fb28c2cc4be7b3d8015c0f5bebe43f060e..724c567757b9566241eee14f7b0bfa74b1bd2f09"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index 16da476..bb77dfb 100644",
+        "index 16da476c..bb77dfbd 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+102"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "85a591e8bebf6a7b8b9adfdebebfb4b8776ab809..3e5ee4738617f0b4536cee654c79c7c71e8d7e7b"
+    "shas": "724c567757b9566241eee14f7b0bfa74b1bd2f09..c5684c3b9e9b42ff8b3eaac28d88f49bef71ffa9"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index bb77dfb..257e563 100644",
+        "index bb77dfbd..257e5632 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " 102"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "3e5ee4738617f0b4536cee654c79c7c71e8d7e7b..15bf3e42bb84c62933b0d29e0b675bca24cc66b2"
+    "shas": "c5684c3b9e9b42ff8b3eaac28d88f49bef71ffa9..747da5bd094aaa871b8ef06d65a18b02c0c74f9c"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/number.js b/number.js",
-        "index 257e563..e69de29 100644",
+        "index 257e5632..e69de29b 100644",
         "--- a/number.js",
         "+++ b/number.js",
         "@@ -1 +0,0 @@",
         "-102"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "15bf3e42bb84c62933b0d29e0b675bca24cc66b2..2e348ee88f62c0857d6f6ce2ab3ee0d46f12afeb"
+    "shas": "747da5bd094aaa871b8ef06d65a18b02c0c74f9c..3ab54dc1f52a044020029364417b8c1e44102ef5"
 }]

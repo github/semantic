@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index e69de29..1cf4ad0 100644",
+        "index e69de29b..1cf4ad05 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -0,0 +1 @@",
         "+theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "2e348ee88f62c0857d6f6ce2ab3ee0d46f12afeb..09aa9131842b754fdd19963205e4e00f4413871b"
+    "shas": "3ab54dc1f52a044020029364417b8c1e44102ef5..32ffc9016a9036ddef2fce855dbabfb7bd1acd96"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index 1cf4ad0..888855a 100644",
+        "index 1cf4ad05..888855ad 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "09aa9131842b754fdd19963205e4e00f4413871b..0b3b0533e575b679bbba53387580ba2c730806e4"
+    "shas": "32ffc9016a9036ddef2fce855dbabfb7bd1acd96..1c41f51366e2e534813ad54543c086b05fd76f42"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index 888855a..60e041c 100644",
+        "index 888855ad..60e041c1 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "0b3b0533e575b679bbba53387580ba2c730806e4..03875ee2891e9d8081f5d4bace0acb59724eca90"
+    "shas": "1c41f51366e2e534813ad54543c086b05fd76f42..6c615ecd1b0e89f5a89aac59f6e3dcea0e53d3b7"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index 60e041c..888855a 100644",
+        "index 60e041c1..888855ad 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " theVar;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "03875ee2891e9d8081f5d4bace0acb59724eca90..fc9c0d118d51bb745bf3665c575c58592deee4d5"
+    "shas": "6c615ecd1b0e89f5a89aac59f6e3dcea0e53d3b7..4e54a7bf031d9056ade28569e9a7c8b8aab05a48"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index 888855a..fbc7b28 100644",
+        "index 888855ad..fbc7b28e 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+theVar2"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "fc9c0d118d51bb745bf3665c575c58592deee4d5..e286370e12767dd248982f92fd5f058e1099616e"
+    "shas": "4e54a7bf031d9056ade28569e9a7c8b8aab05a48..7fc8f379d2c5b766bf4e55da23d7b31726406bd9"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index fbc7b28..7276d95 100644",
+        "index fbc7b28e..7276d95d 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " theVar2"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e286370e12767dd248982f92fd5f058e1099616e..841c185fa272c7e634d52eca4fd38d05c1ac72a4"
+    "shas": "7fc8f379d2c5b766bf4e55da23d7b31726406bd9..8a05285735f7169959851e97686b3b2225b0fd59"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/variable.js b/variable.js",
-        "index 7276d95..e69de29 100644",
+        "index 7276d95d..e69de29b 100644",
         "--- a/variable.js",
         "+++ b/variable.js",
         "@@ -1 +0,0 @@",
         "-theVar2"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "841c185fa272c7e634d52eca4fd38d05c1ac72a4..2642fef686808ac2a6c5edde323e87257f4f2983"
+    "shas": "8a05285735f7169959851e97686b3b2225b0fd59..23f245e71b4513803366aff2b4ae93549ad9d3fa"
 }]

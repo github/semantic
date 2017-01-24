@@ -9,14 +9,14 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index e69de29..a5821d2 100644",
+        "index e69de29b..a5821d24 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -0,0 +1 @@",
         "+// This is a property"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "81bc4513ad3979452e9e95586a5fbc9ca66eeadc..522a93132b55605393a0f7a5421f3d1f7b0d4a8c"
+    "shas": "56b3ef654938c8fc1c02e365cb518f170511a823..9330732da3f60c8e6437c4d11d79aed78a791b04"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-insert-test",
@@ -29,7 +29,7 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index a5821d2..761aa7a 100644",
+        "index a5821d24..761aa7a3 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -1 +1,5 @@",
@@ -40,7 +40,7 @@
         " // This is a property"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "522a93132b55605393a0f7a5421f3d1f7b0d4a8c..f0aa09e8712b14d61160b16073cac5fbd0276038"
+    "shas": "9330732da3f60c8e6437c4d11d79aed78a791b04..c08e371085c5af8d5e11d734ba46ffbbc4d8edbf"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-insert-test",
@@ -53,7 +53,7 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index 761aa7a..3b33406 100644",
+        "index 761aa7a3..3b33406a 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -1,5 +1,3 @@",
@@ -65,7 +65,7 @@
         " // This is a property"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f0aa09e8712b14d61160b16073cac5fbd0276038..9402b254de81dabcddcbd6d7308911822b6f0f59"
+    "shas": "c08e371085c5af8d5e11d734ba46ffbbc4d8edbf..2f680ffad4edd7e2631d6b2a03d73a6f9ed66813"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-test",
@@ -78,7 +78,7 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index 3b33406..761aa7a 100644",
+        "index 3b33406a..761aa7a3 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -1,3 +1,5 @@",
@@ -90,7 +90,7 @@
         " // This is a property"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9402b254de81dabcddcbd6d7308911822b6f0f59..ba788116c40403584cd03df9976350810a9b1162"
+    "shas": "2f680ffad4edd7e2631d6b2a03d73a6f9ed66813..95bdc17204a7e6522cbf0dd0e985cd35865c6f7d"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-replacement-test",
@@ -103,7 +103,7 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index 761aa7a..c2a8148 100644",
+        "index 761aa7a3..c2a8148a 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -1,5 +1,4 @@",
@@ -115,7 +115,7 @@
         "-// This is a property"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ba788116c40403584cd03df9976350810a9b1162..05a2041be1630b8a7309163d4b863cd8966adbe0"
+    "shas": "95bdc17204a7e6522cbf0dd0e985cd35865c6f7d..22fae60a84e7c276dac1afcb316a72a7ae530c37"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-test",
@@ -128,7 +128,7 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index c2a8148..7c74dcd 100644",
+        "index c2a8148a..7c74dcdf 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -1,4 +1,3 @@",
@@ -138,7 +138,7 @@
         " */"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "05a2041be1630b8a7309163d4b863cd8966adbe0..28ae9fb48ab99b60a709d3168a82f53017fa27a0"
+    "shas": "22fae60a84e7c276dac1afcb316a72a7ae530c37..6273138826febf9dd2611fcb51bb643606b284be"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-rest-test",
@@ -151,7 +151,7 @@
     ],
     "patch": [
         "diff --git a/comment.js b/comment.js",
-        "index 7c74dcd..e69de29 100644",
+        "index 7c74dcdf..e69de29b 100644",
         "--- a/comment.js",
         "+++ b/comment.js",
         "@@ -1,3 +0,0 @@",
@@ -160,5 +160,5 @@
         "-*/"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "28ae9fb48ab99b60a709d3168a82f53017fa27a0..8f7edd21ecef61769b82fb5a60a881f31ce30a01"
+    "shas": "6273138826febf9dd2611fcb51bb643606b284be..20109cf62d65353fadfe9965edbf1f9e875db9c4"
 }]

@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index e69de29..7a99e30 100644",
+        "index e69de29b..7a99e309 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -0,0 +1 @@",
         "+y.x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "83f3153b76f49e077237997c965dc6f3c3a159bc..e3b5bd418d494825d815573a2dd33bb71bee5d48"
+    "shas": "8971dc3263a4d4060368d23937d32f6df7c06d16..4e88541e19df2f302cf1337af08f45198be7859b"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index 7a99e30..3204006 100644",
+        "index 7a99e309..32040068 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " y.x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e3b5bd418d494825d815573a2dd33bb71bee5d48..1da355d7b96efcfa960001b22e4bc94e5be102bd"
+    "shas": "4e88541e19df2f302cf1337af08f45198be7859b..a95a09675d9fe9e0d6e296b6527a4c7481e8cf55"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index 3204006..94893a3 100644",
+        "index 32040068..94893a32 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " y.x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1da355d7b96efcfa960001b22e4bc94e5be102bd..f2443f2327ec99428bb7538077575ea11136f8bd"
+    "shas": "a95a09675d9fe9e0d6e296b6527a4c7481e8cf55..34a3e46f6598a923b2e78e0f012dfbe4faac797d"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index 94893a3..3204006 100644",
+        "index 94893a32..32040068 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " y.x = 0;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f2443f2327ec99428bb7538077575ea11136f8bd..396adf86163adae31b6cbe282ed485497c4f42a4"
+    "shas": "34a3e46f6598a923b2e78e0f012dfbe4faac797d..54b9c38305d1c90e6c97ec2c89f6aa125c038f15"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index 3204006..8d78a24 100644",
+        "index 32040068..8d78a24f 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+y.x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "396adf86163adae31b6cbe282ed485497c4f42a4..ebd783b11d81b4c31d3883606aa0ee7019afb1c3"
+    "shas": "54b9c38305d1c90e6c97ec2c89f6aa125c038f15..21b4c15a34c4279184e291cdd81eae4d5c35f565"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index 8d78a24..799018d 100644",
+        "index 8d78a24f..799018d0 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " y.x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ebd783b11d81b4c31d3883606aa0ee7019afb1c3..f0a86404c7e04e9a627fd8464879a14361a379bd"
+    "shas": "21b4c15a34c4279184e291cdd81eae4d5c35f565..93b31824234e8cd04d5e25e83a17d059e8c005b7"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/member-access-assignment.js b/member-access-assignment.js",
-        "index 799018d..e69de29 100644",
+        "index 799018d0..e69de29b 100644",
         "--- a/member-access-assignment.js",
         "+++ b/member-access-assignment.js",
         "@@ -1 +0,0 @@",
         "-y.x = 1;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f0a86404c7e04e9a627fd8464879a14361a379bd..faf582893e706ae259a0482d65d424fbcf137bb2"
+    "shas": "93b31824234e8cd04d5e25e83a17d059e8c005b7..4771589971576b44762a611a7b4b4cbdb9259735"
 }]
