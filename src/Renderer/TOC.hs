@@ -167,7 +167,9 @@ toJSONSummaries TOCSummary{..} = case (maybeFst $ unPatch patch, maybeSnd $ unPa
       ErrorInfo{..} -> pure $ ErrorSummary termName infoSpan
       BranchInfo{..} -> branches >>= toJSONSummaries'
       HideInfo -> []
-      LeafInfo{..} -> pure $ JSONSummary parentInfo
+      LeafInfo{..} -> case parentInfo of
+        NotSummarizable -> []
+        _ -> pure $ JSONSummary parentInfo
 
 termToDiffInfo :: (StringConv leaf Text, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
