@@ -40,6 +40,8 @@ termAssignment _ category children
       ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
       _ -> S.Class constant Nothing rest
     (SingletonClass, identifier : rest ) -> Just $ S.Class identifier Nothing rest
+    (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== When) . Info.category . extract) children)
+    (When, expr : body) -> Just $ S.Case expr body
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (Constant, _ ) -> Just $ S.Fixed children
     (MethodCall, fn : args) | MemberAccess <- Info.category (extract fn)
@@ -95,7 +97,7 @@ categoryForRubyName = \case
   "block_parameter" -> BlockParameter
   "boolean" -> Boolean
   "call" -> MemberAccess
-  "case" -> Switch
+  "case" -> Case
   "class"  -> Class
   "comment" -> Comment
   "conditional" -> Ternary
@@ -147,7 +149,7 @@ categoryForRubyName = \case
   "unless" -> Unless
   "until_modifier" -> Modifier Until
   "until" -> Until
-  "when" -> Case
+  "when" -> When
   "while_modifier" -> Modifier While
   "while" -> While
   "yield" -> Yield
