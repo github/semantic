@@ -58,11 +58,10 @@ data JSONSummary = JSONSummary { info :: ParentInfo, changeType :: Text }
                  deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  -- TODO fix JSON instance
   toJSON JSONSummary{..} = object . ([ "changeType" .= changeType ] <>) $ case info of
     ParentInfo{..} -> [ "category" .= (show parentCategory :: Text), "term" .= parentTermName, "sourceSpan" .= parentSourceSpan ]
     ExpressionInfo{..} -> [ "category" .= (show exprCategory :: Text), "term" .= exprTermName, "sourceSpan" .= exprSourceSpan ]
-    None -> []
+    None -> panic "None ParentInfos should have been pruned"
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan ]
 
 isErrorSummary :: JSONSummary -> Bool
