@@ -17,7 +17,6 @@ import Syntax as S
 import Term
 import Patch
 import Unsafe (unsafeHead)
-import qualified Data.Text as Text
 
 {-
 
@@ -186,47 +185,10 @@ termToDiffInfo blob term = case unwrap term of
 toTermName :: forall leaf fields. DefaultFields fields => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.Function identifier _ _ -> toTermName' identifier
-  S.Method identifier _ args _ -> toTermName' identifier <> paramsToArgNames args
+  S.Method identifier _ _ _ -> toTermName' identifier
   _ -> termNameFromSource term
   where
     toTermName' = toTermName source
-    paramsToArgNames params = "(" <> Text.intercalate ", " (toArgName <$> params) <> ")"
-    toArgName :: SyntaxTerm leaf fields -> Text
-    toArgName arg = case identifiable arg of
-                      Identifiable arg -> toTermName' arg
-                      Unidentifiable _ -> "…"
     termNameFromSource term = termNameFromRange (range term)
     termNameFromRange range = toText $ Source.slice range source
     range = characterRange . extract
-
-data Identifiable a = Identifiable a | Unidentifiable a
-
-identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
-identifiable term = isIdentifiable (unwrap term) term
-  where isIdentifiable = \case
-          S.FunctionCall{} -> Identifiable
-          S.MethodCall{} -> Identifiable
-          S.Function{} -> Identifiable
-          S.Assignment{} -> Identifiable
-          S.OperatorAssignment{} -> Identifiable
-          S.VarAssignment{} -> Identifiable
-          S.SubscriptAccess{} -> Identifiable
-          S.Module{} -> Identifiable
-          S.Class{} -> Identifiable
-          S.Method{} -> Identifiable
-          S.Leaf{} -> Identifiable
-          S.DoWhile{} -> Identifiable
-          S.Import{} -> Identifiable
-          S.Export{} -> Identifiable
-          S.Ternary{} -> Identifiable
-          S.If{} -> Identifiable
-          S.Try{} -> Identifiable
-          S.Switch{} -> Identifiable
-          S.Rescue{} -> Identifiable
-          S.Pair{} -> Identifiable
-          S.Array ty _ -> maybe Unidentifiable (const Identifiable) ty
-          S.Object ty _ -> maybe Unidentifiable (const Identifiable) ty
-          S.BlockStatement{} -> Identifiable
-          S.TypeDecl{} -> Identifiable
-          S.Ty{} -> Identifiable
-          _ -> Unidentifiable
