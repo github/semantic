@@ -16,6 +16,8 @@ import Source
 import Syntax as S
 import Term
 import Patch
+import Unsafe (unsafeHead)
+import qualified Data.Text as Text
 
 {-
 
@@ -97,10 +99,13 @@ toc blobs diff = TOCOutput $ Map.fromList [
     summaries = diffTOC blobs diff
 
 diffTOC :: (StringConv leaf Text, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary]
-diffTOC blobs diff = tocToJSONSummaries =<< diffToTOCSummaries (source <$> blobs) diff
+diffTOC blobs diff = tocToJSONSummaries =<< removeDupes (diffToTOCSummaries (source <$> blobs) diff)
   where
     tocToJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
     tocToJSONSummaries TOCSummary{..} = summaries parentInfo patch
+
+    removeDupes :: [TOCSummary DiffInfo] -> [TOCSummary DiffInfo]
+    removeDupes xs = (fmap unsafeHead . List.groupBy (\a b -> parentInfo a == parentInfo b)) xs
 
     diffToTOCSummaries :: (StringConv leaf Text, DefaultFields fields) => Both (Source Char) -> SyntaxDiff leaf fields -> [TOCSummary DiffInfo]
     diffToTOCSummaries sources = para $ \diff ->
@@ -127,10 +132,11 @@ diffTOC blobs diff = tocToJSONSummaries =<< diffToTOCSummaries (source <$> blobs
             (Nothing, Nothing) -> panic "No diff"
       where
         (beforeSource, afterSource) = runJoin sources
-        toTOCSummary patch diffInfo = pure . TOCSummary patch $ case leafCategory diffInfo of
+        toTOCSummary patch diffInfo@LeafInfo{} = pure . TOCSummary patch $ case leafCategory diffInfo of
               C.Function -> ExpressionInfo (leafCategory diffInfo) (termName diffInfo) (leafSourceSpan diffInfo)
               C.Method -> ExpressionInfo (leafCategory diffInfo) (termName diffInfo) (leafSourceSpan diffInfo)
               _ -> None
+        toTOCSummary patch BranchInfo{..} = toTOCSummary patch =<< branches
 
 
 
