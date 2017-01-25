@@ -29,7 +29,8 @@ termConstructor source sourceSpan category range children _ = pure $! case categ
     _ -> withRanges range Error children (S.Error children)
   Other "import_declaration" -> toImports children
   Function -> withDefaultInfo $ case children of
-    [id, params, block] -> S.Function id (toList $ unwrap params) (toList $ unwrap block)
+    [id, params, block] -> S.Function id (toList $ unwrap params) Nothing (toList $ unwrap block)
+    [id, params, ty, block] -> S.Function id (toList $ unwrap params) (Just ty) (toList $ unwrap block)
     rest -> S.Error rest
   For ->
     withDefaultInfo $ case children of
