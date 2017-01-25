@@ -18,42 +18,6 @@ import Term
 import Patch
 import Unsafe (unsafeHead)
 
-{-
-
-TOCSummary (Patch DiffInfo) [Identifiable (Category, Text), Annotatable]
-
-{
-  "changes": [
-    { FilePath: [ {SourceSpan, TermContext, TermType, ChangeType} ] }
-  ],
-  "errors": [
-    { FilePath: [ {SourceSpan, ErrorText } ] }
-  ]
-}
-
-Example: https://github.com/github/github/pull/50259/files
-
-* app/controllers/application_controller/feature_flags_dependency.rb
-    * enable_feature_flags (method)
-
-* app/models/linked_account_collection.rb
-    * remove (method)
-
-* app/models/repository.rb
-    * filtered_by (method)
-
-* app/models/tenant/mismatch_check.rb
-    + report_tenant_mismatch? (method)
-    + report_tenant_mismatch (method)
-
-* app/models/user.rb
-    * recently_updated_member_repos (method)
-
-* lib/github/config.rb
-    + report_tenant_mismatch_enabled? (method)
-
--}
-
 data JSONSummary = JSONSummary { info :: Summarizable }
                  | ErrorSummary { error :: Text, errorSpan :: SourceSpan }
                  deriving (Generic, Eq, Show)
