@@ -85,7 +85,7 @@ defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, C
 defaultTermAssignment source category children allChildren
   | category `elem` operatorCategories = S.Operator <$> allChildren
   | otherwise = pure $! case (category, children) of
-    (ParseError, children) -> S.Error children
+    (ParseError, children) -> S.ParseError children
 
     (Comment, _) -> S.Comment (toText source)
 

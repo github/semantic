@@ -241,7 +241,7 @@ toTermName source term = case unwrap term of
   S.Pair k v -> toKeyName k <> toArgName v
   S.Return children -> Text.intercalate ", " (termNameFromSource <$> children)
   S.Yield children -> Text.intercalate ", " (termNameFromSource <$> children)
-  S.Error _ -> termNameFromSource term
+  S.ParseError _ -> termNameFromSource term
   S.If expr _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
@@ -330,7 +330,7 @@ termToDiffInfo blob term = case unwrap term of
   S.AnonymousFunction _ _ -> LeafInfo C.AnonymousFunction (toTermName' term) (getField $ extract term)
   S.Comment _ -> HideInfo
   S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (category $ extract term) BCommented
-  S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
+  S.ParseError _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> toLeafInfo term
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob

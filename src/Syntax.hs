@@ -57,7 +57,7 @@ data Syntax a f
   | Comment a
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
-  | Error [f]
+  | ParseError [f]
   -- | A for statement has a list of expressions to setup the iteration and then a list of expressions in the body.
   | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
@@ -133,7 +133,7 @@ instance Listable2 Syntax where
     \/ liftCons2 recur recur Pair
     \/ liftCons1 leaf Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) Syntax.Error
+    \/ liftCons1 (liftTiers recur) Syntax.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
     \/ liftCons2 recur recur DoWhile
     \/ liftCons2 recur (liftTiers recur) While
