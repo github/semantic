@@ -79,12 +79,11 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
-
 patchType :: Patch a -> Text
 patchType = \case
-  Replace{} -> "replaced"
+  Replace{} -> "modified"
   Insert{} -> "added"
-  Delete{} -> "deleted"
+  Delete{} -> "removed"
 
 -- Instances
 
