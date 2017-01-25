@@ -39,7 +39,7 @@ data DiffInfo = LeafInfo { leafCategory :: Category, termName :: Text, leafSourc
  deriving (Eq, Show)
 
 data TOCSummary a = TOCSummary {
-                      patch :: Patch a,
+                      summaryPatch :: Patch a,
                       parentInfo :: Summarizable
                     } deriving (Eq, Functor, Show, Generic)
 
@@ -114,7 +114,7 @@ summarizable term = go (unwrap term) term
           _ -> NotSummarizableTerm
 
 toJSONSummaries :: TOCSummary DiffInfo -> [JSONSummary]
-toJSONSummaries TOCSummary{..} = case afterOrBefore patch of
+toJSONSummaries TOCSummary{..} = case afterOrBefore summaryPatch of
   Just diffInfo -> toJSONSummaries' diffInfo
   Nothing -> panic "No diff"
   where

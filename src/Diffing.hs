@@ -75,7 +75,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
 textDiff :: (ToJSON (Record fields), DefaultFields fields, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
-  Patch -> Renderer.Patch.patch
+  Patch -> patch
   SExpression -> sExpression
   JSON -> json
   Summary -> summary
