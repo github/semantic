@@ -36,21 +36,24 @@ termAssignment _ category children
           [ elseBlock ] | Else <- Info.category (extract elseBlock) -> S.Try body rescues (Just elseBlock) Nothing
           [ ensure ] | Ensure <- Info.category (extract ensure) -> S.Try body rescues Nothing (Just ensure)
           _ -> S.Try body rescues Nothing Nothing
-    (Class, constant : rest ) -> Just $ case rest of
-      ( superclass : body ) | Superclass <- Info.category (extract superclass) -> S.Class constant (Just superclass) body
-      _ -> S.Class constant Nothing rest
-    (SingletonClass, identifier : rest ) -> Just $ S.Class identifier Nothing rest
+    (Class, constant : superclass : body)
+      | Superclass <- Info.category (extract superclass)
+      -> Just $ S.Class constant (Just superclass) body
+    (Class, constant : rest) -> Just $ S.Class constant Nothing rest
+    (SingletonClass, identifier : rest) -> Just $ S.Class identifier Nothing rest
     (Case, _) -> Just $ uncurry S.Switch (Prologue.break ((== When) . Info.category . extract) children)
     (When, expr : body) -> Just $ S.Case expr body
     (Ternary, condition : cases) -> Just $ S.Ternary condition cases
     (Constant, _ ) -> Just $ S.Fixed children
-    (MethodCall, fn : args) | MemberAccess <- Info.category (extract fn)
-                            , [target, method] <- toList (unwrap fn)
-                            -> Just $ S.MethodCall target method (toList . unwrap =<< args)
-                            | otherwise
-                            -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
-    (Other "lambda", first : rest) | null rest -> Just $ S.AnonymousFunction [] [first]
-                                   | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
+    (MethodCall, fn : args)
+      | MemberAccess <- Info.category (extract fn)
+      , [target, method] <- toList (unwrap fn)
+      -> Just $ S.MethodCall target method (toList . unwrap =<< args)
+      | otherwise
+      -> Just $ S.FunctionCall fn (toList . unwrap =<< args)
+    (Other "lambda", first : rest)
+      | null rest -> Just $ S.AnonymousFunction [] [first]
+      | otherwise -> Just $ S.AnonymousFunction (toList (unwrap first)) rest
     (Object, _ ) -> Just . S.Object Nothing $ foldMap toTuple children
     (Modifier If, [ lhs, condition ]) -> Just $ S.If condition [lhs]
     (Modifier Unless, [lhs, rhs]) -> Just $ S.If (withRecord (setCategory (extract rhs) Negate) (S.Negate rhs)) [lhs]
@@ -62,20 +65,25 @@ termAssignment _ category children
     (For, lhs : expr : rest ) -> Just $ S.For [lhs, expr] rest
     (OperatorAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
-    (Method, identifier : rest) | params : body <- rest
-                                , Params <- Info.category (extract params)
-                                -> Just $ S.Method identifier Nothing (toList (unwrap params)) body
-                                | otherwise
-                                -> Just $ S.Method identifier Nothing [] rest
+    (Method, identifier : rest)
+      | params : body <- rest
+      , Params <- Info.category (extract params)
+      -> Just $ S.Method identifier Nothing (toList (unwrap params)) body
+      | otherwise
+      -> Just $ S.Method identifier Nothing [] rest
     (Module, constant : body ) -> Just $ S.Module constant body
     (Modifier Rescue, [lhs, rhs] ) -> Just $ S.Rescue [lhs] [rhs]
-    (Rescue, _ ) -> Just $ case children of
-      exceptions : exceptionVar : rest
-        | RescueArgs <- Info.category (extract exceptions)
-        , RescuedException <- Info.category (extract exceptionVar) -> S.Rescue (toList (unwrap exceptions) <> [exceptionVar]) rest
-      exceptionVar : rest | RescuedException <- Info.category (extract exceptionVar) -> S.Rescue [exceptionVar] rest
-      exceptions : body | RescueArgs <- Info.category (extract exceptions) -> S.Rescue (toList (unwrap exceptions)) body
-      body -> S.Rescue [] body
+    (Rescue, exceptions : exceptionVar : rest)
+      | RescueArgs <- Info.category (extract exceptions)
+      , RescuedException <- Info.category (extract exceptionVar)
+      -> Just $ S.Rescue (toList (unwrap exceptions) <> [exceptionVar]) rest
+    (Rescue, exceptionVar : rest)
+      | RescuedException <- Info.category (extract exceptionVar)
+      -> Just $ S.Rescue [exceptionVar] rest
+    (Rescue, exceptions : body)
+      | RescueArgs <- Info.category (extract exceptions)
+      -> Just $ S.Rescue (toList (unwrap exceptions)) body
+    (Rescue, body) -> Just $ S.Rescue [] body
     (Return, _ ) -> Just $ S.Return children
     (Modifier While, [ lhs, condition ]) -> Just $ S.While condition [lhs]
     (While, expr : rest ) -> Just $ S.While expr rest
