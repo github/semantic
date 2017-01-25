@@ -100,6 +100,7 @@ defaultTermAssignment source category children allChildren
     -- Statements
     (Return, _) -> S.Return children
     (Yield, _) -> S.Yield children
+    (Throw, [expr]) -> S.Throw expr
     (Break, [label]) -> S.Break (Just label)
     (Break, []) -> S.Break Nothing
     (Continue, [label]) -> S.Continue (Just label)
