@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2e1fbc3488b3a5250246698b500360fa5c6cfcf2..e42a971b5a20ca75eb3c72bde201c371aa234e47"
+    "shas": "92abc0a7c86e4fde9374babdb2efcd398d27f6ac..d801e97024f83d9e1877e12a313446d798b56cc8"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -81,7 +81,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e42a971b5a20ca75eb3c72bde201c371aa234e47..aca59151a934c5b7d22a87aa964022b68a778cb1"
+    "shas": "d801e97024f83d9e1877e12a313446d798b56cc8..ea2eeeacd1bd254d9b113e7743aca93de78e20c4"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -190,7 +190,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "aca59151a934c5b7d22a87aa964022b68a778cb1..dc7fcc07a9355e4a2ec338447082958991a735e2"
+    "shas": "ea2eeeacd1bd254d9b113e7743aca93de78e20c4..5f3a65a2146a6f53f7898a59138cd7eff5ba13a7"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -299,7 +299,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dc7fcc07a9355e4a2ec338447082958991a735e2..7b10b01b498546d1d3e0e6c9b28fdfeb6a1087f7"
+    "shas": "5f3a65a2146a6f53f7898a59138cd7eff5ba13a7..c5794aa359e1f8866d3de42d8dc71b730f6cddec"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -342,7 +342,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b10b01b498546d1d3e0e6c9b28fdfeb6a1087f7..a909f7c3616574addb8ffea18320f3bb8d50c85e"
+    "shas": "c5794aa359e1f8866d3de42d8dc71b730f6cddec..166ba5c0c7069627f7f405f4b1b0e88c638f6cd8"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -384,5 +384,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a909f7c3616574addb8ffea18320f3bb8d50c85e..584515bfe655665166b3a9a5db100a4bd4ae398b"
+    "shas": "166ba5c0c7069627f7f405f4b1b0e88c638f6cd8..54cc2c98c56816e321a4fffb6927c2793f3cc794"
 }]

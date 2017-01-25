@@ -98,7 +98,7 @@ termConstructor source sourceSpan category range children allChildren
     (Function, _) -> case children of
       [ body ] -> S.AnonymousFunction [] [body]
       [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
-      [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
+      [ id, params, body ] -> S.Function id (toList (unwrap params)) Nothing [body]
       _ -> S.Error children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children

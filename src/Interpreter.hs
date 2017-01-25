@@ -83,9 +83,10 @@ algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $
              <*> maybeRecursively tyA tyB
              <*> bySimilarity paramsA paramsB
              <*> bySimilarity expressionsA expressionsB
-  (S.Function idA paramsA bodyA, S.Function idB paramsB bodyB) -> Just $
+  (S.Function idA paramsA tyA bodyA, S.Function idB paramsB tyB bodyB) -> Just $
     S.Function <$> recursively idA idB
                <*> bySimilarity paramsA paramsB
+               <*> maybeRecursively tyA tyB
                <*> bySimilarity bodyA bodyB
   _ -> Nothing
   where
