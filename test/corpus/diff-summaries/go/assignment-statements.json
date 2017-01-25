@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "399c47d31e2ad439f8e49bf4680be0812e9b4cc5..588b967609ceba554c3be241d3e651adb36e5988"
+    "shas": "091bc58290f6343880a29ef209a9d87aa7a3fcc0..545e6cd93c1d697e514d1fdad37a57f0d937a526"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-insert-test",
@@ -144,7 +144,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "588b967609ceba554c3be241d3e651adb36e5988..72a5c6da86ec18d24bcf5149e36eb92767c2a4b3"
+    "shas": "545e6cd93c1d697e514d1fdad37a57f0d937a526..e0bbb0f31468f4684ee8e2777fc8993596caa1f0"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-replacement-test",
@@ -292,7 +292,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "72a5c6da86ec18d24bcf5149e36eb92767c2a4b3..e783c2b8b271f1d4a599e0ff415d703c6861f246"
+    "shas": "e0bbb0f31468f4684ee8e2777fc8993596caa1f0..284fe9eeee9487470f4e11d93047de38ef682b7e"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-replacement-test",
@@ -464,7 +464,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e783c2b8b271f1d4a599e0ff415d703c6861f246..bb03ff1db47dfb555571b2a629660a35cc8dc2df"
+    "shas": "284fe9eeee9487470f4e11d93047de38ef682b7e..6ab478bb986f0227f287e5128a038117685d82f0"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-delete-insert-test",
@@ -570,7 +570,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bb03ff1db47dfb555571b2a629660a35cc8dc2df..669fc9b2dcd9476dcf19b5017d4562b269129f35"
+    "shas": "6ab478bb986f0227f287e5128a038117685d82f0..6963690336efde9f4763222a83afe4ce714bf5e7"
 }
 ,{
     "testCaseDescription": "go-assignment-statements-teardown-test",
@@ -612,5 +612,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "669fc9b2dcd9476dcf19b5017d4562b269129f35..caf8cf1b4f25af0ad1f536c2ee53151d5b729c41"
+    "shas": "6963690336efde9f4763222a83afe4ce714bf5e7..2d4500613c50791e41a932edd1885da8e9830f8e"
 }]

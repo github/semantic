@@ -38,7 +38,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8c36241f6fa34a04497a8a14d0ea153c1c1d2ab9..9a7c61650bd046a65f790f2674af28a9a80f4acb"
+    "shas": "2e4178577ebab07e2229a6846523de7a1a01d863..4236b968718153403eb7474c665ec2564c45d4af"
 }
 ,{
     "testCaseDescription": "go-method-declarations-insert-test",
@@ -80,7 +80,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9a7c61650bd046a65f790f2674af28a9a80f4acb..eba990de4a2827ff700a83368308a3192c9c45b2"
+    "shas": "4236b968718153403eb7474c665ec2564c45d4af..1be9a817b553812d204fbf84bdcdceeb09eda9aa"
 }
 ,{
     "testCaseDescription": "go-method-declarations-replacement-test",
@@ -161,7 +161,7 @@
         "+func (self Num) Equals(other Num) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "eba990de4a2827ff700a83368308a3192c9c45b2..4a86aaecd2fb88c05e1c6e35c0d8fdb06c05ea0c"
+    "shas": "1be9a817b553812d204fbf84bdcdceeb09eda9aa..09e86485c7afef0d482a0f495713487f6af20df9"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-replacement-test",
@@ -242,7 +242,7 @@
         "+func (self Person) Equals(other Person) bool {}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4a86aaecd2fb88c05e1c6e35c0d8fdb06c05ea0c..9692aac7ee41b59b2fbf8adfc218e6e4255376f6"
+    "shas": "09e86485c7afef0d482a0f495713487f6af20df9..4c2bf0fb4d489fa2924346c61f289cc66a591413"
 }
 ,{
     "testCaseDescription": "go-method-declarations-delete-insert-test",
@@ -284,7 +284,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9692aac7ee41b59b2fbf8adfc218e6e4255376f6..6ee992ec29190c289cf67e89ff87a102de6e4ffa"
+    "shas": "4c2bf0fb4d489fa2924346c61f289cc66a591413..7e9cc3775968f27c92b41ed9f4c8494fbcd30edc"
 }
 ,{
     "testCaseDescription": "go-method-declarations-teardown-test",
@@ -326,5 +326,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ee992ec29190c289cf67e89ff87a102de6e4ffa..dc481a812acdce8f32ab29c04145291460a7c999"
+    "shas": "7e9cc3775968f27c92b41ed9f4c8494fbcd30edc..7193c3cab8046a6b2b57792ecbef7f2ad5f318b7"
 }]

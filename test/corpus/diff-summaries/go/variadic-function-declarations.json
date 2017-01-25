@@ -5,121 +5,40 @@
             "variadic-function-declarations.go": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                4,
-                                20
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'g2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                9
-                            ],
-                            "end": [
-                                5,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '...int' parameter declaration in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                17
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
+                                1,
                                 1
                             ],
                             "end": [
                                 6,
-                                23
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'g3' function in the main function of the 'main' module"
+                    "summary": "Added the 'main' module"
                 }
             ]
         },
-        "errors": {
-            "variadic-function-declarations.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'func g1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "variadic-function-declarations.go"
     ],
     "patch": [
         "diff --git a/variadic-function-declarations.go b/variadic-function-declarations.go",
-        "index 42ee7381..79058077 100644",
+        "index e69de29b..79058077 100644",
         "--- a/variadic-function-declarations.go",
         "+++ b/variadic-function-declarations.go",
-        "@@ -1,7 +1,5 @@",
-        " package main",
-        " ",
-        " func main() {",
-        "-func g1(a ...*int) {}",
-        "-func g2(...int) {}",
-        "-func g3(a, ...bool) {}",
+        "@@ -0,0 +1,5 @@",
+        "+package main",
         "+",
-        " }"
+        "+func main() {",
+        "+",
+        "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bb8da5de55bd9f6e33daa05e7fa30c9799839aec..ba3aa52d60fb18a02522e63fde118613b4f51254"
+    "shas": "6eefcab8de06ce411a43f0fe718199942aa7d74b..cbc15452a6708013f0559031ebb0190234de7422"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -242,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ba3aa52d60fb18a02522e63fde118613b4f51254..63f6a7a750fc6bf46cab387ce86e0015674e55d5"
+    "shas": "cbc15452a6708013f0559031ebb0190234de7422..b5a661d6c9c6eda94de5c3e4bf688ce16f57692a"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -355,7 +274,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "63f6a7a750fc6bf46cab387ce86e0015674e55d5..29a5c56946f1fdf75d08c3b1bb9a65d7912236d3"
+    "shas": "b5a661d6c9c6eda94de5c3e4bf688ce16f57692a..49205166c96eb0c07161f0e204911499761b30bc"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -468,7 +387,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "29a5c56946f1fdf75d08c3b1bb9a65d7912236d3..c350623e608f4f30cbbca3e4184139c57677f6ad"
+    "shas": "49205166c96eb0c07161f0e204911499761b30bc..400b767878ef457aa783e1fe6d9448a474322df9"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -591,7 +510,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c350623e608f4f30cbbca3e4184139c57677f6ad..2e55253157b7853e326d1dfdd4888f35a0a1f60a"
+    "shas": "400b767878ef457aa783e1fe6d9448a474322df9..cdcea7ca79996d80a7294a25aaafc60468b769ae"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -633,5 +552,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2e55253157b7853e326d1dfdd4888f35a0a1f60a..8c36241f6fa34a04497a8a14d0ea153c1c1d2ab9"
+    "shas": "cdcea7ca79996d80a7294a25aaafc60468b769ae..2e4178577ebab07e2229a6846523de7a1a01d863"
 }]

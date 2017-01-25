@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3c197b92c6dc5f1234f5636deaa24510e27e2797..4ba2d20cc2098296df9b37a4ae7051f22ab5de5e"
+    "shas": "54cc2c98c56816e321a4fffb6927c2793f3cc794..d19eab9ef64c9690bb40f960167fe7f379050ce1"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -161,7 +161,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4ba2d20cc2098296df9b37a4ae7051f22ab5de5e..873b8037a78e5f45bfe90bb78db4b6e7bef13927"
+    "shas": "d19eab9ef64c9690bb40f960167fe7f379050ce1..7b7e60ce9893393670010e1b0c82c393d0bbc87f"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -285,7 +285,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "873b8037a78e5f45bfe90bb78db4b6e7bef13927..78c617eab47b2c8b715b98d28d97769c6e78f60e"
+    "shas": "7b7e60ce9893393670010e1b0c82c393d0bbc87f..3cb474bb7624520b7d6f16188a5949810d92dd20"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -418,7 +418,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "78c617eab47b2c8b715b98d28d97769c6e78f60e..d01ed339fb7ee6b6721d20a3020377ea80b9b046"
+    "shas": "3cb474bb7624520b7d6f16188a5949810d92dd20..2ca22a76ba48f867fd999d0f99608d38b55809fc"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -541,7 +541,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d01ed339fb7ee6b6721d20a3020377ea80b9b046..359faf6a8879f7bf9d812b2d4f20cb676e07e915"
+    "shas": "2ca22a76ba48f867fd999d0f99608d38b55809fc..dd710f15cf06e30adfc658dabf70fbbd8b0958fa"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -583,5 +583,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "359faf6a8879f7bf9d812b2d4f20cb676e07e915..f6932a337097d743873baf243a7933e6c14f5794"
+    "shas": "dd710f15cf06e30adfc658dabf70fbbd8b0958fa..668c02674516194c0623120c957d1be93af6cde5"
 }]
