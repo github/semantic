@@ -30,9 +30,7 @@ termAssignment _ category children
     (VarAssignment, [ x, y ]) -> Just $ S.VarAssignment x y
     (VarDecl, _) -> Just . S.Indexed $ toVarDecl <$> children
     (Object, _) -> Just . S.Object Nothing $ foldMap toTuple children
-    (Pair, _) -> Just $ S.Fixed children
     (DoWhile, [ expr, body ]) -> Just $ S.DoWhile expr body
-    (Throw, [ expr ]) -> Just $ S.Throw expr
     (Constructor, [ expr ]) -> Just $ S.Constructor expr
     (Try, [ body ]) -> Just $ S.Try [body] [] Nothing Nothing
     (Try, [ body, catch ])
@@ -57,7 +55,6 @@ termAssignment _ category children
       | S.Indexed _ <- unwrap statements
       -> Just $ S.Export Nothing (toList (unwrap statements))
       | otherwise -> Just $ S.Export (Just statements) []
-    (Yield, _ ) -> Just $ S.Yield children
     (For, _)
       | Just (exprs, body) <- unsnoc children
       -> Just $ S.For exprs [body]
