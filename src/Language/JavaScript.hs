@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs #-}
+{-# LANGUAGE DataKinds #-}
 module Language.JavaScript where
 
 import Info
