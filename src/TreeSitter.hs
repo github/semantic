@@ -85,7 +85,7 @@ defaultTermAssignment :: Source Char -> Category -> [ SyntaxTerm Text '[Range, C
 defaultTermAssignment source category children allChildren
   | category `elem` operatorCategories = S.Operator <$> allChildren
   | otherwise = pure $! case (category, children) of
-    (Error, children) -> S.Error children
+    (ParseError, children) -> S.Error children
 
     (Comment, _) -> S.Comment (toText source)
 
@@ -129,5 +129,5 @@ categoryForLanguageProductionName = withDefaults . \case
   Language.Go -> Go.categoryForGoName
   _ -> Other
   where withDefaults productionMap = \case
-          "ERROR" -> Error
+          "ERROR" -> ParseError
           s -> productionMap s

@@ -374,7 +374,7 @@ instance HasCategory Category where
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
     C.Comment -> "comment"
-    C.Error -> "error"
+    C.ParseError -> "error"
     ExpressionStatements -> "expression statements"
     C.Assignment -> "assignment"
     C.Function -> "function"
