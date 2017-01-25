@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "96429faca853f0301df4b0d4d43ce26e3011129c..327d46912a0379199ca874a02de94cbd4822e017"
+    "shas": "7789c137205fa0f34827b188a797df83c6948386..acfb558a41718ade520861b5f2e616875edec078"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-insert-test",
@@ -83,7 +83,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "327d46912a0379199ca874a02de94cbd4822e017..edbdc72526206b55a5a68574067653f9a012139e"
+    "shas": "acfb558a41718ade520861b5f2e616875edec078..d61ab0102f88d9e84c1283c4731f9a3fce5ade3e"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-replacement-test",
@@ -139,7 +139,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "edbdc72526206b55a5a68574067653f9a012139e..d297555f9562fdc2f07263c0d3f4448a2d993af6"
+    "shas": "d61ab0102f88d9e84c1283c4731f9a3fce5ade3e..60cd25557da32b165ae4dc47a6187fc9148e7b73"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-replacement-test",
@@ -195,7 +195,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d297555f9562fdc2f07263c0d3f4448a2d993af6..0424e6283242743718ac65313bf399f22e87003f"
+    "shas": "60cd25557da32b165ae4dc47a6187fc9148e7b73..ea8e3c6f7965e71a8c498050bd8f8e0b03167777"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-delete-insert-test",
@@ -240,7 +240,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0424e6283242743718ac65313bf399f22e87003f..1e8d55f993118e8493fd77e4029b4126ca55ea76"
+    "shas": "ea8e3c6f7965e71a8c498050bd8f8e0b03167777..9ddb59d3202cebeecc5e67a8707bff57b78dbff4"
 }
 ,{
     "testCaseDescription": "go-modifying-struct-fields-teardown-test",
@@ -282,5 +282,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1e8d55f993118e8493fd77e4029b4126ca55ea76..cabeb4be978509ff8b604c14a85f64a96314cd7a"
+    "shas": "9ddb59d3202cebeecc5e67a8707bff57b78dbff4..bbcdf5971483fa0f3ce3fd99d306d86089442f74"
 }]

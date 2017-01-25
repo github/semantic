@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5ef8bc0eb6c5afcf5b71c3773b50aacebffe32d5..fc27fba6f9c1e19251a29214c0bc8599c48a93dc"
+    "shas": "580124e3a7025d409fc1d30ce2335a1db77c5ee0..9d4463c6491f01ea4fc44f730feb8c696ea9c54c"
 }
 ,{
     "testCaseDescription": "go-select-statements-insert-test",
@@ -90,7 +90,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fc27fba6f9c1e19251a29214c0bc8599c48a93dc..5b3000889bd5f6fed85f762e41c07c37d058fce5"
+    "shas": "9d4463c6491f01ea4fc44f730feb8c696ea9c54c..a68238bdf61611ca38a6436f79eeb6671cb931f0"
 }
 ,{
     "testCaseDescription": "go-select-statements-replacement-test",
@@ -207,7 +207,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5b3000889bd5f6fed85f762e41c07c37d058fce5..cfad5a03e0e5e2b92b80d8013221c57bb8b54dbb"
+    "shas": "a68238bdf61611ca38a6436f79eeb6671cb931f0..0cd37fb8b6e921962e1261474e11bcf847ae4d35"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-replacement-test",
@@ -324,7 +324,7 @@
         "     return"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cfad5a03e0e5e2b92b80d8013221c57bb8b54dbb..ef37033c96b063deb172c7ceb9cbc6c659cb6f70"
+    "shas": "0cd37fb8b6e921962e1261474e11bcf847ae4d35..53b137d37e8e93c2085879e2a03132ec50cdec5c"
 }
 ,{
     "testCaseDescription": "go-select-statements-delete-insert-test",
@@ -376,7 +376,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ef37033c96b063deb172c7ceb9cbc6c659cb6f70..b4c5ae05e9993d2a8f9abcfa1b1a5e1ff4677aed"
+    "shas": "53b137d37e8e93c2085879e2a03132ec50cdec5c..ec8aedead359f4f4c2e6cce9ea34cac46c198593"
 }
 ,{
     "testCaseDescription": "go-select-statements-teardown-test",
@@ -418,5 +418,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b4c5ae05e9993d2a8f9abcfa1b1a5e1ff4677aed..c14d55dd062dc340dde5986bd08c8b6aa1173023"
+    "shas": "ec8aedead359f4f4c2e6cce9ea34cac46c198593..8e4adfa582cf7fa6c982abcd6b4c21d1239911ec"
 }]
