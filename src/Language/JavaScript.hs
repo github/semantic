@@ -19,9 +19,9 @@ termAssignment _ category children
     (MathAssignment, [ identifier, value ]) -> Just $ S.OperatorAssignment identifier value
     (MemberAccess, [ base, property ]) -> Just $ S.MemberAccess base property
     (SubscriptAccess, [ base, element ]) -> Just $ S.SubscriptAccess base element
-    (CommaOperator, [ a, b ]) -> Just $ case unwrap b of
-      S.Indexed rest -> S.Indexed $ a : rest
-      _ -> S.Indexed children
+    (CommaOperator, [ a, b ])
+      | S.Indexed rest <- unwrap b
+      -> Just $ S.Indexed $ a : rest
     (FunctionCall, member : args)
       | S.MemberAccess target method <- unwrap member
       -> Just $ S.MethodCall target method (toList . unwrap =<< args)
@@ -53,12 +53,14 @@ termAssignment _ category children
     (Import, [ statements, identifier ] ) -> Just $ S.Import identifier (toList (unwrap statements))
     (Import, [ identifier ] ) -> Just $ S.Import identifier []
     (Export, [ statements, identifier] ) -> Just $ S.Export (Just identifier) (toList (unwrap statements))
-    (Export, [ statements ] ) -> Just $ case unwrap statements of
-      S.Indexed _ -> S.Export Nothing (toList (unwrap statements))
-      _ -> S.Export (Just statements) []
+    (Export, [ statements ] )
+      | S.Indexed _ <- unwrap statements
+      -> Just $ S.Export Nothing (toList (unwrap statements))
+      | otherwise -> Just $ S.Export (Just statements) []
     (Yield, _ ) -> Just $ S.Yield children
-    (For, _) | Just (exprs, body) <- unsnoc children
-             -> Just $ S.For exprs [body]
+    (For, _)
+      | Just (exprs, body) <- unsnoc children
+      -> Just $ S.For exprs [body]
     (Function, [ body ]) -> Just $ S.AnonymousFunction [] [body]
     (Function, [ params, body ]) -> Just $ S.AnonymousFunction (toList (unwrap params)) [body]
     (Function, [ id, params, body ]) -> Just $ S.Function id (toList (unwrap params)) [body]
