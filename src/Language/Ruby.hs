@@ -84,10 +84,7 @@ termAssignment _ category children
       | RescueArgs <- Info.category (extract exceptions)
       -> Just $ S.Rescue (toList (unwrap exceptions)) body
     (Rescue, body) -> Just $ S.Rescue [] body
-    (Return, _ ) -> Just $ S.Return children
     (Modifier While, [ lhs, condition ]) -> Just $ S.While condition [lhs]
-    (While, expr : rest ) -> Just $ S.While expr rest
-    (Yield, _ ) -> Just $ S.Yield children
     _ | category `elem` [ BeginBlock, EndBlock ] -> Just $ S.BlockStatement children
     _  -> Nothing
   where
