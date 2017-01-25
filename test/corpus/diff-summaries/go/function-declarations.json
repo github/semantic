@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6cbe8d53838858e6ff83e2890cd6d51da63e06dd..c9165a22e802c84a4c84603433208209bf8ecd58"
+    "shas": "090bcfe2072c5d36d06f9f588c308abeb046e46e..4c821ecfcd1dffc01f8b59326d656fa810c27da1"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c9165a22e802c84a4c84603433208209bf8ecd58..14ddaf5c44b68da54ac1e6080f651683b00abd0d"
+    "shas": "4c821ecfcd1dffc01f8b59326d656fa810c27da1..bcd66229a828820e1dc6df15bdc2e17348f1adcb"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -155,7 +155,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier in the main module"
+                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier in the fb function of the 'main' module"
                 },
                 {
                     "span": {
@@ -182,7 +182,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier in the main module"
+                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier in the fc function of the 'main' module"
                 },
                 {
                     "span": {
@@ -209,7 +209,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier in the main module"
+                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier in the fd function of the 'main' module"
                 }
             ]
         },
@@ -238,7 +238,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "14ddaf5c44b68da54ac1e6080f651683b00abd0d..da31b44611dfde41b3500e215d049e0ae08decd1"
+    "shas": "bcd66229a828820e1dc6df15bdc2e17348f1adcb..25682bee4a82b03d9d7f9ab96c28428ad50270dc"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -297,7 +297,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier in the main module"
+                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier in the f2 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -324,7 +324,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier in the main module"
+                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier in the f2 function of the 'main' module"
                 },
                 {
                     "span": {
@@ -351,7 +351,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier in the main module"
+                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier in the f2 function of the 'main' module"
                 }
             ]
         },
@@ -380,7 +380,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "da31b44611dfde41b3500e215d049e0ae08decd1..cd07dffb2fde011ff7d80b7e9fe6319aadafcba7"
+    "shas": "25682bee4a82b03d9d7f9ab96c28428ad50270dc..fe1c5c29ff27e556e88630190814a22566eaf082"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -438,7 +438,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cd07dffb2fde011ff7d80b7e9fe6319aadafcba7..15310f0e4a692c1ebd2a48e7512e71ae63cbd02f"
+    "shas": "fe1c5c29ff27e556e88630190814a22566eaf082..e5826998ff4221f34b05da09b478a8136e3c4ff0"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -480,5 +480,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "15310f0e4a692c1ebd2a48e7512e71ae63cbd02f..15dbaf1c2f3cba362af5abba2a6aa9d2f1a92990"
+    "shas": "e5826998ff4221f34b05da09b478a8136e3c4ff0..e5224329c24b2e2d564a10269e63b36c492d7bf5"
 }]

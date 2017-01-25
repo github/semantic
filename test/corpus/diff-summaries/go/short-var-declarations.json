@@ -38,7 +38,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6ccea258bd2125cbbe34266069b39fc47fe5d4e3..d86a797bca0743cdc0eb4671f5b3eb25921e46b5"
+    "shas": "b534a2624a6f74eebed7bd6da21bc7df27018a96..a338438394d4abed73faf1a18db50b9ce7fd5d05"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d86a797bca0743cdc0eb4671f5b3eb25921e46b5..949f040e38e0adb5a87c9b9ea7c42568058a2b32"
+    "shas": "a338438394d4abed73faf1a18db50b9ce7fd5d05..1e403ac766aab96d8b2aaabca728c1ed81699dc5"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -232,7 +232,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "949f040e38e0adb5a87c9b9ea7c42568058a2b32..cee7f55944490cc3fd074d9b92e033c52b44a036"
+    "shas": "1e403ac766aab96d8b2aaabca728c1ed81699dc5..e31233f516ea4df97b36bffc70f140f6af79caa3"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -368,7 +368,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cee7f55944490cc3fd074d9b92e033c52b44a036..d8c62fa2d207d7d564ca6f2673d47a697ecea20e"
+    "shas": "e31233f516ea4df97b36bffc70f140f6af79caa3..fe209f5ee06cef0653f60cd08571fd635a66b457"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -426,7 +426,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8c62fa2d207d7d564ca6f2673d47a697ecea20e..38ed1694da804c308df6058dd3cbc3c4c552418d"
+    "shas": "fe209f5ee06cef0653f60cd08571fd635a66b457..c57c2196ef90d21ae6ecd07593b7e224ce45f1f2"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -468,5 +468,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "38ed1694da804c308df6058dd3cbc3c4c552418d..20ca91d3f69487f7d530b334333fdfe2a3743e03"
+    "shas": "c57c2196ef90d21ae6ecd07593b7e224ce45f1f2..47074688bbb73b3e4bf4fe48f221e411e5a9dcae"
 }]
