@@ -227,9 +227,7 @@ toTermName source term = case unwrap term of
       SliceTy -> termNameFromSource base <> toTermName' element
       _ -> toTermName' base <> "[" <> toTermName' element <> "]"
     (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
-  S.VarAssignment varId _ -> case unwrap varId of
-    S.Indexed [ a ] -> toTermName' a
-    _ -> toTermName' varId
+  S.VarAssignment varId _ -> toTermName' varId
   S.VarDecl decl _ -> toTermName' decl
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
