@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index e69de29..0344667 100644",
+        "index e69de29b..03446677 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -0,0 +1 @@",
         "+i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "41ab7cb7dc378bf229f7a08f1a03c0676483f435..1571de07c19283348c86a4d81f61c63270a37d3f"
+    "shas": "6c2a6d2038e58ffec3265d64973449c3c258d5ad..5cc9b010912a3ee08aaf18f3beafedd31740b011"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index 0344667..79f5f20 100644",
+        "index 03446677..79f5f20c 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "1571de07c19283348c86a4d81f61c63270a37d3f..97979c27333f35afb7288063c45a2f25cf5e1808"
+    "shas": "5cc9b010912a3ee08aaf18f3beafedd31740b011..3da1355235d8d4fec9a54cefcf11f9536cfad9fe"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
@@ -159,7 +159,7 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index 79f5f20..284561c 100644",
+        "index 79f5f20c..284561c5 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -1,3 +1,3 @@",
@@ -169,7 +169,7 @@
         " i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "97979c27333f35afb7288063c45a2f25cf5e1808..d8320eb8219fb470d6ac17996f9d74b61fe7e6ee"
+    "shas": "3da1355235d8d4fec9a54cefcf11f9536cfad9fe..566c62a4a59091e26052615274a13a04d2b00401"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
@@ -239,7 +239,7 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index 284561c..79f5f20 100644",
+        "index 284561c5..79f5f20c 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -1,3 +1,3 @@",
@@ -249,7 +249,7 @@
         " i + j * 3 - j % 5;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d8320eb8219fb470d6ac17996f9d74b61fe7e6ee..ca05a18c434755562d8787734dd2aa347af4ffca"
+    "shas": "566c62a4a59091e26052615274a13a04d2b00401..e44f1851599323aed0e6c491558936211b2815fc"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-replacement-test",
@@ -310,7 +310,7 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index 79f5f20..d1055f7 100644",
+        "index 79f5f20c..d1055f77 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -1,3 +1,2 @@",
@@ -320,7 +320,7 @@
         "+i + j * 2 - j % 4;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ca05a18c434755562d8787734dd2aa347af4ffca..4f0d2886b18d7b66ad3b3d0222b5c4040ebfbf05"
+    "shas": "e44f1851599323aed0e6c491558936211b2815fc..1a7ef2981311a4aed0e0591a526b8ef78ee190f7"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -351,7 +351,7 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index d1055f7..79ba2b3 100644",
+        "index d1055f77..79ba2b3f 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -1,2 +1 @@",
@@ -359,7 +359,7 @@
         " i + j * 2 - j % 4;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4f0d2886b18d7b66ad3b3d0222b5c4040ebfbf05..c7c1c352742d04515a004d1c08642b78cf1e83cf"
+    "shas": "1a7ef2981311a4aed0e0591a526b8ef78ee190f7..544ee219892710050b020798ca49e15208a7c028"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -390,12 +390,12 @@
     ],
     "patch": [
         "diff --git a/math-operator.js b/math-operator.js",
-        "index 79ba2b3..e69de29 100644",
+        "index 79ba2b3f..e69de29b 100644",
         "--- a/math-operator.js",
         "+++ b/math-operator.js",
         "@@ -1 +0,0 @@",
         "-i + j * 2 - j % 4;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c7c1c352742d04515a004d1c08642b78cf1e83cf..69248e3fdb3e6ab7da864ef7bd3a915aeefd3cc4"
+    "shas": "544ee219892710050b020798ca49e15208a7c028..68249c6faa764e8f289c3ae7afb4c98267e953d8"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "166ab1d1dfa2b18943f9d328cc47a34b4e4288fa..c72c09d81f43fbcbe4836588ced1f3a4fb63731f"
+    "shas": "e314d296ac8ddd2fee51a4cf45b812637d285244..3a54778e8643fed461c68e500e8eb6aa0ee72ab1"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-insert-test",
@@ -54,11 +69,41 @@
                             ],
                             "end": [
                                 4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'zero' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'int' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
                                 17
                             ]
                         }
                     },
-                    "summary": "Added the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Added '0' in the main function"
                 },
                 {
                     "span": {
@@ -69,18 +114,63 @@
                             ],
                             "end": [
                                 5,
-                                27
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'one' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'one' identifier in the main function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 5,
-                                5
+                                10
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'two' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'uint64' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                23
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added '1' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                26
                             ],
                             "end": [
                                 5,
@@ -88,7 +178,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' var assignment in the main function of the 'main' module"
+                    "summary": "Added '2' in the main function"
                 }
             ]
         },
@@ -112,7 +202,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c72c09d81f43fbcbe4836588ced1f3a4fb63731f..46f18357b783f8a73ac8112e238e667ff4bc1378"
+    "shas": "3a54778e8643fed461c68e500e8eb6aa0ee72ab1..23e6404f39f85f4a31a72cb893ea7145518ca0c6"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-replacement-test",
@@ -144,7 +234,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the a var assignment of the 'main' function"
+                    "summary": "Replaced the 'zero' identifier with the 'a' identifier in the main function"
                 },
                 {
                     "span": {
@@ -171,7 +261,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the b var assignment of the 'main' function"
+                    "summary": "Replaced the 'one' identifier with the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -198,7 +288,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the c var assignment of the 'main' function"
+                    "summary": "Replaced the 'two' identifier with the 'c' identifier in the main function"
                 }
             ]
         },
@@ -223,7 +313,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "46f18357b783f8a73ac8112e238e667ff4bc1378..e7e4dfb126d1a6b2fb2bf72dd548beda84ffbfb4"
+    "shas": "23e6404f39f85f4a31a72cb893ea7145518ca0c6..c239ed4dccd2c65ccb5a7293327ebba940ad92b6"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-replacement-test",
@@ -255,7 +345,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the zero var assignment of the 'main' function"
+                    "summary": "Replaced the 'a' identifier with the 'zero' identifier in the main function"
                 },
                 {
                     "span": {
@@ -282,7 +372,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the one var assignment of the 'main' function"
+                    "summary": "Replaced the 'b' identifier with the 'one' identifier in the main function"
                 },
                 {
                     "span": {
@@ -309,7 +399,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the two var assignment of the 'main' function"
+                    "summary": "Replaced the 'c' identifier with the 'two' identifier in the main function"
                 }
             ]
         },
@@ -334,7 +424,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e7e4dfb126d1a6b2fb2bf72dd548beda84ffbfb4..82cfefb733a9091542c79228bb43a5cbcc284228"
+    "shas": "c239ed4dccd2c65ccb5a7293327ebba940ad92b6..f1c07b4aa5c85609e85929fcd6a42fe1270cb9d8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-delete-insert-test",
@@ -350,11 +440,41 @@
                             ],
                             "end": [
                                 4,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'zero' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                10
+                            ],
+                            "end": [
+                                4,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'int' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                16
+                            ],
+                            "end": [
+                                4,
                                 17
                             ]
                         }
                     },
-                    "summary": "Deleted the 'zero' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted '0' in the main function"
                 },
                 {
                     "span": {
@@ -365,18 +485,63 @@
                             ],
                             "end": [
                                 5,
-                                27
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'one' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'one' identifier in the main function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 5,
-                                5
+                                10
+                            ],
+                            "end": [
+                                5,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'two' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                14
+                            ],
+                            "end": [
+                                5,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'uint64' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                23
+                            ],
+                            "end": [
+                                5,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                26
                             ],
                             "end": [
                                 5,
@@ -384,7 +549,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'two' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted '2' in the main function"
                 }
             ]
         },
@@ -408,7 +573,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "82cfefb733a9091542c79228bb43a5cbcc284228..9d2bb849a481840629ed6bcb2a17afc5e8e49a50"
+    "shas": "f1c07b4aa5c85609e85929fcd6a42fe1270cb9d8..8712527e7cc3056ebb8d176db32429befc4976a8"
 }
 ,{
     "testCaseDescription": "go-var-declarations-with-types-teardown-test",
@@ -423,12 +588,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -450,5 +630,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9d2bb849a481840629ed6bcb2a17afc5e8e49a50..beaafb3d07a00910a1446a55ba991cc61f22aa65"
+    "shas": "8712527e7cc3056ebb8d176db32429befc4976a8..ba8c45bc969c0974d427789ea9cf408475593b4f"
 }]

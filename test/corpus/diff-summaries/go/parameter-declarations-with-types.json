@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                7,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -39,7 +54,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e8d08e2eedd6b2a25ec4649df0ad12534a6c3c09..adce0d5ed52ba8b1d7bca9e8a2bfb5364cda9502"
+    "shas": "57bf5ffc56480fbb108aa9d683b4dfd5324acbbf..86bd926b2066a8c508a3fbaea3aea1c44975dbaa"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-insert-test",
@@ -59,7 +74,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' function in the main module"
+                    "summary": "Added the 'foo' function"
                 }
             ]
         },
@@ -82,7 +97,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "adce0d5ed52ba8b1d7bca9e8a2bfb5364cda9502..44490f03e295a0757ccab40c7b512e055e542679"
+    "shas": "86bd926b2066a8c508a3fbaea3aea1c44975dbaa..d06c9a9989b8b0b59b2ca2cdc1eae70936526a0b"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-replacement-test",
@@ -114,7 +129,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'int' identifier with the 'string' identifier in the foo function"
                 },
                 {
                     "span": {
@@ -141,7 +156,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'a' identifier with the 'x' identifier in the foo function"
                 },
                 {
                     "span": {
@@ -168,7 +183,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'string' identifier with the 'uint64' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'string' identifier with the 'uint64' identifier in the foo function"
                 },
                 {
                     "span": {
@@ -195,7 +210,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'b' identifier with the 'y' identifier in the foo function"
                 }
             ]
         },
@@ -218,7 +233,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "44490f03e295a0757ccab40c7b512e055e542679..e9a034ba8648ede7074592effb77584769908921"
+    "shas": "d06c9a9989b8b0b59b2ca2cdc1eae70936526a0b..7f7499916d8951812d1af4dc3f9edea6512dd4ae"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-replacement-test",
@@ -238,7 +253,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a int' parameter declaration in the foo function of the 'main' module"
+                    "summary": "Added the 'a int' parameter declaration in the foo function"
                 },
                 {
                     "span": {
@@ -265,7 +280,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the foo function of the 'main' module"
+                    "summary": "Replaced the 'x' identifier with the 'b' identifier in the foo function"
                 },
                 {
                     "span": {
@@ -280,7 +295,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y uint64' parameter declaration in the foo function of the 'main' module"
+                    "summary": "Deleted the 'y uint64' parameter declaration in the foo function"
                 }
             ]
         },
@@ -303,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e9a034ba8648ede7074592effb77584769908921..a62c254b900279d25d32867f50b43f29cf80e00f"
+    "shas": "7f7499916d8951812d1af4dc3f9edea6512dd4ae..84be95e6cce29e23fe13ac460c34d9d3639945c1"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-delete-insert-test",
@@ -323,7 +338,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' function in the main module"
+                    "summary": "Deleted the 'foo' function"
                 }
             ]
         },
@@ -346,7 +361,7 @@
         "+"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "a62c254b900279d25d32867f50b43f29cf80e00f..9bc7d216469b8d8a278b807dca1cace07b3cffdc"
+    "shas": "84be95e6cce29e23fe13ac460c34d9d3639945c1..a396a786548a4d67126f0631959c0c1b53b66b84"
 }
 ,{
     "testCaseDescription": "go-parameter-declarations-with-types-teardown-test",
@@ -361,12 +376,27 @@
                                 1
                             ],
                             "end": [
-                                7,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -389,5 +419,5 @@
         "-"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9bc7d216469b8d8a278b807dca1cace07b3cffdc..d294ce5018da872a8921d3401c507217daf06328"
+    "shas": "a396a786548a4d67126f0631959c0c1b53b66b84..840ffcc3fb49c5769944cce7b4fc8f444c2b1aed"
 }]

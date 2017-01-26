@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ce81a7d517fc9a2808b223f5e2ec2b77fd6fad64..500b648128cc717a6a3abe3c3aa11fc82556659e"
+    "shas": "576026694b333d8935d7a3e88a32dbd0ed0b3fa4..e880dbc369823d4b5c4e1643d1301395af59040b"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a1' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 'a1' var assignment in the main function"
                 }
             ]
         },
@@ -81,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "500b648128cc717a6a3abe3c3aa11fc82556659e..bc51671fc62602f0d5a1e399a8cd0cdd272507dd"
+    "shas": "e880dbc369823d4b5c4e1643d1301395af59040b..b5893374f1fc215bc0e9639fbff6745b22594bc0"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-replacement-test",
@@ -101,7 +116,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '4' in the [...]int array of the 'main' function"
+                    "summary": "Added '4' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -128,7 +143,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '5' in the [...]int array of the 'main' function"
+                    "summary": "Replaced '1' with '5' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -143,7 +158,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '6' in the [...]int array of the 'main' function"
+                    "summary": "Added '6' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -158,7 +173,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '2' in the [...]int array of the 'main' function"
+                    "summary": "Deleted '2' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -173,7 +188,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '3' in the [...]int array of the 'main' function"
+                    "summary": "Deleted '3' in the [...]int composite_literal of the 'main' function"
                 }
             ]
         },
@@ -196,7 +211,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bc51671fc62602f0d5a1e399a8cd0cdd272507dd..6a2f0882912e58d2f3e34875a6bb44804d586279"
+    "shas": "b5893374f1fc215bc0e9639fbff6745b22594bc0..235fa8a9d47005f230e6db96c1d2bf4d8e935851"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-replacement-test",
@@ -216,7 +231,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '1' in the [...]int array of the 'main' function"
+                    "summary": "Added '1' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -231,7 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the [...]int array of the 'main' function"
+                    "summary": "Added '2' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -246,7 +261,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '3' in the [...]int array of the 'main' function"
+                    "summary": "Added '3' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -261,7 +276,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '4' in the [...]int array of the 'main' function"
+                    "summary": "Deleted '4' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -276,7 +291,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '5' in the [...]int array of the 'main' function"
+                    "summary": "Deleted '5' in the [...]int composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -291,7 +306,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '6' in the [...]int array of the 'main' function"
+                    "summary": "Deleted '6' in the [...]int composite_literal of the 'main' function"
                 }
             ]
         },
@@ -314,7 +329,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6a2f0882912e58d2f3e34875a6bb44804d586279..b8316cf1b4504b16bf1ede60ccd875adbc2f737b"
+    "shas": "235fa8a9d47005f230e6db96c1d2bf4d8e935851..2dce176e86c49d2fd4be864e3a388ac25674f9d1"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-delete-insert-test",
@@ -334,7 +349,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a1' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 'a1' var assignment in the main function"
                 }
             ]
         },
@@ -357,7 +372,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b8316cf1b4504b16bf1ede60ccd875adbc2f737b..555892195608bc7b16f133fe3389a59785aa83bf"
+    "shas": "2dce176e86c49d2fd4be864e3a388ac25674f9d1..b98fb6db21b918f40b3caf936b11bb72c07cb9dd"
 }
 ,{
     "testCaseDescription": "go-array-with-implicit-length-teardown-test",
@@ -372,12 +387,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -399,5 +429,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "555892195608bc7b16f133fe3389a59785aa83bf..6e579109cc2a3c535790233b54306a5473f1a55d"
+    "shas": "b98fb6db21b918f40b3caf936b11bb72c07cb9dd..b8e41392436d04ec37de7c7358f5c6f016fc7726"
 }]

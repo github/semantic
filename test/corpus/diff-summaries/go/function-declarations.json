@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "090bcfe2072c5d36d06f9f588c308abeb046e46e..4c821ecfcd1dffc01f8b59326d656fa810c27da1"
+    "shas": "b9e8cbc963d70681826124d682474977bcef4d33..75b2b30297a1bb14866f352c5291cae0ad1711b6"
 }
 ,{
     "testCaseDescription": "go-function-declarations-insert-test",
@@ -54,8 +69,8 @@
                                     1
                                 ],
                                 "end": [
-                                    6,
-                                    1
+                                    1,
+                                    13
                                 ]
                             },
                             {
@@ -64,13 +79,13 @@
                                     1
                                 ],
                                 "end": [
-                                    8,
+                                    9,
                                     1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Replaced the 'main' module with 'package main\n\nfunc main() {\nfunc f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}\n}\n' at line 1, column 1 - line 9, column 1"
                 }
             ]
         },
@@ -96,7 +111,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4c821ecfcd1dffc01f8b59326d656fa810c27da1..bcd66229a828820e1dc6df15bdc2e17348f1adcb"
+    "shas": "75b2b30297a1bb14866f352c5291cae0ad1711b6..aced7850a95b463c3083658d0a6b2a9e25021b74"
 }
 ,{
     "testCaseDescription": "go-function-declarations-replacement-test",
@@ -155,7 +170,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier in the fb function of the 'main' module"
+                    "summary": "Replaced the 'f2' identifier with the 'fb' identifier in the fb function"
                 },
                 {
                     "span": {
@@ -182,7 +197,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier in the fc function of the 'main' module"
+                    "summary": "Replaced the 'f2' identifier with the 'fc' identifier in the fc function"
                 },
                 {
                     "span": {
@@ -209,7 +224,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier in the fd function of the 'main' module"
+                    "summary": "Replaced the 'f2' identifier with the 'fd' identifier in the fd function"
                 }
             ]
         },
@@ -238,7 +253,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bcd66229a828820e1dc6df15bdc2e17348f1adcb..25682bee4a82b03d9d7f9ab96c28428ad50270dc"
+    "shas": "aced7850a95b463c3083658d0a6b2a9e25021b74..d0160ccee51c30218f5ca3f776ca8c21cf6ccfd2"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-replacement-test",
@@ -297,7 +312,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier in the f2 function of the 'main' module"
+                    "summary": "Replaced the 'fb' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
@@ -324,7 +339,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier in the f2 function of the 'main' module"
+                    "summary": "Replaced the 'fc' identifier with the 'f2' identifier in the f2 function"
                 },
                 {
                     "span": {
@@ -351,7 +366,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier in the f2 function of the 'main' module"
+                    "summary": "Replaced the 'fd' identifier with the 'f2' identifier in the f2 function"
                 }
             ]
         },
@@ -380,7 +395,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "25682bee4a82b03d9d7f9ab96c28428ad50270dc..fe1c5c29ff27e556e88630190814a22566eaf082"
+    "shas": "d0160ccee51c30218f5ca3f776ca8c21cf6ccfd2..5e7095ac8137e91c12215c45438bbd29c382290e"
 }
 ,{
     "testCaseDescription": "go-function-declarations-delete-insert-test",
@@ -396,7 +411,7 @@
                                     1
                                 ],
                                 "end": [
-                                    8,
+                                    9,
                                     1
                                 ]
                             },
@@ -406,13 +421,13 @@
                                     1
                                 ],
                                 "end": [
-                                    6,
-                                    1
+                                    1,
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'main' module with the 'main' module"
+                    "summary": "Replaced 'package main\n\nfunc main() {\nfunc f1() {}\nfunc f2(a int, b, c, d string) int {}\nfunc f2() (int, error) {}\nfunc f2() (result int, err error) {}\n}\n' at line 1, column 1 - line 9, column 1 with the 'main' module"
                 }
             ]
         },
@@ -438,7 +453,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "fe1c5c29ff27e556e88630190814a22566eaf082..e5826998ff4221f34b05da09b478a8136e3c4ff0"
+    "shas": "5e7095ac8137e91c12215c45438bbd29c382290e..432d945a039effe38996415a0be25ec7a92dc22f"
 }
 ,{
     "testCaseDescription": "go-function-declarations-teardown-test",
@@ -453,12 +468,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -480,5 +510,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e5826998ff4221f34b05da09b478a8136e3c4ff0..e5224329c24b2e2d564a10269e63b36c492d7bf5"
+    "shas": "432d945a039effe38996415a0be25ec7a92dc22f..7ebca2c2e26873ec2ec3d92c6922446eb95bb61f"
 }]

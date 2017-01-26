@@ -119,7 +119,7 @@ syntaxToTermField syntax = case syntax of
   S.Pair a b -> childrenFields [a, b]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
-  S.Error c -> childrenFields c
+  S.ParseError c -> childrenFields c
   S.For expressions body -> [ "expressions" .= expressions ] <> [ "body" .= body ]
   S.DoWhile expression body -> [ "expression" .= expression ]  <> [ "body" .= body ]
   S.While expression body -> [ "expression" .= expression ]  <> [ "body" .= body ]

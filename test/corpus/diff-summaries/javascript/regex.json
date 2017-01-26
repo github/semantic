@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index e69de29..b381842 100644",
+        "index e69de29b..b3818424 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -0,0 +1 @@",
         "+/one/g;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "734bede3c6c3771f011aa729a417011d310ec5cc..9dbffbb28707342ebcd361c29b0d670a271ddb04"
+    "shas": "821df9c41798fbc70ad5ca5a5795c00b2cedb79c..2db757877a7c19866710b3aee81a03666c41b5c4"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index b381842..6ed4b42 100644",
+        "index b3818424..6ed4b424 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " /one/g;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "9dbffbb28707342ebcd361c29b0d670a271ddb04..f294c4a4aac8d0a945272edb200af0866b0d5a0f"
+    "shas": "2db757877a7c19866710b3aee81a03666c41b5c4..c30aee5ff6ef112d49a7192d70292859a7b7031c"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index 6ed4b42..abb87ec 100644",
+        "index 6ed4b424..abb87ec8 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " /one/g;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f294c4a4aac8d0a945272edb200af0866b0d5a0f..c158c5219c063572ee6664525f8fb4377178cdc3"
+    "shas": "c30aee5ff6ef112d49a7192d70292859a7b7031c..5f611ea9f0400d0a16e8f26ed6bb0e77b9f182d4"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index abb87ec..6ed4b42 100644",
+        "index abb87ec8..6ed4b424 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " /one/g;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c158c5219c063572ee6664525f8fb4377178cdc3..38ad972ed8f499cb320e4584c4ae1b95d4e70f41"
+    "shas": "5f611ea9f0400d0a16e8f26ed6bb0e77b9f182d4..522e77adc0cf490332af21396f7b8fc1dadc1e0e"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index 6ed4b42..9f57e91 100644",
+        "index 6ed4b424..9f57e919 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+/on[^/]afe/gim;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "38ad972ed8f499cb320e4584c4ae1b95d4e70f41..79078d16f7a00fca2b3dbf3cf7dadd8f5ba7929c"
+    "shas": "522e77adc0cf490332af21396f7b8fc1dadc1e0e..3756349ee3c2a57533b0586b3efe8330bd649e1a"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index 9f57e91..9b04194 100644",
+        "index 9f57e919..9b04194d 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " /on[^/]afe/gim;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "79078d16f7a00fca2b3dbf3cf7dadd8f5ba7929c..f293398786080c6f5b99e7c36ba482702f5cbbae"
+    "shas": "3756349ee3c2a57533b0586b3efe8330bd649e1a..82af6ebb2352e85a6f3d0f5386f6685c24472554"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/regex.js b/regex.js",
-        "index 9b04194..e69de29 100644",
+        "index 9b04194d..e69de29b 100644",
         "--- a/regex.js",
         "+++ b/regex.js",
         "@@ -1 +0,0 @@",
         "-/on[^/]afe/gim;"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "f293398786080c6f5b99e7c36ba482702f5cbbae..4951403c16600a8ebe50779236bcbc480c823807"
+    "shas": "82af6ebb2352e85a6f3d0f5386f6685c24472554..2440322c22f20e4b94216aa19cb2249a68864183"
 }]

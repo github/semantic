@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d8371152b551458e89b4e39819c41792bba80076..96eafb3baf0354f59b4e4ead7603dcb9a8c610c9"
+    "shas": "0c8ae16482a04b19b4a23f3af01e4d9f314b712e..1f15b0d1afbb74572f14840fe6bf05c90fc968d8"
 }
 ,{
     "testCaseDescription": "go-struct-literals-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's1' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 's1' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -73,7 +88,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's2' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 's2' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 's3' var assignment in the main function of the 'main' module"
+                    "summary": "Added the 's3' var assignment in the main function"
                 }
             ]
         },
@@ -116,7 +131,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "96eafb3baf0354f59b4e4ead7603dcb9a8c610c9..787d8b0d4326b990ca39ecfa787d21dacfce56ea"
+    "shas": "1f15b0d1afbb74572f14840fe6bf05c90fc968d8..4494c26fb9999b04a2c61cf39c32d1d24e8d5f8d"
 }
 ,{
     "testCaseDescription": "go-struct-literals-replacement-test",
@@ -286,7 +301,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "787d8b0d4326b990ca39ecfa787d21dacfce56ea..b1e1747bfe7b356b150181c65accb131af2adc1a"
+    "shas": "4494c26fb9999b04a2c61cf39c32d1d24e8d5f8d..206d1a39d3694158ecdad426673ec76d48e374af"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-replacement-test",
@@ -456,7 +471,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b1e1747bfe7b356b150181c65accb131af2adc1a..9062d2928c093b9470596646a5802e7375970a2e"
+    "shas": "206d1a39d3694158ecdad426673ec76d48e374af..021bb0b55e32d2b017f2b4b29dddcd790cea242d"
 }
 ,{
     "testCaseDescription": "go-struct-literals-delete-insert-test",
@@ -476,7 +491,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's1' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 's1' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -491,7 +506,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's2' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 's2' var assignment in the main function"
                 },
                 {
                     "span": {
@@ -506,7 +521,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 's3' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted the 's3' var assignment in the main function"
                 }
             ]
         },
@@ -534,7 +549,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9062d2928c093b9470596646a5802e7375970a2e..e3dccb9f0e80e1d4dd95ad8f77fc1f3d70da1c56"
+    "shas": "021bb0b55e32d2b017f2b4b29dddcd790cea242d..dc132533bd95c31a8f5e9bb4b9a62e2feb4c10f6"
 }
 ,{
     "testCaseDescription": "go-struct-literals-teardown-test",
@@ -549,12 +564,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -576,5 +606,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e3dccb9f0e80e1d4dd95ad8f77fc1f3d70da1c56..80bb1d299fa3720eb3cdcef8c428f696467572a8"
+    "shas": "dc132533bd95c31a8f5e9bb4b9a62e2feb4c10f6..1d4f678537c1a2636fd9eba370de9e81de874c72"
 }]

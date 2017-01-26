@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,12 +53,13 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "038d3fd0f1c08ca004a0a2d0c61ecc27b0535e67..b49dc2a86107a6125c6c6b5b27a10b97c349c951"
+    "shas": "d4d30589c4945d693f9b6b7e327ddbcd45e70321..35712f9936e6e990151f65bd8282f587c311283f"
 }
 ,{
     "testCaseDescription": "go-int-literals-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "int-literals.go": [
                 {
                     "span": {
@@ -54,30 +70,14 @@
                             ],
                             "end": [
                                 5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' var assignment in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
                                 20
                             ]
                         }
                     },
-                    "summary": "Added the '2' var assignment in the main function of the 'main' module"
+                    "summary": "Added 'a = 1, b = 2, c = 3' at line 5, column 1 - line 5, column 20 in the main function"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "int-literals.go"
@@ -98,7 +98,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b49dc2a86107a6125c6c6b5b27a10b97c349c951..7922f4a2649ec54d9aa444582b20ef48b8a0c49b"
+    "shas": "35712f9936e6e990151f65bd8282f587c311283f..c4fbea18faece138b1ca16fac7c135aacab7e026"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
@@ -157,7 +157,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5' in the 5 var assignment of the 'main' function"
+                    "summary": "Replaced '2' with '5' in an assignment to 5, c of the 'main' function"
                 },
                 {
                     "span": {
@@ -184,7 +184,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in the 5 var assignment of the 'main' function"
+                    "summary": "Replaced '3' with '6' in an assignment to 5, c of the 'main' function"
                 }
             ]
         },
@@ -208,7 +208,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7922f4a2649ec54d9aa444582b20ef48b8a0c49b..e978725a447db93523c51453ac03fe50b8f32e8f"
+    "shas": "c4fbea18faece138b1ca16fac7c135aacab7e026..5a4da82a60dae3adac65138408a1c9c13c9341ed"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
@@ -267,7 +267,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in the 2 var assignment of the 'main' function"
+                    "summary": "Replaced '5' with '2' in an assignment to 2, c of the 'main' function"
                 },
                 {
                     "span": {
@@ -294,7 +294,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in the 2 var assignment of the 'main' function"
+                    "summary": "Replaced '6' with '3' in an assignment to 2, c of the 'main' function"
                 }
             ]
         },
@@ -318,12 +318,13 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e978725a447db93523c51453ac03fe50b8f32e8f..8801fe8fbe85f6c7fde621d02bb69ae1d8d2f117"
+    "shas": "5a4da82a60dae3adac65138408a1c9c13c9341ed..7afa4043deb1d962815d430c79d37af59f929d69"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "int-literals.go": [
                 {
                     "span": {
@@ -334,30 +335,14 @@
                             ],
                             "end": [
                                 5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' var assignment in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                12
-                            ],
-                            "end": [
-                                5,
                                 20
                             ]
                         }
                     },
-                    "summary": "Deleted the '2' var assignment in the main function of the 'main' module"
+                    "summary": "Deleted 'a = 1, b = 2, c = 3' at line 5, column 1 - line 5, column 20 in the main function"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "int-literals.go"
@@ -378,7 +363,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8801fe8fbe85f6c7fde621d02bb69ae1d8d2f117..508d9327fa16fb7a1a03998a5214526d9c6bebf0"
+    "shas": "7afa4043deb1d962815d430c79d37af59f929d69..9db47a4be9cce6edd5a54ffc93d311fb8ec7bd84"
 }
 ,{
     "testCaseDescription": "go-int-literals-teardown-test",
@@ -393,12 +378,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -420,5 +420,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "508d9327fa16fb7a1a03998a5214526d9c6bebf0..091bc58290f6343880a29ef209a9d87aa7a3fcc0"
+    "shas": "9db47a4be9cce6edd5a54ffc93d311fb8ec7bd84..65295513fb69f053f466c62e25b12d37872a7543"
 }]

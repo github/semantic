@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "54cc2c98c56816e321a4fffb6927c2793f3cc794..d19eab9ef64c9690bb40f960167fe7f379050ce1"
+    "shas": "0a55a88480be2cc766ee756b5b5f7bf45704376c..4f60b48123030197c6618ae645a4374972ea4c36"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a[1]' index expression in the main function of the 'main' module"
+                    "summary": "Added the 'a[1]' index expression in the main function"
                 },
                 {
                     "span": {
@@ -69,11 +84,11 @@
                             ],
                             "end": [
                                 5,
-                                6
+                                3
                             ]
                         }
                     },
-                    "summary": "Added the 'b[b[:]]' slice literal in the main function of the 'main' module"
+                    "summary": "Added the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -88,7 +103,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c[1]' slice literal in the main function of the 'main' module"
+                    "summary": "Added the 'c[1]' slice literal in the main function"
                 },
                 {
                     "span": {
@@ -99,41 +114,146 @@
                             ],
                             "end": [
                                 7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'd' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                7
+                            ],
+                            "end": [
+                                8,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added the 'd[1:2]' slice literal in the main function of the 'main' module"
+                    "summary": "Added '3' in the main function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                8,
+                                9,
                                 2
                             ],
                             "end": [
-                                8,
+                                9,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                4
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added '1' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added '2' in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
                                 9
                             ]
                         }
                     },
-                    "summary": "Added the 'e[2:3]' slice literal in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                2
-                            ],
-                            "end": [
-                                9,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f[1:2:3]' slice literal in the main function of the 'main' module"
+                    "summary": "Added '3' in the main function"
                 }
             ]
         },
@@ -161,7 +281,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d19eab9ef64c9690bb40f960167fe7f379050ce1..7b7e60ce9893393670010e1b0c82c393d0bbc87f"
+    "shas": "4f60b48123030197c6618ae645a4374972ea4c36..cd7d3053acc66aa2f4d9f3971970b1d3291a7a59"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-replacement-test",
@@ -181,7 +301,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'z[2]' slice literal in the main function of the 'main' module"
+                    "summary": "Added the 'z[2]' slice literal in the main function"
                 },
                 {
                     "span": {
@@ -196,7 +316,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y[1]' slice literal in the main function of the 'main' module"
+                    "summary": "Added the 'y[1]' slice literal in the main function"
                 },
                 {
                     "span": {
@@ -211,7 +331,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[1]' slice literal in the main function of the 'main' module"
+                    "summary": "Added the 'x[1]' slice literal in the main function"
                 },
                 {
                     "span": {
@@ -226,7 +346,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a[1]' index expression in the main function of the 'main' module"
+                    "summary": "Deleted the 'a[1]' index expression in the main function"
                 },
                 {
                     "span": {
@@ -237,11 +357,11 @@
                             ],
                             "end": [
                                 5,
-                                6
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b[b[:]]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -256,7 +376,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c[1]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted the 'c[1]' slice literal in the main function"
                 }
             ]
         },
@@ -285,7 +405,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "7b7e60ce9893393670010e1b0c82c393d0bbc87f..3cb474bb7624520b7d6f16188a5949810d92dd20"
+    "shas": "cd7d3053acc66aa2f4d9f3971970b1d3291a7a59..c84e151f812ae561b1912638e0585fe32d854242"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-replacement-test",
@@ -305,7 +425,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a[1]' index expression in the main function of the 'main' module"
+                    "summary": "Added the 'a[1]' index expression in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -322,59 +457,59 @@
                             },
                             {
                                 "start": [
-                                    5,
+                                    6,
                                     2
                                 ],
                                 "end": [
-                                    5,
+                                    6,
                                     3
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'z' identifier with the 'b' identifier in the b[b[:]] slice literal of the 'main' function"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                4
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '2' in the b[b[:]] slice literal of the 'main' function"
+                    "summary": "Replaced the 'z' identifier with the 'c' identifier in the c[1] slice literal of the 'main' function"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    5,
-                                    2
+                                    4,
+                                    4
                                 ],
                                 "end": [
-                                    5,
-                                    3
+                                    4,
+                                    5
                                 ]
                             },
                             {
                                 "start": [
                                     6,
-                                    2
+                                    4
                                 ],
                                 "end": [
                                     6,
-                                    3
+                                    5
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'y' identifier with the 'c' identifier in the c[1] slice literal of the 'main' function"
+                    "summary": "Replaced '2' with '1' in the c[1] slice literal of the 'main' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                2
+                            ],
+                            "end": [
+                                5,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y[1]' slice literal in the main function"
                 },
                 {
                     "span": {
@@ -389,7 +524,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[1]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted the 'x[1]' slice literal in the main function"
                 }
             ]
         },
@@ -418,7 +553,7 @@
         "  f[1:2:3]"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3cb474bb7624520b7d6f16188a5949810d92dd20..2ca22a76ba48f867fd999d0f99608d38b55809fc"
+    "shas": "c84e151f812ae561b1912638e0585fe32d854242..08a032f27c171ad3d26321259c510b30cf268471"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-delete-insert-test",
@@ -438,7 +573,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a[1]' index expression in the main function of the 'main' module"
+                    "summary": "Deleted the 'a[1]' index expression in the main function"
                 },
                 {
                     "span": {
@@ -449,11 +584,11 @@
                             ],
                             "end": [
                                 5,
-                                6
+                                3
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b[b[:]]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted the 'b' identifier in the main function"
                 },
                 {
                     "span": {
@@ -468,7 +603,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c[1]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted the 'c[1]' slice literal in the main function"
                 },
                 {
                     "span": {
@@ -479,41 +614,146 @@
                             ],
                             "end": [
                                 7,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'd' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                4
+                            ],
+                            "end": [
+                                7,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                6
+                            ],
+                            "end": [
+                                7,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                2
+                            ],
+                            "end": [
+                                8,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                5
+                            ],
+                            "end": [
+                                8,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                7
+                            ],
+                            "end": [
+                                8,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'd[1:2]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted '3' in the main function"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                8,
+                                9,
                                 2
                             ],
                             "end": [
-                                8,
+                                9,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f' identifier in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                4
+                            ],
+                            "end": [
+                                9,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '1' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                6
+                            ],
+                            "end": [
+                                9,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2' in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                8
+                            ],
+                            "end": [
+                                9,
                                 9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'e[2:3]' slice literal in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                2
-                            ],
-                            "end": [
-                                9,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f[1:2:3]' slice literal in the main function of the 'main' module"
+                    "summary": "Deleted '3' in the main function"
                 }
             ]
         },
@@ -541,7 +781,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2ca22a76ba48f867fd999d0f99608d38b55809fc..dd710f15cf06e30adfc658dabf70fbbd8b0958fa"
+    "shas": "08a032f27c171ad3d26321259c510b30cf268471..6f372cae9a7ae4a00c120150faa8316627b50f7d"
 }
 ,{
     "testCaseDescription": "go-indexing-expressions-teardown-test",
@@ -556,12 +796,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -583,5 +838,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "dd710f15cf06e30adfc658dabf70fbbd8b0958fa..668c02674516194c0623120c957d1be93af6cde5"
+    "shas": "6f372cae9a7ae4a00c120150faa8316627b50f7d..39c039e08c3764d56d26a74bbc7bb32704cc398c"
 }]

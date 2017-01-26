@@ -35,7 +35,7 @@
         "+end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f1b6bbddd7c59150a9f8c15746168a84eb3d12cd..9c67c3d54b1988f9dc9d36d133263fb55392f5a5"
+    "shas": "01b13564c812c309867f8f8201bbbebe8f878f4d..b7dd051c8d7021a24eef603c87d14027d19ba043"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-insert-test",
@@ -75,7 +75,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "9c67c3d54b1988f9dc9d36d133263fb55392f5a5..fa52999f22ea2db5ec6279edc1ce6923b03fa112"
+    "shas": "b7dd051c8d7021a24eef603c87d14027d19ba043..75a68dbeeb7a428a3f86b783db24c1cf5e3c4fc1"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-replacement-test",
@@ -130,7 +130,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "fa52999f22ea2db5ec6279edc1ce6923b03fa112..0066f7111989f8c16984b561886143c96ccfc653"
+    "shas": "75a68dbeeb7a428a3f86b783db24c1cf5e3c4fc1..77bd11b3d718b733c4aa6b58fe27bd5ca8074e49"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-replacement-test",
@@ -185,7 +185,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "0066f7111989f8c16984b561886143c96ccfc653..f6bbfebf7315403e68eeeb74b59c36c02d96aca7"
+    "shas": "77bd11b3d718b733c4aa6b58fe27bd5ca8074e49..ecf42398fcfb1b45807c155dcf231429ce55d335"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-delete-insert-test",
@@ -225,7 +225,7 @@
         " end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f6bbfebf7315403e68eeeb74b59c36c02d96aca7..b3f6954afea9828fb56e8dc8bd2f11fc3385f827"
+    "shas": "ecf42398fcfb1b45807c155dcf231429ce55d335..6289c01f7f9b0dead7f8b63f9e86498811e843a1"
 }
 ,{
     "testCaseDescription": "ruby-method-declaration-params-teardown-test",
@@ -264,5 +264,5 @@
         "-end"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "b3f6954afea9828fb56e8dc8bd2f11fc3385f827..90b769d2ee1bd1b62ce2da0ff8b1574c43cca4ec"
+    "shas": "6289c01f7f9b0dead7f8b63f9e86498811e843a1..5458878541d4dbd326730893f8986cee3285d576"
 }]

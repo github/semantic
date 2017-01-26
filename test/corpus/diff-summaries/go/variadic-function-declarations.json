@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6eefcab8de06ce411a43f0fe718199942aa7d74b..cbc15452a6708013f0559031ebb0190234de7422"
+    "shas": "aa75d831de9909c8ed71c01ca49d0b4ef4e4b7e8..9db615e38de5c59ee4b97268aabc270c799757eb"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-insert-test",
@@ -58,67 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{}' block in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                9
-                            ],
-                            "end": [
-                                5,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the '...int' parameter declaration in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                17
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Added the '{}' block in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'f3' function in the main function of the 'main' module"
+                    "summary": "Added the '{}' expression statements in the main function"
                 }
             ]
         },
@@ -137,7 +92,22 @@
                             ]
                         }
                     },
-                    "summary": "Added 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
+                    "summary": "Added 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added 'func f2(...int) {}\nfunc f3(a, ...bool) {}\n' at line 5, column 1 - line 7, column 1 in the main function"
                 }
             ]
         }
@@ -161,7 +131,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cbc15452a6708013f0559031ebb0190234de7422..b5a661d6c9c6eda94de5c3e4bf688ce16f57692a"
+    "shas": "9db615e38de5c59ee4b97268aabc270c799757eb..e6d1f6dee30000099d39ae30f4e31285dcd8a0a0"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-replacement-test",
@@ -193,7 +163,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'f1' identifier with the 'g1' identifier in the main function"
                 },
                 {
                     "span": {
@@ -220,7 +190,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'f2' identifier with the 'g2' identifier in the main function"
                 },
                 {
                     "span": {
@@ -274,7 +244,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "b5a661d6c9c6eda94de5c3e4bf688ce16f57692a..49205166c96eb0c07161f0e204911499761b30bc"
+    "shas": "e6d1f6dee30000099d39ae30f4e31285dcd8a0a0..4f6a3884d5c4e05ef0cdb21e07836f3d7d353e2d"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-replacement-test",
@@ -306,7 +276,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'g1' identifier with the 'f1' identifier in the main function"
                 },
                 {
                     "span": {
@@ -333,7 +303,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'g2' identifier with the 'f2' identifier in the main function"
                 },
                 {
                     "span": {
@@ -387,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "49205166c96eb0c07161f0e204911499761b30bc..400b767878ef457aa783e1fe6d9448a474322df9"
+    "shas": "4f6a3884d5c4e05ef0cdb21e07836f3d7d353e2d..90853de5caa0e260fa11b902eaa7475ebdf99232"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-delete-insert-test",
@@ -407,67 +377,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{}' block in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                6
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f2' identifier in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                9
-                            ],
-                            "end": [
-                                5,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '...int' parameter declaration in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                17
-                            ],
-                            "end": [
-                                5,
-                                19
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '{}' block in the main function of the 'main' module"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                23
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'f3' function in the main function of the 'main' module"
+                    "summary": "Deleted the '{}' expression statements in the main function"
                 }
             ]
         },
@@ -486,7 +396,22 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function of the 'main' module"
+                    "summary": "Deleted 'func f1(a ...*int)' at line 4, column 1 - line 4, column 19 in the main function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'func f2(...int) {}\nfunc f3(a, ...bool) {}\n' at line 5, column 1 - line 7, column 1 in the main function"
                 }
             ]
         }
@@ -510,7 +435,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "400b767878ef457aa783e1fe6d9448a474322df9..cdcea7ca79996d80a7294a25aaafc60468b769ae"
+    "shas": "90853de5caa0e260fa11b902eaa7475ebdf99232..c5a13455d55bc14c5ff37ddbd752df78ca9cb4b2"
 }
 ,{
     "testCaseDescription": "go-variadic-function-declarations-teardown-test",
@@ -525,12 +450,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -552,5 +492,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "cdcea7ca79996d80a7294a25aaafc60468b769ae..2e4178577ebab07e2229a6846523de7a1a01d863"
+    "shas": "c5a13455d55bc14c5ff37ddbd752df78ca9cb4b2..a8adfaba3e02d1f9416a61ff929abbed0bc123d4"
 }]

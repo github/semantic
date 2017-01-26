@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index e69de29..9d723b9 100644",
+        "index e69de29b..9d723b91 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -0,0 +1 @@",
         "+new module.Klass(1, \"two\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "b1ed87edc6bf561edc524058ab781a95970a3258..692f777ed1db0b3284bd2728f6c651425e20ab34"
+    "shas": "bc8f6203c7c5033d706c0155313d250aff41b6ce..3caf8ac9c67ede5f4ca73fa8f4ce3fd50f5b4760"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index 9d723b9..2c91b11 100644",
+        "index 9d723b91..2c91b115 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " new module.Klass(1, \"two\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "692f777ed1db0b3284bd2728f6c651425e20ab34..e4d96364ed5caab5be836020193ea527a6cd6e55"
+    "shas": "3caf8ac9c67ede5f4ca73fa8f4ce3fd50f5b4760..2e8198e081b41db8e2acbf111fe27f6ad6485cb5"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-insert-test",
@@ -121,7 +121,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"three\" string with the \"two\" string in the module.Klass(1, \"two\") method call"
+                    "summary": "Replaced the \"three\" string with the \"two\" string in the module.Klass(1, \"two\") function call"
                 }
             ]
         },
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index 2c91b11..892f542 100644",
+        "index 2c91b115..892f5425 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " new module.Klass(1, \"two\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e4d96364ed5caab5be836020193ea527a6cd6e55..c5f5c7389717f787423d9698a3e0593a965ffbd5"
+    "shas": "2e8198e081b41db8e2acbf111fe27f6ad6485cb5..8b2e189f8eadc258f196519389b45657f5067553"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-replacement-test",
@@ -174,7 +174,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"two\" string with the \"three\" string in the module.Klass(1, \"three\") method call"
+                    "summary": "Replaced the \"two\" string with the \"three\" string in the module.Klass(1, \"three\") function call"
                 }
             ]
         },
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index 892f542..2c91b11 100644",
+        "index 892f5425..2c91b115 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " new module.Klass(1, \"two\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "c5f5c7389717f787423d9698a3e0593a965ffbd5..d17799b023d4e85c6e1d97220121da96a1323970"
+    "shas": "8b2e189f8eadc258f196519389b45657f5067553..27f7005c773c3ace00b6f45987dfd72b9afa8144"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index 2c91b11..cd77b98 100644",
+        "index 2c91b115..cd77b985 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+new module.Klass(1, \"three\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "d17799b023d4e85c6e1d97220121da96a1323970..ddc3d491ed287b5aee714bedf5c2de5ba46770ce"
+    "shas": "27f7005c773c3ace00b6f45987dfd72b9afa8144..c9a6ceeda21a46940f061c9a31e10160cfafa5bf"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index cd77b98..75f6a29 100644",
+        "index cd77b985..75f6a29e 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " new module.Klass(1, \"three\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ddc3d491ed287b5aee714bedf5c2de5ba46770ce..e0a37e9237220e1382c4502fdfbbb4cc10cf04e0"
+    "shas": "c9a6ceeda21a46940f061c9a31e10160cfafa5bf..d4e43daedb1bb2589ec006729907f9ed22855eb4"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/constructor-call.js b/constructor-call.js",
-        "index 75f6a29..e69de29 100644",
+        "index 75f6a29e..e69de29b 100644",
         "--- a/constructor-call.js",
         "+++ b/constructor-call.js",
         "@@ -1 +0,0 @@",
         "-new module.Klass(1, \"three\");"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "e0a37e9237220e1382c4502fdfbbb4cc10cf04e0..41ab7cb7dc378bf229f7a08f1a03c0676483f435"
+    "shas": "d4e43daedb1bb2589ec006729907f9ed22855eb4..6c2a6d2038e58ffec3265d64973449c3c258d5ad"
 }]

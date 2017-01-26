@@ -27,14 +27,14 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index e69de29..01f859b 100644",
+        "index e69de29b..01f859b1 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -0,0 +1 @@",
         "+`one line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "dffe792710a5ad52de12ed62e48340a71e5c9227..4f86472b03fd24538a67565981a8d25700240497"
+    "shas": "b0cccfc42d36aba8e42003998233c798245c627f..2040236e0fd466e286462380a49b72595d79d6a9"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-insert-test",
@@ -80,7 +80,7 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index 01f859b..777fde6 100644",
+        "index 01f859b1..777fde68 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -1 +1,3 @@",
@@ -89,7 +89,7 @@
         " `one line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "4f86472b03fd24538a67565981a8d25700240497..8e2e8be8c6d60e68e5851f727da2c71ace094f34"
+    "shas": "2040236e0fd466e286462380a49b72595d79d6a9..05f27649aa9bc187d1ebfcc9810842f8992e3fd7"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-insert-test",
@@ -132,7 +132,7 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index 777fde6..657129f 100644",
+        "index 777fde68..657129fc 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -1,3 +1,3 @@",
@@ -142,7 +142,7 @@
         " `one line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "8e2e8be8c6d60e68e5851f727da2c71ace094f34..a481b18c353836ec0291fd6a2e9ea424de6b7a8c"
+    "shas": "05f27649aa9bc187d1ebfcc9810842f8992e3fd7..aa5a50db04e0712c494739ab35e56368a5a3f498"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-test",
@@ -185,7 +185,7 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index 657129f..777fde6 100644",
+        "index 657129fc..777fde68 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -1,3 +1,3 @@",
@@ -195,7 +195,7 @@
         " `one line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "a481b18c353836ec0291fd6a2e9ea424de6b7a8c..671ff7c523a3b938440bc9534540d94f391acd9e"
+    "shas": "aa5a50db04e0712c494739ab35e56368a5a3f498..b81a678bbbb5ef57d6c873d1fa629c0c23463dda"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-replacement-test",
@@ -256,7 +256,7 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index 777fde6..2b8c0dd 100644",
+        "index 777fde68..2b8c0dde 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -1,3 +1,2 @@",
@@ -266,7 +266,7 @@
         "+`multi line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "671ff7c523a3b938440bc9534540d94f391acd9e..ba89b5cfbffb97d143c19125b8ed8e468113cd32"
+    "shas": "b81a678bbbb5ef57d6c873d1fa629c0c23463dda..f70c47ebd50d4c6a193f45e79414ba29cb16e719"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-test",
@@ -297,7 +297,7 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index 2b8c0dd..399f117 100644",
+        "index 2b8c0dde..399f1173 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -1,2 +1 @@",
@@ -305,7 +305,7 @@
         " `multi line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ba89b5cfbffb97d143c19125b8ed8e468113cd32..ce95b79e18d47915e2eecdef309a73b64417d53c"
+    "shas": "f70c47ebd50d4c6a193f45e79414ba29cb16e719..bf45487f8f0f916e3bbd3a0b39f3dea7f723e069"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-rest-test",
@@ -336,12 +336,12 @@
     ],
     "patch": [
         "diff --git a/template-string.js b/template-string.js",
-        "index 399f117..e69de29 100644",
+        "index 399f1173..e69de29b 100644",
         "--- a/template-string.js",
         "+++ b/template-string.js",
         "@@ -1 +0,0 @@",
         "-`multi line`"
     ],
     "gitDir": "test/corpus/repos/javascript",
-    "shas": "ce95b79e18d47915e2eecdef309a73b64417d53c..75f87f22428c68545ebb3f876a1b09caf59d75c9"
+    "shas": "bf45487f8f0f916e3bbd3a0b39f3dea7f723e069..6e93ce14abfffa0befb5a6168efdc830619e0319"
 }]

@@ -11,12 +11,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Added the 'main' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'main' function"
                 }
             ]
         },
@@ -38,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "27df5c61699f3ed1d465e409ed4793a9a141e7bd..5118722fef5fb98edf5863588a5d6f1a932b1776"
+    "shas": "43ac69d0304e8f5a93bb985e3f4e05d9dff5d2b6..d7bd23e7679d4f3143995c6304e123585877638e"
 }
 ,{
     "testCaseDescription": "go-label-statements-insert-test",
@@ -58,7 +73,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Added the 'insert_label' identifier in the main function"
                 }
             ]
         },
@@ -83,7 +98,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5118722fef5fb98edf5863588a5d6f1a932b1776..86e5386c51e472b69c96dee0f11f13101ea549db"
+    "shas": "d7bd23e7679d4f3143995c6304e123585877638e..8114f172b2e02c45b8fd463e2091351fe761e226"
 }
 ,{
     "testCaseDescription": "go-label-statements-replacement-test",
@@ -115,7 +130,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'insert_label' identifier with the 'replacement_label' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'insert_label' identifier with the 'replacement_label' identifier in the main function"
                 }
             ]
         },
@@ -139,7 +154,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "86e5386c51e472b69c96dee0f11f13101ea549db..5a05fa05c7fc5750b9b13926bc8c051100f8dbbf"
+    "shas": "8114f172b2e02c45b8fd463e2091351fe761e226..e7b09a82b9ebb4ceefce68cfefe69428b5f0a87c"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-replacement-test",
@@ -171,7 +186,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'replacement_label' identifier with the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Replaced the 'replacement_label' identifier with the 'insert_label' identifier in the main function"
                 }
             ]
         },
@@ -195,7 +210,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5a05fa05c7fc5750b9b13926bc8c051100f8dbbf..0a064cd984a675ea6f57a157f4e410711dcef167"
+    "shas": "e7b09a82b9ebb4ceefce68cfefe69428b5f0a87c..876c876dba02766deea4ec644d0006c41d975f2f"
 }
 ,{
     "testCaseDescription": "go-label-statements-delete-insert-test",
@@ -215,7 +230,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'insert_label' identifier in the main function of the 'main' module"
+                    "summary": "Deleted the 'insert_label' identifier in the main function"
                 }
             ]
         },
@@ -240,7 +255,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "0a064cd984a675ea6f57a157f4e410711dcef167..84dde822378492f82447d8959a9978ab56a05ce7"
+    "shas": "876c876dba02766deea4ec644d0006c41d975f2f..3616fca3cc1bfdda36ba9e5a381194c409872b33"
 }
 ,{
     "testCaseDescription": "go-label-statements-teardown-test",
@@ -255,12 +270,27 @@
                                 1
                             ],
                             "end": [
-                                6,
-                                1
+                                1,
+                                13
                             ]
                         }
                     },
                     "summary": "Deleted the 'main' module"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'main' function"
                 }
             ]
         },
@@ -282,5 +312,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "84dde822378492f82447d8959a9978ab56a05ce7..a759987355f2393c92a9df39d4c9e56a2ea2ce19"
+    "shas": "3616fca3cc1bfdda36ba9e5a381194c409872b33..030876029c6aa56a60b06740ec65bec788ad8715"
 }]
