@@ -16,6 +16,7 @@ import Category as C
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Functor.Listable
+import Data.List.NonEmpty (nonEmpty)
 import qualified Data.Text as Text
 import Data.Text.Listable
 import Data.Record
@@ -196,7 +197,7 @@ toTermName source term = case unwrap term of
   S.Defer expr -> toTermName' expr
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> termNameFromChildren term children
-  S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Indexed children -> maybe "branch" sconcat (nonEmpty (intersperse ", " (toTermName' <$> children)))
   Leaf leaf -> toS leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
