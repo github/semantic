@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "372dfd6bcd3a6ff64487adf376d5afeb38b130aa..6865a500a3436787a7df2fb2030ab34b468fc7b3"
+    "shas": "84d5bd939d05dae989135d37ad4b9758a7bbc9a1..18e40ef38a2e94f66e282e921c30d3ff3890e781"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-insert-test",
@@ -112,7 +112,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "6865a500a3436787a7df2fb2030ab34b468fc7b3..ff8785a4e7d6cdebc2572ce440f3958f5f6ddd75"
+    "shas": "18e40ef38a2e94f66e282e921c30d3ff3890e781..46f79dee910a01008eda79b408487a10631dc963"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-replacement-test",
@@ -250,7 +250,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "ff8785a4e7d6cdebc2572ce440f3958f5f6ddd75..2d6c96a98b5c075da330035a8ecd653be585aeb7"
+    "shas": "46f79dee910a01008eda79b408487a10631dc963..f4c1a31b4fb61346a74c9d94eda77a120537c072"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-replacement-test",
@@ -388,7 +388,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2d6c96a98b5c075da330035a8ecd653be585aeb7..d5e2b62a34599c340ffac4a0a9d246521dbf03a2"
+    "shas": "f4c1a31b4fb61346a74c9d94eda77a120537c072..1b04d54513d681f095e0ac2bb0307ee28655267e"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-delete-insert-test",
@@ -447,7 +447,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5e2b62a34599c340ffac4a0a9d246521dbf03a2..3fc499fb9046ba8f4af95b18bc752ad5d8514b91"
+    "shas": "1b04d54513d681f095e0ac2bb0307ee28655267e..1292bd3150e32a45291e77c72242a6628b1accce"
 }
 ,{
     "testCaseDescription": "go-go-and-defer-statements-teardown-test",
@@ -504,5 +504,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "3fc499fb9046ba8f4af95b18bc752ad5d8514b91..99baf955f08d1bbc4b8e2286b69f637388270021"
+    "shas": "1292bd3150e32a45291e77c72242a6628b1accce..73cc1f1aabe4d7d185e64c96202fc2f6daf8f47e"
 }]

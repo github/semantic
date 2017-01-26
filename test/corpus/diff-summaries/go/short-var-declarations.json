@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "bd4ab6fa47d6fc0894c2e2eef8a8f057041f9ac6..664515cc84883284bba84f34ac558df1633a3682"
+    "shas": "4f40372740c8d0b4a36b3e16f3b4756055c3766d..7068e2c5c9f6e44c77d529a02fb1358ad09eeca5"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-insert-test",
@@ -141,7 +141,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "664515cc84883284bba84f34ac558df1633a3682..152b12c1af0962f1dd4c8a56a6f6787f749a20ac"
+    "shas": "7068e2c5c9f6e44c77d529a02fb1358ad09eeca5..12b247072f29307564a4c98e8a27b0e8fec450ae"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-replacement-test",
@@ -277,7 +277,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "152b12c1af0962f1dd4c8a56a6f6787f749a20ac..990f8d4f2cdc537257a3b75c6e258b525e50b664"
+    "shas": "12b247072f29307564a4c98e8a27b0e8fec450ae..c68f23d6f53738fc50db4a542f6f58a992dd94cb"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-replacement-test",
@@ -413,7 +413,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "990f8d4f2cdc537257a3b75c6e258b525e50b664..e0556808db84f6eaa9eb9a2c70135b9c0a8ac46e"
+    "shas": "c68f23d6f53738fc50db4a542f6f58a992dd94cb..c5e85ef4b31a93dface8914359d1f5c40b171ac4"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-delete-insert-test",
@@ -501,7 +501,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e0556808db84f6eaa9eb9a2c70135b9c0a8ac46e..2858e81d239d96a3512a4773bea6347b6accd37a"
+    "shas": "c5e85ef4b31a93dface8914359d1f5c40b171ac4..d35c67b4e9d45e93c2899fdc231b060045858010"
 }
 ,{
     "testCaseDescription": "go-short-var-declarations-teardown-test",
@@ -558,5 +558,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2858e81d239d96a3512a4773bea6347b6accd37a..cf70e6f19e450518d80476ba6c15e6aaf90d7477"
+    "shas": "d35c67b4e9d45e93c2899fdc231b060045858010..d466cac08ed7e913f228ce5d3554f80d255d9877"
 }]

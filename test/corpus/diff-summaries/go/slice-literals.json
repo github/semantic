@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "e5c421b000cbd23d40b1db03ade91751a05d78f1..13949120bdb43705ae33aa54945251a311ad460b"
+    "shas": "5aa1aa94084ce9497716f1813f30f865da83f3ca..6724d26ea3b6d1eb38cf0159faeadd697360abf8"
 }
 ,{
     "testCaseDescription": "go-slice-literals-insert-test",
@@ -131,7 +131,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "13949120bdb43705ae33aa54945251a311ad460b..f8fd3f9d8ad269c0799c662989d997992cd7c5ed"
+    "shas": "6724d26ea3b6d1eb38cf0159faeadd697360abf8..aed671f7264ed046486b76ef60e348bcdf4b4d05"
 }
 ,{
     "testCaseDescription": "go-slice-literals-replacement-test",
@@ -163,7 +163,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '{}' literal with the \"sup\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the '{}' literal with the \"sup\" string in the []string\"sup\" composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -190,7 +190,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"hello\" string in the []string\"hello\" composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -217,7 +217,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the \"hi\" string with the \"bar\" string in the []string\"bar\", \"baz\" composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -244,7 +244,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"baz\" string in the []string\"bar\", \"baz\" composite_literal of the 'main' function"
                 }
             ]
         },
@@ -275,7 +275,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f8fd3f9d8ad269c0799c662989d997992cd7c5ed..4d7dcc8885b34133385280ec6b5a71a0ede92f82"
+    "shas": "aed671f7264ed046486b76ef60e348bcdf4b4d05..e856c13fc185d49b9c7b1369de4e22b27fc4a029"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-replacement-test",
@@ -334,7 +334,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the \"hello\" string with the \"hi\" string in the []string\"hi\" composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -361,7 +361,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the \"bar\" string with the \"hi\" string in the []string\"hi\", \"hello\" composite_literal of the 'main' function"
                 },
                 {
                     "span": {
@@ -388,7 +388,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the []stringelement composite_literal of the 'main' function"
+                    "summary": "Replaced the \"baz\" string with the \"hello\" string in the []string\"hi\", \"hello\" composite_literal of the 'main' function"
                 }
             ]
         },
@@ -419,7 +419,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4d7dcc8885b34133385280ec6b5a71a0ede92f82..2f560d375043fff4c5784d41e1196db3a1845b3a"
+    "shas": "e856c13fc185d49b9c7b1369de4e22b27fc4a029..8fee41fe98210262f814044cd3338dadbcfdaa3b"
 }
 ,{
     "testCaseDescription": "go-slice-literals-delete-insert-test",
@@ -497,7 +497,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "2f560d375043fff4c5784d41e1196db3a1845b3a..439d42b628b64ef74652ab0f903919bae3ce3dc6"
+    "shas": "8fee41fe98210262f814044cd3338dadbcfdaa3b..09b51ce6b09370fdf7b6ab5d41f6ea823ff1390d"
 }
 ,{
     "testCaseDescription": "go-slice-literals-teardown-test",
@@ -554,5 +554,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "439d42b628b64ef74652ab0f903919bae3ce3dc6..3507db71300ed6eabbd039d88371bc7563433f3a"
+    "shas": "09b51ce6b09370fdf7b6ab5d41f6ea823ff1390d..eebf513ed3b01d35b26a6bc4db9dd32c0a70c17a"
 }]

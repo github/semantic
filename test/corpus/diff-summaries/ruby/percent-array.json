@@ -34,7 +34,7 @@
         "+%w(one two)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "793e1bdbe7ec874e9b83489ff39233476953a8f8..15b317c93ed35622c3a7fe384fbfad8b076d3bb7"
+    "shas": "50239ae63445ee12774182b323b735f392bdacdf..a7e3abb247fb7745756dbddf2308729399f71ef4"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-replacement-insert-test",
@@ -89,7 +89,7 @@
         " %w(one two)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "15b317c93ed35622c3a7fe384fbfad8b076d3bb7..f144cb1cf8e1795d34b35e6ce317c284d00376eb"
+    "shas": "a7e3abb247fb7745756dbddf2308729399f71ef4..e88a9b1d3365387c6fb8441bb04c0825192094c7"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-insert-test",
@@ -130,7 +130,7 @@
         " %w(one two)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "f144cb1cf8e1795d34b35e6ce317c284d00376eb..857fd2946cb46b9a08edab28e5cf198c742bfa11"
+    "shas": "e88a9b1d3365387c6fb8441bb04c0825192094c7..f8d2dfe3f1ffef4408e4048d6c0e6fe56c840999"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-replacement-test",
@@ -171,7 +171,7 @@
         " %w(one two)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "857fd2946cb46b9a08edab28e5cf198c742bfa11..dea32425b07fe0f468437448a9405a27e1e9feb9"
+    "shas": "f8d2dfe3f1ffef4408e4048d6c0e6fe56c840999..2ee908509e74e7d42ec52ca757f059011679a894"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-replacement-test",
@@ -242,7 +242,7 @@
         "+%W(one #{b} three)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "dea32425b07fe0f468437448a9405a27e1e9feb9..6e7a5ff793203d4b44da87556a5ae0aeaf92d381"
+    "shas": "2ee908509e74e7d42ec52ca757f059011679a894..d997f76ec24b13f760a5c47f43fffb07a3ada7f5"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-test",
@@ -281,7 +281,7 @@
         " %W(one #{b} three)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "6e7a5ff793203d4b44da87556a5ae0aeaf92d381..7a4736498b7c31e5ddeaff932060b456bbd9eabb"
+    "shas": "d997f76ec24b13f760a5c47f43fffb07a3ada7f5..4847fda42bb24f9729ada1a5bbfd42820728496b"
 }
 ,{
     "testCaseDescription": "ruby-percent-array-delete-rest-test",
@@ -319,5 +319,5 @@
         "-%W(one #{b} three)"
     ],
     "gitDir": "test/corpus/repos/ruby",
-    "shas": "7a4736498b7c31e5ddeaff932060b456bbd9eabb..6c8dc9471a192b2a2dbb0003b78e81330f92875e"
+    "shas": "4847fda42bb24f9729ada1a5bbfd42820728496b..0caec37a9c91cd2e743845adbd4fd52f27f01026"
 }]

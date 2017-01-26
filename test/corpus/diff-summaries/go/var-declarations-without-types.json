@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d147174fa9386f64d836398a308deb8d689c714e..01d3959ff2b61e33c004695c708dd7a22a627016"
+    "shas": "27b8f285b0bcfbbfb2b1c153aab79e582eb1d126..cab014af237b0afc1343cd8432de01bd29aaa7cf"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "01d3959ff2b61e33c004695c708dd7a22a627016..938ad8d0c826ca92d308e9d1b5460fdb213a38c5"
+    "shas": "cab014af237b0afc1343cd8432de01bd29aaa7cf..e992a1d11174d26e125a5ead05693d71751db05f"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-replacement-test",
@@ -128,7 +128,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the identifier var assignment of the 'main' function"
+                    "summary": "Replaced the 'zero' identifier with the 'one' identifier in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -143,7 +143,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'two' identifier in the identifier var assignment of the 'main' function"
+                    "summary": "Added the 'two' identifier in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -170,7 +170,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in the identifier var assignment of the 'main' function"
+                    "summary": "Replaced '0' with '1' in the one, two var assignment of the 'main' function"
                 },
                 {
                     "span": {
@@ -185,7 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '2' in the identifier var assignment of the 'main' function"
+                    "summary": "Added '2' in the one, two var assignment of the 'main' function"
                 }
             ]
         },
@@ -208,7 +208,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "938ad8d0c826ca92d308e9d1b5460fdb213a38c5..d5be4275b6211b3898e27f15f484f66b1e7a4daa"
+    "shas": "e992a1d11174d26e125a5ead05693d71751db05f..7ace8c4c6a887ef56c22a21098e3492466a3369d"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-replacement-test",
@@ -320,7 +320,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "d5be4275b6211b3898e27f15f484f66b1e7a4daa..db1d0e8f48b67361a3809dbd80b44a165d9d5bec"
+    "shas": "7ace8c4c6a887ef56c22a21098e3492466a3369d..670defb9bab4035d3bdb35191c4ddbf5afe38a3e"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-delete-insert-test",
@@ -363,7 +363,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "db1d0e8f48b67361a3809dbd80b44a165d9d5bec..27eb8ed1080e4f4336485b2ebde7cf5fad10328a"
+    "shas": "670defb9bab4035d3bdb35191c4ddbf5afe38a3e..fac9adad074640c95af49daa738780a4ada6de1c"
 }
 ,{
     "testCaseDescription": "go-var-declarations-without-types-teardown-test",
@@ -420,5 +420,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "27eb8ed1080e4f4336485b2ebde7cf5fad10328a..9b69c29734b10d8e29a928acf4122dad872c7b9f"
+    "shas": "fac9adad074640c95af49daa738780a4ada6de1c..7aa1f765b3bfe7327f731e6d2f7f93579f901261"
 }]

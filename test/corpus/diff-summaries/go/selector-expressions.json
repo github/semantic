@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "9ddc3648934fd8836a4268547e5d56f1ceda4528..4db1f5b7f9535fa5f47053d906299ea4ba7e8947"
+    "shas": "604fc6a52a5a33f31a45ed3be498d8b2e821dfc9..4ec49dbdf652100731b5b7c2a73cb91de91268e9"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-insert-test",
@@ -96,7 +96,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "4db1f5b7f9535fa5f47053d906299ea4ba7e8947..8ea1af3cd9e1193fec43abfa1b302b81f968d239"
+    "shas": "4ec49dbdf652100731b5b7c2a73cb91de91268e9..45a392d527c9516ed7a0617a8ad052e065d1c658"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-replacement-test",
@@ -205,7 +205,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "8ea1af3cd9e1193fec43abfa1b302b81f968d239..c220cd4d42fbe624807f927217ee58d18bb5f696"
+    "shas": "45a392d527c9516ed7a0617a8ad052e065d1c658..b9b271568b754bd08cd8ba1b03293d64ed97d39e"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-replacement-test",
@@ -314,7 +314,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "c220cd4d42fbe624807f927217ee58d18bb5f696..5f925dea5e0856d57f9a2e5bc1d2af27fe102c6e"
+    "shas": "b9b271568b754bd08cd8ba1b03293d64ed97d39e..2704ca17438d9f784bb1754098bbf53332295bc2"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-delete-insert-test",
@@ -357,7 +357,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "5f925dea5e0856d57f9a2e5bc1d2af27fe102c6e..462183fc2b6c8b944e77ddcab10a81a7db2d432a"
+    "shas": "2704ca17438d9f784bb1754098bbf53332295bc2..5cd2989306561ffdbf84ef461d95ebca95cb176c"
 }
 ,{
     "testCaseDescription": "go-selector-expressions-teardown-test",
@@ -414,5 +414,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "462183fc2b6c8b944e77ddcab10a81a7db2d432a..1a1ada28b748eda9acdefd9cb61a36fe1a010fe1"
+    "shas": "5cd2989306561ffdbf84ef461d95ebca95cb176c..c41bf65a465e4f7333785876f7010cd398372491"
 }]

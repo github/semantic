@@ -53,7 +53,7 @@
         "+}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1a06b53522da08ff0e788409aeccdf5f3f4b01bd..1f314ecf0de4fadb9d7e8fc74e165cd2cefb1612"
+    "shas": "b34a29214dd3a4e004c26f6acbc313aacaee0833..7681b89facce39da2b8c0562a1b9d4f7039cd531"
 }
 ,{
     "testCaseDescription": "go-int-literals-insert-test",
@@ -98,7 +98,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "1f314ecf0de4fadb9d7e8fc74e165cd2cefb1612..f46a350f5acf876f46eeb0aaffadc43341f2e131"
+    "shas": "7681b89facce39da2b8c0562a1b9d4f7039cd531..61ea50a1c41e76f53081ab331113d518e07aaab1"
 }
 ,{
     "testCaseDescription": "go-int-literals-replacement-test",
@@ -157,7 +157,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '5' in an assignment to number of the 'main' function"
+                    "summary": "Replaced '2' with '5' in an assignment to 5, c of the 'main' function"
                 },
                 {
                     "span": {
@@ -184,7 +184,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '6' in an assignment to number of the 'main' function"
+                    "summary": "Replaced '3' with '6' in an assignment to 5, c of the 'main' function"
                 }
             ]
         },
@@ -208,7 +208,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "f46a350f5acf876f46eeb0aaffadc43341f2e131..754d614b0d1e45ba0400c7cb9b613ad8568419c8"
+    "shas": "61ea50a1c41e76f53081ab331113d518e07aaab1..3990517ad1505ee6b5013b40c9c46c95b08ed8b5"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-replacement-test",
@@ -267,7 +267,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '2' in an assignment to number of the 'main' function"
+                    "summary": "Replaced '5' with '2' in an assignment to 2, c of the 'main' function"
                 },
                 {
                     "span": {
@@ -294,7 +294,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '6' with '3' in an assignment to number of the 'main' function"
+                    "summary": "Replaced '6' with '3' in an assignment to 2, c of the 'main' function"
                 }
             ]
         },
@@ -318,7 +318,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "754d614b0d1e45ba0400c7cb9b613ad8568419c8..be0866dfa1dfe647e46dae621f63bc5e11787e9c"
+    "shas": "3990517ad1505ee6b5013b40c9c46c95b08ed8b5..bca92f667bb78b611b7bee2bfe6752a212ef2e82"
 }
 ,{
     "testCaseDescription": "go-int-literals-delete-insert-test",
@@ -363,7 +363,7 @@
         " }"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "be0866dfa1dfe647e46dae621f63bc5e11787e9c..26240e45ff614e45ef463d40e96ac83d2e346b7d"
+    "shas": "bca92f667bb78b611b7bee2bfe6752a212ef2e82..261c9516e7d01bc2ce530da8097f8fc4dfd193c4"
 }
 ,{
     "testCaseDescription": "go-int-literals-teardown-test",
@@ -420,5 +420,5 @@
         "-}"
     ],
     "gitDir": "test/corpus/repos/go",
-    "shas": "26240e45ff614e45ef463d40e96ac83d2e346b7d..95d304f17785619b34b91180cd1ab2e5fea05c8f"
+    "shas": "261c9516e7d01bc2ce530da8097f8fc4dfd193c4..0131ba660219d1b7eae0f2ad99f0279ddd72540a"
 }]
